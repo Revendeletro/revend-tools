@@ -93,7 +93,18 @@ table.dt tr:hover td{background:var(--color-background-secondary)}
         <span id="batBadge" class="bat-ok">Boa</span>
       </div>
     </div>
-    <div class="cell"><span class="lbl">Valor Base</span><span class="val-base" id="valor-base">R$ 0,00</span></div>
+    <div class="cell" style="flex-direction:column;align-items:flex-start;gap:3px">
+      <span class="lbl">Valor Base</span>
+      <span class="val-base" id="valor-base">R$ 0,00</span>
+      <div id="parte-slider-wrap" style="display:none;width:100%;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:#888;margin-bottom:2px">
+          <span>Mínimo: <b id="lbl-min">R$ 0</b></span>
+          <span>Máximo: <b id="lbl-max">R$ 0</b></span>
+        </div>
+        <input type="range" id="parteRange" min="0" max="100" value="50" step="1" oninput="onParteSlider()" style="width:100%;cursor:pointer;accent-color:#1a6b3c">
+        <div style="font-size:10px;color:#1a6b3c;font-weight:700;margin-top:2px">⬆ Arraste para negociar o valor de entrada</div>
+      </div>
+    </div>
     <div class="cell"><span class="lbl">Cód. Agendamento</span><input type="text" id="codagend"></div>
   </div>
   <table class="dt">
@@ -209,7 +220,10 @@ table.dt tr:hover td{background:var(--color-background-secondary)}
 <script>
 const precos={"IPHONE XR 64GB":200,"IPHONE XR 128GB":270,"IPHONE XR 256GB":300,"IPHONE 11 64GB":400,"IPHONE 11 128GB":500,"IPHONE 11 256GB":550,"IPHONE 11 PRO 64GB":650,"IPHONE 11 PRO 256GB":750,"IPHONE 11 PRO 512GB":850,"IPHONE 11 PRO MAX 64GB":700,"IPHONE 11 PRO MAX 256GB":800,"IPHONE 11 PRO MAX 512GB":900,"IPHONE 12 64GB":750,"IPHONE 12 128GB":900,"IPHONE 12 256GB":1000,"IPHONE 12 PRO 128GB":1350,"IPHONE 12 PRO 256GB":1450,"IPHONE 12 PRO 512GB":1550,"IPHONE 12 PRO MAX 128GB":1600,"IPHONE 12 PRO MAX 256GB":1700,"IPHONE 12 PRO MAX 512GB":1800,"IPHONE 13 128GB":1300,"IPHONE 13 256GB":1550,"IPHONE 13 512GB":1650,"IPHONE 13 PRO 128GB":1750,"IPHONE 13 PRO 256GB":1900,"IPHONE 13 PRO 512GB":2100,"IPHONE 13 PRO 1TB":2200,"IPHONE 13 PRO MAX 128GB":2200,"IPHONE 13 PRO MAX 256GB":2400,"IPHONE 13 PRO MAX 512GB":2550,"IPHONE 13 PRO MAX 1TB":2650,"IPHONE 14 128GB":1580,"IPHONE 14 256GB":1750,"IPHONE 14 PLUS 128GB":1750,"IPHONE 14 PLUS 256GB":1950,"IPHONE 14 PLUS 512GB":2100,"IPHONE 14 PRO 128GB":2200,"IPHONE 14 PRO 256GB":2500,"IPHONE 14 PRO 512GB":2600,"IPHONE 14 PRO MAX 128GB":2700,"IPHONE 14 PRO MAX 256GB":3100,"IPHONE 14 PRO MAX 512GB":3250,"IPHONE 14 PRO MAX 1TB":3350,"IPHONE 15 128GB":2200,"IPHONE 15 256GB":2400,"IPHONE 15 512GB":2550,"IPHONE 15 PLUS 128GB":2350,"IPHONE 15 PLUS 256GB":2550,"IPHONE 15 PLUS 512GB":2700,"IPHONE 15 PRO 128GB":2750,"IPHONE 15 PRO 256GB":2900,"IPHONE 15 PRO 512GB":3000,"IPHONE 15 PRO 1TB":3150,"IPHONE 15 PRO MAX 256GB":3500,"IPHONE 15 PRO MAX 512GB":3700,"IPHONE 15 PRO MAX 1TB":3900,"IPHONE 16E 128GB":2200,"IPHONE 16E 256GB":2300,"IPHONE 16 128GB":3100,"IPHONE 16 256GB":3250,"IPHONE 16 512GB":3450,"IPHONE 16 PLUS 128GB":3500,"IPHONE 16 PLUS 256GB":3650,"IPHONE 16 PLUS 512GB":3800,"IPHONE 16 PRO 128GB":3850,"IPHONE 16 PRO 256GB":4050,"IPHONE 16 PRO 512GB":4300,"IPHONE 16 PRO 1TB":4600,"IPHONE 16 PRO MAX 256GB":4450,"IPHONE 16 PRO MAX 512GB":4750,"IPHONE 16 PRO MAX 1TB":4950,"IPHONE 17E 256GB":2750,"IPHONE 17E 512GB":2900,"IPHONE 17 256GB":3800,"IPHONE 17 512GB":4600,"IPHONE 17 AIR 256GB":4200,"IPHONE 17 AIR 512GB":4500,"IPHONE 17 PRO 256GB":5900,"IPHONE 17 PRO 512GB":6600,"IPHONE 17 PRO 1TB":7100,"IPHONE 17 PRO MAX 256GB":6650,"IPHONE 17 PRO MAX 512GB":7550,"IPHONE 17 PRO MAX 1TB":8350,"IPHONE 17 PRO MAX 2TB":9600};
 
-// Tabela de valores para ENTRADA COMO PARTE DE PAGAMENTO (valores da tabela fornecida)
+// Valor MÍNIMO para entrada como parte de pagamento (= Upgrade)
+const precosParteMin={"IPHONE XR 64GB":300,"IPHONE XR 128GB":370,"IPHONE XR 256GB":400,"IPHONE 11 64GB":500,"IPHONE 11 128GB":600,"IPHONE 11 256GB":650,"IPHONE 11 PRO 64GB":750,"IPHONE 11 PRO 256GB":850,"IPHONE 11 PRO 512GB":950,"IPHONE 11 PRO MAX 64GB":800,"IPHONE 11 PRO MAX 256GB":900,"IPHONE 11 PRO MAX 512GB":1000,"IPHONE 12 64GB":850,"IPHONE 12 128GB":1000,"IPHONE 12 256GB":1100,"IPHONE 12 PRO 128GB":1450,"IPHONE 12 PRO 256GB":1550,"IPHONE 12 PRO 512GB":1650,"IPHONE 12 PRO MAX 128GB":1700,"IPHONE 12 PRO MAX 256GB":1800,"IPHONE 12 PRO MAX 512GB":1900,"IPHONE 13 128GB":1400,"IPHONE 13 256GB":1650,"IPHONE 13 512GB":1750,"IPHONE 13 PRO 128GB":1850,"IPHONE 13 PRO 256GB":2000,"IPHONE 13 PRO 512GB":2200,"IPHONE 13 PRO 1TB":2300,"IPHONE 13 PRO MAX 128GB":2300,"IPHONE 13 PRO MAX 256GB":2500,"IPHONE 13 PRO MAX 512GB":2650,"IPHONE 13 PRO MAX 1TB":2750,"IPHONE 14 128GB":1680,"IPHONE 14 256GB":1850,"IPHONE 14 PLUS 128GB":1850,"IPHONE 14 PLUS 256GB":2050,"IPHONE 14 PLUS 512GB":2200,"IPHONE 14 PRO 128GB":2300,"IPHONE 14 PRO 256GB":2600,"IPHONE 14 PRO 512GB":2700,"IPHONE 14 PRO MAX 128GB":2800,"IPHONE 14 PRO MAX 256GB":3200,"IPHONE 14 PRO MAX 512GB":3350,"IPHONE 14 PRO MAX 1TB":3450,"IPHONE 15 128GB":2300,"IPHONE 15 256GB":2500,"IPHONE 15 512GB":2650,"IPHONE 15 PLUS 128GB":2450,"IPHONE 15 PLUS 256GB":2650,"IPHONE 15 PLUS 512GB":2800,"IPHONE 15 PRO 128GB":2850,"IPHONE 15 PRO 256GB":3000,"IPHONE 15 PRO 512GB":3100,"IPHONE 15 PRO 1TB":3250,"IPHONE 15 PRO MAX 256GB":3600,"IPHONE 15 PRO MAX 512GB":3800,"IPHONE 15 PRO MAX 1TB":4000,"IPHONE 16E 128GB":2300,"IPHONE 16E 256GB":2400,"IPHONE 16 128GB":3200,"IPHONE 16 256GB":3350,"IPHONE 16 512GB":3550,"IPHONE 16 PLUS 128GB":3600,"IPHONE 16 PLUS 256GB":3750,"IPHONE 16 PLUS 512GB":3900,"IPHONE 16 PRO 128GB":3950,"IPHONE 16 PRO 256GB":4150,"IPHONE 16 PRO 512GB":4400,"IPHONE 16 PRO 1TB":4700,"IPHONE 16 PRO MAX 256GB":4550,"IPHONE 16 PRO MAX 512GB":4850,"IPHONE 16 PRO MAX 1TB":5050,"IPHONE 17E 256GB":2850,"IPHONE 17E 512GB":3000,"IPHONE 17 256GB":3900,"IPHONE 17 512GB":4700,"IPHONE 17 AIR 256GB":4300,"IPHONE 17 AIR 512GB":4600,"IPHONE 17 PRO 256GB":6000,"IPHONE 17 PRO 512GB":6700,"IPHONE 17 PRO 1TB":7200,"IPHONE 17 PRO MAX 256GB":6750,"IPHONE 17 PRO MAX 512GB":7650,"IPHONE 17 PRO MAX 1TB":8450,"IPHONE 17 PRO MAX 2TB":9700};
+
+// Valor MÁXIMO para entrada como parte de pagamento (= Proposta)
 const precosPartePagamento={"IPHONE XR 64GB":350,"IPHONE XR 128GB":470,"IPHONE XR 256GB":490,"IPHONE 11 64GB":600,"IPHONE 11 128GB":700,"IPHONE 11 256GB":800,"IPHONE 11 PRO 64GB":850,"IPHONE 11 PRO 256GB":950,"IPHONE 11 PRO 512GB":1000,"IPHONE 11 PRO MAX 64GB":950,"IPHONE 11 PRO MAX 256GB":1100,"IPHONE 11 PRO MAX 512GB":1100,"IPHONE 12 64GB":1000,"IPHONE 12 128GB":1150,"IPHONE 12 256GB":1200,"IPHONE 12 PRO 128GB":1550,"IPHONE 12 PRO 256GB":1650,"IPHONE 12 PRO 512GB":1750,"IPHONE 12 PRO MAX 128GB":1850,"IPHONE 12 PRO MAX 256GB":1950,"IPHONE 12 PRO MAX 512GB":2050,"IPHONE 13 128GB":1550,"IPHONE 13 256GB":1800,"IPHONE 13 512GB":1950,"IPHONE 13 PRO 128GB":2000,"IPHONE 13 PRO 256GB":2200,"IPHONE 13 PRO 512GB":2300,"IPHONE 13 PRO 1TB":2400,"IPHONE 13 PRO MAX 128GB":2400,"IPHONE 13 PRO MAX 256GB":2650,"IPHONE 13 PRO MAX 512GB":2750,"IPHONE 13 PRO MAX 1TB":2850,"IPHONE 14 128GB":1800,"IPHONE 14 256GB":2100,"IPHONE 14 PLUS 128GB":2000,"IPHONE 14 PLUS 256GB":2200,"IPHONE 14 PLUS 512GB":2300,"IPHONE 14 PRO 128GB":2400,"IPHONE 14 PRO 256GB":2700,"IPHONE 14 PRO 512GB":2850,"IPHONE 14 PRO MAX 128GB":3000,"IPHONE 14 PRO MAX 256GB":3300,"IPHONE 14 PRO MAX 512GB":3450,"IPHONE 14 PRO MAX 1TB":3550,"IPHONE 15 128GB":2450,"IPHONE 15 256GB":2650,"IPHONE 15 512GB":2800,"IPHONE 15 PLUS 128GB":2600,"IPHONE 15 PLUS 256GB":2800,"IPHONE 15 PLUS 512GB":2950,"IPHONE 15 PRO 128GB":2950,"IPHONE 15 PRO 256GB":3100,"IPHONE 15 PRO 512GB":3200,"IPHONE 15 PRO 1TB":3400,"IPHONE 15 PRO MAX 256GB":3800,"IPHONE 15 PRO MAX 512GB":4000,"IPHONE 15 PRO MAX 1TB":4200,"IPHONE 16E 128GB":2500,"IPHONE 16E 256GB":2600,"IPHONE 16 128GB":3350,"IPHONE 16 256GB":3600,"IPHONE 16 512GB":3800,"IPHONE 16 PLUS 128GB":3700,"IPHONE 16 PLUS 256GB":4000,"IPHONE 16 PLUS 512GB":4150,"IPHONE 16 PRO 128GB":4100,"IPHONE 16 PRO 256GB":4300,"IPHONE 16 PRO 512GB":4650,"IPHONE 16 PRO 1TB":4800,"IPHONE 16 PRO MAX 256GB":4700,"IPHONE 16 PRO MAX 512GB":5000,"IPHONE 16 PRO MAX 1TB":5300,"IPHONE 17E 256GB":3000,"IPHONE 17E 512GB":3200,"IPHONE 17 256GB":4100,"IPHONE 17 512GB":4900,"IPHONE 17 AIR 256GB":4600,"IPHONE 17 AIR 512GB":4900,"IPHONE 17 PRO 256GB":6300,"IPHONE 17 PRO 512GB":7000,"IPHONE 17 PRO 1TB":7500,"IPHONE 17 PRO MAX 256GB":7000,"IPHONE 17 PRO MAX 512GB":7900,"IPHONE 17 PRO MAX 1TB":8750,"IPHONE 17 PRO MAX 2TB":10000};
 
 const descs={"IPHONE 11":{tela:300,tela2:200,vidro:200,bateria:300,carcaca:300,carcaca2:200,faceid:300,camF:230,camT:280,lente:100,carr:220,sensor:170,bot:150,auri:150,af:150},"IPHONE 11 PRO":{tela:320,tela2:220,vidro:250,bateria:320,carcaca:320,carcaca2:250,faceid:350,camF:250,camT:350,lente:100,carr:280,sensor:200,bot:150,auri:180,af:180},"IPHONE 11 PRO MAX":{tela:350,tela2:250,vidro:300,bateria:350,carcaca:350,carcaca2:300,faceid:400,camF:350,camT:400,lente:100,carr:300,sensor:200,bot:150,auri:180,af:180},"IPHONE 12":{tela:420,tela2:250,vidro:300,bateria:350,carcaca:350,carcaca2:300,faceid:400,camF:300,camT:400,lente:100,carr:250,sensor:200,bot:180,auri:180,af:180},"IPHONE 12 PRO":{tela:450,tela2:270,vidro:320,bateria:380,carcaca:370,carcaca2:300,faceid:400,camF:320,camT:500,lente:100,carr:300,sensor:220,bot:200,auri:200,af:200},"IPHONE 12 PRO MAX":{tela:480,tela2:300,vidro:370,bateria:400,carcaca:400,carcaca2:350,faceid:450,camF:330,camT:550,lente:100,carr:320,sensor:220,bot:200,auri:200,af:200},"IPHONE 13":{tela:470,tela2:300,vidro:320,bateria:380,carcaca:400,carcaca2:350,faceid:600,camF:330,camT:500,lente:100,carr:300,sensor:250,bot:200,auri:200,af:200},"IPHONE 13 PRO":{tela:500,tela2:350,vidro:350,bateria:400,carcaca:420,carcaca2:400,faceid:600,camF:400,camT:600,lente:100,carr:400,sensor:270,bot:200,auri:200,af:200},"IPHONE 13 PRO MAX":{tela:550,tela2:400,vidro:400,bateria:420,carcaca:450,carcaca2:400,faceid:600,camF:400,camT:650,lente:100,carr:450,sensor:280,bot:200,auri:200,af:200},"IPHONE 14":{tela:500,tela2:400,vidro:400,bateria:400,carcaca:450,carcaca2:400,faceid:650,camF:400,camT:500,lente:100,carr:380,sensor:280,bot:200,auri:200,af:220},"IPHONE 14 PRO":{tela:650,tela2:450,vidro:450,bateria:450,carcaca:500,carcaca2:500,faceid:700,camF:400,camT:650,lente:100,carr:420,sensor:280,bot:200,auri:200,af:250},"IPHONE 14 PRO MAX":{tela:700,tela2:500,vidro:470,bateria:500,carcaca:550,carcaca2:550,faceid:750,camF:420,camT:700,lente:100,carr:500,sensor:320,bot:200,auri:200,af:250},"IPHONE 14 PLUS":{tela:700,tela2:450,vidro:450,bateria:470,carcaca:520,carcaca2:450,faceid:650,camF:400,camT:600,lente:100,carr:400,sensor:280,bot:200,auri:200,af:220},"IPHONE 15":{tela:700,tela2:500,vidro:400,bateria:500,carcaca:550,carcaca2:600,faceid:800,camF:500,camT:550,lente:100,carr:520,sensor:350,bot:300,auri:350,af:300},"IPHONE 15 PLUS":{tela:720,tela2:550,vidro:420,bateria:520,carcaca:550,carcaca2:700,faceid:900,camF:550,camT:550,lente:120,carr:600,sensor:400,bot:400,auri:400,af:400},"IPHONE 15 PRO":{tela:700,tela2:550,vidro:450,bateria:550,carcaca:600,carcaca2:800,faceid:1000,camF:600,camT:750,lente:120,carr:700,sensor:500,bot:500,auri:500,af:500},"IPHONE 15 PRO MAX":{tela:750,tela2:600,vidro:500,bateria:600,carcaca:650,carcaca2:900,faceid:1200,camF:700,camT:800,lente:120,carr:800,sensor:500,bot:500,auri:500,af:500},"IPHONE 16E":{tela:800,tela2:650,vidro:520,bateria:650,carcaca:650,carcaca2:950,faceid:1500,camF:750,camT:800,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16":{tela:800,tela2:650,vidro:520,bateria:650,carcaca:650,carcaca2:950,faceid:1500,camF:750,camT:800,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PLUS":{tela:820,tela2:670,vidro:530,bateria:670,carcaca:670,carcaca2:950,faceid:1500,camF:750,camT:850,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PRO":{tela:900,tela2:700,vidro:550,bateria:750,carcaca:700,carcaca2:1000,faceid:1800,camF:850,camT:950,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PRO MAX":{tela:950,tela2:750,vidro:550,bateria:800,carcaca:750,carcaca2:1000,faceid:1900,camF:850,camT:1100,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17AIR":{tela:970,tela2:750,vidro:650,bateria:900,carcaca:800,carcaca2:1200,faceid:2000,camF:900,camT:1100,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17":{tela:970,tela2:800,vidro:650,bateria:900,carcaca:800,carcaca2:1200,faceid:2000,camF:900,camT:1100,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17 PRO":{tela:1200,tela2:950,vidro:700,bateria:950,carcaca:850,carcaca2:1300,faceid:2100,camF:1000,camT:1500,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17 PRO MAX":{tela:1500,tela2:1100,vidro:750,bateria:1100,carcaca:900,carcaca2:1300,faceid:2100,camF:1000,camT:1500,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0}};
@@ -240,7 +254,13 @@ function getBase(m){for(const k of Object.keys(descs))if(m.startsWith(k))return 
 function getModalidade(){return(document.querySelector('input[name="modalidade"]:checked')||{value:"compra"}).value}
 function getPrecoAtual(m){
   const mod=getModalidade();
-  if(mod==="parte")return precosPartePagamento[m]||0;
+  if(mod==="parte"){
+    const vMin=precosParteMin[m]||0;
+    const vMax=precosPartePagamento[m]||0;
+    if(!m||(!vMin&&!vMax))return 0;
+    const pct=(parseInt(document.getElementById("parteRange").value)||50)/100;
+    return Math.round(vMin+(vMax-vMin)*pct);
+  }
   return precos[m]||0;
 }
 
@@ -262,6 +282,8 @@ function onModalidade(){
   if(btn)btn.textContent=isCompra?"⬇ Gerar PDF — Orçamento + Contrato":"⬇ Gerar PDF — Registro de Negociação";
   if(btn)btn.style.background=isCompra?"#c0392b":"#1a6b3c";
   // Refresh model/price
+  const m=document.getElementById("modelo").value;
+  atualizarSliderParte(m);
   onModeloChange();
 }
 
@@ -284,6 +306,7 @@ function onBat(){
 function onModeloChange(){
   const m=document.getElementById("modelo").value;
   const base=getBase(m);
+  atualizarSliderParte(m);
   const preco=getPrecoAtual(m);
   document.getElementById("valor-base").textContent=fmt(preco);
   renderTabela(base?descs[base]:null);
@@ -728,6 +751,33 @@ async function gerarPDF(){
 }
 
 renderTabela(null);calcular();
+
+// ── SLIDER PARTE DE PAGAMENTO ──────────────────────────────
+function onParteSlider(){
+  const m=document.getElementById("modelo").value;
+  const vMin=precosParteMin[m]||0;
+  const vMax=precosPartePagamento[m]||0;
+  const pct=(parseInt(document.getElementById("parteRange").value)||50)/100;
+  const val=Math.round(vMin+(vMax-vMin)*pct);
+  document.getElementById("valor-base").textContent=fmt(val);
+  calcular();
+}
+
+function atualizarSliderParte(m){
+  const wrap=document.getElementById("parte-slider-wrap");
+  const mod=getModalidade();
+  if(!wrap)return;
+  if(mod==="parte"&&m){
+    const vMin=precosParteMin[m]||0;
+    const vMax=precosPartePagamento[m]||0;
+    document.getElementById("lbl-min").textContent=fmt(vMin);
+    document.getElementById("lbl-max").textContent=fmt(vMax);
+    document.getElementById("parteRange").value=50;
+    wrap.style.display="";
+  } else {
+    wrap.style.display="none";
+  }
+}
 
 // ── RG UPLOAD ──────────────────────────────────────────
 const rgData={frente:null,verso:null};
