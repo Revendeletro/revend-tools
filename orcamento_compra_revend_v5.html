@@ -122,7 +122,16 @@ table.dt tr:hover td{background:var(--color-background-secondary)}
   <div class="footer">
     <div class="fc"><span style="font-size:12px;font-weight:700">Valor Final</span><span class="vfnum" id="valor-final">R$ 0,00</span></div>
     <div class="fc" style="justify-content:flex-end"><span style="font-size:12px;font-weight:700;margin-right:8px">Desconto Total</span><span class="dt-num" id="desc-total">-R$ 0,00</span></div>
-    <div class="fc" style="justify-content:flex-end"><span style="font-size:12px;font-weight:700;margin-right:6px">Desc. Autorizado R$</span><input type="number" id="descAut" value="0" min="0" style="width:70px;text-align:right" oninput="calcular()"></div>
+    <div class="fc" style="justify-content:flex-end;flex-direction:column;align-items:flex-end;gap:5px;padding:8px 14px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;font-weight:700;color:#555">Desc. Autorizado R$</span>
+        <input type="number" id="descAut" value="" min="0" placeholder="0" style="width:75px;text-align:right;border:.5px solid #ccc;border-radius:4px;padding:3px 6px;font-size:12px" oninput="calcular()">
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;font-weight:700;color:#1a6b3c">✦ Valor Final Autorizado R$</span>
+        <input type="number" id="valorFinalAut" value="" min="0" placeholder="automático" style="width:75px;text-align:right;border:1.5px solid #1a6b3c;border-radius:4px;padding:3px 6px;font-size:12px;background:#f0fff4" oninput="calcular()">
+      </div>
+    </div>
   </div>
 
   <!-- PRAZO DE PAGAMENTO -->
@@ -333,21 +342,44 @@ function renderTabela(d){
 function calcular(){
   const m=document.getElementById("modelo").value;
   const base=getBase(m);const d=base?descs[base]:{};const preco=getPrecoAtual(m);
-  let total=0;
+  let totalDescontos=0;
   itens.forEach(item=>{
     const chk=document.getElementById("chk_"+item.key);
     const totEl=document.getElementById("tot_"+item.key);
     if(!chk||!totEl)return;
-    if(chk.checked){const val=d[item.key]||0;total+=val;totEl.textContent=val>0?"-"+fmt(val):"R$ 0,00";totEl.style.color="#c0392b";}
+    if(chk.checked){const val=d[item.key]||0;totalDescontos+=val;totEl.textContent=val>0?"-"+fmt(val):"R$ 0,00";totEl.style.color="#c0392b";}
     else{totEl.textContent="R$ 0,00";totEl.style.color="var(--color-text-secondary)";}
   });
-  const dAut=parseFloat(document.getElementById("descAut").value)||0;
-  const base72h=Math.max(0,preco-total-dAut);
-  const valPix=Math.round(base72h*0.95*100)/100;
-  const val72h=base72h;
-  const val7d=Math.round(base72h*1.03*100)/100;
 
-  document.getElementById("desc-total").textContent="-"+fmt(total);
+  const dAutRaw=document.getElementById("descAut").value;
+  const dAut=dAutRaw!==""?parseFloat(dAutRaw)||0:null;
+  const vFAutRaw=document.getElementById("valorFinalAut").value;
+  const vFAut=vFAutRaw!==""?parseFloat(vFAutRaw)||0:null;
+
+  // Desconto aplicado: se Desc.Autorizado preenchido → substitui os descontos da tabela
+  // Se não preenchido → usa os descontos marcados normalmente
+  const descontoEfetivo = dAut!==null ? dAut : totalDescontos;
+
+  // Valor base após desconto efetivo
+  const base72h = Math.max(0, preco - descontoEfetivo);
+  const valPix  = Math.round(base72h*0.95*100)/100;
+  const val72h  = base72h;
+  const val7d   = Math.round(base72h*1.03*100)/100;
+
+  // Desconto exibido na linha "Desconto Total"
+  document.getElementById("desc-total").textContent = "-"+fmt(descontoEfetivo);
+
+  // Destacar o campo descAut visualmente quando ativo
+  const descAutEl=document.getElementById("descAut");
+  if(dAut!==null && dAut>0){
+    descAutEl.style.borderColor="#c0392b";
+    descAutEl.style.background="#fff5f5";
+    descAutEl.style.fontWeight="700";
+  } else {
+    descAutEl.style.borderColor="#ccc";
+    descAutEl.style.background="";
+    descAutEl.style.fontWeight="";
+  }
 
   // Update payment option values
   const elPix=document.getElementById("val-pix");
@@ -360,10 +392,34 @@ function calcular(){
   // Determine selected prazo
   const prazo=document.querySelector('input[name="prazo"]:checked');
   const prazoVal=prazo?prazo.value:"72h";
-  let final=val72h;
-  if(prazoVal==="pix")final=valPix;
-  else if(prazoVal==="7d")final=val7d;
-  document.getElementById("valor-final").textContent=fmt(final);
+  let finalCalc=val72h;
+  if(prazoVal==="pix")finalCalc=valPix;
+  else if(prazoVal==="7d")finalCalc=val7d;
+
+  // Valor Final Autorizado sobrescreve tudo se preenchido
+  const finalExibido = vFAut!==null ? vFAut : finalCalc;
+
+  const vfEl=document.getElementById("valor-final");
+  vfEl.textContent=fmt(finalExibido);
+  if(vFAut!==null){
+    vfEl.style.background="#d0f0e0";
+    vfEl.style.color="#1a6b3c";
+    vfEl.style.outline="2px solid #1a6b3c";
+  } else {
+    vfEl.style.background="#d4edda";
+    vfEl.style.color="#155724";
+    vfEl.style.outline="";
+  }
+
+  // Destacar o campo valorFinalAut visualmente quando ativo
+  const vfAutEl=document.getElementById("valorFinalAut");
+  if(vFAut!==null && vFAut>0){
+    vfAutEl.style.fontWeight="700";
+    vfAutEl.style.color="#1a6b3c";
+  } else {
+    vfAutEl.style.fontWeight="";
+    vfAutEl.style.color="";
+  }
 
   // Highlight selected label
   ["pix","72h","7d"].forEach(p=>{
@@ -384,14 +440,34 @@ function getState(){
   const m=document.getElementById("modelo").value;
   const base=getBase(m);const d=base?descs[base]:{};const preco=getPrecoAtual(m);
   const bat=parseInt(document.getElementById("batRange").value);
-  const dAut=parseFloat(document.getElementById("descAut").value)||0;
   const modalidade=getModalidade();
-  const defeitos=[];let totalDesc=0;
+
+  const dAutRaw=document.getElementById("descAut").value;
+  const dAut=dAutRaw!==""?parseFloat(dAutRaw)||0:null;
+  const vFAutRaw=document.getElementById("valorFinalAut").value;
+  const vFAut=vFAutRaw!==""?parseFloat(vFAutRaw)||0:null;
+
+  const defeitos=[];let totalDescontos=0;
   itens.forEach(item=>{
     const chk=document.getElementById("chk_"+item.key);const val=d[item.key]||0;
-    if(chk&&chk.checked){totalDesc+=val;defeitos.push({label:item.label,cond:item.cond,val,checked:true});}
+    if(chk&&chk.checked){totalDescontos+=val;defeitos.push({label:item.label,cond:item.cond,val,checked:true});}
     else if(chk){defeitos.push({label:item.label,cond:item.cond,val,checked:false});}
   });
+
+  // Desconto efetivo: descAut substitui descontos normais se preenchido
+  const descontoEfetivo = dAut!==null ? dAut : totalDescontos;
+  const base72h = Math.max(0, preco - descontoEfetivo);
+  const prazoSel=(document.querySelector('input[name="prazo"]:checked')||{value:"72h"}).value;
+  const valPix=Math.round(base72h*0.95*100)/100;
+  const val72h=base72h;
+  const val7d=Math.round(base72h*1.03*100)/100;
+
+  // Valor final: vFAut sobrescreve tudo se preenchido
+  let finalCalc=val72h;
+  if(prazoSel==="pix")finalCalc=valPix;
+  else if(prazoSel==="7d")finalCalc=val7d;
+  const finalReal = vFAut!==null ? vFAut : finalCalc;
+
   return{
     modalidade,
     responsavel:document.getElementById("responsavel").value||"",
@@ -405,13 +481,15 @@ function getState(){
     endereco:document.getElementById("endereco").value||"",
     cor:document.getElementById("cor").value||"",
     codagend:document.getElementById("codagend").value||"",
-    modelo:m,bat,preco,dAut,totalDesc,
-    final:Math.max(0,preco-totalDesc-dAut),
+    modelo:m,bat,preco,
+    dAut,            // null se não preenchido
+    vFAut,           // null se não preenchido
+    totalDescontos,
+    descontoEfetivo,
     defeitos,aprovado:document.getElementById("aprovado").checked,
-    prazo:(document.querySelector('input[name="prazo"]:checked')||{value:"72h"}).value,
-    valPix:Math.round(Math.max(0,preco-totalDesc-dAut)*0.95*100)/100,
-    val72h:Math.max(0,preco-totalDesc-dAut),
-    val7d:Math.round(Math.max(0,preco-totalDesc-dAut)*1.03*100)/100
+    prazo:prazoSel,
+    valPix,val72h,val7d,
+    final:finalReal  // valor que vai para o contrato
   };
 }
 
@@ -502,7 +580,7 @@ async function gerarPDF(){
   // rodapé orcamento — opções de pagamento
   doc.setDrawColor(40,40,40);doc.setLineWidth(0.6);doc.line(M,y,W-M,y);y+=2;
 
-  // Row: Valor Final + Desconto Total + Desc. Autorizado
+  // Row: Valor Base + Desconto Efetivo + Desc. Autorizado / Substituição
   const colW=(W-2*M)/3;
   doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.rect(M,y,W-2*M,12);
   doc.line(M+colW,y,M+colW,y+12);doc.line(M+colW*2,y,M+colW*2,y+12);
@@ -512,13 +590,30 @@ async function gerarPDF(){
   doc.setFontSize(10);doc.setTextColor(21,87,36);
   doc.text("R$ "+fmtNum(s.val72h),M+2+(colW-6)/2,y+9.5,{align:"center"});
   doc.setTextColor(0,0,0);doc.setFontSize(8);doc.setFont("helvetica","bold");
-  doc.text("Desconto Total",M+colW+2,y+4);
-  doc.setTextColor(192,57,43);doc.setFontSize(10);
-  doc.text("-R$ "+fmtNum(s.totalDesc),M+colW*2-2,y+10,{align:"right"});
+
+  // Coluna do meio: mostra desconto efetivo e nota se foi substituído
+  if(s.dAut!==null){
+    doc.text("Desc. Autorizado (substitui)",M+colW+2,y+4);
+    doc.setFontSize(7);doc.setFont("helvetica","italic");doc.setTextColor(140,70,0);
+    doc.text("Desc. normal: -R$ "+fmtNum(s.totalDescontos)+" (ignorado)",M+colW+2,y+8);
+  } else {
+    doc.text("Desconto Total",M+colW+2,y+4);
+  }
+  doc.setTextColor(192,57,43);doc.setFontSize(10);doc.setFont("helvetica","bold");
+  doc.text("-R$ "+fmtNum(s.descontoEfetivo),M+colW*2-2,y+10,{align:"right"});
   doc.setTextColor(0,0,0);doc.setFontSize(8);doc.setFont("helvetica","bold");
-  doc.text("Desc. Autorizado",M+colW*2+2,y+4);
-  doc.setTextColor(192,57,43);doc.setFontSize(10);
-  doc.text("-R$ "+fmtNum(s.dAut),W-M-2,y+10,{align:"right"});
+
+  // Coluna direita: Valor Final Autorizado se ativo, senão Desc. Autorizado vazio
+  if(s.vFAut!==null){
+    doc.text("Valor Final Autorizado",M+colW*2+2,y+4);
+    doc.setFillColor(208,240,220);doc.roundedRect(M+colW*2+2,y+5,colW-6,6,1,1,"F");
+    doc.setFontSize(10);doc.setTextColor(26,107,60);
+    doc.text("R$ "+fmtNum(s.vFAut),M+colW*2+2+(colW-6)/2,y+9.5,{align:"center"});
+  } else {
+    doc.text("Desc. Autorizado",M+colW*2+2,y+4);
+    doc.setTextColor(s.dAut!==null?192:160,s.dAut!==null?57:160,s.dAut!==null?43:160);doc.setFontSize(10);
+    doc.text(s.dAut!==null?"-R$ "+fmtNum(s.dAut):"—",W-M-2,y+10,{align:"right"});
+  }
   doc.setTextColor(0,0,0);y+=12;
 
   // Payment options row — somente para COMPRA
@@ -555,12 +650,16 @@ async function gerarPDF(){
 
   // Final valor box
   const prazoLabel=s.prazo==="pix"?"PIX IMEDIATO":s.prazo==="72h"?"72 HORAS (PADRAO)":"7 DIAS UTEIS";
-  const finalVal=s.prazo==="pix"?s.valPix:s.prazo==="7d"?s.val7d:s.val72h;
-  const boxLabel=s.modalidade==="parte"
-    ?"VALOR DE ENTRADA (PARTE DO PAGAMENTO):  R$ "+fmtNum(s.final)
-    :"VALOR ACORDADO ("+prazoLabel+"):  R$ "+fmtNum(finalVal);
-  const boxColor=s.modalidade==="parte"?[208,240,220]:[212,237,218];
-  const boxStroke=s.modalidade==="parte"?[26,107,60]:[21,87,36];
+  const boxColor=s.modalidade==="parte"?[208,240,220]:s.vFAut!==null?[208,240,220]:[212,237,218];
+  const boxStroke=s.modalidade==="parte"?[26,107,60]:s.vFAut!==null?[26,107,60]:[21,87,36];
+  let boxLabel;
+  if(s.modalidade==="parte"){
+    boxLabel="VALOR DE ENTRADA (PARTE DO PAGAMENTO):  R$ "+fmtNum(s.final);
+  } else if(s.vFAut!==null){
+    boxLabel="✦ VALOR FINAL AUTORIZADO:  R$ "+fmtNum(s.final);
+  } else {
+    boxLabel="VALOR ACORDADO ("+prazoLabel+"):  R$ "+fmtNum(s.final);
+  }
   doc.setFillColor(...boxColor);doc.roundedRect(M,y,W-2*M,14,2,2,"F");
   doc.setDrawColor(...boxStroke);doc.setLineWidth(0.5);doc.roundedRect(M,y,W-2*M,14,2,2,"S");
   doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...boxStroke);
@@ -618,11 +717,14 @@ async function gerarPDF(){
     doc.setTextColor(0,120,0);doc.setFontSize(11);doc.setFont("helvetica","bold");
     doc.text("R$ "+fmtNum(s.final)+" (VALOR DE ENTRADA — PARTE DO PAGAMENTO)",M+44,y);
     doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont("helvetica","normal");y+=9;
+  } else if(s.vFAut!==null){
+    doc.setTextColor(26,107,60);doc.setFontSize(11);doc.setFont("helvetica","bold");
+    doc.text("R$ "+fmtNum(s.final)+" (VALOR FINAL AUTORIZADO)",M+44,y);
+    doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont("helvetica","normal");y+=9;
   } else {
-    const contratoFinalVal=s.prazo==="pix"?s.valPix:s.prazo==="7d"?s.val7d:s.val72h;
     const contratoPrazoTxt=s.prazo==="pix"?"(PIX IMEDIATO)":s.prazo==="7d"?"(7 DIAS UTEIS)":"(72 HORAS)";
     doc.setTextColor(0,120,0);doc.setFontSize(11);doc.setFont("helvetica","bold");
-    doc.text("R$ "+fmtNum(contratoFinalVal)+" "+contratoPrazoTxt,M+44,y);
+    doc.text("R$ "+fmtNum(s.final)+" "+contratoPrazoTxt,M+44,y);
     doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont("helvetica","normal");y+=9;
   }
 
