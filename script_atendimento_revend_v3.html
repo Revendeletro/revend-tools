@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script de Atendimento — Revend Eletro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C0272D;
+    --red-dark: #9B1F24;
+    --red-light: #E8383F;
+    --bg: #F4F5F7;
+    --bg-white: #FFFFFF;
+    --bg-dark: #1A1D23;
+    --text-primary: #111318;
+    --text-secondary: #4A5568;
+    --text-muted: #8A94A6;
+    --border: #E2E8F0;
+    --border-dark: #CBD5E0;
+    --green: #16A34A;
+    --green-bg: #F0FDF4;
+    --amber: #D97706;
+    --amber-bg: #FFFBEB;
+    --blue: #1D4ED8;
+    --blue-bg: #EFF6FF;
+    --purple: #7C3AED;
+    --purple-bg: #F5F3FF;
+    --teal: #0F766E;
+    --teal-bg: #F0FDFA;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--red);
+    color: white;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(192,39,45,0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 20px; }
+  .logo-area { display: flex; align-items: center; gap: 10px; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; opacity: 0.75; font-weight: 400; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-subtitle { font-size: 12px; opacity: 0.7; }
+  .header-tags { display: flex; gap: 6px; }
+  .h-tag { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: default; display: flex; align-items: center; gap: 4px; }
+
+  /* LAYOUT */
+  .app-body { display: flex; min-height: calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg-dark);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4A5568;
+    padding: 10px 10px 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: #94A3B8;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #E2E8F0; }
+  .nav-item.active { background: var(--red); color: #fff; }
+  .nav-item.active .nav-num { background: rgba(255,255,255,0.2); color: #fff; }
+  .nav-num {
+    font-size: 10px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.08);
+    color: #64748B;
+    border-radius: 4px;
+    padding: 2px 5px;
+    min-width: 20px;
+    text-align: center;
+  }
+  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
+
+  /* MAIN */
+  .main { flex: 1; overflow-y: auto; padding: 24px; }
+
+  .page-header {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+  }
+  .page-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .page-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .stage-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    letter-spacing: 0.02em;
+  }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: var(--shadow); }
+
+  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .card-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
+
+  /* BADGES */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 9px;
+    border-radius: 99px;
+    letter-spacing: 0.01em;
+  }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .badge-red { background: #FEF2F2; color: #DC2626; }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); }
+  .badge-teal { background: var(--teal-bg); color: var(--teal); }
+  .badge-dark { background: #F1F5F9; color: #334155; }
+
+  /* MESSAGE BOX */
+  .msg-wrap { margin: 12px 0 8px; }
+  .msg-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+  .msg-box {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 12px 15px;
+    font-size: 13px;
+    color: var(--text-primary);
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .msg-box.blue-border { border-left-color: var(--blue); }
+  .msg-box.green-border { border-left-color: var(--green); }
+  .msg-box.amber-border { border-left-color: var(--amber); }
+  .msg-box.purple-border { border-left-color: var(--purple); }
+
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-dark);
+    background: var(--bg-white);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .copy-btn:hover { background: #F1F5F9; border-color: #94A3B8; }
+  .copy-btn.copied { color: var(--green); border-color: #86EFAC; background: var(--green-bg); }
+
+  /* TIP / ALERT */
+  .tip {
+    display: flex;
+    gap: 8px;
+    background: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #92400E;
+    line-height: 1.5;
+    margin: 10px 0;
+  }
+  .tip-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  .alert-red {
+    display: flex;
+    gap: 8px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #7F1D1D;
+    line-height: 1.5;
+    margin: 10px 0;
+  }
+
+  .alert-green {
+    display: flex;
+    gap: 8px;
+    background: var(--green-bg);
+    border: 1px solid #86EFAC;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #14532D;
+    line-height: 1.5;
+    margin: 10px 0;
+  }
+
+  .alert-blue {
+    display: flex;
+    gap: 8px;
+    background: var(--blue-bg);
+    border: 1px solid #BFDBFE;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #1E3A8A;
+    line-height: 1.5;
+    margin: 10px 0;
+  }
+
+  /* GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0; }
+  .grid-cell {
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px;
+  }
+  .grid-cell-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .grid-cell-body { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
+
+  /* FUNNEL TIMELINE */
+  .timeline { margin: 10px 0; }
+  .tl-item { display: flex; gap: 12px; margin-bottom: 10px; }
+  .tl-left { display: flex; flex-direction: column; align-items: center; }
+  .tl-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .tl-line { width: 2px; background: var(--border); flex: 1; margin: 2px auto; min-height: 16px; }
+  .tl-content { flex: 1; padding-bottom: 6px; }
+  .tl-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .tl-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+  /* OBJECTION DECISION TREE */
+  .decision-box {
+    background: linear-gradient(135deg, #1A1D23 0%, #2D3142 100%);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    margin: 10px 0;
+    color: white;
+  }
+  .decision-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #F1F5F9; }
+  .decision-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px; }
+  .decision-key { background: var(--red); color: white; border-radius: 4px; padding: 2px 8px; font-weight: 700; font-size: 11px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; height: fit-content; }
+  .decision-val { color: #CBD5E0; line-height: 1.5; }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 15px;
+    box-shadow: var(--shadow-sm);
+  }
+  .stat-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
+  .stat-val.red { color: var(--red); }
+  .stat-val.green { color: var(--green); }
+  .stat-val.amber { color: var(--amber); }
+  .stat-val.blue { color: var(--blue); }
+
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* URGENCY BANNER */
+  .urgency-banner {
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    color: white;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .urgency-icon { font-size: 22px; }
+  .urgency-title { font-size: 13px; font-weight: 700; }
+  .urgency-desc { font-size: 12px; opacity: 0.85; margin-top: 2px; line-height: 1.4; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 12px; }
+    .grid2, .grid3 { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .header-tags { display: none; }
+    .mobile-tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border);
+      -webkit-overflow-scrolling: touch;
+    }
+    .mobile-tab {
+      flex-shrink: 0;
+      padding: 6px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: white;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .mobile-tab.active { background: var(--red); color: white; border-color: var(--red); }
+  }
+  @media (min-width: 769px) {
+    .mobile-tabs { display: none; }
+  }
+
+  /* Highlight keywords */
+  .kw { font-weight: 600; color: var(--text-primary); }
+  .kw-red { font-weight: 600; color: var(--red); }
+  .kw-green { font-weight: 600; color: var(--green); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-left">
+    <div class="logo-area">
+      <div>
+        <div class="logo-text">revend</div>
+        <div class="logo-sub">Eletro</div>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-title">Script de Atendimento</div>
+      <div class="header-subtitle">Guia de vendas · Funil completo · 🟢 Versão 3.0</div>
+    </div>
+  </div>
+  <div class="header-tags">
+    <div class="h-tag">📱 iPhone</div>
+    <div class="h-tag">💻 MacBook</div>
+    <div class="h-tag">⌚ Apple Watch</div>
+    <div class="h-tag">🎯 Conversão</div>
+  </div>
+</header>
+
+<!-- MOBILE TABS -->
+<div class="mobile-tabs" id="mobileTabs">
+  <button class="mobile-tab active" onclick="show('recepcao', this)">1. Recepção</button>
+  <button class="mobile-tab" onclick="show('qualificacao', this)">2. Qualificação</button>
+  <button class="mobile-tab" onclick="show('proposta', this)">3. Proposta</button>
+  <button class="mobile-tab" onclick="show('objecoes', this)">4. Objeções</button>
+  <button class="mobile-tab" onclick="show('fechamento', this)">5. Fechamento</button>
+  <button class="mobile-tab" onclick="show('followup', this)">6. Follow-up & Rmkt</button>
+  <button class="mobile-tab" onclick="show('entrega', this)">7. Entrega</button>
+  <button class="mobile-tab" onclick="show('posvenda', this)">8. Pós-venda</button>
+  <button class="mobile-tab" onclick="show('compra', this)">9. Compra/Troca</button>
+  <button class="mobile-tab" onclick="show('comprou-agendou', this)">10. Comprou/Agendou</button>
+</div>
+
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-label">Funil de Vendas</div>
+    <button class="nav-item active" onclick="show('recepcao', this)"><span class="nav-icon">👋</span><span class="nav-num">1</span> Recepção</button>
+    <button class="nav-item" onclick="show('qualificacao', this)"><span class="nav-icon">🔍</span><span class="nav-num">2</span> Qualificação</button>
+    <button class="nav-item" onclick="show('proposta', this)"><span class="nav-icon">📋</span><span class="nav-num">3</span> Proposta</button>
+    <button class="nav-item" onclick="show('objecoes', this)"><span class="nav-icon">🛡️</span><span class="nav-num">4</span> Objeções</button>
+    <button class="nav-item" onclick="show('fechamento', this)"><span class="nav-icon">🔒</span><span class="nav-num">5</span> Fechamento</button>
+    <button class="nav-item" onclick="show('followup', this)"><span class="nav-icon">🔁</span><span class="nav-num">6</span> Follow-up & Remarketing</button>
+    <button class="nav-item" onclick="show('entrega', this)"><span class="nav-icon">🚀</span><span class="nav-num">7</span> Entrega</button>
+    <button class="nav-item" onclick="show('posvenda', this)"><span class="nav-icon">⭐</span><span class="nav-num">8</span> Pós-venda</button>
+    <button class="nav-item" onclick="show('compra', this)"><span class="nav-icon">♻️</span><span class="nav-num">9</span> Compra/Troca</button>
+    <button class="nav-item" onclick="show('comprou-agendou', this)"><span class="nav-icon">✅</span><span class="nav-num">10</span> Comprou/Agendou</button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- STATS ROW (always visible) -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">1ª Resposta</div>
+        <div class="stat-val amber">20min</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Meta: &gt;90% dos leads</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Durante atend.</div>
+        <div class="stat-val blue">10min</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Meta: &gt;80% das msgs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sem resposta</div>
+        <div class="stat-val red">0 dia</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Lead não dorme sem contato</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Sinal Reserva</div>
+        <div class="stat-val green">R$100</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Abater na compra</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Rmkt Final</div>
+        <div class="stat-val red">D+6</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Lead perdido se sem resp.</div>
+      </div>
+    </div>
+
+    <!-- ======================== RECEPÇÃO ======================== -->
+    <div id="recepcao" class="section active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">👋 Etapa 1 — Recepção</div>
+          <div class="page-desc">Primeiro contato e abertura do atendimento</div>
+        </div>
+        <span class="badge badge-blue">⏱ Máx. 20 min para responder</span>
+      </div>
+
+      <div class="urgency-banner">
+        <div class="urgency-icon">🚨</div>
+        <div>
+          <div class="urgency-title">REGRA DE OURO — Lead que não recebe resposta em 20min vai embora para o concorrente</div>
+          <div class="urgency-desc">Velocidade na resposta = conversão. Não espere. Ative notificações. Priorize sempre.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Fluxo Kommo — Entrada de lead</div>
+        <div class="card-title">📲 Protocolo de entrada via Insta / WhatsApp</div>
+        <div class="alert-blue"><span>🔵</span><span><strong>Kommo CRM:</strong> Todo lead que chega pelo Instagram ou WhatsApp deve ser processado conforme este fluxo antes de qualquer mensagem.</span></div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">1</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">📥 Recebe o lead no Kommo</div>
+              <div class="tl-desc">Lead entra via Insta ou WhatsApp. Abre imediatamente. Tempo máximo: <strong>20 minutos</strong> para 1ª resposta.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">2</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">📋 Preenche o cabeçalho (RmkT)</div>
+              <div class="tl-desc">Antes de responder, preencha no Kommo: nome, canal de origem, produto de interesse, situação (novo / upgrade / troca). Isso alimenta o remarketing automático.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">3</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">🔍 Entender o cliente — 3 cenários</div>
+              <div class="tl-desc">Identifique em qual dos 3 cenários o cliente está (ver card abaixo) e siga o caminho correspondente.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">3 Cenários do cliente — Etapa crítica</div>
+        <div class="card-title">🎯 Como identificar onde o cliente está no processo</div>
+        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Sempre identifique o cenário antes de enviar a tabela ou fazer proposta.</strong> Cada cenário pede uma abordagem diferente.</div>
+        <div class="grid3">
+          <div class="grid-cell" style="border-left: 3px solid var(--green);">
+            <div class="grid-cell-title" style="color:var(--green);">✅ Cenário 1 — Falou o que quer</div>
+            <div class="grid-cell-body">Cliente já veio com modelo específico em mente. <strong>Não envie tabela.</strong> Vá direto para a proposta personalizada do modelo desejado.</div>
+          </div>
+          <div class="grid-cell" style="border-left: 3px solid var(--amber);">
+            <div class="grid-cell-title" style="color:var(--amber);">🔎 Cenário 2 — Acessou a tabela</div>
+            <div class="grid-cell-body">Cliente já viu os preços. Pergunta qual modelo específico chamou atenção. Foque em comparar as opções e qualificar orçamento/pagamento.</div>
+          </div>
+          <div class="grid-cell" style="border-left: 3px solid var(--blue);">
+            <div class="grid-cell-title" style="color:var(--blue);">📤 Cenário 3 — Não acessou ainda</div>
+            <div class="grid-cell-body">Cliente não conhece os preços. <strong>Envie a tabela + mensagem de abertura.</strong> Aguarde retorno antes de qualificar.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Mensagem de abertura</div>
+        <div class="card-title">✨ Boas-vindas e abertura de atendimento</div>
+        <div class="tip"><span class="tip-icon">💡</span> Envie imediatamente ao receber o lead. Personalize com seu nome no lugar de [Felipe].</div>
+        <div class="msg-wrap">
+          <div class="msg-box">✨ Olá, tudo bem? Seja muito bem-vindo(a) à Revend! ✨
+
+Eu sou o *Felipe* e estou aqui para proporcionar a melhor experiência na sua busca pelos produtos Apple 🍎
+
+Para iniciar seu atendimento, poderia me informar:
+📝 Qual é o seu nome?
+📱 Você já tem algum modelo em mente?
+
+Fico no aguardo! 😊
+
+🔗 Nossa tabela atualizada: https://revendeletro.com.br/tabela-de-valores/</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'boas-vindas')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Lead sem resposta inicial — Reativação rápida</div>
+        <div class="card-title">⚡ Cliente não respondeu após 2h — Reativação</div>
+        <div class="alert-red"><span>🔴</span><span>Não deixe o lead esfriar. Se não houve resposta em 2h, dispare esta mensagem.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">Oi! 😊 Vi que você entrou em contato com a Revend. Quero garantir que você seja bem atendido(a) pessoalmente por mim!
+
+Tenho ótimas opções disponíveis agora — qual produto você estava pesquisando? 🍎
+
+Me conta que faço questão de te ajudar a encontrar o melhor negócio!</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'reativacao')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Fora do horário</div>
+        <div class="card-title">🌙 Mensagem de ausência automática</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">Olá! Este é o setor de Vendas da Revend. Não estamos em horário de atendimento no momento, mas você já está na fila prioritária! ⏰
+
+🕐 Horários: Seg–Sex 10h às 18h | Sábado: 10h às 16h
+
+Sua mensagem foi recebida ✅ Por favor, informe seu *nome* e o *produto de interesse* para agilizarmos assim que abrirmos.
+
+🔗 Tabela atualizada: https://revendeletro.com.br/tabela-de-valores/</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'ausencia')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== QUALIFICAÇÃO ======================== -->
+    <div id="qualificacao" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔍 Etapa 2 — Qualificação</div>
+          <div class="page-desc">Entenda o perfil, necessidade e poder de compra do cliente</div>
+        </div>
+        <span class="badge badge-purple">Máx. 3 perguntas</span>
+      </div>
+
+      <div class="urgency-banner">
+        <div class="urgency-icon">🎯</div>
+        <div>
+          <div class="urgency-title">Qualifique ANTES de apresentar preço. Quem mostra preço cedo, perde poder de negociação.</div>
+          <div class="urgency-desc">Entenda o que o cliente quer, por que quer e como quer pagar. Só então construa sua proposta.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Perguntas estratégicas de triagem</div>
+        <div class="card-title">🔑 As 3 perguntas que definem tudo</div>
+        <div class="grid3">
+          <div class="grid-cell">
+            <div class="grid-cell-title">🛍️ Tipo de produto</div>
+            <div class="grid-cell-body">Você prefere aparelho <strong>lacrado</strong>, <strong>sem caixa</strong> (igual a novo) ou <strong>seminovo</strong>? Cada um tem uma relação custo-benefício diferente!</div>
+          </div>
+          <div class="grid-cell">
+            <div class="grid-cell-title">💰 Forma de pagamento</div>
+            <div class="grid-cell-body">Pretende pagar à vista no <strong>Pix</strong> (melhor preço) ou parcelado no <strong>cartão</strong>? Assim já te mostro a melhor opção.</div>
+          </div>
+          <div class="grid-cell">
+            <div class="grid-cell-title">♻️ Tem aparelho para dar</div>
+            <div class="grid-cell-body">Você tem algum iPhone ou dispositivo Apple que gostaria de usar como parte do pagamento? Pode reduzir bastante o valor final!</div>
+          </div>
+        </div>
+        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Regra dos 2:</strong> Nunca ofereça mais de 2 opções ao mesmo tempo. O cliente se perde e abandona a conversa.</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Perguntas-chave para entender a necessidade real</div>
+        <div class="card-title">📱 Qual modelo? Já possui algum?</div>
+        <div class="alert-blue"><span>🧠</span><span>Essas duas perguntas definem se é primeira compra, upgrade ou troca — e mudam toda a estratégia de proposta.</span></div>
+        <div class="grid2">
+          <div class="grid-cell">
+            <div class="grid-cell-title">📱 Qual modelo você tem interesse?</div>
+            <div class="grid-cell-body">Identifique se o cliente já sabe o que quer ou se precisa de orientação. Se não souber, oriente com base no orçamento e uso (câmera, bateria, performance).</div>
+          </div>
+          <div class="grid-cell">
+            <div class="grid-cell-title">🔄 Já possui algum Apple?</div>
+            <div class="grid-cell-body">Se <strong>sim</strong>: abra caminho para upgrade/troca. Se <strong>não</strong>: é primeira compra, enfatize a facilidade de migração, garantia e suporte Revend.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Entender o que o cliente achou + próximo passo</div>
+        <div class="card-title">💬 Após enviar tabela / proposta — Entender reação</div>
+        <div class="tip"><span class="tip-icon">💡</span> Após enviar a tabela ou proposta, <strong>sempre pergunte o que ele achou e para quando precisa</strong>. Isso revela urgência real.</div>
+        <div class="msg-wrap">
+          <div class="msg-box green-border">[Nome], o que você achou das opções? Alguma chamou mais atenção? 😊
+
+E me diz: você está precisando para quando? Assim consigo verificar a disponibilidade certa para você!</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'entender-reacao')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Categorias explicadas para o cliente</div>
+        <div class="card-title">📦 Como explicar os tipos de produto</div>
+        <div class="grid2">
+          <div class="grid-cell">
+            <div><span class="badge badge-dark">♻️ Seminovo</span></div>
+            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Aparelho usado em boas condições. Garantia <strong>90 dias Revend</strong>. Melhor preço.</div>
+          </div>
+          <div class="grid-cell">
+            <div><span class="badge badge-blue">📦 Sem caixa</span></div>
+            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Funciona como novo. Bateria <strong>87–100%</strong>. Garantia 90 dias. Custo-benefício excelente.</div>
+          </div>
+          <div class="grid-cell">
+            <div><span class="badge badge-purple">📬 Open Box</span></div>
+            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Completo na caixa. Garantia <strong>6 meses Revend</strong> + cabo + fonte turbo.</div>
+          </div>
+          <div class="grid-cell">
+            <div><span class="badge badge-green">🍎 Lacrado Apple</span></div>
+            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">100% novo. Garantia <strong>1 ano Apple</strong>. Máxima segurança e tranquilidade.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Quando o cliente está "apenas pesquisando"</div>
+        <div class="card-title">🧐 Técnica de Ancoragem de Valor</div>
+        <div class="card-body">Use esta abordagem para transformar um pesquisador em comprador:</div>
+        <div class="msg-wrap">
+          <div class="msg-box green-border">[Nome], entendo que você está pesquisando — isso é inteligente! 
+
+Mas posso te adiantar uma coisa: nosso estoque gira *muito* rápido, especialmente os modelos mais procurados. 
+
+Semana passada, 3 clientes que disseram "vou pesquisar mais" voltaram no dia seguinte... e o modelo já tinha esgotado 😅
+
+Te faço uma proposta: me diz o modelo exato que você quer e eu verifico agora se ainda temos disponível. Assim você já sabe se vale a pena pesquisar ou se é melhor garantir o seu antes que suma!</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'ancoragem')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== PROPOSTA ======================== -->
+    <div id="proposta" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">📋 Etapa 3 — Proposta</div>
+          <div class="page-desc">Apresentação, geração de desejo e urgência</div>
+        </div>
+        <span class="badge badge-blue">Sempre 2 opções</span>
+      </div>
+
+      <div class="urgency-banner">
+        <div class="urgency-icon">🎬</div>
+        <div>
+          <div class="urgency-title">SEMPRE envie um vídeo curto do produto após a proposta</div>
+          <div class="urgency-desc">Vídeo de 15–30 segundos mostrando o aparelho gera confiança imediata e aumenta conversão em até 40%. Grave mostrando o produto ligado, com bateria e número de série visível.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Modelo de proposta padrão</div>
+        <div class="card-title">📱 Proposta com 2 opções (iPhone como exemplo)</div>
+        <div class="msg-wrap">
+          <div class="msg-box">Oi, *[Nome]*! Separei as melhores opções para você 📱
+
+*◼️ iPhone [modelo] [GB] — Sem Caixa*
+💰 R$ [valor] — Garantia Revend 10 meses ✅
+
+*◽️ iPhone [modelo] [GB] — Lacrado Apple*
+💰 R$ [valor] — Garantia 1 ano Apple ✅
+
+Ambos com *nota fiscal*, *pronta entrega* e *bateria acima de 90%*!
+
+Qual te interessa mais? Já envio o vídeo do aparelho para você 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'proposta')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Após apresentar proposta — Gerar urgência + desejo</div>
+        <div class="card-title">🔥 Técnica de Escassez + Prova Social</div>
+        <div class="tip"><span class="tip-icon">🧠</span> Envie esta mensagem JUNTO com o vídeo do produto. A combinação é devastadora para conversão.</div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">*[Nome]*, acabei de verificar o estoque agora e é o seguinte:
+
+Esse modelo está com alta procura esta semana — saíram *[X] unidades* nos últimos 2 dias 🔥
+
+Consigo *garantir o seu* até hoje, mas precisaria de uma confirmação da sua parte. 
+
+Se você vier buscar pessoalmente aqui na loja, ainda consigo te incluir um *brinde exclusivo* 🎁
+
+Quer que eu reserve esse modelo para você agora?</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'desejo')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Prova Social — Usar quando cliente hesita</div>
+        <div class="card-title">👥 Mensagem de Prova Social</div>
+        <div class="msg-wrap">
+          <div class="msg-box purple-border">Olha, vou te ser *100% transparente*, [Nome]:
+
+Esse modelo que te mostrei é um dos mais pedidos aqui. Só esta semana vendemos [X] unidades desse iPhone.
+
+Nossa avaliação no Google é *4.9 ⭐ com mais de [X] avaliações* — você pode conferir agora mesmo antes de decidir.
+
+Muitos dos nossos clientes compraram na Revend depois de pesquisar em outros lugares e perceberam que o conjunto (preço + garantia + NF + atendimento) é imbatível.
+
+Te mando o link das avaliações se quiser ver 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'prova-social')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Formas de pagamento</div>
+        <div class="card-title">💳 Mensagem de pagamento</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">💰 *Formas de Pagamento Revend:*
+
+✅ Dinheiro (melhor condição!)
+✅ Pix (desconto especial à vista)
+✅ Cartão de débito (+2% de taxa)
+✅ Cartão de crédito em até *18x*
+❌ Boleto bancário não aceitamos
+
+📦 *Entrega via motoboy ou Correios:*
+Sinal de 10% + frete antecipado.
+
+Posso enviar a simulação de parcelamento para você agora?</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'pagamento')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== OBJEÇÕES ======================== -->
+    <div id="objecoes" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🛡️ Etapa 4 — Tratamento de Objeções</div>
+          <div class="page-desc">Nunca encerre sem entender e contornar a objeção</div>
+        </div>
+        <span class="badge badge-amber">⚠️ Nunca desista na primeira objeção</span>
+      </div>
+
+      <div class="decision-box">
+        <div class="decision-title">🧭 ÁRVORE DE DECISÃO — Quando encerrar o atendimento?</div>
+        <div class="decision-item">
+          <div class="decision-key">ENCERRA ✓</div>
+          <div class="decision-val">Cliente confirma que <strong>não tem o dinheiro</strong> agora e não tem previsão. Não force. Agradeça e deixe a porta aberta.</div>
+        </div>
+        <div class="decision-item">
+          <div class="decision-key">ENCERRA ✓</div>
+          <div class="decision-val">Cliente diz que <strong>está apenas pesquisando</strong>, você já fez 2 tentativas de qualificar e ele não engajou.</div>
+        </div>
+        <div class="decision-item">
+          <div class="decision-key">CONTINUA 🔁</div>
+          <div class="decision-val"><strong>Qualquer outro motivo</strong>: preço alto, garantia, modelo, cor, bateria, prazo, desconfiança — há solução para tudo.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 1 — Preço</div>
+        <div class="card-title">💸 "Achei caro" / "Vi mais barato em outro lugar"</div>
+        <span class="badge badge-amber">Preço</span>
+        <div class="alert-blue"><span>🧠</span><span><strong>Técnica:</strong> Reframe + Quebra de Crença + Âncora de Valor. Não entre em guerra de preço. Eleve o valor percebido.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], entendo muito bem — e é ótimo que você esteja comparando! 
+
+Mas deixa eu te perguntar uma coisa: esse preço mais baixo que você viu vem com *nota fiscal, garantia documentada e atendimento pós-venda*? 
+
+Porque na Revend você compra com *segurança total*: aparelho 100% original, NF-e, garantia real e nosso SAC disponível se precisar.
+
+Muitos clientes que compraram "mais barato" em outros lugares voltaram para nós depois de ter dor de cabeça. Com a Revend, isso não acontece.
+
+O que te faria fechar hoje mesmo? Posso ver se consigo melhorar alguma condição para você 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-preco')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 2 — Bateria</div>
+        <div class="card-title">🔋 "Quero bateria 100%"</div>
+        <span class="badge badge-amber">Bateria</span>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], excelente que você presta atenção nisso — mostra que você entende de produto!
+
+Vou ser direto: bateria *100%* em aparelhos "sem caixa" é raro, porque já foram ativados. Mas 90–97% é *exatamente igual* na prática do dia a dia — você vai usar o aparelho por 1–2 anos e a diferença não vai aparecer.
+
+O que realmente importa é ser *bateria original Apple*, e todos os nossos aparelhos têm isso garantido.
+
+Na hora de separar o seu, verifico os modelos disponíveis e escolho o de *maior saúde de bateria* para você! Combinado? 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-bateria')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 3 — Upgrade / valor de troca baixo</div>
+        <div class="card-title">🔄 "O valor de troca está baixo"</div>
+        <span class="badge badge-amber">Upgrade</span>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], entendo a sua preocupação — e você tem razão de questionar!
+
+Vou verificar agora se consigo melhorar o valor da avaliação do seu aparelho. Me confirma: está sem detalhes na tela e carcaça, certo?
+
+Independente disso, pensa assim: o que importa é o *valor líquido que você vai desembolsar* para sair com o novo. Com a troca, você já reduz esse custo de forma significativa.
+
+Me dá um minuto que eu já consulto internamente para ver o *máximo que consigo liberar* para o seu aparelho 💪</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-troca')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 4 — Garantia</div>
+        <div class="card-title">🔒 "E se der problema? E a garantia?"</div>
+        <span class="badge badge-amber">Garantia</span>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], essa é uma das melhores perguntas que um comprador pode fazer — e temos muito orgulho da nossa resposta!
+
+✅ Aparelhos Lacrados: *1 ano de garantia direta com a Apple*
+✅ Sem Caixa / Open Box: *Garantia Revend* com SAC exclusivo
+✅ Em caso de qualquer problema: WhatsApp direto *(11) 94025-1866*
+
+Atendemos de seg a sex 10h30–17h30 e nossa equipe resolve. Temos *mais de [X] clientes atendidos* sem problemas na garantia.
+
+Isso te dá a tranquilidade que você precisava? 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-garantia')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 5 — Indecisão</div>
+        <div class="card-title">🤔 "Vou pensar" / "Vou pesquisar mais"</div>
+        <span class="badge badge-amber">Indecisão</span>
+        <div class="alert-red"><span>🚨</span><span>"Vou pensar" é código para "não me convenceu ainda". Descubra o motivo real.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">Claro, [Nome]! Pensar é importante em uma compra como essa 😊
+
+Mas me ajuda com uma coisa: o que especificamente ainda te deixa com dúvida? É o *preço*, a *forma de pagamento*, o *modelo*, ou tem alguma outra questão?
+
+Pergunto porque muitas vezes consigo resolver na hora — seja ajustando uma condição, explicando melhor algum detalhe ou encontrando uma opção que se encaixa melhor na sua realidade.
+
+O que seria o ideal para você fechar hoje? Me conta! 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-pesquisa')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 6 — Desconfiança / nunca comprou online</div>
+        <div class="card-title">😰 "Tenho medo de golpe" / "Nunca comprei assim"</div>
+        <span class="badge badge-red">Confiança</span>
+        <div class="msg-wrap">
+          <div class="msg-box purple-border">[Nome], sua preocupação é completamente válida — e parabéns por ser cauteloso!
+
+Deixa eu te mostrar que a Revend é uma empresa real e séria:
+🏢 Somos CNPJ *28.724.816/0001-87* — você pode consultar agora na Receita Federal
+📍 Loja física: R. Tuiuti, 1951, Tatuapé — SP
+⭐ [X]+ avaliações no Google com nota [X.X]
+📋 Emitimos Nota Fiscal Eletrônica em toda venda
+
+Você pode vir pessoalmente conhecer a loja antes de decidir. É aqui em São Paulo, no Tatuapé! 
+
+Prefere passar pessoalmente ou quer que eu te envie mais informações de segurança primeiro? 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-confianca')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 7 — Concorrência (outro fornecedor)</div>
+        <div class="card-title">🏪 "Vi igual em outro lugar" / "Outro vendedor me ofereceu"</div>
+        <span class="badge badge-red">Concorrência</span>
+        <div class="alert-blue"><span>🧠</span><span><strong>Técnica:</strong> Não ataque o concorrente. Compare valor, não preço. Negocie condições para fechar.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">[Nome], ótimo que você está pesquisando — isso só confirma que você é um comprador inteligente!
+
+Me conta: essa outra oferta vem com *nota fiscal, garantia documentada e atendimento pós-venda garantido*?
+
+Na Revend, além do preço competitivo, você tem:
+✅ NF-e em toda venda
+✅ Garantia real (não é promessa de boca)
+✅ SAC com atendimento humano
+✅ Loja física para você visitar antes de decidir
+
+Posso ver o que consigo fazer para igualar ou superar essa condição. Me passa o valor que você viu e verifico aqui 💪</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-concorrencia')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 8 — Valor alto / Up de produto</div>
+        <div class="card-title">💰 "Tá caro" / "Quero descontar mais" / Taxa alta no cartão</div>
+        <span class="badge badge-amber">Taxa / Negociação</span>
+        <div class="tip"><span class="tip-icon">🧠</span> Reduza a taxa, ofereça up de produto com melhor custo-benefício, ou negocie brinde. Use as 3 alavancas em sequência, nunca de uma vez.</div>
+        <div class="grid3">
+          <div class="grid-cell" style="border-left:3px solid var(--red);">
+            <div class="grid-cell-title" style="color:var(--red);">💳 Taxa → Reduzir</div>
+            <div class="grid-cell-body">Ofereça migração para Pix/débito. Mostre que a economia na taxa cobre a diferença que ele pede.</div>
+          </div>
+          <div class="grid-cell" style="border-left:3px solid var(--amber);">
+            <div class="grid-cell-title" style="color:var(--amber);">📦 Up produto → Negociar</div>
+            <div class="grid-cell-body">Apresente uma versão ligeiramente superior que entrega mais valor pelo mesmo delta de preço. "Por só R$X a mais você leva o [modelo melhor]."</div>
+          </div>
+          <div class="grid-cell" style="border-left:3px solid var(--green);">
+            <div class="grid-cell-title" style="color:var(--green);">🎁 Desc. / Brinde</div>
+            <div class="grid-cell-body">Solicite autorização interna para desconto ou inclua brinde (case, cabo, película). Cria sensação de ganho sem mexer no preço principal.</div>
+          </div>
+        </div>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], entendo! Deixa eu verificar aqui o que consigo fazer por você.
+
+Duas opções que posso explorar agora:
+1️⃣ Se você conseguir pagar no *Pix ou débito*, consigo uma condição melhor na hora
+2️⃣ Posso verificar se há margem para incluir um *brinde* sem alterar o preço
+
+Qual dessas faz mais sentido para você? Assim já aciono internamente 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'obj-negociacao')">📋 Copiar resposta</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Objeção 9 — Psicológica / Sem resposta</div>
+        <div class="card-title">🧠 Cliente indeciso, pesquisando ou simplesmente sumiu</div>
+        <span class="badge badge-purple">Psicológico</span>
+        <div class="alert-red"><span>🚨</span><span>Quando o cliente some sem dar objeção clara, acione o remarketing estruturado (D+1, D+2, D+3, D+6). Não deixe o lead esfriar sem ação.</span></div>
+        <div class="decision-box">
+          <div class="decision-title">🧭 Como identificar e agir em cada caso psicológico</div>
+          <div class="decision-item">
+            <div class="decision-key">INDECISO</div>
+            <div class="decision-val">Diz que vai pensar, pede mais tempo. → Descubra o motivo real: "O que especificamente ainda te deixa em dúvida?" Resolva na hora.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">PESQUISANDO</div>
+            <div class="decision-val">Compara com outros lugares. → Use prova social + urgência de estoque. Mostre risco de perder o modelo.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">SEM RESP.</div>
+            <div class="decision-val">Sumiu sem razão. → Ative remarketing D+1 → D+2 → D+3 → D+6. Verifique status até o final do dia antes de arquivar.</div>
+          </div>
+        </div>
+        <div class="tip"><span class="tip-icon">📌</span> Verifique status de leads sem resposta <strong>até o final do dia</strong>. Nenhum lead dorme sem pelo menos uma tentativa de contato.</div>
+      </div>
+    </div>
+
+    <!-- ======================== FECHAMENTO ======================== -->
+    <div id="fechamento" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔒 Etapa 5 — Fechamento</div>
+          <div class="page-desc">Técnicas de fechamento e reserva do produto</div>
+        </div>
+        <span class="badge badge-green">Conversão</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Técnica 1 — Fechamento por escolha</div>
+        <div class="card-title">🎯 Pergunta de fechamento alternativo</div>
+        <div class="card-body">Em vez de perguntar "quer comprar?", dê duas opções que assumem a compra:</div>
+        <div class="msg-wrap">
+          <div class="msg-box green-border">*[Nome]*, já vejo que você gostou do modelo! 
+
+Me diz: você prefere *passar na loja* para verificar pessoalmente ou prefere que eu *organize a entrega* via motoboy para você?
+
+Para qualquer uma das opções, vou reservar o modelo agora mesmo no seu nome — só preciso de qual é melhor para você! 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'fechamento-alternativo')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Técnica 2 — Escassez real</div>
+        <div class="card-title">⚡ Fechamento com urgência de estoque</div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">*[Nome]*, acabo de verificar e temos *apenas [X] unidade(s)* desse modelo disponível agora.
+
+Considerando que recebo consultas constantemente e o estoque gira rápido, não consigo garantir disponibilidade para amanhã sem uma reserva confirmada.
+
+Para *garantir o seu hoje*, só preciso de *R$ 100,00 de sinal via Pix* — que é descontado na compra. 
+
+Você consegue fazer isso agora? O modelo fica bloqueado no seu nome por 48h ⏳</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'fechamento-escassez')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Solicitação de sinal / reserva</div>
+        <div class="card-title">💰 Mensagem de reserva oficial</div>
+        <div class="tip"><span class="tip-icon">📌</span> iPad e MacBook: sinal obrigatório de 10%. Demais: mínimo R$ 100. Sem exceção.</div>
+        <div class="msg-wrap">
+          <div class="msg-box">*Ótima escolha, [Nome]!* 🎉
+
+Para garantir o aparelho no seu nome com *atendimento prioritário*, nossa reserva é de:
+
+💸 *R$ 100,00 via Pix*
+CNPJ: 28.724.816/0001-87 *(Revend Comércio Varejista)*
+*(O valor é 100% abatido na compra)*
+
+Após o comprovante, já bloqueo o produto para você e confirmo o agendamento!
+
+Qual o melhor dia e horário para você? 🗓️</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'reserva')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Formulário de agendamento</div>
+        <div class="card-title">📅 Modelo para enviar no grupo interno</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">📅 *AGENDAMENTO*
+● Código:
+● Data:
+● Horário:
+● Nome completo:
+● Telefone:
+● Produto (modelo | capacidade | cor):
+● Valor:
+● Forma de pagamento:
+● Sinal confirmado: ✅ / ❌
+● Observações:</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'agendamento')">📋 Copiar modelo</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Cliente recusa sinal</div>
+        <div class="card-title">🤝 Quando o cliente não quer dar sinal</div>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome]! 😊 Sem problema — você pode vir sem reserva.
+
+Só preciso ser transparente: sem sinal, o modelo *permanece na linha de venda* até você chegar. Se outro cliente confirmar antes, o modelo pode ser vendido.
+
+Para evitar que você venha e não encontre o produto, *recomendo fortemente* pelo menos o sinal de R$ 100. 
+
+Você consegue enviar agora? Prometo que vale a garantia de ter o produto esperando por você! 💪</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'sem-sinal')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== FOLLOW-UP & REMARKETING ======================== -->
+    <div id="followup" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🔁 Etapa 6 — Follow-up & Remarketing</div>
+          <div class="page-desc">Sequência unificada para leads que pararam de responder</div>
+        </div>
+        <span class="badge badge-red">D+1 → D+2 → D+3 → D+6</span>
+      </div>
+
+      <div class="urgency-banner">
+        <div class="urgency-icon">📊</div>
+        <div>
+          <div class="urgency-title">Não interprete silêncio como "não quero" — siga a sequência até o D+6</div>
+          <div class="urgency-desc">Cada dia tem uma alavanca diferente: entender → desconto/bônus → urgência/NF → encerramento. Não queime etapas.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Quando usar Follow-up vs Remarketing</div>
+        <div class="card-title">🧭 Qual contexto se aplica?</div>
+        <div class="grid2">
+          <div class="grid-cell" style="border-left:3px solid var(--blue);">
+            <div class="grid-cell-title" style="color:var(--blue);">🔁 Follow-up — Mesmo vendedor</div>
+            <div class="grid-cell-body">Lead sumiu durante o atendimento ativo. <strong>Você mesmo</strong> continua tentando o contato na sequência D+1 → D+6.</div>
+          </div>
+          <div class="grid-cell" style="border-left:3px solid var(--purple);">
+            <div class="grid-cell-title" style="color:var(--purple);">📡 Remarketing — Vendedor Rmkt</div>
+            <div class="grid-cell-body">Lead frio ou atendimento encerrado sem venda. <strong>Transferir no Kommo</strong> para o vendedor de Remarketing antes de iniciar a sequência.</div>
+          </div>
+        </div>
+        <div class="alert-blue" style="margin-top:10px;"><span>🔵</span><span><strong>Kommo (Remarketing):</strong> Preencha o cabeçalho e transfira o lead para o vendedor de Rmkt antes de disparar qualquer mensagem.</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Visão geral da sequência</div>
+        <div class="card-title">📆 Cadência D+1 → D+2 → D+3 → D+6</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#DBEAFE;color:#1D4ED8;">H+2</div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Reativação leve</div><div class="tl-desc">Cliente viu mas não respondeu. Tom casual — apenas verificar se recebeu.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#FEF3C7;color:#D97706;">D+1</div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Entender o cliente</div><div class="tl-desc">Descobrir o motivo real da não-compra. Não tente vender — pergunte primeiro.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#FCE7F3;color:#9D174D;">D+2</div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Desconto ou bônus especial</div><div class="tl-desc">Adicionar valor: brinde, desconto pontual ou parcelamento melhor.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#D1FAE5;color:#065F46;">D+3</div><div class="tl-line"></div></div>
+            <div class="tl-content"><div class="tl-title">Garantia + Urgência (NF / Escassez)</div><div class="tl-desc">"Últimas unidades" + nota fiscal garantida. Use escassez <strong>real</strong> — verifique o estoque antes.</div></div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:#FEE2E2;color:#991B1B;">D+6</div></div>
+            <div class="tl-content"><div class="tl-title">Último contato — Lead Perdido</div><div class="tl-desc">Encerramento. Arquivar no WhatsApp + mover para "Lead Perdido" no Kommo.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">H+2 — Reativação rápida</div>
+        <div class="card-title">⏱️ Cliente viu a mensagem mas não respondeu</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">Oi, [Nome]! 😊 Só passando para ver se você recebeu as informações que te mandei!
+
+Qualquer dúvida sobre o [produto], estou aqui para ajudar. Me chama!
+
+Abraço 👋</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'followup-h2')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">D+1 — Entender o cliente</div>
+        <div class="card-title">🔍 Primeiro dia — Descobrir o motivo real</div>
+        <div class="tip"><span class="tip-icon">💡</span> Não tente vender aqui. Foque em <strong>entender</strong> o que travou. A resposta te dá a alavanca certa para D+2 e D+3.</div>
+        <div class="msg-wrap">
+          <div class="msg-box purple-border">Oi, *[Nome]*! 😊 Tudo bem?
+
+Conversamos sobre o [produto] e queria entender melhor: teve alguma dúvida que ficou sem resposta ou alguma condição que não te agradou?
+
+Pergunto porque muitas vezes consigo resolver na hora — seja no preço, na forma de pagamento ou em algum detalhe do produto.
+
+Me conta! 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'remark-d1')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">D+2 — Desconto ou bônus especial</div>
+        <div class="card-title">🎁 Segundo dia — Adicionar valor</div>
+        <div class="msg-wrap">
+          <div class="msg-box amber-border">Oi, *[Nome]*! Tudo bem?
+
+Tenho uma condição especial hoje que não consigo garantir para amanhã:
+
+🎁 *Para quem fechar até hoje*, consigo incluir um *[brinde/acessório]* sem custo adicional.
+
+Ou se preferir, posso verificar uma *condição de parcelamento especial* para você.
+
+Vale a pena aproveitar! O que você acha? 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'remark-d2')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">D+3 — Garantia + Urgência</div>
+        <div class="card-title">⚡ Terceiro dia — Escassez real + NF</div>
+        <div class="tip"><span class="tip-icon">⚠️</span> Verifique o estoque antes de enviar. <strong>Nunca invente escassez</strong> — prejudica a credibilidade.</div>
+        <div class="msg-wrap">
+          <div class="msg-box">*[Nome]*, preciso te contar:
+
+Estamos com a *última unidade* do [modelo] que você estava vendo. Essa semana saíram [X] unidades desse modelo.
+
+Se sair essa última, o próximo lote já vem com valor diferente — e sem garantia de prazo de chegada.
+
+Consigo *reservar por hoje* se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome, com *nota fiscal garantida* ✅
+
+O que me diz? ⏳</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'remark-d3')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">D+6 — Último contato</div>
+        <div class="card-title">🚪 Técnica do encerramento</div>
+        <div class="alert-red"><span>🔴</span><span>Último contato antes de mover para "Lead Perdido". Funciona porque cria senso de perda — muitos respondem exatamente aqui.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], como não recebi retorno, vou presumir que você encontrou outra opção ou não tem interesse no momento.
+
+Estarei *encerrando* o atendimento por aqui — mas fica à vontade para nos contatar quando quiser. Sempre teremos ótimas opções para você! 😊
+
+Foi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'remark-d6')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Após D+6 → Encerramento no Kommo</div>
+        <div class="card-title">❌ Ações de encerramento definitivo</div>
+        <div class="decision-box">
+          <div class="decision-title">🧭 Checklist de encerramento</div>
+          <div class="decision-item">
+            <div class="decision-key">WhatsApp</div>
+            <div class="decision-val">Arquivar a conversa. Não deletar — pode ser reativado no futuro.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">Kommo</div>
+            <div class="decision-val">Mover para <strong>"Lead Perdido"</strong>. Registrar motivo: sem resposta / concorrência / sem dinheiro.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">Feedback</div>
+            <div class="decision-val">Analisem semanalmente os motivos mais recorrentes para ajustar abordagem.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Remarketing de produto específico — Lead frio</div>
+        <div class="card-title">📦 Notificar cliente sobre produto que ele queria</div>
+        <div class="tip"><span class="tip-icon">💡</span> Use quando chegar um produto que o cliente havia perguntado anteriormente. Personalização máxima — ele vai lembrar da conversa.</div>
+        <div class="msg-wrap">
+          <div class="msg-box purple-border">*[Nome]*, lembra que você estava procurando o [produto específico]?
+
+Acabou de chegar uma unidade aqui e *lembrei de você imediatamente*!
+
+Disponível com nota fiscal, garantia e no valor que conversamos (ou melhor!).
+
+Posso reservar no seu nome agora? São pouquíssimas unidades 😊⏳</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'remark3')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== ENTREGA ======================== -->
+    <div id="entrega" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">🚀 Etapa 7 — Entrega</div>
+          <div class="page-desc">Logística e confirmação de entrega ou visita</div>
+        </div>
+        <span class="badge badge-blue">Motoboy · Correios · Loja</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Entrega por motoboy</div>
+        <div class="card-title">🏍️ Informações de entrega</div>
+        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Atenção total a pedidos suspeitos.</strong> Confirme documento e endereço antes de liberar qualquer entrega.</div>
+        <div class="msg-wrap">
+          <div class="msg-box">Olá! 😊 Realizamos entrega via *Motoboy*, com custo de *R$ 2,00/km*.
+
+A entrega é feita mediante pagamento total antecipado ou *entrada de 10% + frete*.
+
+📋 Para agendar, precisamos:
+● Selfie segurando seu *RG ou CNH*
+● *Comprovante de residência*
+
+Também fazemos envio via *Correios* — me manda seu CEP que calculo o frete na hora! 📦</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'motoboy')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Localização das lojas</div>
+        <div class="card-title">📍 Endereço e horários</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">📍 *Revend Eletro — Unidade Tatuapé:*
+R. Tuiuti, 1951 — Conj. 10, Tatuapé, São Paulo
+
+🕐 Horário: Seg–Sex 10h15–18h45 | Sáb 9h30–16h30
+📞 Tel: (11) 2667-8827
+
+🏢 Também temos unidades em *São José dos Campos* e *Sorocaba*!
+
+⚠️ Obrigatório apresentar *documento de identidade* para acessar o local.</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'endereco')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== PÓS-VENDA ======================== -->
+    <div id="posvenda" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">⭐ Etapa 8 — Pós-venda</div>
+          <div class="page-desc">Fidelização, avaliação e gestão de satisfação</div>
+        </div>
+        <span class="badge badge-teal">Fidelização</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Pós-compra — Mensagem de satisfação</div>
+        <div class="card-title">💙 Follow-up 24–48h após a venda</div>
+        <div class="msg-wrap">
+          <div class="msg-box green-border">Olá, *[Nome]*! Esperamos que esteja aproveitando ao máximo seu novo [produto]! 😊
+
+Gostaríamos de saber: como foi sua experiência de compra na Revend?
+
+Seu feedback é muito importante para continuarmos sendo a melhor opção em Apple do Brasil 🍎
+
+Se quiser nos avaliar no Google, seria incrível — ajuda muito outros clientes a nos encontrar! ⭐
+
+Qualquer dúvida ou necessidade, estou aqui. Abraço, [Seu nome]! 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'posvenda')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Cliente insatisfeito</div>
+        <div class="card-title">🆘 Gestão de crise — Cliente com problema</div>
+        <div class="alert-red"><span>🔴</span><span>Responda em no máximo 30 minutos. Velocidade é a chave para reverter insatisfação.</span></div>
+        <div class="msg-wrap">
+          <div class="msg-box">[Nome], recebi sua mensagem e já estou priorizando sua situação pessoalmente 🙏
+
+Lamento muito pela experiência e quero resolver isso para você da melhor forma possível.
+
+Me conta exatamente o que aconteceu para que eu possa acionar a solução mais rápida.
+
+A Revend existe para garantir que você fique 100% satisfeito — e vamos chegar lá juntos! 💙</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'insatisfeito')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Encaminhamento para SAC</div>
+        <div class="card-title">🔧 Problema técnico — Direcionar para SAC</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">Olá! Para garantir o melhor atendimento para o seu caso, vou direcionar você ao nosso SAC especializado:
+
+📱 WhatsApp SAC: *(11) 94025-1866*
+🕐 Seg–Sex: 10h30 às 17h30
+*(Não atendemos sábados e feriados)*
+
+Atendimento por ordem de chegada. Mencione que é cliente da unidade [local] para agilizar!
+
+Estou à disposição se precisar de mais alguma coisa 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'sac')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== COMPRA / TROCA ======================== -->
+    <div id="compra" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">♻️ Etapa 10 — Compra / Troca</div>
+          <div class="page-desc">Avaliação de aparelhos usados e propostas de upgrade</div>
+        </div>
+        <span class="badge badge-teal">Upgrade</span>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Abertura de compra</div>
+        <div class="card-title">🛒 Cliente quer vender ou fazer upgrade</div>
+        <div class="msg-wrap">
+          <div class="msg-box green-border">Compramos sim, [Nome]! 😊
+
+Me conta: você prefere:
+1️⃣ *Vender* o seu aparelho (recebe o valor em dinheiro/Pix)
+2️⃣ *Upgrade* — trocar por um modelo superior pagando a diferença
+3️⃣ *Downgrade* — trocar por modelo inferior + receber o saldo de volta
+
+Qual faz mais sentido para você agora?</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'compra-intro')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Formulário de avaliação</div>
+        <div class="card-title">📋 Pré-avaliação do aparelho</div>
+        <div class="msg-wrap">
+          <div class="msg-box">♻️ *Para fazer a pré-avaliação, me informa:*
+
+● Modelo, capacidade e cor:
+● Marcas de uso na carcaça ou tela? R:
+● Algum reparo realizado anteriormente? R:
+● Algo quebrado ou defeituoso? R:
+● Desbloqueado para todas as operadoras? R:
+● Digital ou Face ID funcionando 100%? R:
+● % saúde da bateria? *(Ajustes > Bateria > Saúde)* R:
+● Ainda na garantia Apple? R:
+
+📸 *Envie fotos* das laterais, frente e traseira (com tela ligada).
+
+⚠️ Valor estimado pode variar na avaliação presencial.</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'avaliacao-iphone')">📋 Copiar formulário</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Proposta de upgrade</div>
+        <div class="card-title">📈 Modelo de proposta com troca</div>
+        <div class="msg-wrap">
+          <div class="msg-box purple-border">Oi, *[Nome]*! 😊 Montei uma proposta personalizada para o seu upgrade:
+
+📱 *iPhone [novo modelo] — Opções:*
+◼️ Lacrado: R$ [valor] *(garantia 1 ano Apple)*
+◽️ Sem Caixa: R$ [valor] *(garantia 10 meses Revend)*
+
+♻️ *Seu [aparelho atual]* com [X]% de bateria:
+→ Avaliado em *R$ [valor de troca]*
+
+💰 *Valor líquido que você pagaria:*
+◼️ Lacrado: *R$ [valor final]*
+◽️ Sem Caixa: *R$ [valor final]*
+
+Quer a simulação no cartão em até 18x? 😉</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'proposta-upgrade')">📋 Copiar modelo</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Orientação antes da visita</div>
+        <div class="card-title">💾 Backup e preparação do aparelho</div>
+        <div class="msg-wrap">
+          <div class="msg-box blue-border">*[Nome]*, para agilizar ao máximo quando você chegar, recomendo fazer o backup agora:
+
+💾 *iCloud:* Ajustes → [Seu Nome] → iCloud → Backup → Fazer Backup Agora
+
+💻 *iTunes/Finder:* Conecte ao computador e clique em "Fazer Backup Agora"
+
+⚠️ *Importante:*
+O aparelho precisa estar *desbloqueado* e com o *iCloud removido* (Ajustes > [Seu Nome] > Sair) antes de entregar.
+
+Nossa equipe também pode auxiliar presencialmente se precisar! 😊</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'backup')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+    <!-- ======================== COMPROU / AGENDOU ======================== -->
+    <div id="comprou-agendou" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">✅ Etapa 11 — Comprou / Agendou</div>
+          <div class="page-desc">Fluxo pós-decisão: confirmação, não-resposta e encerramento</div>
+        </div>
+        <span class="badge badge-green">Pós-decisão</span>
+      </div>
+
+      <div class="urgency-banner">
+        <div class="urgency-icon">🎯</div>
+        <div>
+          <div class="urgency-title">Toda decisão do cliente — compra ou agendamento — precisa de ação imediata sua</div>
+          <div class="urgency-desc">Registre no Kommo, confirme com o cliente e atualize o status do lead. Lead ganho = mover para "Comprou". Lead perdido = fechar no Kommo.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Resultado: COMPROU</div>
+        <div class="card-title">🏆 Cliente fechou — Fluxo pós-venda</div>
+        <div class="alert-green"><span>✅</span><span><strong>Kommo:</strong> Mover lead para "Lead Ganho". Registrar valor, produto, forma de pagamento e vendedor.</span></div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">1</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">💾 Registro no Kommo → "Lead Ganho"</div>
+              <div class="tl-desc">Mova o lead imediatamente. Preencha todos os campos: produto, valor, forma de pagamento, vendedor.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">2</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">📦 Pós-venda 24–48h</div>
+              <div class="tl-desc">Envie a mensagem de pós-venda perguntando sobre a experiência. Solicite avaliação no Google.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">3</div><div class="tl-line"></div></div>
+            <div class="tl-content">
+              <div class="tl-title">⭐ Feedback do cliente</div>
+              <div class="tl-desc">Colete feedback (positivo ou negativo). Avaliações positivas = peça Google Review. Negativas = escale para SAC.</div>
+            </div>
+          </div>
+        </div>
+        <div class="msg-wrap">
+          <div class="msg-label">Mensagem de pós-venda (24–48h após)</div>
+          <div class="msg-box green-border">Olá, *[Nome]*! 😊 Esperamos que esteja curtindo muito o novo [produto]!
+
+Queria saber: como foi sua experiência de compra na Revend?
+
+Seu feedback é muito importante para a gente 🍎
+
+Se quiser nos avaliar no Google, seria incrível — ajuda outros clientes a nos encontrar! ⭐
+
+Qualquer dúvida, estou aqui. Abraço! 🙏</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'posvenda')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Resultado: AGENDOU</div>
+        <div class="card-title">📅 Cliente agendou visita — Confirmação e acompanhamento</div>
+        <div class="grid2">
+          <div class="grid-cell" style="border-left:3px solid var(--blue);">
+            <div class="grid-cell-title" style="color:var(--blue);">🤖 Confirmação Automática (Kommo)</div>
+            <div class="grid-cell-body">Configure mensagem automática de confirmação no Kommo para disparar após o agendamento ser registrado. Inclui: data, horário, endereço e o que trazer.</div>
+          </div>
+          <div class="grid-cell" style="border-left:3px solid var(--amber);">
+            <div class="grid-cell-title" style="color:var(--amber);">✍️ Confirmação Manual</div>
+            <div class="grid-cell-body">Se automático não disparar: envie a mensagem de confirmação manual com todos os dados do agendamento. Confirme também no dia anterior.</div>
+          </div>
+        </div>
+        <div class="msg-wrap">
+          <div class="msg-label">Confirmação de agendamento</div>
+          <div class="msg-box blue-border">*[Nome]*, tudo certo! Seu agendamento está confirmado ✅
+
+📅 *Data:* [data]
+🕐 *Horário:* [horário]
+📍 *Local:* R. Tuiuti, 1951 — Conj. 10, Tatuapé, SP
+📱 *Produto reservado:* [modelo]
+
+⚠️ *Importante:* Traga documento de identidade (RG ou CNH).
+Se precisar reagendar, me avisa com antecedência, tá? 😊
+
+Te esperamos! 🍎</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'confirmacao-agendamento')">📋 Copiar mensagem</button>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Resultado: NÃO RESPONDEU após agendamento</div>
+        <div class="card-title">🔕 Cliente agendou mas sumiu ou não apareceu</div>
+        <div class="alert-red"><span>🔴</span><span>Se o cliente não confirmar em 2h ou não aparecer no horário marcado, siga o protocolo abaixo antes de encerrar.</span></div>
+        <div class="decision-box">
+          <div class="decision-title">🧭 Protocolo para não-resposta pós-agendamento</div>
+          <div class="decision-item">
+            <div class="decision-key">WhatsApp</div>
+            <div class="decision-val">Tentou contato e não houve resposta → <strong>Arquivar a conversa no WhatsApp</strong>. Não delete — pode voltar.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">Kommo</div>
+            <div class="decision-val">Após arquivar no WhatsApp → <strong>Fechar o contato no Kommo</strong> como "Sem contato". Libera a unidade para venda.</div>
+          </div>
+          <div class="decision-item">
+            <div class="decision-key">Produto</div>
+            <div class="decision-val">Se havia reserva → <strong>Liberar o produto para venda</strong> após 48h sem confirmação.</div>
+          </div>
+        </div>
+        <div class="msg-wrap">
+          <div class="msg-label">Última tentativa antes de arquivar</div>
+          <div class="msg-box amber-border">[Nome], tudo bem? Notei que não tivemos resposta desde o nosso agendamento.
+
+Só quero confirmar: ainda tem interesse no [produto]? Estou aqui para ajudar!
+
+Se não puder mais nesse horário, me avisa que reagendo sem problema 😊
+
+(Caso não haja retorno, vou liberar a reserva para outros clientes na fila.)</div>
+        </div>
+        <button class="copy-btn" onclick="copyMsg(this, 'nao-respondeu-agendamento')">📋 Copiar mensagem</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Navigation
+function show(id, el) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+
+  // Remove active from all nav items and mobile tabs
+  document.querySelectorAll('.sidebar .nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.mobile-tab').forEach(b => b.classList.remove('active'));
+
+  // Activate all buttons that point to this section id
+  document.querySelectorAll(`[onclick*="'${id}'"]`).forEach(b => b.classList.add('active'));
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Messages dictionary
+const msgs = {
+  'boas-vindas': '✨ Olá, tudo bem? Seja muito bem-vindo(a) à Revend! ✨\n\nEu sou o Felipe e estou aqui para proporcionar a melhor experiência na sua busca pelos produtos Apple 🍎\n\nPara iniciar seu atendimento, poderia me informar:\n📝 Qual é o seu nome?\n📱 Você já tem algum modelo em mente?\n\nFico no aguardo! 😊\n\n🔗 Nossa tabela atualizada: https://revendeletro.com.br/tabela-de-valores/',
+  'reativacao': 'Oi! 😊 Vi que você entrou em contato com a Revend. Quero garantir que você seja bem atendido(a) pessoalmente por mim!\n\nTenho ótimas opções disponíveis agora — qual produto você estava pesquisando? 🍎\n\nMe conta que faço questão de te ajudar a encontrar o melhor negócio!',
+  'ausencia': 'Olá! Este é o setor de Vendas da Revend. Não estamos em horário de atendimento no momento, mas você já está na fila prioritária! ⏰\n\n🕐 Horários: Seg–Sex 10h às 18h | Sábado: 10h às 16h\n\nSua mensagem foi recebida ✅ Por favor, informe seu nome e o produto de interesse para agilizarmos assim que abrirmos.\n\n🔗 Tabela atualizada: https://revendeletro.com.br/tabela-de-valores/',
+  'ancoragem': '[Nome], entendo que você está pesquisando — isso é inteligente!\n\nMas posso te adiantar uma coisa: nosso estoque gira muito rápido, especialmente os modelos mais procurados.\n\nSemana passada, 3 clientes que disseram "vou pesquisar mais" voltaram no dia seguinte... e o modelo já tinha esgotado 😅\n\nTe faço uma proposta: me diz o modelo exato que você quer e eu verifico agora se ainda temos disponível. Assim você já sabe se vale a pena pesquisar ou se é melhor garantir o seu antes que suma!',
+  'proposta': 'Oi, [Nome]! Separei as melhores opções para você 📱\n\n◼️ iPhone [modelo] [GB] — Sem Caixa\n💰 R$ [valor] — Garantia Revend 10 meses ✅\n\n◽️ iPhone [modelo] [GB] — Lacrado Apple\n💰 R$ [valor] — Garantia 1 ano Apple ✅\n\nAmbos com nota fiscal, pronta entrega e bateria acima de 90%!\n\nQual te interessa mais? Já envio o vídeo do aparelho para você 😊',
+  'desejo': '[Nome], acabei de verificar o estoque agora e é o seguinte:\n\nEsse modelo está com alta procura esta semana — saíram [X] unidades nos últimos 2 dias 🔥\n\nConsigo garantir o seu até hoje, mas precisaria de uma confirmação da sua parte.\n\nSe você vier buscar pessoalmente aqui na loja, ainda consigo te incluir um brinde exclusivo 🎁\n\nQuer que eu reserve esse modelo para você agora?',
+  'prova-social': 'Olha, vou te ser 100% transparente, [Nome]:\n\nEsse modelo que te mostrei é um dos mais pedidos aqui. Só esta semana vendemos [X] unidades desse iPhone.\n\nNossa avaliação no Google é 4.9 ⭐ com mais de [X] avaliações — você pode conferir agora mesmo antes de decidir.\n\nMuitos dos nossos clientes compraram na Revend depois de pesquisar em outros lugares e perceberam que o conjunto (preço + garantia + NF + atendimento) é imbatível.\n\nTe mando o link das avaliações se quiser ver 😊',
+  'pagamento': '💰 Formas de Pagamento Revend:\n\n✅ Dinheiro (melhor condição!)\n✅ Pix (desconto especial à vista)\n✅ Cartão de débito (+2% de taxa)\n✅ Cartão de crédito em até 18x\n❌ Boleto bancário não aceitamos\n\n📦 Entrega via motoboy ou Correios:\nSinal de 10% + frete antecipado.\n\nPosso enviar a simulação de parcelamento para você agora?',
+  'obj-preco': '[Nome], entendo muito bem — e é ótimo que você esteja comparando!\n\nMas deixa eu te perguntar uma coisa: esse preço mais baixo que você viu vem com nota fiscal, garantia documentada e atendimento pós-venda?\n\nPorque na Revend você compra com segurança total: aparelho 100% original, NF-e, garantia real e nosso SAC disponível se precisar.\n\nMuitos clientes que compraram "mais barato" em outros lugares voltaram para nós depois de ter dor de cabeça. Com a Revend, isso não acontece.\n\nO que te faria fechar hoje mesmo? Posso ver se consigo melhorar alguma condição para você 🙏',
+  'obj-bateria': '[Nome], excelente que você presta atenção nisso — mostra que você entende de produto!\n\nVou ser direto: bateria 100% em aparelhos "sem caixa" é raro, porque já foram ativados. Mas 90–97% é exatamente igual na prática do dia a dia — você vai usar o aparelho por 1–2 anos e a diferença não vai aparecer.\n\nO que realmente importa é ser bateria original Apple, e todos os nossos aparelhos têm isso garantido.\n\nNa hora de separar o seu, verifico os modelos disponíveis e escolho o de maior saúde de bateria para você! Combinado? 😊',
+  'obj-troca': '[Nome], entendo a sua preocupação — e você tem razão de questionar!\n\nVou verificar agora se consigo melhorar o valor da avaliação do seu aparelho. Me confirma: está sem detalhes na tela e carcaça, certo?\n\nIndependente disso, pensa assim: o que importa é o valor líquido que você vai desembolsar para sair com o novo. Com a troca, você já reduz esse custo de forma significativa.\n\nMe dá um minuto que eu já consulto internamente para ver o máximo que consigo liberar para o seu aparelho 💪',
+  'obj-garantia': '[Nome], essa é uma das melhores perguntas que um comprador pode fazer — e temos muito orgulho da nossa resposta!\n\n✅ Aparelhos Lacrados: 1 ano de garantia direta com a Apple\n✅ Sem Caixa / Open Box: Garantia Revend com SAC exclusivo\n✅ Em caso de qualquer problema: WhatsApp direto (11) 94025-1866\n\nAtendemos de seg a sex 10h30–17h30 e nossa equipe resolve. Temos mais de [X] clientes atendidos sem problemas na garantia.\n\nIsso te dá a tranquilidade que você precisava? 😊',
+  'obj-pesquisa': 'Claro, [Nome]! Pensar é importante em uma compra como essa 😊\n\nMas me ajuda com uma coisa: o que especificamente ainda te deixa com dúvida? É o preço, a forma de pagamento, o modelo, ou tem alguma outra questão?\n\nPergunto porque muitas vezes consigo resolver na hora — seja ajustando uma condição, explicando melhor algum detalhe ou encontrando uma opção que se encaixa melhor na sua realidade.\n\nO que seria o ideal para você fechar hoje? Me conta! 🙏',
+  'obj-confianca': '[Nome], sua preocupação é completamente válida — e parabéns por ser cauteloso!\n\nDeixa eu te mostrar que a Revend é uma empresa real e séria:\n🏢 Somos CNPJ 28.724.816/0001-87 — você pode consultar agora na Receita Federal\n📍 Loja física: R. Tuiuti, 1951, Tatuapé — SP\n⭐ [X]+ avaliações no Google com nota [X.X]\n📋 Emitimos Nota Fiscal Eletrônica em toda venda\n\nVocê pode vir pessoalmente conhecer a loja antes de decidir. É aqui em São Paulo, no Tatuapé!\n\nPrefere passar pessoalmente ou quer que eu te envie mais informações de segurança primeiro? 😊',
+  'fechamento-alternativo': '[Nome], já vejo que você gostou do modelo!\n\nMe diz: você prefere passar na loja para verificar pessoalmente ou prefere que eu organize a entrega via motoboy para você?\n\nPara qualquer uma das opções, vou reservar o modelo agora mesmo no seu nome — só preciso de qual é melhor para você! 😊',
+  'fechamento-escassez': '[Nome], acabo de verificar e temos apenas [X] unidade(s) desse modelo disponível agora.\n\nConsiderando que recebo consultas constantemente e o estoque gira rápido, não consigo garantir disponibilidade para amanhã sem uma reserva confirmada.\n\nPara garantir o seu hoje, só preciso de R$ 100,00 de sinal via Pix — que é descontado na compra.\n\nVocê consegue fazer isso agora? O modelo fica bloqueado no seu nome por 48h ⏳',
+  'reserva': 'Ótima escolha, [Nome]! 🎉\n\nPara garantir o aparelho no seu nome com atendimento prioritário, nossa reserva é de:\n\n💸 R$ 100,00 via Pix\nCNPJ: 28.724.816/0001-87 (Revend Comércio Varejista)\n(O valor é 100% abatido na compra)\n\nApós o comprovante, já bloqueo o produto para você e confirmo o agendamento!\n\nQual o melhor dia e horário para você? 🗓️',
+  'agendamento': '📅 AGENDAMENTO\n● Código:\n● Data:\n● Horário:\n● Nome completo:\n● Telefone:\n● Produto (modelo | capacidade | cor):\n● Valor:\n● Forma de pagamento:\n● Sinal confirmado: ✅ / ❌\n● Observações:',
+  'sem-sinal': '[Nome]! 😊 Sem problema — você pode vir sem reserva.\n\nSó preciso ser transparente: sem sinal, o modelo permanece na linha de venda até você chegar. Se outro cliente confirmar antes, o modelo pode ser vendido.\n\nPara evitar que você venha e não encontre o produto, recomendo fortemente pelo menos o sinal de R$ 100.\n\nVocê consegue enviar agora? Prometo que vale a garantia de ter o produto esperando por você! 💪',
+  'followup-h2': 'Oi, [Nome]! 😊 Só passando para ver se você recebeu as informações que te mandei!\n\nQualquer dúvida sobre o [produto], estou aqui para ajudar. Me chama!\n\nAbraço 👋',
+  'followup-d1': 'Boa tarde, [Nome]!\n\nAinda tenho disponível o [produto] que conversamos — mas nosso estoque está girando bastante esta semana.\n\nSó quero garantir que você não perca a oportunidade, porque o modelo no valor que te passei pode não estar disponível por muito mais tempo.\n\nAinda tem interesse? Posso te ajudar com alguma outra condição? 😊',
+  'followup-d2': 'Oi, [Nome]! Tudo bem?\n\nOlha, estou com uma condição especial hoje que não consigo garantir para amanhã:\n\n🎁 Para quem fechar hoje, consigo incluir um [brinde/acessório] no seu pedido sem custo adicional.\n\nOu se preferir, posso verificar uma condição de parcelamento especial para você.\n\nVale a pena aproveitar! O que você acha? 😊',
+  'followup-d3': '[Nome], preciso te contar:\n\nEstamos com a última unidade do [modelo] que você estava vendo. A gente vendeu [X] unidades dessa versão essa semana.\n\nSe sair essa última, o próximo lote já vem com valor diferente.\n\nConsigo reservar por hoje se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome ✅\n\nO que me diz? ⏳',
+  'followup-d5': 'Olá, [Nome]! 👋\n\nPensando no que conversamos, tenho uma alternativa que pode ser mais interessante para você:\n\nEm vez do [modelo anterior], o [modelo alternativo] cabe no mesmo orçamento e tem [vantagem específica].\n\nVocê toparia eu te mandar as informações dessa opção? Pode ser o match perfeito! 😊',
+  'followup-d7': '[Nome], como não recebi retorno, vou presumir que você encontrou outro produto ou não tem mais interesse no momento.\n\nEstarei encerrando o atendimento por aqui — mas fica à vontade para nos contatar quando quiser, sempre teremos ótimas opções para você! 😊\n\nFoi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏',
+  'motoboy': 'Olá! 😊 Realizamos entrega via Motoboy, com custo de R$ 2,00/km.\n\nA entrega é feita mediante pagamento total antecipado ou entrada de 10% + frete.\n\n📋 Para agendar, precisamos:\n● Selfie segurando seu RG ou CNH\n● Comprovante de residência\n\nTambém fazemos envio via Correios — me manda seu CEP que calculo o frete na hora! 📦',
+  'endereco': '📍 Revend Eletro — Unidade Tatuapé:\nR. Tuiuti, 1951 — Conj. 10, Tatuapé, São Paulo\n\n🕐 Horário: Seg–Sex 10h15–18h45 | Sáb 9h30–16h30\n📞 Tel: (11) 2667-8827\n\n🏢 Também temos unidades em São José dos Campos e Sorocaba!\n\n⚠️ Obrigatório apresentar documento de identidade para acessar o local.',
+  'posvenda': 'Olá, [Nome]! Esperamos que esteja aproveitando ao máximo seu novo [produto]! 😊\n\nGostaríamos de saber: como foi sua experiência de compra na Revend?\n\nSeu feedback é muito importante para continuarmos sendo a melhor opção em Apple do Brasil 🍎\n\nSe quiser nos avaliar no Google, seria incrível — ajuda muito outros clientes a nos encontrar! ⭐\n\nQualquer dúvida ou necessidade, estou aqui. Abraço, [Seu nome]! 🙏',
+  'insatisfeito': '[Nome], recebi sua mensagem e já estou priorizando sua situação pessoalmente 🙏\n\nLamento muito pela experiência e quero resolver isso para você da melhor forma possível.\n\nMe conta exatamente o que aconteceu para que eu possa acionar a solução mais rápida.\n\nA Revend existe para garantir que você fique 100% satisfeito — e vamos chegar lá juntos! 💙',
+  'sac': 'Olá! Para garantir o melhor atendimento para o seu caso, vou direcionar você ao nosso SAC especializado:\n\n📱 WhatsApp SAC: (11) 94025-1866\n🕐 Seg–Sex: 10h30 às 17h30\n(Não atendemos sábados e feriados)\n\nAtendimento por ordem de chegada. Mencione que é cliente da unidade [local] para agilizar!\n\nEstou à disposição se precisar de mais alguma coisa 😊',
+  'remark1': 'Oi, [Nome]! Tudo bem? 😊\n\nPassaram alguns dias desde que conversamos sobre o [produto] — como está a sua pesquisa?\n\nTenho uma novidade que pode te interessar: chegou um novo lote e estamos com condições especiais essa semana.\n\nSe quiser que eu monte uma proposta atualizada para você, é só falar! 🍎',
+  'remark-d1': 'Oi, [Nome]! 😊 Tudo bem?\n\nPassamos a conversar ontem sobre o [produto] e queria entender melhor: teve alguma dúvida que ficou sem resposta ou alguma condição que não te agradou?\n\nPergunto porque muitas vezes consigo resolver na hora — seja no preço, na forma de pagamento ou em algum detalhe do produto.\n\nMe conta! 🙏',
+  'remark-d2': 'Oi, [Nome]! Tudo bem?\n\nTenho uma condição especial hoje que não consigo garantir para amanhã:\n\n🎁 Para quem fechar até hoje, consigo incluir um [brinde/acessório] sem custo adicional.\n\nOu se preferir, posso verificar uma condição de parcelamento especial para você.\n\nVale a pena aproveitar! O que você acha? 😊',
+  'remark-d3': '[Nome], preciso te contar:\n\nEstamos com a última unidade do [modelo] que você estava vendo. Essa semana saíram [X] unidades desse modelo.\n\nSe sair essa última, o próximo lote já vem com valor diferente — e sem garantia de prazo de chegada.\n\nConsigo reservar por hoje se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome, com nota fiscal garantida ✅\n\nO que me diz? ⏳',
+  'remark-d6': '[Nome], como não recebi retorno, vou presumir que você encontrou outra opção ou não tem interesse no momento.\n\nEstarei encerrando o atendimento por aqui — mas fica à vontade para nos contatar quando quiser. Sempre teremos ótimas opções para você! 😊\n\nFoi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏',
+  'entender-reacao': '[Nome], o que você achou das opções? Alguma chamou mais atenção? 😊\n\nE me diz: você está precisando para quando? Assim consigo verificar a disponibilidade certa para você!',
+  'obj-concorrencia': '[Nome], ótimo que você está pesquisando — isso só confirma que você é um comprador inteligente!\n\nMe conta: essa outra oferta vem com nota fiscal, garantia documentada e atendimento pós-venda garantido?\n\nNa Revend, além do preço competitivo, você tem:\n✅ NF-e em toda venda\n✅ Garantia real (não é promessa de boca)\n✅ SAC com atendimento humano\n✅ Loja física para você visitar antes de decidir\n\nPosso ver o que consigo fazer para igualar ou superar essa condição. Me passa o valor que você viu e verifico aqui 💪',
+  'obj-negociacao': '[Nome], entendo! Deixa eu verificar aqui o que consigo fazer por você.\n\nDuas opções que posso explorar agora:\n1️⃣ Se você conseguir pagar no Pix ou débito, consigo uma condição melhor na hora\n2️⃣ Posso verificar se há margem para incluir um brinde sem alterar o preço\n\nQual dessas faz mais sentido para você? Assim já aciono internamente 🙏',
+  'confirmacao-agendamento': '[Nome], tudo certo! Seu agendamento está confirmado ✅\n\n📅 Data: [data]\n🕐 Horário: [horário]\n📍 Local: R. Tuiuti, 1951 — Conj. 10, Tatuapé, SP\n📱 Produto reservado: [modelo]\n\n⚠️ Importante: Traga documento de identidade (RG ou CNH).\nSe precisar reagendar, me avisa com antecedência, tá? 😊\n\nTe esperamos! 🍎',
+  'nao-respondeu-agendamento': '[Nome], tudo bem? Notei que não tivemos resposta desde o nosso agendamento.\n\nSó quero confirmar: ainda tem interesse no [produto]? Estou aqui para ajudar!\n\nSe não puder mais nesse horário, me avisa que reagendo sem problema 😊\n\n(Caso não haja retorno, vou liberar a reserva para outros clientes na fila.)',
+  'remark3': '[Nome], lembra que você estava procurando o [produto específico]?\n\nAcabou de chegar uma unidade aqui e lembrei de você imediatamente!\n\nDisponível com nota fiscal, garantia e no valor que conversamos (ou melhor!).\n\nPosso reservar no seu nome agora? São pouquíssimas unidades 😊⏳',
+  'sem-interesse': '[Nome], agradeço muito pela oportunidade de te atender! 🥰\n\nEntendo que não foi o momento certo — e isso é completamente válido.\n\nQuando você estiver pronto(a) para dar o próximo passo, a Revend estará aqui com as melhores opções Apple do mercado.\n\nBoa sorte na sua pesquisa! Abraço 💙',
+  'compra-intro': 'Compramos sim, [Nome]! 😊\n\nMe conta: você prefere:\n1️⃣ Vender o seu aparelho (recebe o valor em dinheiro/Pix)\n2️⃣ Upgrade — trocar por um modelo superior pagando a diferença\n3️⃣ Downgrade — trocar por modelo inferior + receber o saldo de volta\n\nQual faz mais sentido para você agora?',
+  'avaliacao-iphone': '♻️ Para fazer a pré-avaliação, me informa:\n\n● Modelo, capacidade e cor:\n● Marcas de uso na carcaça ou tela? R:\n● Algum reparo realizado anteriormente? R:\n● Algo quebrado ou defeituoso? R:\n● Desbloqueado para todas as operadoras? R:\n● Digital ou Face ID funcionando 100%? R:\n● % saúde da bateria? (Ajustes > Bateria > Saúde) R:\n● Ainda na garantia Apple? R:\n\n📸 Envie fotos das laterais, frente e traseira (com tela ligada).\n\n⚠️ Valor estimado pode variar na avaliação presencial.',
+  'proposta-upgrade': 'Oi, [Nome]! 😊 Montei uma proposta personalizada para o seu upgrade:\n\n📱 iPhone [novo modelo] — Opções:\n◼️ Lacrado: R$ [valor] (garantia 1 ano Apple)\n◽️ Sem Caixa: R$ [valor] (garantia 10 meses Revend)\n\n♻️ Seu [aparelho atual] com [X]% de bateria:\n→ Avaliado em R$ [valor de troca]\n\n💰 Valor líquido que você pagaria:\n◼️ Lacrado: R$ [valor final]\n◽️ Sem Caixa: R$ [valor final]\n\nQuer a simulação no cartão em até 18x? 😉',
+  'backup': '[Nome], para agilizar ao máximo quando você chegar, recomendo fazer o backup agora:\n\n💾 iCloud: Ajustes → [Seu Nome] → iCloud → Backup → Fazer Backup Agora\n\n💻 iTunes/Finder: Conecte ao computador e clique em "Fazer Backup Agora"\n\n⚠️ Importante:\nO aparelho precisa estar desbloqueado e com o iCloud removido (Ajustes > [Seu Nome] > Sair) antes de entregar.\n\nNossa equipe também pode auxiliar presencialmente se precisar! 😊'
+};
+
+function copyMsg(btn, key) {
+  const text = msgs[key] || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const original = btn.textContent;
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = original;
+      btn.classList.remove('copied');
+    }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copiar mensagem'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>

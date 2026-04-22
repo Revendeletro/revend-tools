@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estoque por Modelos | Revend</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #3a3a3a; padding: 20px; min-height: 100vh; }
+        /* SYNC BANNER */
+        #syncBanner {
+            position:fixed; top:0; left:0; right:0; z-index:9999;
+            background:#c8102e; color:white; text-align:center;
+            font-size:13px; font-weight:700; padding:10px;
+            display:none; align-items:center; justify-content:center; gap:10px;
+        }
+        #syncBanner.show { display:flex; }
+        #syncBanner.ok   { background:#16a34a; }
+        #syncBanner.err  { background:#b91c1c; }
+        .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .container { max-width:1500px; margin:0 auto; background:white; border-radius:12px; box-shadow:0 8px 32px rgba(0,0,0,0.35); overflow:hidden; }
+        .header { background:#c8102e; color:white; padding:22px 30px; display:flex; align-items:center; gap:18px; position:relative; overflow:hidden; }
+        .header::after { content:''; position:absolute; right:0; top:0; bottom:0; width:220px; background:linear-gradient(to left,rgba(0,0,0,0.18),transparent); }
+        .header-logo { display:flex; flex-direction:column; gap:2px; }
+        .header-logo .logo-mark { font-size:22px; font-weight:900; letter-spacing:-1px; line-height:1; font-style:italic; color:white; }
+        .header-logo .logo-mark span { color:rgba(255,255,255,0.7); font-weight:400; font-style:normal; font-size:13px; display:block; letter-spacing:0; }
+        .header-divider { width:2px; height:44px; background:rgba(255,255,255,0.3); border-radius:2px; }
+        .header-info h1 { font-size:20px; font-weight:800; letter-spacing:-0.3px; }
+        .header-info p  { font-size:12px; opacity:0.75; margin-top:3px; }
+        .apple-badge { display:inline-flex; gap:8px; margin-left:auto; position:relative; z-index:1; flex-wrap:wrap; justify-content:flex-end; }
+        .apple-badge span { background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25); padding:3px 12px; border-radius:20px; font-size:11px; font-weight:600; }
+        /* CONTROLS */
+        .controls { padding:14px 20px; background:#f5f5f5; border-bottom:2px solid #e0e0e0; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+        .controls label { font-weight:700; font-size:13px; color:#333; }
+        .controls input[type="date"] { padding:8px 12px; border:2px solid #ccc; border-radius:6px; font-weight:600; font-size:13px; background:white; }
+        .btn { padding:9px 18px; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px; transition:all 0.2s; white-space:nowrap; }
+        .btn:hover { filter:brightness(0.88); transform:translateY(-1px); }
+        .btn:active { transform:translateY(0); }
+        .btn-save   { background:#c8102e; }
+        .btn-export { background:#e07b00; }
+        .btn-update { background:#c8102e; }
+        .btn-clear  { background:#999; }
+        /* TOOLBAR */
+        .toolbar { padding:10px 20px; background:white; border-bottom:1px solid #e0e0e0; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+        .search-box { flex:1; min-width:200px; padding:8px 14px; border:2px solid #e0e0e0; border-radius:6px; font-size:13px; outline:none; transition:border-color 0.2s; }
+        .search-box:focus { border-color:#c8102e; }
+        .filter-btn { padding:7px 14px; border:2px solid #e0e0e0; border-radius:6px; background:white; cursor:pointer; font-size:12px; font-weight:600; transition:all 0.2s; color:#666; }
+        .filter-btn.active, .filter-btn:hover { background:#c8102e; color:white; border-color:#c8102e; }
+        /* CONTENT */
+        .content { padding:20px; max-height:68vh; overflow-y:auto; }
+        .brand-group { margin-bottom:40px; }
+        .brand-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding:12px 20px; background:#c8102e; border-radius:8px; color:white; }
+        .brand-header h2 { font-size:15px; font-weight:800; letter-spacing:0.5px; text-transform:uppercase; }
+        .brand-header .brand-count { margin-left:auto; background:rgba(255,255,255,0.18); padding:3px 12px; border-radius:20px; font-size:11px; }
+        .category { margin-bottom:24px; }
+        .category-title { font-size:13px; font-weight:800; color:#555; margin-bottom:8px; padding:6px 12px; background:#f5f5f5; border-left:4px solid #c8102e; border-radius:0 6px 6px 0; text-transform:uppercase; letter-spacing:0.5px; }
+        .warranty-badge { display:inline-block; margin-left:10px; padding:1px 8px; border-radius:10px; font-size:10px; background:#fde8ec; color:#c8102e; border:1px solid #f5aab8; text-transform:none; letter-spacing:0; }
+        table { width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:4px; }
+        thead { background:#2a2a2a; color:white; position:sticky; top:0; z-index:5; }
+        th { padding:10px 8px; text-align:left; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; }
+        td { padding:9px 8px; border-bottom:1px solid #f0f0f0; vertical-align:middle; }
+        tbody tr:hover { background:#fff5f6; }
+        tbody tr.hidden-row { display:none; }
+        .item-name { font-weight:600; color:#222; }
+        .checkbox-cell { text-align:center; }
+        .checkbox-cell input[type="checkbox"] { width:17px; height:17px; cursor:pointer; accent-color:#c8102e; }
+        input[type="number"] { width:64px; padding:5px 6px; border:2px solid #e0e0e0; border-radius:6px; text-align:center; font-weight:700; font-size:12px; background:white; }
+        input[type="number"]:focus { outline:none; border-color:#c8102e; }
+        .current-stock-cell { font-weight:700; color:#222; font-size:13px; }
+        .stock-date  { font-size:10px; color:#c8102e; font-weight:600; }
+        .stock-date.none { color:#aaa; font-weight:400; }
+        .last-order  { font-size:10px; color:#2a9d58; font-weight:600; }
+        .last-order.none { color:#aaa; font-weight:400; }
+        .status-badge { display:inline-block; padding:2px 8px; border-radius:6px; font-size:10px; font-weight:700; text-transform:uppercase; }
+        .status-badge.low { background:#fef3c7; color:#92400e; }
+        .status-badge.ok  { background:#d1fae5; color:#065f46; }
+        .status-badge.out { background:#fee2e2; color:#991b1b; }
+        /* MODELS BUTTON */
+        .models-btn { padding:4px 10px; background:#fde8ec; color:#c8102e; border:1px solid #f5aab8; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; display:block; margin-bottom:4px; transition:all 0.15s; }
+        .models-btn:hover { background:#f5aab8; }
+        .models-btn.has-models { background:#fee2e2; color:#c8102e; border-color:#fca5a5; }
+        .models-summary { font-size:10px; color:#c8102e; font-weight:600; line-height:1.4; }
+        .models-summary.none { color:#aaa; font-weight:400; }
+        /* MODAL */
+        .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center; }
+        .modal-overlay.open { display:flex; }
+        .modal { background:white; border-radius:12px; width:740px; max-width:95vw; max-height:88vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 20px 60px rgba(0,0,0,0.4); }
+        .modal-header { background:#c8102e; color:white; padding:18px 24px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+        .modal-header-info h3 { font-size:15px; font-weight:800; }
+        .modal-header-info p  { font-size:11px; opacity:0.75; margin-top:3px; }
+        .modal-close { background:rgba(255,255,255,0.15); border:none; color:white; width:32px; height:32px; border-radius:50%; cursor:pointer; font-size:18px; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.2s; }
+        .modal-close:hover { background:rgba(255,255,255,0.3); }
+        .modal-body { padding:20px; overflow-y:auto; flex:1; }
+        .modal-add-row { display:flex; gap:8px; align-items:center; margin-bottom:18px; flex-wrap:wrap; padding:14px 16px; background:#fde8ec; border-radius:8px; border:2px solid #f5aab8; }
+        .modal-add-row label { font-size:12px; font-weight:700; color:#c8102e; white-space:nowrap; }
+        .modal-model-select { flex:1; min-width:180px; padding:8px 10px; border:2px solid #f5aab8; border-radius:6px; font-size:13px; font-weight:600; color:#1e293b; background:white; outline:none; }
+        .modal-model-select:focus { border-color:#c8102e; }
+        .modal-qty-add { width:70px; padding:8px 6px; border:2px solid #f5aab8; border-radius:6px; font-size:13px; font-weight:700; text-align:center; background:white; outline:none; }
+        .btn-modal-add { padding:8px 18px; background:#c8102e; color:white; border:none; border-radius:6px; cursor:pointer; font-size:12px; font-weight:700; white-space:nowrap; transition:background 0.15s; }
+        .btn-modal-add:hover { background:#a00d24; }
+        .modal-list-title { font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
+        .modal-list-empty { font-size:12px; color:#cbd5e1; font-style:italic; padding:8px 0; }
+        .modal-selected-list { display:flex; flex-direction:column; gap:6px; }
+        .modal-sel-row { display:flex; align-items:center; gap:8px; padding:9px 12px; background:white; border:2px solid #e2e8f0; border-radius:8px; }
+        .modal-sel-name { flex:1; font-size:13px; font-weight:700; color:#1e293b; }
+        .modal-sel-qty-input { width:62px; padding:5px 6px; border:2px solid #93c5fd; border-radius:6px; font-size:12px; font-weight:700; text-align:center; background:#f0f7ff; outline:none; }
+        .modal-sel-unit { font-size:11px; color:#94a3b8; font-weight:600; }
+        .btn-modal-remove { background:#fee2e2; color:#dc2626; border:none; border-radius:6px; width:26px; height:26px; cursor:pointer; font-size:14px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background 0.15s; }
+        .btn-modal-remove:hover { background:#fca5a5; }
+        .modal-footer { padding:16px 24px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .modal-summary-text { font-size:12px; color:#64748b; font-weight:600; }
+        .modal-confirm { padding:10px 24px; background:#c8102e; color:white; border:none; border-radius:6px; cursor:pointer; font-size:13px; font-weight:700; transition:background 0.2s; }
+        .modal-confirm:hover { background:#a00d24; }
+        .modal-cancel { padding:10px 18px; background:white; color:#555; border:2px solid #e0e0e0; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; }
+        /* SUMMARY */
+        .summary { padding:16px 20px; background:#f5f5f5; border-top:2px solid #e0e0e0; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; }
+        .summary-card { background:white; padding:14px; border-radius:8px; border-left:4px solid #c8102e; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+        .summary-card h3 { font-size:11px; color:#888; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+        .summary-card p  { font-size:22px; font-weight:800; color:#c8102e; }
+        @media print {
+            body { background:white; padding:0; }
+            .container { box-shadow:none; border-radius:0; }
+            .controls,.toolbar,.summary,.no-print,.modal-overlay,#syncBanner { display:none !important; }
+            .content { max-height:none; overflow:visible; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner">
+    <div class="spinner" id="syncSpinner"></div>
+    <span id="syncMsg">Sincronizando...</span>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+    <div class="modal" id="modalBox">
+        <div class="modal-header">
+            <div class="modal-header-info">
+                <h3 id="modalTitle">Selecionar Modelos</h3>
+                <p>Marque os modelos e defina a quantidade de cada um</p>
+            </div>
+            <button class="modal-close" onclick="closeModal()">×</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <div style="display:flex;gap:8px;align-items:center;">
+                <button class="modal-cancel" onclick="clearAllModal()" style="color:#dc2626;border-color:#fca5a5;">🗑️ Limpar tudo</button>
+                <span class="modal-summary-text" id="modalSummaryText">Nenhum modelo selecionado</span>
+            </div>
+            <div style="display:flex;gap:8px;">
+                <button class="modal-cancel" onclick="closeModal()">Cancelar</button>
+                <button class="modal-confirm" onclick="confirmModels()">✅ Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+    <div class="header">
+        <div class="header-logo">
+            <div class="logo-mark">revend<span>Eletro</span></div>
+        </div>
+        <div class="header-divider"></div>
+        <div class="header-info">
+            <h1>Estoque por Modelos</h1>
+            <p>Controle de Estoque · Pedidos · Reposição · <span id="syncStatus" style="opacity:0.8">💾 LocalStorage</span></p>
+        </div>
+        <div class="apple-badge">
+            <span>📱 iPhone XR → 17 Pro Max</span>
+            <span>💻 MacBook</span>
+            <span>📱 iPad</span>
+            <span>⌚ Apple Watch</span>
+        </div>
+    </div>
+
+    <div class="controls no-print">
+        <label>📅 Data do Pedido: <input type="date" id="orderDate"></label>
+        <button class="btn btn-save"   onclick="saveOrder()">💾 Salvar Pedido</button>
+        <button class="btn btn-export" onclick="exportData()">📤 Exportar Pedido</button>
+        <button class="btn btn-update" onclick="atualizarEstoque()">🔄 Atualizar Estoque</button>
+        <button class="btn" style="background:#444;" onclick="imprimirEstoque()">🖨️ Imprimir Estoque</button>
+        <button class="btn btn-clear"  onclick="clearAll()">🗑️ Limpar Seleção</button>
+        <button class="btn" id="undoBtn" style="background:#e07b00;opacity:0.45;" onclick="desfazerUltimaAlteracao()" disabled title="Nada para desfazer">↩️ Desfazer</button>
+        <button class="btn" style="background:#555;" onclick="exportarDadosJSON()">⬇️ Exportar JSON</button>
+        <button class="btn" style="background:#333;" onclick="document.getElementById('importFileInput').click()">⬆️ Importar JSON</button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importarDadosJSON(event)">
+    </div>
+
+    <div class="toolbar no-print">
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍  Buscar produto..." oninput="filterRows()">
+        <button class="filter-btn active" onclick="setFilter('all',this)">Todos</button>
+        <button class="filter-btn"        onclick="setFilter('out',this)">❌ Em Falta</button>
+        <button class="filter-btn"        onclick="setFilter('low',this)">⚠️ Baixo</button>
+        <button class="filter-btn"        onclick="setFilter('ok',this)">✅ OK</button>
+        <button class="filter-btn"        onclick="setFilter('sel',this)">🛒 Selecionados</button>
+    </div>
+
+    <div class="content" id="tableContent"></div>
+
+    <div class="summary no-print">
+        <div class="summary-card"><h3>📦 Em Falta</h3><p id="countOut">0</p></div>
+        <div class="summary-card"><h3>⚠️ Estoque Baixo</h3><p id="countLow">0</p></div>
+        <div class="summary-card"><h3>✅ Estoque OK</h3><p id="countOk">0</p></div>
+        <div class="summary-card"><h3>🛒 Selecionados</h3><p id="countSelected">0</p></div>
+        <div class="summary-card"><h3>📋 Total Itens</h3><p id="countTotal">0</p></div>
+    </div>
+</div>
+
+<!-- LOCALSTORAGE -->
+<script>
+// ═══ LOCALSTORAGE FUNCTIONS ════════════════════════════════════════════════
+function lsGet(key, defaultValue = {}) {
+    try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : defaultValue;
+    } catch (e) {
+        console.error('lsGet error:', e);
+        return defaultValue;
+    }
+}
+
+function lsSet(key, value) {
+    try {
+        localStorage.setItem(key, JSON.stringify(value));
+    } catch (e) {
+        console.error('lsSet error:', e);
+        showBanner('❌ Erro ao salvar. Espaço insuficiente.', 'err');
+    }
+}
+
+function showBanner(msg, type = 'loading') {
+    const b = document.getElementById('syncBanner');
+    const s = document.getElementById('syncSpinner');
+    const m = document.getElementById('syncMsg');
+    b.className = 'show ' + type;
+    s.style.display = type === 'loading' ? 'block' : 'none';
+    m.textContent = msg;
+    if (type !== 'loading') setTimeout(() => { b.className = ''; }, 2500);
+}
+
+// ═══ MODELOS ═══════════════════════════════════════════════════════════════
+const MODEL_GROUPS = {
+    "iPhone XR / XS":  ["iPhone XR","iPhone XS","iPhone XS Max"],
+    "iPhone 11":       ["iPhone 11","iPhone 11 Pro","iPhone 11 Pro Max"],
+    "iPhone 12":       ["iPhone 12","iPhone 12 Mini","iPhone 12 Pro","iPhone 12 Pro Max"],
+    "iPhone 13":       ["iPhone 13","iPhone 13 Mini","iPhone 13 Pro","iPhone 13 Pro Max"],
+    "iPhone 14":       ["iPhone 14","iPhone 14 Plus","iPhone 14 Pro","iPhone 14 Pro Max"],
+    "iPhone 15":       ["iPhone 15","iPhone 15 Plus","iPhone 15 Pro","iPhone 15 Pro Max"],
+    "iPhone 16":       ["iPhone 16","iPhone 16 Plus","iPhone 16 Pro","iPhone 16 Pro Max"],
+    "iPhone 17":       ["iPhone 17","iPhone 17 Air","iPhone 17 Pro","iPhone 17 Pro Max"],
+    "iPad":            ["iPad 9ª geração","iPad 10ª geração","iPad Air","iPad Mini","iPad Pro 11\"","iPad Pro 12.9\"","iPad Pro 13\""],
+    "Apple Watch":     ["Apple Watch SE","Apple Watch S6/S7","Apple Watch S8/S9/S10","Apple Watch Ultra","Apple Watch Ultra 2"],
+    "Películas":       [
+        "iPhone 12 Pro Max","iPhone 13 Pro Max","iPhone 14 Plus","iPhone 14 Pro Max",
+        "iPhone 15 Plus","iPhone 14 Pro | 15 | 15 Pro","iPhone 15 Pro Max",
+        "iPhone 12 | 12 Pro","iPhone 7 Plus | 8 Plus","iPhone 7G | 8G",
+        "iPhone XR | 11","iPhone 13 | 13 Pro | 14","iPhone XS Max | 11 Pro Max",
+        "iPhone X | XS | 11 Pro","iPhone 16","iPhone 16 Pro","iPhone 16 Pro Max",
+        "iPhone 16 Plus","iPhone 17 | 17 Pro","iPhone 17 Pro Max","iPhone 17 Air"
+    ],
+    "Película Câmera Individual": [
+        "iPhone 12 Pro",
+        "iPhone 12 Pro Max",
+        "iPhone 13 Pro | 13 Pro Max",
+        "iPhone 11 Pro | 11 Pro Max",
+        "iPhone 11 | 12 | 12 Mini",
+        "iPhone 13 | 13 Mini",
+        "iPhone 14 | 14 Plus",
+        "iPhone 14 Pro | 14 Pro Max",
+        "iPhone 15 | 15 Plus",
+        "iPhone 15 Pro | 15 Pro Max",
+        "iPhone 16 | 16 Plus",
+        "iPhone 16 Pro | 16 Pro Max"
+    ]
+};
+
+const MODEL_SCOPE = {
+    iphone:       ["iPhone XR / XS","iPhone 11","iPhone 12","iPhone 13","iPhone 14","iPhone 15","iPhone 16","iPhone 17"],
+    iphone_14_15: ["iPhone 14","iPhone 15"],
+    iphone_15_16: ["iPhone 15","iPhone 16"],
+    ipad:         ["iPad"],
+    watch:        ["Apple Watch"],
+    iphone_ipad:  ["iPhone XR / XS","iPhone 11","iPhone 12","iPhone 13","iPhone 14","iPhone 15","iPhone 16","iPhone 17","iPad"],
+    pelicula:         ["Películas"],
+    pelicula_cam_ind: ["Película Câmera Individual"],
+};
+
+// ═══ CATÁLOGO ══════════════════════════════════════════════════════════════
+const catalog = [
+    { brand:"🍎 Apple Original", categories:[
+        { title:"Cabos Lightning", warranty:null, items:[
+            {key:"AP_CABLE_L1",  name:"Cabo Lightning p/ USB (1 m)",             status:"low"},
+            {key:"AP_CABLE_L2",  name:"Cabo Lightning p/ USB (2 m)",             status:"low"},
+            {key:"AP_CABLE_CL1", name:"Cabo USB-C p/ Lightning (1 m)",           status:"low"},
+            {key:"AP_CABLE_CL2", name:"Cabo USB-C p/ Lightning (2 m)",           status:"low"},
+            {key:"AP_CABLE_CC1", name:"Cabo USB-C p/ C (1 m) | iPhone 15 e 16", status:"low"}
+        ]},
+        { title:"Carregadores", warranty:null, items:[
+            {key:"AP_CHG_5W",   name:"Carregador USB 5W",              status:"ok"},
+            {key:"AP_CHG_20W",  name:"Carregador USB-C 20W",           status:"ok"},
+            {key:"AP_CHG_35W",  name:"Carregador USB-C 35W",           status:"low"},
+            {key:"AP_CHG_2USB", name:"Carregador 2 Saídas USB-C 35W",  status:"low"},
+            {key:"AP_CHG_AW",   name:"Carregador Apple Watch USB",     status:"ok"},
+            {key:"AP_CHG_AWC",  name:"Carregador Apple Watch USB-C",   status:"low"},
+            {key:"AP_MAGSAFE",  name:"Carregador MagSafe",             status:"ok"},
+            {key:"AP_BAT_MAG",  name:"Bateria MagSafe",                status:"low"}
+        ]},
+        { title:"AirTag", warranty:null, items:[
+            {key:"AP_AIRTAG1", name:"AirTag",      status:"ok"},
+            {key:"AP_AIRTAG4", name:"AirTag Pack", status:"low"}
+        ]}
+    ]},
+    { brand:"⚡ IWILL · Energia e Cabos", categories:[
+        { title:"Cabos", warranty:"3 anos", items:[
+            {key:"IW_HARD_CL12", name:"Cabo Hard USB-C p/ Lightning (1,2 m)", status:"low"}
+        ]},
+        { title:"Cabos Strong Lightning", warranty:"5 anos", items:[
+            {key:"IW_STR_L12",  name:"Cabo Strong Lightning p/ USB TPE (1,2 m)",            status:"low"},
+            {key:"IW_STR_L2",   name:"Cabo Strong Lightning p/ USB TPE (2 m)",              status:"low"},
+            {key:"IW_STR_LNYL", name:"Cabo Strong Lightning p/ USB - Nylon Triplo (1,2 m)", status:"low"},
+            {key:"IW_STR_CL12", name:"Cabo Strong USB-C p/ Lightning TPE (1,2 m)",          status:"low"},
+            {key:"IW_STR_CL2",  name:"Cabo Strong USB-C p/ Lightning TPE (2 m)",            status:"low"}
+        ]},
+        { title:"Carregadores", warranty:"2 anos", items:[
+            {key:"IW_CHG_2S20",   name:"Carregador 2 Saídas (USB + USB-C) 20W", status:"ok"},
+            {key:"IW_CHG_2C35",   name:"Carregador 2 Saídas USB-C 35W",          status:"ok"},
+            {key:"IW_CHG_C20",    name:"Carregador USB-C 20W",                   status:"ok"},
+            {key:"IW_CHG_C20COL", name:"Carregador USB-C 20W COLORS",            status:"low"}
+        ]},
+        { title:"Power Bank & Adaptadores", warranty:"1 ano", items:[
+            {key:"IW_PB_20W", name:"Power Bank Speed 20W USB-C (10000mAh)",     status:"low"},
+            {key:"IW_HUB3",   name:"Adaptador Hub 3 em 1 (USB - HDMI - USB-C)", status:"low"}
+        ]}
+    ]},
+    { brand:"🎧 IWILL · Fone de Ouvido e Som", categories:[
+        { title:"EarPods", warranty:"1 ano", items:[
+            {key:"IW_EP_LIGHT", name:"Fone EarPods Lightning", status:"ok"},
+            {key:"IW_EP_TYPEC", name:"Fone EarPods Tipo C",    status:"ok"}
+        ]},
+        { title:"AirPods Premium", warranty:"90 dias", items:[
+            {key:"IW_AP_MAX", name:"AirPods Max Premium",  status:"low"},
+            {key:"IW_AP_STD", name:"AirPods Premium",      status:"ok"},
+            {key:"IW_AP_PRO", name:"AirPods Pro Premium",  status:"ok"}
+        ]}
+    ]},
+    { brand:"🛡️ Capas e Proteção", categories:[
+        { title:"Capas iPhone", warranty:null, items:[
+            {key:"CP_LUXY",      name:"Capa Luxy",                                        status:"ok",  modelScope:"iphone"},
+            {key:"CP_LUXY_F",    name:"Capa Luxy Focus",                                  status:"ok",  modelScope:"iphone"},
+            {key:"CP_PERF_KIT",  name:"Capa Perfect C/ Kit Lentes",                       status:"low", modelScope:"iphone"},
+            {key:"CP_FASH_KIT",  name:"Capa Fashion C/ Kit Lentes",                       status:"low", modelScope:"iphone"},
+            {key:"CP_SILK",      name:"Capa Silk",                                        status:"ok",  modelScope:"iphone"},
+            {key:"CP_CLEAR_MAG", name:"Capa Clear MagSafe",                               status:"ok",  modelScope:"iphone"},
+            {key:"CP_COLOR_MAG", name:"Capa Colors MagSafe",                              status:"ok",  modelScope:"iphone"},
+            {key:"CP_NEW_SKIN",  name:"Capa New Skin",                                    status:"low", modelScope:"iphone"},
+            {key:"CP_SIL_AP",    name:"Capa Silicone Apple",                              status:"ok",  modelScope:"iphone"},
+            {key:"CP_SPACE_AI",  name:"Capa Space Anti-Impacto",                          status:"ok",  modelScope:"iphone"},
+            {key:"CP_SPACE_C",   name:"Capa Space Color",                                 status:"low", modelScope:"iphone"},
+            {key:"CP_GLASS",     name:"Capa Glass",                                       status:"low", modelScope:"iphone"},
+            {key:"CP_AUTO_F",    name:"Capa Auto Focus",                                  status:"low", modelScope:"iphone"},
+            {key:"CP_KK_KIT",    name:"Kit King Kong (Capa + Película Tela + Câmera)",    status:"low", modelScope:"iphone"},
+            {key:"CP_DOUBLE_LX", name:"Capa Double Lux",                                  status:"ok",  modelScope:"iphone"},
+            {key:"CP_DOUBLE_14", name:"Capa Double Lux | iPhone 14 e 15",                 status:"ok",  modelScope:"iphone_14_15"},
+            {key:"CP_DUALL",     name:"Capa Duall",                                       status:"low", modelScope:"iphone"},
+            {key:"CP_CLARITY",   name:"Capa Clarity",                                     status:"ok",  modelScope:"iphone"},
+            {key:"CP_CLARITY14", name:"Capa Clarity | iPhone 14 e 15",                    status:"ok",  modelScope:"iphone_14_15"}
+        ]},
+        { title:"Capas iPad & Apple Watch", warranty:null, items:[
+            {key:"CP_IPAD",     name:"Capa iPad",                      status:"ok",  modelScope:"ipad"},
+            {key:"CP_AW_TRANS", name:"Capa Apple Watch Transparente",  status:"ok",  modelScope:"watch"}
+        ]},
+        { title:"Pulseiras Apple Watch", warranty:null, items:[
+            {key:"CP_PUL_MIX",   name:"Pulseira Apple Watch (Loop, Milanesa, Nylon)", status:"ok",  modelScope:"watch"},
+            {key:"CP_PUL_GSHLD", name:"Pulseira Apple Watch GSHIELD",                 status:"low", modelScope:"watch"},
+            {key:"CP_PUL_IW",    name:"Pulseira Apple Watch IWILL",                   status:"low", modelScope:"watch"}
+        ]},
+        { title:"Películas", warranty:null, items:[
+            {key:"CP_PEL_CAM_C", name:"Película Câmera Traseira Completa",    status:"ok",  modelScope:"pelicula"},
+            {key:"CP_PEL_CAM_I", name:"Película Câmera Traseira Individual",  status:"ok",  modelScope:"pelicula_cam_ind"},
+            {key:"CP_PEL_NORM",  name:"Película Normal",                      status:"ok",  modelScope:"pelicula"},
+            {key:"CP_PEL_PRIV",  name:"Película Privacidade",                 status:"ok",  modelScope:"pelicula"},
+            {key:"CP_PEL_KING",  name:"Película King - Resistente",           status:"low", modelScope:"pelicula"},
+            {key:"CP_PEL_IPAD",  name:"Película iPad",                        status:"ok",  modelScope:"ipad"},
+            {key:"CP_PEL_AW_U",  name:"Película Apple Watch Ultra",           status:"low", modelScope:"watch"},
+            {key:"CP_PEL_AW_SE", name:"Película Apple Watch SE, S8, S9, S10", status:"low", modelScope:"watch"}
+        ]},
+        { title:"Acessórios", warranty:null, items:[
+            {key:"CP_PROT_CAB", name:"Protetor de Cabo", status:"ok"}
+        ]}
+    ]}
+];
+
+// ═══ STATE ═════════════════════════════════════════════════════════════════
+let selectedModels   = {};
+let stockModels      = {};
+let currentModalKey  = null;
+let currentModalMode = 'order';
+let currentFilter    = 'all';
+
+// Dados em memória (espelho do localStorage)
+let _orders = {};
+let _stock  = {};
+let _models = {};
+let _stockM = {};
+
+const UNDO_LIMIT = 20;
+let undoStack = [];
+
+function snapshotState(label) {
+    undoStack.push({
+        orders:      JSON.stringify(_orders),
+        stock:       JSON.stringify(_stock),
+        models:      JSON.stringify(_models),
+        stockModels: JSON.stringify(_stockM),
+        label
+    });
+    if (undoStack.length > UNDO_LIMIT) undoStack.shift();
+    updateUndoBtn();
+}
+
+function updateUndoBtn() {
+    const btn = document.getElementById('undoBtn');
+    if (!btn) return;
+    if (undoStack.length === 0) { btn.disabled=true; btn.title='Nada para desfazer'; btn.style.opacity='0.45'; }
+    else { btn.disabled=false; btn.title=`Desfazer: ${undoStack[undoStack.length-1].label}`; btn.style.opacity='1'; }
+}
+
+async function desfazerUltimaAlteracao() {
+    if (!undoStack.length) return alert('Nada para desfazer.');
+    const snap = undoStack.pop();
+    showBanner('Desfazendo...','loading');
+    _orders = JSON.parse(snap.orders);
+    _stock  = JSON.parse(snap.stock);
+    _models = JSON.parse(snap.models);
+    _stockM = JSON.parse(snap.stockModels);
+    stockModels = JSON.parse(snap.stockModels);
+    selectedModels = JSON.parse(snap.models);
+    lsSet('revend_orders', _orders);
+    lsSet('revend_stock', _stock);
+    lsSet('revend_models', _models);
+    lsSet('revend_stockModelos', _stockM);
+    loadData();
+    updateUndoBtn();
+    showBanner(`↩️ Desfeito: ${snap.label}`,'ok');
+}
+window.desfazerUltimaAlteracao = desfazerUltimaAlteracao;
+
+// ── Helpers memória ─────────────────────────────────────────────────────
+const getOrders = () => _orders;
+const getStock  = () => _stock;
+
+async function setOrders(o) { _orders = o; lsSet('revend_orders', o); }
+async function setStock(s)  { _stock  = s; lsSet('revend_stock', s); }
+
+function getItemInfo(key) {
+    for (const brand of catalog)
+        for (const cat of brand.categories)
+            for (const item of cat.items)
+                if (item.key === key) return {...item, brand:brand.brand, cat:cat.title};
+    return null;
+}
+window.getItemInfo = getItemInfo;
+
+// ═══ RENDER ════════════════════════════════════════════════════════════════
+function renderTables() {
+    let html = '';
+    catalog.forEach(brand => {
+        const total = brand.categories.reduce((s,c)=>s+c.items.length,0);
+        html += `<div class="brand-group">
+            <div class="brand-header"><h2>${brand.brand}</h2><span class="brand-count">${total} produtos</span></div>`;
+
+        brand.categories.forEach(cat => {
+            const wLabel = cat.warranty ? `<span class="warranty-badge">⏱ Garantia ${cat.warranty}</span>` : '';
+            const hasMdl = cat.items.some(i=>i.modelScope);
+
+            html += `<div class="category">
+                <div class="category-title">${cat.title}${wLabel}</div>
+                <table><thead><tr>
+                    <th>Produto</th><th>Atual</th><th>Atualizado em</th><th>Status</th>
+                    <th>Comprar?</th><th>Qtd Pedido</th><th>Qtd Estoque</th>
+                    ${hasMdl?'<th>Modelos p/ Pedido</th><th>Estoque por Modelos</th>':''}
+                    <th>Último Pedido</th>
+                </tr></thead><tbody>`;
+
+            cat.items.forEach(item => {
+                const badge = item.status==='ok'?'OK':item.status==='low'?'BAIXO':'FALTA';
+                const mdlCell = hasMdl
+                    ? `<td style="min-width:160px">${item.modelScope
+                        ? `<button class="models-btn" id="mbtn_${item.key}" onclick="openModal('${item.key}','order')">📱 Selecionar Modelos</button>
+                           <div class="models-summary none" id="msum_${item.key}">Nenhum selecionado</div>`
+                        : `<span style="color:#ccc;font-size:11px">—</span>`}</td>
+                      <td style="min-width:160px">${item.modelScope
+                        ? `<button class="models-btn" id="smbtn_${item.key}" onclick="openModal('${item.key}','stock')" style="background:#d1fae5;color:#065f46;border-color:#6ee7b7;">📦 Estoque Modelos</button>
+                           <div class="models-summary none" id="smsum_${item.key}">Não informado</div>`
+                        : `<span style="color:#ccc;font-size:11px">—</span>`}</td>`
+                    : '';
+
+                html += `<tr data-item="${item.key}" data-status="${item.status}">
+                    <td class="item-name">${item.name}</td>
+                    <td class="current-stock-cell current-stock">—</td>
+                    <td class="stock-date none">—</td>
+                    <td><span class="status-badge ${item.status}">${badge}</span></td>
+                    <td class="checkbox-cell"><input type="checkbox" class="need-buy"></td>
+                    <td><input type="number" class="qty-input" min="0" value="0"></td>
+                    <td><input type="number" class="qty-stock" min="0" value="" placeholder="—"></td>
+                    ${mdlCell}
+                    <td class="last-order none">Nenhum</td>
+                </tr>`;
+            });
+            html += `</tbody></table></div>`;
+        });
+        html += `</div>`;
+    });
+
+    document.getElementById('tableContent').innerHTML = html;
+    document.querySelectorAll('.need-buy').forEach(cb => cb.addEventListener('change', updateCount));
+    updateCount();
+}
+
+// ═══ MODAL ═════════════════════════════════════════════════════════════════
+function openModal(key, mode) {
+    currentModalKey  = key;
+    currentModalMode = mode || 'order';
+    const info    = getItemInfo(key);
+    const isStock = currentModalMode === 'stock';
+
+    document.getElementById('modalTitle').textContent =
+        (isStock ? '📦 Estoque por Modelos — ' : '📱 Pedido — ') + info.name;
+
+    const groups = MODEL_SCOPE[info.modelScope] || MODEL_SCOPE.iphone;
+    const allModels = [];
+    groups.forEach(gName => (MODEL_GROUPS[gName]||[]).forEach(m => allModels.push({group:gName,model:m})));
+    window._modalAllModels = allModels;
+
+    const optionsHtml = allModels.map(e=>`<option value="${e.model.replace(/"/g,'&quot;')}">${e.model}</option>`).join('');
+
+    document.getElementById('modalBody').innerHTML = `
+        <div class="modal-add-row" style="${isStock?'background:#ecfdf5;border-color:#6ee7b7;':''}">
+            <label style="${isStock?'color:#065f46;':''}">Modelo:</label>
+            <select class="modal-model-select" id="modalDropdown" style="${isStock?'border-color:#6ee7b7;':''}">
+                <option value="">— Selecione um modelo —</option>${optionsHtml}
+            </select>
+            <input type="number" class="modal-qty-add" id="modalQtyAdd" value="1" min="1" style="${isStock?'border-color:#6ee7b7;':''}">
+            <span style="font-size:11px;color:#94a3b8;font-weight:600;">un</span>
+            <button class="btn-modal-add" onclick="addModelToList()" style="${isStock?'background:#0f766e;':''}">＋ Adicionar</button>
+        </div>
+        <div class="modal-list-title">${isStock?'Modelos em estoque':'Modelos adicionados'}</div>
+        <div class="modal-selected-list" id="modalSelectedList"></div>`;
+
+    renderModalList();
+    refreshModalSummary();
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('modalDropdown').focus();
+}
+window.openModal = openModal;
+
+function getModalState() { return currentModalMode === 'stock' ? stockModels : selectedModels; }
+
+function renderModalList() {
+    const state = getModalState();
+    const sel   = state[currentModalKey] || {};
+    const list  = document.getElementById('modalSelectedList');
+    if (!list) return;
+    const entries = Object.entries(sel);
+    if (!entries.length) { list.innerHTML = '<div class="modal-list-empty">Nenhum modelo adicionado ainda.</div>'; return; }
+    list.innerHTML = entries.map(([m,q]) => {
+        const mEsc = m.replace(/'/g,"\\'").replace(/"/g,'&quot;');
+        return `<div class="modal-sel-row">
+            <span class="modal-sel-name">${m}</span>
+            <input type="number" class="modal-sel-qty-input" value="${q}" min="1" oninput="updateSelQty(this,'${mEsc}')">
+            <span class="modal-sel-unit">un</span>
+            <button class="btn-modal-remove" onclick="removeModel('${mEsc}')" title="Remover">✕</button>
+        </div>`;
+    }).join('');
+}
+
+function addModelToList() {
+    const sel   = document.getElementById('modalDropdown');
+    const qty   = parseInt(document.getElementById('modalQtyAdd').value) || 1;
+    const model = sel.value;
+    if (!model) return;
+    const state = getModalState();
+    if (!state[currentModalKey]) state[currentModalKey] = {};
+    state[currentModalKey][model] = Math.max(1, qty);
+    sel.value = '';
+    document.getElementById('modalQtyAdd').value = 1;
+    renderModalList(); refreshModalSummary();
+}
+window.addModelToList = addModelToList;
+
+function updateSelQty(inp, m) {
+    const v = Math.max(1, parseInt(inp.value)||1);
+    const state = getModalState();
+    if (state[currentModalKey]) state[currentModalKey][m] = v;
+    refreshModalSummary();
+}
+window.updateSelQty = updateSelQty;
+
+function removeModel(m) {
+    const state = getModalState();
+    if (state[currentModalKey]) delete state[currentModalKey][m];
+    renderModalList(); refreshModalSummary();
+}
+window.removeModel = removeModel;
+
+function refreshModalSummary() {
+    const state = getModalState();
+    const n = Object.keys(state[currentModalKey]||{}).length;
+    document.getElementById('modalSummaryText').textContent = n===0 ? 'Nenhum modelo adicionado' : `${n} modelo(s)`;
+}
+
+function clearAllModal() {
+    const state = getModalState();
+    state[currentModalKey] = {};
+    renderModalList(); refreshModalSummary();
+}
+window.clearAllModal = clearAllModal;
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); currentModalKey=null; }
+window.closeModal = closeModal;
+
+function closeModalOutside(e) { if (e.target===document.getElementById('modalOverlay')) closeModal(); }
+window.closeModalOutside = closeModalOutside;
+
+async function confirmModels() {
+    const key     = currentModalKey;
+    const isStock = currentModalMode === 'stock';
+    const state   = getModalState();
+    const sel     = state[key] || {};
+    const n       = Object.keys(sel).length;
+    const info    = getItemInfo(key);
+
+    if (isStock) {
+        const btn = document.getElementById('smbtn_'+key);
+        const sum = document.getElementById('smsum_'+key);
+        if (btn && sum) {
+            if (n > 0) {
+                btn.classList.add('has-models');
+                btn.textContent = `📦 ${n} modelo(s) em estoque`;
+                const preview = Object.entries(sel).slice(0,2).map(([m,q])=>`${m}: ${q}un`).join(' · ');
+                sum.textContent = preview + (n>2?` +${n-2} mais`:'');
+                sum.classList.remove('none');
+                snapshotState(`Estoque Modelos — ${info?.name||key}`);
+                const sd   = {...getStock()};
+                const hoje = new Date().toLocaleDateString('pt-BR');
+                const total = Object.values(sel).reduce((s,v)=>s+v,0);
+                const modelArr = Object.entries(sel).map(([m,q])=>({model:m,qty:q}));
+                sd[key] = { qty:`${total} un`, date:hoje, models:modelArr };
+                _stock  = sd;
+                _stockM = {..._stockM, [key]: sel};
+                showBanner('Salvando estoque...','loading');
+                lsSet('revend_stock', _stock);
+                lsSet('revend_stockModelos', _stockM);
+                showBanner('✅ Estoque salvo!','ok');
+                const row = document.querySelector(`tr[data-item="${key}"]`);
+                if (row) {
+                    row.querySelector('.current-stock').textContent = `${total} un`;
+                    const dt = row.querySelector('.stock-date');
+                    dt.textContent = hoje; dt.classList.remove('none');
+                }
+            } else {
+                btn.classList.remove('has-models');
+                btn.textContent = '📦 Estoque Modelos';
+                sum.textContent = 'Não informado';
+                sum.classList.add('none');
+            }
+        }
+    } else {
+        const btn = document.getElementById('mbtn_'+key);
+        const sum = document.getElementById('msum_'+key);
+        if (n > 0) {
+            btn.classList.add('has-models');
+            btn.textContent = `📱 ${n} modelo(s) selecionado(s)`;
+            const preview = Object.entries(sel).slice(0,2).map(([m,q])=>`${m}: ${q}un`).join(' · ');
+            sum.textContent = preview + (n>2?` +${n-2} mais`:'');
+            sum.classList.remove('none');
+            const row = document.querySelector(`tr[data-item="${key}"]`);
+            if (row && !row.querySelector('.need-buy').checked) { row.querySelector('.need-buy').checked=true; updateCount(); }
+        } else {
+            btn.classList.remove('has-models');
+            btn.textContent = '📱 Selecionar Modelos';
+            sum.textContent = 'Nenhum selecionado';
+            sum.classList.add('none');
+        }
+        _models = JSON.parse(JSON.stringify(selectedModels));
+        lsSet('revend_models', _models);
+    }
+    closeModal();
+}
+window.confirmModels = confirmModels;
+
+// ═══ LOAD DATA ═════════════════════════════════════════════════════════════
+function loadData() {
+    const orders = getOrders();
+    const stock  = getStock();
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const key = row.getAttribute('data-item');
+
+        if (orders[key]?.length > 0) {
+            const last = orders[key].at(-1);
+            const cell = row.querySelector('.last-order');
+            cell.textContent = `${last.date} — ${last.qtySummary||last.qty}`;
+            cell.classList.remove('none');
+        }
+
+        if (stock[key]) {
+            row.querySelector('.current-stock').textContent = stock[key].qty;
+            const dt = row.querySelector('.stock-date');
+            dt.textContent = stock[key].date; dt.classList.remove('none');
+
+            if (stock[key].models?.length) {
+                const modelArr = stock[key].models;
+                const n   = modelArr.length;
+                const btn = document.getElementById('smbtn_'+key);
+                const sum = document.getElementById('smsum_'+key);
+                if (btn && sum) {
+                    btn.classList.add('has-models');
+                    btn.textContent = `📦 ${n} modelo(s) em estoque`;
+                    const preview = modelArr.slice(0,2).map(e=>`${e.model}: ${e.qty}un`).join(' · ');
+                    sum.textContent = preview + (n>2?` +${n-2} mais`:'');
+                    sum.classList.remove('none');
+                }
+                if (!stockModels[key]) stockModels[key] = {};
+                modelArr.forEach(e => stockModels[key][e.model] = e.qty);
+            }
+        }
+    });
+
+    // restaura modelos de pedido
+    for (const key in selectedModels) {
+        const sel = selectedModels[key];
+        const n   = Object.keys(sel).length;
+        if (!n) continue;
+        const btn = document.getElementById('mbtn_'+key);
+        const sum = document.getElementById('msum_'+key);
+        if (!btn||!sum) continue;
+        btn.classList.add('has-models');
+        btn.textContent = `📱 ${n} modelo(s) selecionado(s)`;
+        const preview = Object.entries(sel).slice(0,2).map(([m,q])=>`${m}: ${q}un`).join(' · ');
+        sum.textContent = preview + (n>2?` +${n-2} mais`:'');
+        sum.classList.remove('none');
+    }
+}
+
+// ═══ SALVAR PEDIDO ═════════════════════════════════════════════════════════
+async function saveOrder() {
+    const dv = document.getElementById('orderDate').value;
+    if (!dv) return alert('Selecione a data!');
+
+    const orders = {...getOrders()};
+    let count = 0;
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cb  = row.querySelector('.need-buy');
+        const qty = row.querySelector('.qty-input');
+        const key = row.getAttribute('data-item');
+        if (!cb.checked) return;
+
+        const info = getItemInfo(key);
+        const mods = selectedModels[key] || {};
+        const hasModels = info?.modelScope && Object.keys(mods).length > 0;
+
+        if (!orders[key]) orders[key] = [];
+
+        if (hasModels) {
+            const modelArr = Object.entries(mods).map(([m,q])=>({model:m,qty:q}));
+            const totalQty = modelArr.reduce((s,e)=>s+e.qty,0);
+            orders[key].push({ date:new Date(dv+'T12:00:00').toLocaleDateString('pt-BR'), rawDate:dv, models:modelArr, qtySummary:`${totalQty} un em ${modelArr.length} modelos` });
+            count++;
+        } else if (Number(qty.value) > 0) {
+            orders[key].push({ date:new Date(dv+'T12:00:00').toLocaleDateString('pt-BR'), rawDate:dv, qty:qty.value, qtySummary:qty.value+' un' });
+            count++;
+        }
+    });
+
+    if (count===0) return alert('Nenhum item selecionado com quantidade ou modelos!');
+    snapshotState('Salvar Pedido');
+    showBanner('Salvando pedido...','loading');
+    _models = JSON.parse(JSON.stringify(selectedModels));
+    await setOrders(orders);
+    lsSet('revend_models', _models);
+    showBanner(`✅ ${count} itens salvos!`,'ok');
+    loadData();
+    clearAll();
+}
+window.saveOrder = saveOrder;
+
+// ═══ ATUALIZAR ESTOQUE ═════════════════════════════════════════════════════
+async function atualizarEstoque() {
+    const sd   = {...getStock()};
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let count  = 0;
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const inp = row.querySelector('.qty-stock');
+        const key = row.getAttribute('data-item');
+        if (!key) return;
+
+        const hasStockModels = stockModels[key] && Object.keys(stockModels[key]).length > 0;
+        const hasQtyValue    = inp && inp.value.trim() !== '';
+
+        if (hasQtyValue) {
+            const v = inp.value.trim();
+            row.querySelector('.current-stock').textContent = v;
+            const dt = row.querySelector('.stock-date');
+            dt.textContent = hoje; dt.classList.remove('none');
+            const modelArr = hasStockModels
+                ? Object.entries(stockModels[key]).map(([m,q])=>({model:m,qty:q}))
+                : (sd[key]?.models || null);
+            sd[key] = { qty:v, date:hoje, models:modelArr };
+            inp.value = '';
+            count++;
+        } else if (hasStockModels) {
+            const modelArr = Object.entries(stockModels[key]).map(([m,q])=>({model:m,qty:q}));
+            const total    = modelArr.reduce((s,e)=>s+e.qty,0);
+            const qtyStr   = `${total} un`;
+            row.querySelector('.current-stock').textContent = qtyStr;
+            const dt = row.querySelector('.stock-date');
+            dt.textContent = hoje; dt.classList.remove('none');
+            sd[key] = { qty:qtyStr, date:hoje, models:modelArr };
+            count++;
+        }
+    });
+
+    if (count===0) return alert('Preencha "Qtd Estoque" ou defina modelos via "📦 Estoque Modelos" nos itens que deseja atualizar.');
+    snapshotState('Atualizar Estoque');
+    showBanner('Salvando estoque...','loading');
+    _stockM = JSON.parse(JSON.stringify(stockModels));
+    await setStock(sd);
+    lsSet('revend_stockModelos', _stockM);
+    showBanner(`✅ Estoque de ${count} item(ns) atualizado!`,'ok');
+    updateCount();
+}
+window.atualizarEstoque = atualizarEstoque;
+
+// ═══ IMPRIMIR ESTOQUE ══════════════════════════════════════════════════════
+function imprimirEstoque() {
+    const stock = getStock();
+    const hoje  = new Date().toLocaleString('pt-BR');
+    const result = {};
+    catalog.forEach(brand => brand.categories.forEach(cat => cat.items.forEach(item => {
+        const s = stock[item.key];
+        const models = s?.models || null;
+        const total  = models ? models.reduce((a,e)=>a+e.qty,0) : (s ? s.qty : '—');
+        if (!result[brand.brand]) result[brand.brand]={};
+        if (!result[brand.brand][cat.title]) result[brand.brand][cat.title]=[];
+        result[brand.brand][cat.title].push({name:item.name, qty:total, dtAtl:s?s.date:'—', status:item.status, models});
+    })));
+
+    const bs = {ok:'background:#d1fae5;color:#065f46;',low:'background:#fef3c7;color:#92400e;',out:'background:#fee2e2;color:#991b1b;'};
+    const bl = {ok:'OK',low:'BAIXO',out:'FALTA'};
+
+    let body = `<html><head><meta charset="UTF-8"><title>Estoque Atual</title>
+    <style>body{font-family:Arial,sans-serif;padding:30px;color:#1e293b}
+    h2{color:#c8102e;border-bottom:3px solid #c8102e;padding-bottom:10px;margin-bottom:20px}
+    h3{color:#c8102e;font-size:15px;border-left:4px solid #c8102e;padding-left:10px;margin:20px 0 4px}
+    h4{color:#64748b;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px}
+    table{width:100%;border-collapse:collapse;margin-bottom:10px}
+    th{background:#2a2a2a;color:white;padding:7px 10px;text-align:left;font-size:11px}
+    td{padding:6px 10px;border-bottom:1px solid #e2e8f0;font-size:13px}
+    tr:nth-child(even) td{background:#f8fafc}
+    .badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700}
+    .footer{margin-top:30px;font-size:11px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:10px}
+    </style></head><body><h2>📦 Estoque Atual — Revend</h2>`;
+
+    for (const b in result) {
+        body += `<h3>${b}</h3>`;
+        for (const c in result[b]) {
+            body += `<h4>${c}</h4><table><thead><tr><th>Produto</th><th>Qtd</th><th>Modelos</th><th>Atualizado em</th><th>Status</th></tr></thead><tbody>`;
+            result[b][c].forEach(r => {
+                const det = r.models ? r.models.map(e=>`${e.model}: ${e.qty}un`).join(' · ') : '—';
+                body += `<tr><td>${r.name}</td><td><strong>${r.qty!=='—'?r.qty+' un':'—'}</strong></td><td style="font-size:11px">${det}</td><td>${r.dtAtl}</td><td><span class="badge" style="${bs[r.status]||''}">${bl[r.status]||r.status}</span></td></tr>`;
+            });
+            body += `</tbody></table>`;
+        }
+    }
+    body += `<div class="footer">Gerado em ${hoje}</div></body></html>`;
+    const win = window.open('','','width=900,height=860');
+    win.document.write(body); win.document.close(); win.focus();
+    setTimeout(()=>win.print(),400);
+}
+window.imprimirEstoque = imprimirEstoque;
+
+// ═══ EXPORTAR PEDIDO ═══════════════════════════════════════════════════════
+function exportData() {
+    const dv = document.getElementById('orderDate').value;
+    const label = dv ? new Date(dv+'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+    const grouped = {};
+
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cb  = row.querySelector('.need-buy');
+        const qty = row.querySelector('.qty-input');
+        const key = row.getAttribute('data-item');
+        if (!cb.checked) return;
+        const info = getItemInfo(key); if (!info) return;
+        if (!grouped[info.brand]) grouped[info.brand]={};
+        if (!grouped[info.brand][info.cat]) grouped[info.brand][info.cat]=[];
+        const mods = selectedModels[key]||{};
+        if (info.modelScope && Object.keys(mods).length>0) {
+            Object.entries(mods).forEach(([m,q]) => grouped[info.brand][info.cat].push(`• ${info.name} — ${m}: ${q} un`));
+        } else if (Number(qty.value)>0) {
+            grouped[info.brand][info.cat].push(`• ${info.name} — ${qty.value} un`);
+        }
+    });
+
+    const hasAny = Object.values(grouped).some(c=>Object.values(c).some(l=>l.length>0));
+    if (!hasAny) return alert('Nenhum item selecionado com quantidade!');
+
+    let text = `📦 PEDIDO — ${label}\n${'═'.repeat(45)}\n\n`;
+    for (const b in grouped) { text+=`▶ ${b}\n`; for (const c in grouped[b]) { text+=`  ── ${c}\n${grouped[b][c].map(l=>'  '+l).join('\n')}\n\n`; } }
+
+    navigator.clipboard.writeText(text)
+        .then(()=>alert('✅ Lista copiada para a área de transferência!'))
+        .catch(()=>{ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); alert('✅ Lista copiada!'); });
+}
+window.exportData = exportData;
+
+// ═══ LIMPAR ════════════════════════════════════════════════════════════════
+function clearAll() {
+    document.querySelectorAll('.need-buy').forEach(cb=>cb.checked=false);
+    document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
+    document.querySelectorAll('.qty-stock').forEach(i=>i.value='');
+    updateCount();
+}
+window.clearAll = clearAll;
+
+// ═══ BUSCA/FILTRO ══════════════════════════════════════════════════════════
+function filterRows() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const name   = row.querySelector('.item-name')?.textContent.toLowerCase()||'';
+        const status = row.getAttribute('data-status')||'';
+        const chk    = row.querySelector('.need-buy')?.checked;
+        const ms = currentFilter==='all'||(currentFilter==='out'&&status==='out')||(currentFilter==='low'&&status==='low')||(currentFilter==='ok'&&status==='ok')||(currentFilter==='sel'&&chk);
+        row.classList.toggle('hidden-row',!(name.includes(q)&&ms));
+    });
+}
+window.filterRows = filterRows;
+
+function setFilter(f,btn) {
+    currentFilter=f;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); filterRows();
+}
+window.setFilter = setFilter;
+
+function updateCount() {
+    document.getElementById('countOut').textContent      = document.querySelectorAll('.status-badge.out').length;
+    document.getElementById('countLow').textContent      = document.querySelectorAll('.status-badge.low').length;
+    document.getElementById('countOk').textContent       = document.querySelectorAll('.status-badge.ok').length;
+    document.getElementById('countSelected').textContent = document.querySelectorAll('.need-buy:checked').length;
+    document.getElementById('countTotal').textContent    = document.querySelectorAll('tbody tr').length;
+    filterRows();
+}
+window.updateCount = updateCount;
+
+// ═══ EXPORTAR/IMPORTAR JSON ═════════════════════════════════════════════════
+function exportarDadosJSON() {
+    const dados = { versao:1, exportadoEm:new Date().toISOString(), pedidos:_orders, estoque:_stock, modelos:_models, stockModelos:_stockM };
+    const blob  = new Blob([JSON.stringify(dados,null,2)],{type:'application/json'});
+    const url   = URL.createObjectURL(blob);
+    const a     = document.createElement('a');
+    a.href = url; a.download = `estoque_revend_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.json`;
+    a.click(); URL.revokeObjectURL(url);
+}
+window.exportarDadosJSON = exportarDadosJSON;
+
+async function importarDadosJSON(event) {
+    const file = event.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const dados = JSON.parse(e.target.result);
+            if (!dados.pedidos || !dados.estoque) return alert('❌ Arquivo inválido.');
+            if (!confirm(`Importar dados de ${new Date(dados.exportadoEm).toLocaleString('pt-BR')}?\n\nIsso vai substituir os dados atuais.`)) return;
+            snapshotState('Importar Dados JSON');
+            showBanner('Importando...','loading');
+            _orders = dados.pedidos;
+            _stock  = dados.estoque;
+            _models = dados.modelos || {};
+            _stockM = dados.stockModelos || {};
+            selectedModels = _models;
+            stockModels    = _stockM;
+            lsSet('revend_orders', _orders);
+            lsSet('revend_stock', _stock);
+            lsSet('revend_models', _models);
+            lsSet('revend_stockModelos', _stockM);
+            loadData();
+            showBanner('✅ Dados importados com sucesso!','ok');
+        } catch { alert('❌ Erro ao ler o arquivo.'); }
+    };
+    reader.readAsText(file);
+    event.target.value='';
+}
+window.importarDadosJSON = importarDadosJSON;
+
+// ═══ INIT — carrega dados do localStorage ═══════════════════════════════════
+async function init() {
+    document.getElementById('orderDate').valueAsDate = new Date();
+    renderTables();
+    showBanner('Carregando dados locais...','loading');
+
+    try {
+        _orders = lsGet('revend_orders', {});
+        _stock  = lsGet('revend_stock', {});
+        _models = lsGet('revend_models', {});
+        _stockM = lsGet('revend_stockModelos', {});
+        selectedModels = _models;
+        stockModels    = _stockM;
+
+        loadData();
+        updateUndoBtn();
+        document.getElementById('syncStatus').textContent = '💾 LocalStorage — dados locais';
+        showBanner('✅ Dados carregados com sucesso!','ok');
+
+    } catch(e) {
+        showBanner('❌ Erro ao carregar dados locais.','err');
+        console.error(e);
+    }
+}
+
+init();
+</script>
+</body>
+</html>

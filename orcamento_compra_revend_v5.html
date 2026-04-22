@@ -1,0 +1,770 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:13px;color:var(--color-text-primary)}
+.header{background:#1a1a1a;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0}
+.company-info{font-size:10px;text-align:right;line-height:1.7;opacity:.9}
+.title-bar{background:#222;color:#fff;text-align:center;padding:10px;font-size:20px;font-weight:700;letter-spacing:1px}
+.form-wrap{border:0.5px solid var(--color-border-tertiary);border-top:none;border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);overflow:hidden}
+.sec-hdr{background:#444;color:#fff;text-align:center;padding:5px;font-size:11px;font-weight:700;letter-spacing:.8px}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:.5px solid var(--color-border-tertiary)}
+.row-aparelho{display:grid;grid-template-columns:1fr 2fr 1fr;border-bottom:.5px solid var(--color-border-tertiary)}
+.cell{padding:7px 10px;border-right:.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cell:last-child{border-right:none}
+.lbl{font-weight:700;font-size:11px;white-space:nowrap;min-width:fit-content}
+input[type=text],input[type=date],select{border:.5px solid var(--color-border-secondary);border-radius:4px;padding:3px 6px;font-size:12px;background:var(--color-background-primary);color:var(--color-text-primary);width:100%}
+.val-base{font-size:18px;font-weight:700}
+.bat-row{display:flex;align-items:center;gap:6px;width:100%}
+.bat-num{font-size:13px;font-weight:700;min-width:38px}
+.bat-ok{color:#155724;background:#d4edda;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+.bat-ruim{color:#721c24;background:#f8d7da;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+input[type=range]{flex:1;cursor:pointer}
+table.dt{width:100%;border-collapse:collapse}
+table.dt th{background:#555;color:#fff;padding:6px 10px;font-size:11px;font-weight:700;text-align:left}
+table.dt th.c{text-align:center}
+table.dt td{padding:6px 10px;border-bottom:.5px solid var(--color-border-tertiary);font-size:12px;vertical-align:middle}
+table.dt tr:hover td{background:var(--color-background-secondary)}
+.cond{font-size:10px;color:var(--color-text-secondary);font-style:italic}
+.vr{text-align:right;font-size:11px;color:var(--color-text-secondary)}
+.tot{text-align:right;font-weight:700;color:#c0392b}
+.footer{display:grid;grid-template-columns:1fr 1fr 1fr;border-top:2px solid #333}
+.fc{padding:10px 14px;border-right:.5px solid var(--color-border-tertiary);display:flex;align-items:center;gap:8px}
+.fc:last-child{border-right:none}
+.vfnum{font-size:20px;font-weight:700;background:#d4edda;color:#155724;padding:4px 12px;border-radius:4px}
+.dt-num{font-size:15px;font-weight:700;color:#c0392b}
+.extra-row{border-bottom:.5px solid var(--color-border-tertiary);padding:8px 10px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn-pdf{background:#c0392b;color:#fff;border:none;padding:9px 20px;border-radius:5px;cursor:pointer;font-size:13px;font-weight:700;margin-top:10px;float:right}
+.btn-pdf:hover{background:#a93226}
+</style>
+
+<div id="app">
+<div class="header">
+  <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAEGAXYDASIAAhEBAxEB/8QAHQABAAICAwEBAAAAAAAAAAAAAAcIBgkBBAUDAv/EAFAQAAEDAwIDBQMEDgQMBwAAAAABAgMEBQYHEQgSIRMxQVFhInGBCRSRkhUWIzI2N0JSYnJ1gpSzM6GisRckNENEc3R2k7LR01NXg5XBwtL/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8ApkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADOdM9J881GlcmKWKarp2LyyVcjmxQRr6vcqJv6JuvoSHeuEjWK30fzinoLTdHIm6w0dcnOn/ERiL8FUCAwZFk2D5djEzo8ixy62zlXZXT0r2tX3O22X6THQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABl2juITZ5qRZMTikWJlfUok8iJ1jiaivkcnqjGu29djES0nydWNpX6k3vJHs5mWmgSKN23dJM7ZP7LHgXexawWrGLBSWKyUkdJQUcaRwxRpsiInj6qveq+KnXtOZYpdqySjteR2itqYpFjligrY3uY5PBURe8x3iFyh2HaL5TfopezqIqB8NM5O9Jpfucap6o56L8DVXFNJE9HwyOY5PFq7KBuPqIop2dnPFHLGve17UVF+kjTNtA9JctR77jhtDS1Lt96i3otLJuvivZ7I5f1kU1/4XrlqriTmNtOZ3J0Df9HqnJUR7eSNkR3L8NibsP41r/T8rMrxOhr0VUR0tBM6B23nyu5kVfigGS5dwTWmfmfimY1VJ5RXCnbKn12cq/1EJZpwtavY5zSQWOG+0zU5lmtc6SLt/q3csi/BqltMJ4q9I8iVkNXdKqwVDlROS5U6taq+faM5monq5Wkw2PIbFfqZtTZLzb7lC7ufS1LJU+lqqBqLvVmu1lqlpbvbKy31Cd8VVA6JyfByIdA226j4DjGoGO1Fkya2RVcEyLyS900DvB8b+9qp9HgqKnQ1f6uYVWae6hXbE616yuopto5dtu1iciOY/wCLVQDEgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANiXARiyWLRFLxLFy1V9rZKlyqnXsmfc2J7vZc5P1zXlSwSVNTHTxNc+SRyMY1E3VVVdkQ25acWCLFcEsmOxIm1voooHKni5rURy/SigV2+UYyX5jgFixiNyo+517qiRE7ljhb4/vSN+goiT/x4ZSt/wBc6i3Ry81PZKSOiaid3Ou8j19+8nKv6qEAAAAAO7a7jcLZUpU22uqaKdvdJTyrG5Pih0jNtDcZ+3DVzGMceztIKu4RfOG+cLF55P7DXAbPdLEvH+DjHlv9RJUXRbdA6qkk+/c9WIqq79Lfv9Si/wAoNU0U+vTIqbbtqa0U8dVsn5aue5P7DmGwxqIiIiIiInciGp/XTJftt1cye/pJ2kVTcJEgdv3xMXkZt6crUAwgAAAAAAAAAAAAAAAAAAAAAAAAAAADnYDgAAAAAAAAAAAAAAAAAAAABKvCbjCZVr3jNHJHz09JU/P5/JGwpzpv6K9GJ8TZ3W1MFBRS1VTI2OGGN0kj3LsjWtRVVV9NkKW/Jv4x2t6ynLpYnLHTQx0FO9U6K5y87/iiNZ9Yn3i9yb7WdA8ilik5Km4Qpb4fNe2Xlft+5zga3s6vkuTZnecgnVee41stT18Ec5VRPgmyHigAAAALQfJ3Y2tx1Pu+RvYjobRQcjXL4SzKqJ/ZbIVfMv091JzfT6aWXDshqrT26o6ZjEa+ORURURXMeitdtuu26LtuBst1+yh2HaOZPf4pOzqYaB7KZ2/VJpPYjVPc5yL8DVKu6ruqky6ocRmb6jaetxDIqW2I35xHNJV0sbo5JuRFTZ7eZW9VVF9lGp07iGUA4AAAAAAAAAAAAAAAAAAAAAAAAAAH1pYJaiZkMEb5ZXrsxjGq5zl8kRCfcL4S9U7/AGyK4V0dtsUcrOZkNbMvb7bbpzMai8u/kqoqeKIS3wI6P0tPZ26nZBRMlq6pyts0czd0hiRVR02y/lOVFRF8ETdPvi3XgBq31h0OzvS6OKryCjhntszuVlfRvWSJHfmv6IrHe9Nl8FXrtGKG4DLLLbMlx2usF4pI6qgroVhmje3dFRfFPJU70XwVEU1i4rpBl2Y6hXXFMVoHVn2Oq5IZ62RUbBC1r1ajnv7k327k3VeuyLsBHQLqYtwSUCRRPynNal8u33WG3UzWoi+j377/AFTnKeCW2rTvfjGbVUErU3bFcKdsjXL6vZy7fVUClQM71Z0ozPTK5tpcmt3ZwTb/ADatiXmgnRO/ld4L+i7Z3jtsqKTdiPB9U5Pi1ryGhz+kSmuNLHUxotA5Vaj2ou33/huBVYEga76a3HSrOVxi4VkdejqZlTBVsjViTMduirsqrts5rm9/5JH4AEncPOkNfq/kVfaqS5NtkVDTJPLUvhWRqKrtmt2RU6r1X91SSNVOFWbT7Abrl1xzimnioIkc2JtE5Fle5yNazfmXbdzkTfw7wK0gkrRvRfNdU6hz7DSRwW2J6NqLjVKrII1/NRdt3u2TfZu+3TfbdCymP8E2OxQtXIc2udVJy9W0FNHA1F97+fdPggFIQXJy/gn5aeSXE8yWSVPvKe4UyJv/AOoxf/qVb1EwfJ8AyKSxZTa5qCranNGrk3jmZ4Pjd3Ob6p3Lui7KiogY0AWA0b4Wc3zq2016u80eNWioaj4X1EavqJWL3ObFumyL4cypv39yoqha3gwxluNaA2RVi7Oe6rJcZv0lkdsxf+G2MiH5SLKGx0mLYdE/7rIstxqW+TU+5x/SvafQSNbuGyejoII4tYtQI6mCNGRvirWshaiJ0RI9l2RNk6cxC3EVw4aq1ErsoZk0+fJSUyRbyR8la2FiK7ZGbr2myud3Krl37lAqiD9uYrF2d0cnei96GcaQ6X5XqdkC2nG6NrmRNR9TVyqrYadqr0Vy+a+CJ1X6QMEBevGuCnDY6HbJMqvlZVr40HZwRt80RHseq+HXdPcdDO+Cqy/Y1ZcGyi4x17GqvY3ZWSRyr4JzRsarPocBSWNjpHtYxN1cqInvLx1XBljFfjdA+kyK7Wm8fNovnSPYyen7XkTn5W7Ncntb/lL7iv2h2m95XiWsWHZDbn0tTbbg2proZG9OSFe09ytdytRFToqONlVyrqa2W6or6yTs6amhfNNIvcxjGq5yr8EUDU3qria4Lnt1xN9xguUlulSJ9RCxWtc7lRVTZfFN9l9UMXPVzG9T5Hld1v8AVb9tcayWpcirvy871dt8N9jygPyAAAAAAAAAAAAAAAAAAAAAAAAejjVtmvGQUFop+s1bUx0zE273PcjU/vPOM30D663YQnnfqL+c0DahjtqpbHYaCzUTGx01DTR08TWpsiNY1Gp/cYEzXfS1mXXTFq3LKK23G2VDoJ0rndhErm7I7lkd7C7L023Rd0Xpt1JNNTmun45cw/bVV/NcBfjUviBwy2x09jwu8W/JsmusjKS2wUM6SxMmldyMdJI3dqIjlReXfdfTvJC0ywy14LilPZLbG1X/ANLV1Cp7dVO7rJK9fFVX6E2ROiIa+eCi2w3LiNxxJ2c7KZKioRP0mwP5V+DlavwNlrm7tVu6pv4p3gQFrjxQYlp3fZccoaCe/wB3g6VTIJ0jip39/I5+y+0nTdERdt9l67odXRjirxPOcgpcdvFqlx241kiRUj5KhJYJnr3M59kVHKvRN02Vdk33VD83bg800ulzqrlW33L5KmqldNK9ayDdznKqqv8AQ+anyp+DTS6CWOWG95ex8b0e1yVsG6Ki7p/mQJt1Fw+zZ1iVdjN+pmT0dWxU6pusb/yZGr4OavVFIr4Oa+tt+KX3TS8vRbnht0kou7bnp3qr43+5V59vREJxpYPm9PHD2r5eRiN537cztk7128St77zBh/HhLb5XpFT5dZYUkRV2b27GubGvvXsVb73AeH8otia12JWPMoYt5LdUOo6hze/spE3bv6I5q/W9SjaG2bWbFIc40syHF5WNe6uo3pBzdzZm+1E74Pa1fgaqrTZ665ZFS2CmhetfVVbKOOLb2lkc9GI3bz3UC/HAJhzrBo/NkVREjavIKt0zFVPaSnj9iNF/eSR3uch2eLSlqs5v+D6Q26oWKS+Vrq2vc1f6OkhavM5fpdt5qhN+HWOkxnFbXj1CiJT26kjpo/VGNRN/jtuV50iv7M54zM4u/apNSWO1rbKJPBjWyNa/b0V/aL+8BYfGLHasYsFHY7LRx0lBRxpFDFG3ZERPH1Ve9V8V6leNVOL3FMZyGos2O2ObJH0r1jmqUqkggVyLsqMdyuV2yp37beRY2+UH2Us9ZbFq6mkSrp5IFnpnI2WJHtVvMxVRURyb7oqouyleXcF+lSpv9mcv/jaf/sAZPoLxFYrqnc1sjaKos165FfHTTvSRs6Im7uzem3MqJ12VEXZFXwMo4g9NLdqhp7V2SpjjbcYWOmtlUqe1BOibp1/NdtyuTyXzRDBMR4T9PcVym25HZr9lsVfballRC51ZAqK5q77KiQpu1e5U8UVU8SwCAa7eDDSuLL9VaqryGh7W3Y2qSVFPKnsvqeZUjjcniiK1XKnjyoi9DYVVVNNb6Oaqqp4aemhYr3ve5GMjYidVVV7kRCMOH3HaWx3TUeSGHkdVZdUuRf0Oyic1Pgr3fSR38obkdZa9LrVZKSZ0bLvXq2o2Xbmjjbzcq/vK36AM1quJ7RenuTqF2Wo/lVWumjop3RIqL4ORnVPVN0Jas1yt15tlPc7VXU9dRVDEkhngkR7HtXuVFTvNOqF1fk5corai2ZNiVTUukpKNYayjjcu/ZK9XNkRPRVRi+/fzAxjji0fShzyzZNi9F+E1UlFPTRM6fPVVOVU9ZN+7zaq+JbDRPT+16baf0GN2+OLtmMbJW1DW7LUTqic71Xx69E8kRDIr/YbfeZrZJXwtl+x1a2thRU7pWtcjV+HNv70Q/GZ3unxvErtkFW1ywWyimrH7d6pGxXbJ6rtsBFuunEXhul91WxyQ1V4vjWI+SkpVREhRfve0evRFVOuybrt1XbdN8e0y4tMFy2909lu9BV47V1L0jglqZGvgc9V2aivT73fzVNvUoPk14rcgyCvvdylWasrqh88z18XOXc85FA27T4nZZs5pMyfSN+zFNRyUTZ0TZXRPc12zvPZWrt5cziO+MrJvtb0Av3Zv5J7m1tuj9UlXZ6fU5zK9CLjWXPRzEq+4PWWpntNO58jl3V68iJuvquxWr5STKUWbFsMp5OrEluNUz3/c4v7pfpAptucAAAAAAAAAAAAAAAAAAAAAAAAAADN9Avx4YP8A7wUX85phBnGgP48MH/3gov5zQNsBqb1x/HJmP7aqv5rjbIamtcfxyZj+2qr+a4DOOCa4xW/iOx3tntY2pbUUyKq/lOgfyp8XIifE2R3aGSptlVBBK+GWSF7GSMXZWuVqoip7l6moHHrrV2K/W+9UD+SroKmOpgd5PY5HNX6UNq2kme2XUjB6LJbLOxWytRtTAjt300yInNG9PBU/rTZe5QNdl51h1ktV1q7ZW53f4qmlmfDKx1SqK1zVVFT+o6sGtOr9RM2GHPb++R7ka1ralVVyquyIhdTXHhjxLUm9OyCjuE+O3qb/ACmeGBJoqj9J8aq32vVHJv47nT0Y4WMT0/yKHIbpdqjJbjTO5qTtqdsMELk7n8m7lc5PBVdsnftvsqBXBKni1T/R9Rv4WX/8kbZXkefUOpNJds0q7q7JLNNA5nz/AHSaHkd2sbVReqJ7W+36Rs41HzSyYBh1dk9/qGw0lJGqtbv7c0i/exsTxc5enp1VdkRVNVeeZJWZdmV2ya4L/jNyqnzvTwbuvRqeiJsnwA2y4heKbIsXtl9pFRYLhSx1MfXfo9qO/wDkqrgukDrbxw3apkolW029jr7S7p7Llm3azb9WRZNvWMzXgKzF2RaNLYqmXnrMeqVpu/dVgeqvjVfisjfcxCwMdJTNr316Qs+dPibCsu3tKxFVUavoiucvxAxzWDKYcK0yv+TyuajqCifJCjvypV9mNvxe5qfEpz8nld+bVzIaepmc6pr7Y6VVd1WRWytV3x9okb5RbLPmOE2TD4ZESW6VLqqZqL17KJOm/ornJ9X0KjaNZvU6eakWfLKZiyfMpvu8Sf52FyK2RnvVqrsvguy+AGzXWaC/VGleSNxesqKS8soJJKOWndtJ2jE50a31dy8v7xrfXXTV7/zBvv8AEqbOsTv9pyrHKK/2WqjrLdXRJLDIxd0VF70XyVF3RU8FRUIA1U4Q8Ry3JJ75YL7UY1JVPV9RTspUqIOde9WNVzVZuvVU3VOvREAqfZdXdcL3dKe12jM8mr66pdyQ09PK573u8kRE3UzH53xar+RqN/DS/wDQtVoJw8YnpRcX3qKsnvV7cxY21lREjEhaqbKkbEVeVVTdFVVVdunTrvkXENqfbdLdPau81EjH3KoY+G2Uqqm88+3RdvzG7orl8uneqAYjwRVd8r9KbpU5JNVTXdcgqW1b6lVWVZGsiaqO38U22+BHXylH4N4h/ttR/wAjDN+AKonrNEKysqZHSzz36qkle7vc5WxKqqYR8pP+DeIf7ZUf8jAKRltPk2fwyyz9nw/zFKlltPk2Pwyyz9nw/wAxQLyKm5gnEBaK++6LZbabXG6WtqLXMkUTE3dIqN35ETzXbb4nx4hMwrcC0xq8soGdrLb6qle6L/xI1nja9m/hu1VTfw33Pe0+y6w53idJkeP1jKugqm+ftRu29pjk8HJ3KgGo09fDMduWWZTbscs8Dpq64TthhaidEVV++d5NRN1VfBEVTYJqbwraaZndZrvTfZDH6+dyvlW3vZ2MjlXfmWNzVRF/VVpkWi+g2C6WTur7NDU112e1WOuFc5HSNave1iNRGtT3Jv5qoEiYzZ4LDjltslN/QUFLHTR+fKxqNT+41q8WuUNyzXjIayKXtKejlSgg2XpyxJyrt6K7nX4l5eJzVei0u08qKuOaJ1/rmPgtUG6KvOqbLKqfms33XzXZPE1jVE0lRK+aZ6vleque5e9VVd1UD5L3nByvecAAAAAAAAAAAAAAAAAAAAAAAAADIdNr9Di2f2HJainkqIrVcYKx8TFRHPSN6OVqKvTddjHgBeZONzGdvwFvP8VH/wBCm+fXqPJc4veQwwPp47lXzVTInu3cxHvVyIq+fU8E/QAy7TXUfLdOryt0xS6SUUr0RJol9uKdE8HsXoqf1p4KhiIAuPivG5MyhZHk2CMlqGoiOnoK7kY5fSN7VVPrKfbJeN2P5jJHjmCPbVuTZstdW7sYvqxjd1+shTFRsBm2qWp+Z6l3NtblV2dUNjcqwU0TUjgg38GMT+9d181MJRAhyBKHDzrHcdH77cLhS2qO7U1fAkU1K+oWJN2ru13MjV6puqd3iTevHDcdvxc0v/u7v+0VAAEga86oXLVnOftmr6FlvbHSx0tPSslWRImN3VfaVE33c5y93j6EfKcgCQtI9Yc30wq3Pxq4MWjkfzzUFU1ZKeRfVu6Ki+rVRehY+x8btH82Y284BOlRt7b6O4I5rl80a5iKnu3X3lLVOALhZhxs3CejfBieFQUVQvRKm41Syo1P9WxG9f3vgVhz3Ncnzu+OvOVXae41apytV67Njb+axqdGp6IY2cqBYDQTiTrNKMFXFqfEae6tdWSVSzvrliXd6NTl5UYvdy+fieNxFa71msVBaaOoxuCztt0skqOjq1mWRXoibdWt222IZAHGxKnDprHUaO3m6XGnsMV4+yFO2B0b6lYeTldzIu/K7f3EWACxusvFPX6j6d3LD5sOgtrK7s1WoZcHSKzkka/71WJvvy7d/iRDpnqTmOnlzWvxW8zUSvVFmh2R0M23dzsXovv7/UxA4UC4WL8bVfDSsZkmC09VO1ER89BWrC1f3Htdt9Y+OXcbF3noXQ4phVNb6h3RKmvq1n5fdG1revvcqehUNQgHvZxlmQ5rf5b7k1zmuNfKiNWSRejWp3Nanc1qbr0Tp1PBU5ONgOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/2Q==" style="height:40px;filter:brightness(0) invert(1);">
+  <div class="company-info">Revend Eletro Comercio de Equipamentos Eletronicos Ltda.<br>Rua Tuiuti, 1951 - Tatuapé | São Paulo CEP:03307-005 | CNPJ: 28.724.816/0001-87</div>
+</div>
+<div class="title-bar" id="title-bar">ORÇAMENTO COMPRA</div>
+<!-- SELETOR DE MODALIDADE -->
+<div style="background:#2a2a2a;padding:10px 16px;display:flex;align-items:center;gap:12px;border-bottom:2px solid #c0392b">
+  <span style="color:#aaa;font-size:11px;font-weight:700;letter-spacing:.8px;white-space:nowrap">TIPO DE ENTRADA:</span>
+  <label id="lbl-mod-compra" style="cursor:pointer;flex:1;border:2px solid #c0392b;border-radius:6px;padding:8px 14px;display:flex;align-items:center;gap:8px;background:#fff5f5;transition:all .2s">
+    <input type="radio" name="modalidade" value="compra" id="mod-compra" onchange="onModalidade()" checked style="accent-color:#c0392b;width:16px;height:16px">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#c0392b">🛒 COMPRA</div>
+      <div style="font-size:10px;color:#888">Cliente quer vender o produto para a loja</div>
+    </div>
+  </label>
+  <label id="lbl-mod-parte" style="cursor:pointer;flex:1;border:2px solid #555;border-radius:6px;padding:8px 14px;display:flex;align-items:center;gap:8px;background:transparent;transition:all .2s">
+    <input type="radio" name="modalidade" value="parte" id="mod-parte" onchange="onModalidade()" style="accent-color:#1a6b3c;width:16px;height:16px">
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#ddd">🔄 ENTRADA COMO PARTE DE PAGAMENTO</div>
+      <div style="font-size:10px;color:#888">Cliente entrega produto como desconto na compra</div>
+    </div>
+  </label>
+</div>
+<div class="form-wrap">
+  <div class="sec-hdr">INFORMAÇÕES DO CLIENTE</div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">RESPONSÁVEL:</span><input type="text" id="responsavel" placeholder="Nome do colaborador" oninput="calcular()"></div>
+    <div class="cell"><span class="lbl">IMEI | Nº SERIE:</span><input type="text" id="imei" placeholder="IMEI / Série"></div>
+    <div class="cell"><span class="lbl">DATA:</span><input type="date" id="data"></div>
+  </div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">Nº VENDA</span><input type="text" id="nvenda"></div>
+    <div class="cell"><span class="lbl">NOME DO CLIENTE:</span><input type="text" id="nome" placeholder="Nome completo do cliente" oninput="calcular()"></div>
+    <div class="cell"><span class="lbl">CONTATO:</span><input type="text" id="contato" placeholder="(11) 99999-9999"></div>
+  </div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">CPF:</span><input type="text" id="cpf" placeholder="000.000.000-00"></div>
+    <div class="cell"><span class="lbl">RG:</span><input type="text" id="rg" placeholder="RG do cliente"></div>
+    <div class="cell"><span class="lbl">ENDEREÇO:</span><input type="text" id="endereco" placeholder="Rua, nº, bairro, cidade"></div>
+  </div>
+  <div class="sec-hdr">INFORMAÇÕES DO APARELHO</div>
+  <div class="row-aparelho">
+    <div class="cell"><span class="lbl">Cor</span><input type="text" id="cor" placeholder="Ex: Preto"></div>
+    <div class="cell"><span class="lbl">Modelo</span><select id="modelo" style="font-size:13px;font-weight:700" onchange="onModeloChange()"><option value="">-- Selecione o modelo --</option></select></div>
+    <div class="cell"><span class="lbl">Aprovado</span><input type="checkbox" id="aprovado" style="width:20px;height:20px"></div>
+  </div>
+  <div class="row-aparelho">
+    <div class="cell" style="flex-direction:column;align-items:flex-start;gap:3px">
+      <span class="lbl">Saúde da Bateria</span>
+      <div class="bat-row">
+        <input type="range" id="batRange" min="50" max="100" value="85" step="1" oninput="onBat()">
+        <span class="bat-num" id="batValTxt">85%</span>
+        <span id="batBadge" class="bat-ok">Boa</span>
+      </div>
+    </div>
+    <div class="cell"><span class="lbl">Valor Base</span><span class="val-base" id="valor-base">R$ 0,00</span></div>
+    <div class="cell"><span class="lbl">Cód. Agendamento</span><input type="text" id="codagend"></div>
+  </div>
+  <table class="dt">
+    <thead>
+      <tr>
+        <th class="c" style="width:36px">✓</th>
+        <th>DESCONTOS</th>
+        <th>CONDIÇÃO</th>
+        <th class="c" style="width:100px">VALOR</th>
+        <th class="c" style="width:100px">TOTAL</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+  <div class="footer">
+    <div class="fc"><span style="font-size:12px;font-weight:700">Valor Final</span><span class="vfnum" id="valor-final">R$ 0,00</span></div>
+    <div class="fc" style="justify-content:flex-end"><span style="font-size:12px;font-weight:700;margin-right:8px">Desconto Total</span><span class="dt-num" id="desc-total">-R$ 0,00</span></div>
+    <div class="fc" style="justify-content:flex-end"><span style="font-size:12px;font-weight:700;margin-right:6px">Desc. Autorizado R$</span><input type="number" id="descAut" value="0" min="0" style="width:70px;text-align:right" oninput="calcular()"></div>
+  </div>
+
+  <!-- PRAZO DE PAGAMENTO -->
+  <div id="prazo-section">
+  <div class="sec-hdr">PRAZO DE PAGAMENTO — ESCOLHA DO CLIENTE</div>
+  <div style="padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:.5px solid var(--color-border-tertiary)">
+    <label id="lbl-pix" style="cursor:pointer;flex:1;min-width:180px;border:2px solid #e0e0e0;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:all .2s">
+      <input type="radio" name="prazo" value="pix" id="prazo-pix" onchange="calcular()" style="accent-color:#c0392b;width:18px;height:18px">
+      <div>
+        <div style="font-size:12px;font-weight:700">⚡ Pagamento imediato</div>
+        <div style="font-size:11px;color:#888">Pagamento na hora via PIX</div>
+        <div id="val-pix" style="font-size:14px;font-weight:700;color:#155724;margin-top:2px">R$ 0,00</div>
+      </div>
+    </label>
+    <label id="lbl-72h" style="cursor:pointer;flex:1;min-width:180px;border:2px solid #c0392b;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:all .2s;background:#fff5f5">
+      <input type="radio" name="prazo" value="72h" id="prazo-72h" onchange="calcular()" checked style="accent-color:#c0392b;width:18px;height:18px">
+      <div>
+        <div style="font-size:12px;font-weight:700">🕒 72 horas (padrão)</div>
+        <div style="font-size:11px;color:#888">3 dias úteis — padrão Revend</div>
+        <div id="val-72h" style="font-size:14px;font-weight:700;color:#155724;margin-top:2px">R$ 0,00</div>
+      </div>
+    </label>
+    <label id="lbl-7d" style="cursor:pointer;flex:1;min-width:180px;border:2px solid #e0e0e0;border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;transition:all .2s">
+      <input type="radio" name="prazo" value="7d" id="prazo-7d" onchange="calcular()" style="accent-color:#c0392b;width:18px;height:18px">
+      <div>
+        <div style="font-size:12px;font-weight:700">📅 7 dias úteis</div>
+        <div style="font-size:11px;color:#888">Prazo estendido</div>
+        <div id="val-7d" style="font-size:14px;font-weight:700;color:#155724;margin-top:2px">R$ 0,00</div>
+      </div>
+    </label>
+  </div>
+  </div><!-- /prazo-section -->
+
+  <!-- ASSINATURAS — visível apenas no PDF -->
+  <div id="assinaturas-section" style="display:none">
+  <div class="sec-hdr">ASSINATURAS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:.5px solid var(--color-border-tertiary)">
+    <div style="padding:14px 16px;border-right:.5px solid var(--color-border-tertiary)">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">CLIENTE (VENDEDOR)</div>
+      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
+      <div id="sig-nome" style="font-size:11px;font-weight:700;color:#333"></div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Assinatura do Cliente / Vendedor</div>
+    </div>
+    <div style="padding:14px 16px;border-right:.5px solid var(--color-border-tertiary)">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">COLABORADOR RESPONSÁVEL PELOS TESTES</div>
+      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
+      <div id="sig-resp" style="font-size:11px;font-weight:700;color:#333"></div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Responsável pelos testes</div>
+    </div>
+    <div style="padding:14px 16px">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">SUPERVISÃO (QUANDO NECESSÁRIO)</div>
+      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
+      <div style="font-size:11px;font-weight:700;color:#ccc;font-style:italic">Opcional</div>
+      <div style="font-size:10px;color:#888;margin-top:2px">Assinatura da Supervisão</div>
+    </div>
+  </div>
+</div><!-- /assinaturas-section -->
+
+  <!-- UPLOAD RG DO CLIENTE -->
+  <div class="sec-hdr">DOCUMENTO RG DO CLIENTE — ANEXO AO CONTRATO</div>
+  <div style="padding:10px 14px;border-bottom:.5px solid var(--color-border-tertiary);display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+    <div style="flex:1;min-width:220px">
+      <div style="font-size:11px;font-weight:700;margin-bottom:6px">📎 Frente do RG</div>
+      <input type="file" id="rg-frente" accept="image/*" onchange="onRgUpload('frente')" style="font-size:11px;width:100%">
+      <div id="rg-frente-preview" style="margin-top:6px;display:none">
+        <img id="rg-frente-img" style="max-width:100%;max-height:120px;border:1px solid #ccc;border-radius:4px;object-fit:contain">
+        <div style="font-size:10px;color:#155724;font-weight:700;margin-top:3px">✓ Frente carregada</div>
+        <button onclick="limparRg('frente')" style="font-size:10px;color:#c0392b;background:none;border:none;cursor:pointer;padding:0;margin-top:2px">✕ Remover</button>
+      </div>
+    </div>
+    <div style="flex:1;min-width:220px">
+      <div style="font-size:11px;font-weight:700;margin-bottom:6px">📎 Verso do RG</div>
+      <input type="file" id="rg-verso" accept="image/*" onchange="onRgUpload('verso')" style="font-size:11px;width:100%">
+      <div id="rg-verso-preview" style="margin-top:6px;display:none">
+        <img id="rg-verso-img" style="max-width:100%;max-height:120px;border:1px solid #ccc;border-radius:4px;object-fit:contain">
+        <div style="font-size:10px;color:#155724;font-weight:700;margin-top:3px">✓ Verso carregado</div>
+        <button onclick="limparRg('verso')" style="font-size:10px;color:#c0392b;background:none;border:none;cursor:pointer;padding:0;margin-top:2px">✕ Remover</button>
+      </div>
+    </div>
+    <div style="flex:1;min-width:220px;align-self:center">
+      <div style="font-size:10px;color:#888;line-height:1.6">
+        As imagens do RG serão incluídas automaticamente no PDF após a seção de assinaturas.<br>
+        Formatos aceitos: JPG, PNG, HEIC. Opcional — o PDF é gerado normalmente sem o documento.
+      </div>
+    </div>
+  </div>
+
+</div>
+<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
+  <button class="btn-pdf" id="btn-gerar-pdf" onclick="gerarPDF()" style="background:#c0392b">⬇ Gerar PDF — Orçamento + Contrato</button>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const precos={"IPHONE XR 64GB":200,"IPHONE XR 128GB":270,"IPHONE XR 256GB":300,"IPHONE 11 64GB":400,"IPHONE 11 128GB":500,"IPHONE 11 256GB":550,"IPHONE 11 PRO 64GB":650,"IPHONE 11 PRO 256GB":750,"IPHONE 11 PRO 512GB":850,"IPHONE 11 PRO MAX 64GB":700,"IPHONE 11 PRO MAX 256GB":800,"IPHONE 11 PRO MAX 512GB":900,"IPHONE 12 64GB":750,"IPHONE 12 128GB":900,"IPHONE 12 256GB":1000,"IPHONE 12 PRO 128GB":1350,"IPHONE 12 PRO 256GB":1450,"IPHONE 12 PRO 512GB":1550,"IPHONE 12 PRO MAX 128GB":1600,"IPHONE 12 PRO MAX 256GB":1700,"IPHONE 12 PRO MAX 512GB":1800,"IPHONE 13 128GB":1300,"IPHONE 13 256GB":1550,"IPHONE 13 512GB":1650,"IPHONE 13 PRO 128GB":1750,"IPHONE 13 PRO 256GB":1900,"IPHONE 13 PRO 512GB":2100,"IPHONE 13 PRO 1TB":2200,"IPHONE 13 PRO MAX 128GB":2200,"IPHONE 13 PRO MAX 256GB":2400,"IPHONE 13 PRO MAX 512GB":2550,"IPHONE 13 PRO MAX 1TB":2650,"IPHONE 14 128GB":1580,"IPHONE 14 256GB":1750,"IPHONE 14 PLUS 128GB":1750,"IPHONE 14 PLUS 256GB":1950,"IPHONE 14 PLUS 512GB":2100,"IPHONE 14 PRO 128GB":2200,"IPHONE 14 PRO 256GB":2500,"IPHONE 14 PRO 512GB":2600,"IPHONE 14 PRO MAX 128GB":2700,"IPHONE 14 PRO MAX 256GB":3100,"IPHONE 14 PRO MAX 512GB":3250,"IPHONE 14 PRO MAX 1TB":3350,"IPHONE 15 128GB":2200,"IPHONE 15 256GB":2400,"IPHONE 15 512GB":2550,"IPHONE 15 PLUS 128GB":2350,"IPHONE 15 PLUS 256GB":2550,"IPHONE 15 PLUS 512GB":2700,"IPHONE 15 PRO 128GB":2750,"IPHONE 15 PRO 256GB":2900,"IPHONE 15 PRO 512GB":3000,"IPHONE 15 PRO 1TB":3150,"IPHONE 15 PRO MAX 256GB":3500,"IPHONE 15 PRO MAX 512GB":3700,"IPHONE 15 PRO MAX 1TB":3900,"IPHONE 16E 128GB":2200,"IPHONE 16E 256GB":2300,"IPHONE 16 128GB":3100,"IPHONE 16 256GB":3250,"IPHONE 16 512GB":3450,"IPHONE 16 PLUS 128GB":3500,"IPHONE 16 PLUS 256GB":3650,"IPHONE 16 PLUS 512GB":3800,"IPHONE 16 PRO 128GB":3850,"IPHONE 16 PRO 256GB":4050,"IPHONE 16 PRO 512GB":4300,"IPHONE 16 PRO 1TB":4600,"IPHONE 16 PRO MAX 256GB":4450,"IPHONE 16 PRO MAX 512GB":4750,"IPHONE 16 PRO MAX 1TB":4950,"IPHONE 17E 256GB":2750,"IPHONE 17E 512GB":2900,"IPHONE 17 256GB":3800,"IPHONE 17 512GB":4600,"IPHONE 17 AIR 256GB":4200,"IPHONE 17 AIR 512GB":4500,"IPHONE 17 PRO 256GB":5900,"IPHONE 17 PRO 512GB":6600,"IPHONE 17 PRO 1TB":7100,"IPHONE 17 PRO MAX 256GB":6650,"IPHONE 17 PRO MAX 512GB":7550,"IPHONE 17 PRO MAX 1TB":8350,"IPHONE 17 PRO MAX 2TB":9600};
+
+// Tabela de valores para ENTRADA COMO PARTE DE PAGAMENTO (valores da tabela fornecida)
+const precosPartePagamento={"IPHONE XR 64GB":350,"IPHONE XR 128GB":470,"IPHONE XR 256GB":490,"IPHONE 11 64GB":600,"IPHONE 11 128GB":700,"IPHONE 11 256GB":800,"IPHONE 11 PRO 64GB":850,"IPHONE 11 PRO 256GB":950,"IPHONE 11 PRO 512GB":1000,"IPHONE 11 PRO MAX 64GB":950,"IPHONE 11 PRO MAX 256GB":1100,"IPHONE 11 PRO MAX 512GB":1100,"IPHONE 12 64GB":1000,"IPHONE 12 128GB":1150,"IPHONE 12 256GB":1200,"IPHONE 12 PRO 128GB":1550,"IPHONE 12 PRO 256GB":1650,"IPHONE 12 PRO 512GB":1750,"IPHONE 12 PRO MAX 128GB":1850,"IPHONE 12 PRO MAX 256GB":1950,"IPHONE 12 PRO MAX 512GB":2050,"IPHONE 13 128GB":1550,"IPHONE 13 256GB":1800,"IPHONE 13 512GB":1950,"IPHONE 13 PRO 128GB":2000,"IPHONE 13 PRO 256GB":2200,"IPHONE 13 PRO 512GB":2300,"IPHONE 13 PRO 1TB":2400,"IPHONE 13 PRO MAX 128GB":2400,"IPHONE 13 PRO MAX 256GB":2650,"IPHONE 13 PRO MAX 512GB":2750,"IPHONE 13 PRO MAX 1TB":2850,"IPHONE 14 128GB":1800,"IPHONE 14 256GB":2100,"IPHONE 14 PLUS 128GB":2000,"IPHONE 14 PLUS 256GB":2200,"IPHONE 14 PLUS 512GB":2300,"IPHONE 14 PRO 128GB":2400,"IPHONE 14 PRO 256GB":2700,"IPHONE 14 PRO 512GB":2850,"IPHONE 14 PRO MAX 128GB":3000,"IPHONE 14 PRO MAX 256GB":3300,"IPHONE 14 PRO MAX 512GB":3450,"IPHONE 14 PRO MAX 1TB":3550,"IPHONE 15 128GB":2450,"IPHONE 15 256GB":2650,"IPHONE 15 512GB":2800,"IPHONE 15 PLUS 128GB":2600,"IPHONE 15 PLUS 256GB":2800,"IPHONE 15 PLUS 512GB":2950,"IPHONE 15 PRO 128GB":2950,"IPHONE 15 PRO 256GB":3100,"IPHONE 15 PRO 512GB":3200,"IPHONE 15 PRO 1TB":3400,"IPHONE 15 PRO MAX 256GB":3800,"IPHONE 15 PRO MAX 512GB":4000,"IPHONE 15 PRO MAX 1TB":4200,"IPHONE 16E 128GB":2500,"IPHONE 16E 256GB":2600,"IPHONE 16 128GB":3350,"IPHONE 16 256GB":3600,"IPHONE 16 512GB":3800,"IPHONE 16 PLUS 128GB":3700,"IPHONE 16 PLUS 256GB":4000,"IPHONE 16 PLUS 512GB":4150,"IPHONE 16 PRO 128GB":4100,"IPHONE 16 PRO 256GB":4300,"IPHONE 16 PRO 512GB":4650,"IPHONE 16 PRO 1TB":4800,"IPHONE 16 PRO MAX 256GB":4700,"IPHONE 16 PRO MAX 512GB":5000,"IPHONE 16 PRO MAX 1TB":5300,"IPHONE 17E 256GB":3000,"IPHONE 17E 512GB":3200,"IPHONE 17 256GB":4100,"IPHONE 17 512GB":4900,"IPHONE 17 AIR 256GB":4600,"IPHONE 17 AIR 512GB":4900,"IPHONE 17 PRO 256GB":6300,"IPHONE 17 PRO 512GB":7000,"IPHONE 17 PRO 1TB":7500,"IPHONE 17 PRO MAX 256GB":7000,"IPHONE 17 PRO MAX 512GB":7900,"IPHONE 17 PRO MAX 1TB":8750,"IPHONE 17 PRO MAX 2TB":10000};
+
+const descs={"IPHONE 11":{tela:300,tela2:200,vidro:200,bateria:300,carcaca:300,carcaca2:200,faceid:300,camF:230,camT:280,lente:100,carr:220,sensor:170,bot:150,auri:150,af:150},"IPHONE 11 PRO":{tela:320,tela2:220,vidro:250,bateria:320,carcaca:320,carcaca2:250,faceid:350,camF:250,camT:350,lente:100,carr:280,sensor:200,bot:150,auri:180,af:180},"IPHONE 11 PRO MAX":{tela:350,tela2:250,vidro:300,bateria:350,carcaca:350,carcaca2:300,faceid:400,camF:350,camT:400,lente:100,carr:300,sensor:200,bot:150,auri:180,af:180},"IPHONE 12":{tela:420,tela2:250,vidro:300,bateria:350,carcaca:350,carcaca2:300,faceid:400,camF:300,camT:400,lente:100,carr:250,sensor:200,bot:180,auri:180,af:180},"IPHONE 12 PRO":{tela:450,tela2:270,vidro:320,bateria:380,carcaca:370,carcaca2:300,faceid:400,camF:320,camT:500,lente:100,carr:300,sensor:220,bot:200,auri:200,af:200},"IPHONE 12 PRO MAX":{tela:480,tela2:300,vidro:370,bateria:400,carcaca:400,carcaca2:350,faceid:450,camF:330,camT:550,lente:100,carr:320,sensor:220,bot:200,auri:200,af:200},"IPHONE 13":{tela:470,tela2:300,vidro:320,bateria:380,carcaca:400,carcaca2:350,faceid:600,camF:330,camT:500,lente:100,carr:300,sensor:250,bot:200,auri:200,af:200},"IPHONE 13 PRO":{tela:500,tela2:350,vidro:350,bateria:400,carcaca:420,carcaca2:400,faceid:600,camF:400,camT:600,lente:100,carr:400,sensor:270,bot:200,auri:200,af:200},"IPHONE 13 PRO MAX":{tela:550,tela2:400,vidro:400,bateria:420,carcaca:450,carcaca2:400,faceid:600,camF:400,camT:650,lente:100,carr:450,sensor:280,bot:200,auri:200,af:200},"IPHONE 14":{tela:500,tela2:400,vidro:400,bateria:400,carcaca:450,carcaca2:400,faceid:650,camF:400,camT:500,lente:100,carr:380,sensor:280,bot:200,auri:200,af:220},"IPHONE 14 PRO":{tela:650,tela2:450,vidro:450,bateria:450,carcaca:500,carcaca2:500,faceid:700,camF:400,camT:650,lente:100,carr:420,sensor:280,bot:200,auri:200,af:250},"IPHONE 14 PRO MAX":{tela:700,tela2:500,vidro:470,bateria:500,carcaca:550,carcaca2:550,faceid:750,camF:420,camT:700,lente:100,carr:500,sensor:320,bot:200,auri:200,af:250},"IPHONE 14 PLUS":{tela:700,tela2:450,vidro:450,bateria:470,carcaca:520,carcaca2:450,faceid:650,camF:400,camT:600,lente:100,carr:400,sensor:280,bot:200,auri:200,af:220},"IPHONE 15":{tela:700,tela2:500,vidro:400,bateria:500,carcaca:550,carcaca2:600,faceid:800,camF:500,camT:550,lente:100,carr:520,sensor:350,bot:300,auri:350,af:300},"IPHONE 15 PLUS":{tela:720,tela2:550,vidro:420,bateria:520,carcaca:550,carcaca2:700,faceid:900,camF:550,camT:550,lente:120,carr:600,sensor:400,bot:400,auri:400,af:400},"IPHONE 15 PRO":{tela:700,tela2:550,vidro:450,bateria:550,carcaca:600,carcaca2:800,faceid:1000,camF:600,camT:750,lente:120,carr:700,sensor:500,bot:500,auri:500,af:500},"IPHONE 15 PRO MAX":{tela:750,tela2:600,vidro:500,bateria:600,carcaca:650,carcaca2:900,faceid:1200,camF:700,camT:800,lente:120,carr:800,sensor:500,bot:500,auri:500,af:500},"IPHONE 16E":{tela:800,tela2:650,vidro:520,bateria:650,carcaca:650,carcaca2:950,faceid:1500,camF:750,camT:800,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16":{tela:800,tela2:650,vidro:520,bateria:650,carcaca:650,carcaca2:950,faceid:1500,camF:750,camT:800,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PLUS":{tela:820,tela2:670,vidro:530,bateria:670,carcaca:670,carcaca2:950,faceid:1500,camF:750,camT:850,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PRO":{tela:900,tela2:700,vidro:550,bateria:750,carcaca:700,carcaca2:1000,faceid:1800,camF:850,camT:950,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 16 PRO MAX":{tela:950,tela2:750,vidro:550,bateria:800,carcaca:750,carcaca2:1000,faceid:1900,camF:850,camT:1100,lente:150,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17AIR":{tela:970,tela2:750,vidro:650,bateria:900,carcaca:800,carcaca2:1200,faceid:2000,camF:900,camT:1100,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17":{tela:970,tela2:800,vidro:650,bateria:900,carcaca:800,carcaca2:1200,faceid:2000,camF:900,camT:1100,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17 PRO":{tela:1200,tela2:950,vidro:700,bateria:950,carcaca:850,carcaca2:1300,faceid:2100,camF:1000,camT:1500,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0},"IPHONE 17 PRO MAX":{tela:1500,tela2:1100,vidro:750,bateria:1100,carcaca:900,carcaca2:1300,faceid:2100,camF:1000,camT:1500,lente:200,carr:0,sensor:0,bot:0,auri:0,af:0}};
+
+const itens=[
+  {key:"tela",label:"TELA",cond:"Quebrada ou com riscos profundos"},
+  {key:"tela2",label:"TELA²",cond:"Msg. peça não genuína ou baixa qualidade | marcas leves"},
+  {key:"vidro",label:"VIDRO TRASEIRO",cond:"Trincado ou quebrada"},
+  {key:"bateria",label:"BATERIA",cond:"Em manutenção ou abaixo de 85%"},
+  {key:"carcaca",label:"CARCAÇA",cond:"Avarias muito profundas (necessário trocar a carcaça)"},
+  {key:"carcaca2",label:"CARCAÇA²",cond:"Arranhões ou marcas leves"},
+  {key:"faceid",label:"FACE ID",cond:"Não funciona ou intermitente"},
+  {key:"camF",label:"CAMERA FRONTAL",cond:"Não funciona | embaçada | manchas e outros problemas"},
+  {key:"camT",label:"CAMERA TRASEIRA",cond:"Não funciona | embaçada | manchas e outros problemas"},
+  {key:"lente",label:"LENTE DA CAMERA",cond:"Cada lente quebrada"},
+  {key:"carr",label:"ENTRADA DO CARREGADOR",cond:"Mal contato ou não carrega"},
+  {key:"sensor",label:"SENSOR DE PROXIMIDADE",cond:"Não funciona ou intermitente"},
+  {key:"bot",label:"BOTÃO VOLUME | POWER | VIBRA",cond:"Não funciona ou com qualquer defeito"},
+  {key:"auri",label:"AURICULAR",cond:"Som baixo | chiado ou estourado"},
+  {key:"af",label:"AUTO FALANTE E MICROFONE",cond:"Som baixo | chiado ou estourado"},
+  {key:"caixa",label:"CAIXA",cond:""},
+  {key:"acessorios",label:"ACESSÓRIOS",cond:""}
+];
+
+function fmt(v){return"R$ "+v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtNum(v){return v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function getBase(m){for(const k of Object.keys(descs))if(m.startsWith(k))return k;return null}
+function getModalidade(){return(document.querySelector('input[name="modalidade"]:checked')||{value:"compra"}).value}
+function getPrecoAtual(m){
+  const mod=getModalidade();
+  if(mod==="parte")return precosPartePagamento[m]||0;
+  return precos[m]||0;
+}
+
+function onModalidade(){
+  const mod=getModalidade();
+  const isCompra=mod==="compra";
+  // Update title bar
+  document.getElementById("title-bar").textContent=isCompra?"ORÇAMENTO COMPRA":"ORÇAMENTO — ENTRADA COMO PARTE DE PAGAMENTO";
+  // Update modal labels
+  document.getElementById("lbl-mod-compra").style.borderColor=isCompra?"#c0392b":"#555";
+  document.getElementById("lbl-mod-compra").style.background=isCompra?"#fff5f5":"transparent";
+  document.getElementById("lbl-mod-parte").style.borderColor=!isCompra?"#1a6b3c":"#555";
+  document.getElementById("lbl-mod-parte").style.background=!isCompra?"#f0fff4":"transparent";
+  // Prazo section: hide for parte pagamento
+  const prazoSection=document.getElementById("prazo-section");
+  if(prazoSection)prazoSection.style.display=isCompra?"":"none";
+  // Update button label
+  const btn=document.getElementById("btn-gerar-pdf");
+  if(btn)btn.textContent=isCompra?"⬇ Gerar PDF — Orçamento + Contrato":"⬇ Gerar PDF — Registro de Negociação";
+  if(btn)btn.style.background=isCompra?"#c0392b":"#1a6b3c";
+  // Refresh model/price
+  onModeloChange();
+}
+
+const sel=document.getElementById("modelo");
+Object.keys(precos).forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m;sel.appendChild(o)});
+document.getElementById("data").value=new Date().toISOString().split("T")[0];
+
+function onBat(){
+  const v=parseInt(document.getElementById("batRange").value);
+  document.getElementById("batValTxt").textContent=v+"%";
+  const badge=document.getElementById("batBadge");
+  if(v>=85){badge.textContent="Boa";badge.className="bat-ok"}
+  else{badge.textContent="Ruim";badge.className="bat-ruim"}
+  const m=document.getElementById("modelo").value;
+  const base=getBase(m);
+  if(base&&v<85){const chk=document.getElementById("chk_bateria");if(chk)chk.checked=true;}
+  calcular();
+}
+
+function onModeloChange(){
+  const m=document.getElementById("modelo").value;
+  const base=getBase(m);
+  const preco=getPrecoAtual(m);
+  document.getElementById("valor-base").textContent=fmt(preco);
+  renderTabela(base?descs[base]:null);
+  calcular();
+}
+
+function renderTabela(d){
+  const tb=document.getElementById("tbody");tb.innerHTML="";
+  const bat=parseInt(document.getElementById("batRange").value);
+  itens.forEach(item=>{
+    const val=d?(d[item.key]||0):0;
+    const disabled=val===0&&item.key!=="caixa"&&item.key!=="acessorios";
+    const preCheck=item.key==="bateria"&&bat<85;
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td style="text-align:center"><input type="checkbox" id="chk_${item.key}" onchange="calcular()" ${disabled?"disabled":""} ${preCheck?"checked":""}></td>
+      <td style="font-weight:700">${item.label}</td>
+      <td class="cond">${item.cond.toUpperCase()}</td>
+      <td class="vr">${val>0?fmt(val):""}</td>
+      <td class="tot" id="tot_${item.key}">R$ 0,00</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function calcular(){
+  const m=document.getElementById("modelo").value;
+  const base=getBase(m);const d=base?descs[base]:{};const preco=getPrecoAtual(m);
+  let total=0;
+  itens.forEach(item=>{
+    const chk=document.getElementById("chk_"+item.key);
+    const totEl=document.getElementById("tot_"+item.key);
+    if(!chk||!totEl)return;
+    if(chk.checked){const val=d[item.key]||0;total+=val;totEl.textContent=val>0?"-"+fmt(val):"R$ 0,00";totEl.style.color="#c0392b";}
+    else{totEl.textContent="R$ 0,00";totEl.style.color="var(--color-text-secondary)";}
+  });
+  const dAut=parseFloat(document.getElementById("descAut").value)||0;
+  const base72h=Math.max(0,preco-total-dAut);
+  const valPix=Math.round(base72h*0.95*100)/100;
+  const val72h=base72h;
+  const val7d=Math.round(base72h*1.03*100)/100;
+
+  document.getElementById("desc-total").textContent="-"+fmt(total);
+
+  // Update payment option values
+  const elPix=document.getElementById("val-pix");
+  const el72h=document.getElementById("val-72h");
+  const el7d=document.getElementById("val-7d");
+  if(elPix)elPix.textContent=fmt(valPix);
+  if(el72h)el72h.textContent=fmt(val72h);
+  if(el7d)el7d.textContent=fmt(val7d);
+
+  // Determine selected prazo
+  const prazo=document.querySelector('input[name="prazo"]:checked');
+  const prazoVal=prazo?prazo.value:"72h";
+  let final=val72h;
+  if(prazoVal==="pix")final=valPix;
+  else if(prazoVal==="7d")final=val7d;
+  document.getElementById("valor-final").textContent=fmt(final);
+
+  // Highlight selected label
+  ["pix","72h","7d"].forEach(p=>{
+    const lbl=document.getElementById("lbl-"+p);
+    if(!lbl)return;
+    if(p===prazoVal){lbl.style.borderColor="#c0392b";lbl.style.background="#fff5f5";}
+    else{lbl.style.borderColor="#e0e0e0";lbl.style.background="";}
+  });
+
+  // Update signature name fields live
+  const sigNome=document.getElementById("sig-nome");
+  const sigResp=document.getElementById("sig-resp");
+  if(sigNome)sigNome.textContent=document.getElementById("nome").value||"";
+  if(sigResp)sigResp.textContent=document.getElementById("responsavel").value||"";
+}
+
+function getState(){
+  const m=document.getElementById("modelo").value;
+  const base=getBase(m);const d=base?descs[base]:{};const preco=getPrecoAtual(m);
+  const bat=parseInt(document.getElementById("batRange").value);
+  const dAut=parseFloat(document.getElementById("descAut").value)||0;
+  const modalidade=getModalidade();
+  const defeitos=[];let totalDesc=0;
+  itens.forEach(item=>{
+    const chk=document.getElementById("chk_"+item.key);const val=d[item.key]||0;
+    if(chk&&chk.checked){totalDesc+=val;defeitos.push({label:item.label,cond:item.cond,val,checked:true});}
+    else if(chk){defeitos.push({label:item.label,cond:item.cond,val,checked:false});}
+  });
+  return{
+    modalidade,
+    responsavel:document.getElementById("responsavel").value||"",
+    imei:document.getElementById("imei").value||"",
+    data:document.getElementById("data").value||"",
+    nvenda:document.getElementById("nvenda").value||"",
+    nome:document.getElementById("nome").value||"",
+    contato:document.getElementById("contato").value||"",
+    cpf:document.getElementById("cpf").value||"",
+    rg:document.getElementById("rg").value||"",
+    endereco:document.getElementById("endereco").value||"",
+    cor:document.getElementById("cor").value||"",
+    codagend:document.getElementById("codagend").value||"",
+    modelo:m,bat,preco,dAut,totalDesc,
+    final:Math.max(0,preco-totalDesc-dAut),
+    defeitos,aprovado:document.getElementById("aprovado").checked,
+    prazo:(document.querySelector('input[name="prazo"]:checked')||{value:"72h"}).value,
+    valPix:Math.round(Math.max(0,preco-totalDesc-dAut)*0.95*100)/100,
+    val72h:Math.max(0,preco-totalDesc-dAut),
+    val7d:Math.round(Math.max(0,preco-totalDesc-dAut)*1.03*100)/100
+  };
+}
+
+async function gerarPDF(){
+  const s=getState();
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:"mm",format:"a4"});
+  const W=210,M=14;let y=0;
+
+  function header(){
+    doc.setFillColor(25,25,25);doc.rect(0,0,W,24,"F");
+    doc.setFillColor(40,40,40);doc.rect(0,24,W,11,"F");
+    doc.setTextColor(255,255,255);
+    try{doc.addImage("data:image/jpeg;base64,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","JPEG",M,4,28,15);}catch(e){doc.setFontSize(18);doc.setFont("helvetica","bold");doc.text("revend",M,16);}
+    doc.setFontSize(7.5);doc.setFont("helvetica","normal");
+    doc.text("Revend Eletro Comercio de Equipamentos Eletronicos Ltda.",W-M,8,{align:"right"});
+    doc.text("Rua Tuiuti, 1951 - Tatuapé | São Paulo CEP:03307-005 | CNPJ: 28.724.816/0001-87",W-M,13,{align:"right"});
+    doc.setFontSize(13);doc.setFont("helvetica","bold");
+    const pdfTitle=s.modalidade==="parte"?"ENTRADA COMO PARTE DE PAGAMENTO":"ORCAMENTO COMPRA";
+    doc.text(pdfTitle,W/2,30,{align:"center"});
+    doc.setTextColor(0,0,0);y=38;
+  }
+
+  function secHdr(txt){
+    doc.setFillColor(70,70,70);doc.rect(M,y,W-2*M,7,"F");
+    doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont("helvetica","bold");
+    doc.text(txt,W/2,y+5,{align:"center"});
+    doc.setTextColor(0,0,0);y+=7;
+  }
+
+  function rowCells(pairs,h){
+    const colW=(W-2*M)/pairs.length;
+    doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.rect(M,y,W-2*M,h);
+    pairs.forEach((p,i)=>{
+      if(i>0)doc.line(M+colW*i,y,M+colW*i,y+h);
+      doc.setFontSize(7);doc.setFont("helvetica","bold");doc.setTextColor(80,80,80);
+      doc.text(String(p[0]).toUpperCase()+":",M+colW*i+2,y+4);
+      doc.setFontSize(9);doc.setFont("helvetica","normal");doc.setTextColor(0,0,0);
+      const val=String(p[1]);
+      const lines=doc.splitTextToSize(val,colW-6);
+      doc.text(lines[0]||"",M+colW*i+2,y+9);
+    });
+    y+=h;
+  }
+
+  // PAGE 1 — ORCAMENTO
+  header();
+  secHdr("INFORMACOES DO CLIENTE");
+  rowCells([["Responsavel",s.responsavel],["IMEI | No Serie",s.imei],["Data",s.data]],12);
+  rowCells([["No Venda",s.nvenda],["Nome do Cliente",s.nome],["Contato",s.contato]],12);
+  rowCells([["CPF",s.cpf],["RG",s.rg],["Endereco",s.endereco]],12);
+  secHdr("INFORMACOES DO APARELHO");
+  rowCells([["Cor",s.cor],["Modelo",s.modelo],["Cod. Agendamento",s.codagend]],12);
+  const batStatus=(s.bat>=85?"BOA":"RUIM")+" ("+s.bat+"%)";
+  rowCells([["Saude da Bateria",batStatus],["Valor Base","R$ "+fmtNum(s.preco)],["Aprovado",s.aprovado?"SIM":"NAO"]],12);
+
+  // tabela descontos
+  doc.setFillColor(70,70,70);doc.rect(M,y,W-2*M,7,"F");
+  doc.setTextColor(255,255,255);doc.setFontSize(7.5);doc.setFont("helvetica","bold");
+  doc.text("",M+4,y+5);doc.text("DESCONTOS",M+12,y+5);
+  doc.text("CONDICAO",M+62,y+5);
+  doc.text("VALOR",W-M-26,y+5,{align:"right"});doc.text("TOTAL",W-M-2,y+5,{align:"right"});
+  doc.setTextColor(0,0,0);y+=7;
+
+  // Only show checked (selected) items in PDF
+  const checkedDefeitos=s.defeitos.filter(item=>item.checked);
+  if(checkedDefeitos.length===0){
+    doc.setFontSize(8);doc.setFont("helvetica","italic");doc.setTextColor(120,120,120);
+    doc.text("Nenhum defeito selecionado",M+4,y+5);doc.setTextColor(0,0,0);y+=8;
+  } else {
+    checkedDefeitos.forEach(item=>{
+      const h=7;
+      doc.setDrawColor(200,200,200);doc.setLineWidth(0.2);doc.rect(M,y,W-2*M,h);
+      doc.setFontSize(7);doc.setFont("helvetica","normal");
+      doc.setFillColor(200,0,0);doc.circle(M+4,y+3.5,1.5,"F");
+      doc.setFont("helvetica","bold");doc.setTextColor(0,0,0);
+      doc.text(item.label,M+9,y+4.8);
+      doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
+      const condLines=doc.splitTextToSize(item.cond.toUpperCase(),58);
+      doc.text(condLines[0],M+58,y+4.8);
+      doc.setTextColor(0,0,0);
+      if(item.val>0)doc.text("R$ "+fmtNum(item.val),W-M-26,y+4.8,{align:"right"});
+      if(item.val>0){doc.setTextColor(192,57,43);doc.text("-R$ "+fmtNum(item.val),W-M-2,y+4.8,{align:"right"});}
+      doc.setTextColor(0,0,0);y+=h;
+    });
+  }
+
+  // rodapé orcamento — opções de pagamento
+  doc.setDrawColor(40,40,40);doc.setLineWidth(0.6);doc.line(M,y,W-M,y);y+=2;
+
+  // Row: Valor Final + Desconto Total + Desc. Autorizado
+  const colW=(W-2*M)/3;
+  doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.rect(M,y,W-2*M,12);
+  doc.line(M+colW,y,M+colW,y+12);doc.line(M+colW*2,y,M+colW*2,y+12);
+  doc.setFontSize(8);doc.setFont("helvetica","bold");
+  doc.text("Valor Base (72h)",M+2,y+4);
+  doc.setFillColor(212,237,218);doc.roundedRect(M+2,y+5,colW-6,6,1,1,"F");
+  doc.setFontSize(10);doc.setTextColor(21,87,36);
+  doc.text("R$ "+fmtNum(s.val72h),M+2+(colW-6)/2,y+9.5,{align:"center"});
+  doc.setTextColor(0,0,0);doc.setFontSize(8);doc.setFont("helvetica","bold");
+  doc.text("Desconto Total",M+colW+2,y+4);
+  doc.setTextColor(192,57,43);doc.setFontSize(10);
+  doc.text("-R$ "+fmtNum(s.totalDesc),M+colW*2-2,y+10,{align:"right"});
+  doc.setTextColor(0,0,0);doc.setFontSize(8);doc.setFont("helvetica","bold");
+  doc.text("Desc. Autorizado",M+colW*2+2,y+4);
+  doc.setTextColor(192,57,43);doc.setFontSize(10);
+  doc.text("-R$ "+fmtNum(s.dAut),W-M-2,y+10,{align:"right"});
+  doc.setTextColor(0,0,0);y+=12;
+
+  // Payment options row — somente para COMPRA
+  if(s.modalidade!=="parte"){
+    secHdr("PRAZO DE PAGAMENTO — OPCAO DO CLIENTE");y+=3;
+    const optW=(W-2*M)/3;
+    const opts=[
+      {id:"pix",icon:"PIX IMEDIATO",val:s.valPix,sub:"Pagamento na hora"},
+      {id:"72h",icon:"72 HORAS (PADRAO)",val:s.val72h,sub:"3 dias uteis"},
+      {id:"7d",icon:"7 DIAS UTEIS",val:s.val7d,sub:"Prazo estendido"}
+    ];
+    opts.forEach((opt,i)=>{
+      const ox=M+optW*i;
+      const sel=(s.prazo===opt.id);
+      if(sel){doc.setFillColor(255,245,245);doc.rect(ox,y,optW,18,"F");}
+      doc.setDrawColor(sel?192:180,sel?57:180,sel?43:180);doc.setLineWidth(sel?0.7:0.3);
+      doc.rect(ox,y,optW,18);
+      doc.setFontSize(7.5);doc.setFont("helvetica","bold");
+      doc.setTextColor(sel?192:80,sel?57:80,sel?43:80);
+      doc.text(opt.icon,ox+optW/2,y+5,{align:"center"});
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(120,120,120);
+      doc.text(opt.sub,ox+optW/2,y+9,{align:"center"});
+      doc.setFontSize(sel?11:9);doc.setFont("helvetica","bold");
+      doc.setTextColor(21,87,36);
+      doc.text("R$ "+fmtNum(opt.val),ox+optW/2,y+15.5,{align:"center"});
+      if(sel){
+        doc.setFontSize(8);doc.setTextColor(192,57,43);
+        doc.text("✓ SELECIONADO",ox+optW/2,y+21,{align:"center"});
+      }
+      doc.setTextColor(0,0,0);
+    });
+    y+=opts.some(o=>o.id===s.prazo)?26:20;
+  }
+
+  // Final valor box
+  const prazoLabel=s.prazo==="pix"?"PIX IMEDIATO":s.prazo==="72h"?"72 HORAS (PADRAO)":"7 DIAS UTEIS";
+  const finalVal=s.prazo==="pix"?s.valPix:s.prazo==="7d"?s.val7d:s.val72h;
+  const boxLabel=s.modalidade==="parte"
+    ?"VALOR DE ENTRADA (PARTE DO PAGAMENTO):  R$ "+fmtNum(s.final)
+    :"VALOR ACORDADO ("+prazoLabel+"):  R$ "+fmtNum(finalVal);
+  const boxColor=s.modalidade==="parte"?[208,240,220]:[212,237,218];
+  const boxStroke=s.modalidade==="parte"?[26,107,60]:[21,87,36];
+  doc.setFillColor(...boxColor);doc.roundedRect(M,y,W-2*M,14,2,2,"F");
+  doc.setDrawColor(...boxStroke);doc.setLineWidth(0.5);doc.roundedRect(M,y,W-2*M,14,2,2,"S");
+  doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(...boxStroke);
+  doc.text(boxLabel,W/2,y+9,{align:"center"});
+  doc.setTextColor(0,0,0);y+=18;
+
+  // PAGE 2 — CONTRATO / REGISTRO
+  doc.addPage();y=0;header();
+  doc.setFontSize(s.modalidade==="parte"?11:13);doc.setFont("helvetica","bold");doc.setTextColor(0,0,0);
+  const contratoTituloPDF=s.modalidade==="parte"?"REGISTRO DE ENTRADA COMO PARTE DE PAGAMENTO":"CONTRATO DE COMPRA DE PRODUTOS APPLE";
+  doc.text(contratoTituloPDF,W/2,y+8,{align:"center"});
+  y+=14;
+
+  doc.setFontSize(9);
+  secHdr("IDENTIFICACAO DAS PARTES");y+=3;
+
+  doc.setFont("helvetica","bold");
+  if(s.modalidade==="parte"){
+    doc.text("Loja Receptora: ",M,y);
+    doc.setFont("helvetica","normal");
+    doc.text("Revend Eletro, CNPJ 28.724.816/0001-87, Rua Tuiuti 1951, Tatuapé - São Paulo.",M+32,y);y+=5;
+    doc.text("Doravante denominada \"Loja\".",M,y);y+=8;
+  } else {
+    doc.text("Comprador: ",M,y);
+    doc.setFont("helvetica","normal");
+    doc.text("Revend Eletro, CNPJ 28.724.816/0001-87, Rua Tuiuti 1951, Tatuapé - São Paulo.",M+22,y);y+=5;
+    doc.text("Doravante denominado \"Comprador\".",M,y);y+=8;
+  }
+
+  const clienteLabel=s.modalidade==="parte"?"Cliente / Portador: ":"Vendedor / Cliente: ";
+  const clienteLabelW=s.modalidade==="parte"?32:36;
+  doc.setFont("helvetica","bold");doc.text(clienteLabel,M,y);
+  doc.setFont("helvetica","normal");doc.text(s.nome||"___________________________________",M+clienteLabelW,y);y+=5;
+  doc.setFont("helvetica","bold");doc.text("RG: ",M,y);doc.setFont("helvetica","normal");doc.text(s.rg||"________________",M+8,y);
+  doc.setFont("helvetica","bold");doc.text("  CPF: ",M+55,y);doc.setFont("helvetica","normal");doc.text(s.cpf||"___________________________",M+67,y);y+=5;
+  doc.setFont("helvetica","bold");doc.text("Endereco: ",M,y);doc.setFont("helvetica","normal");
+  const endLines=doc.splitTextToSize(s.endereco||"___________________________________________________",W-2*M-22);
+  doc.text(endLines,M+22,y);y+=endLines.length*4.5+5;
+  doc.text(s.modalidade==="parte"?"Doravante denominado \"Cliente\".":"Doravante denominado \"Vendedor\".",M,y);y+=9;
+
+  secHdr("OBJETO DO CONTRATO");y+=4;
+  doc.setFontSize(9);doc.setFont("helvetica","normal");
+  if(s.modalidade==="parte"){
+    const objLines=doc.splitTextToSize("O presente instrumento registra a entrega, pelo cliente, do seguinte produto Apple como parte do pagamento de uma negociacao realizada na loja:",W-2*M);
+    doc.text(objLines,M,y);y+=objLines.length*4.5+2;
+  } else {
+    const objLines=doc.splitTextToSize("O presente contrato tem por objeto a compra, pelo Comprador, do seguinte produto Apple:",W-2*M);
+    doc.text(objLines,M,y);y+=objLines.length*4.5+2;
+  }
+  doc.setFont("helvetica","bold");doc.text("Modelo: ",M+4,y);doc.setFont("helvetica","normal");doc.text(s.modelo||"",M+20,y);y+=5;
+  doc.setFont("helvetica","bold");doc.text("Cor: ",M+4,y);doc.setFont("helvetica","normal");doc.text(s.cor||"",M+14,y);
+  doc.setFont("helvetica","bold");doc.text("  IMEI / No Serie: ",M+35,y);doc.setFont("helvetica","normal");doc.text(s.imei||"",M+72,y);y+=5;
+  doc.setFont("helvetica","bold");doc.text("VALOR ACORDADO: ",M+4,y);
+  if(s.modalidade==="parte"){
+    doc.setTextColor(0,120,0);doc.setFontSize(11);doc.setFont("helvetica","bold");
+    doc.text("R$ "+fmtNum(s.final)+" (VALOR DE ENTRADA — PARTE DO PAGAMENTO)",M+44,y);
+    doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont("helvetica","normal");y+=9;
+  } else {
+    const contratoFinalVal=s.prazo==="pix"?s.valPix:s.prazo==="7d"?s.val7d:s.val72h;
+    const contratoPrazoTxt=s.prazo==="pix"?"(PIX IMEDIATO)":s.prazo==="7d"?"(7 DIAS UTEIS)":"(72 HORAS)";
+    doc.setTextColor(0,120,0);doc.setFontSize(11);doc.setFont("helvetica","bold");
+    doc.text("R$ "+fmtNum(contratoFinalVal)+" "+contratoPrazoTxt,M+44,y);
+    doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont("helvetica","normal");y+=9;
+  }
+
+  secHdr("DECLARACAO DE LICITUDE E RESPONSABILIDADE");y+=4;
+  const dec=doc.splitTextToSize(s.modalidade==="parte"
+    ?"O Cliente declara, sob as penas da lei, que o produto acima descrito e de sua propriedade legitima e se trata de um produto licito, nao oriundo de furto, roubo ou qualquer outra atividade ilegal. O Cliente e o unico responsavel por qualquer tipo de bloqueio ou irregularidades relacionadas ao produto que possam ocorrer posteriormente a entrega."
+    :"O Vendedor declara, sob as penas da lei, que o produto acima descrito e de sua propriedade legitima e se trata de um produto licito, nao oriundo de furto, roubo ou qualquer outra atividade ilegal. O Vendedor e o unico responsavel por qualquer tipo de bloqueio ou irregularidades relacionadas ao produto que possam ocorrer posteriormente a compra."
+  ,W-2*M);
+  doc.text(dec,M,y);y+=dec.length*4.5+5;
+
+  if(s.modalidade!=="parte"){
+    secHdr("PRAZO DE PAGAMENTO");y+=4;
+    const pag=doc.splitTextToSize("O pagamento sera realizado via PIX, dentro do prazo acordado entre as partes, conforme opcao selecionada no momento da negociacao.",W-2*M);
+    doc.text(pag,M,y);y+=pag.length*4.5+3;
+    doc.setFont("helvetica","bold");
+    const prazoDescPdf=s.prazo==="pix"?"PAGAMENTO IMEDIATO VIA PIX — VALOR: R$ "+fmtNum(s.valPix):s.prazo==="7d"?"PRAZO DE 7 DIAS UTEIS — VALOR: R$ "+fmtNum(s.val7d):"PRAZO DE 72 HORAS (3 DIAS UTEIS) — VALOR: R$ "+fmtNum(s.val72h);
+    doc.text("Prazo e valor acordados: "+prazoDescPdf,M,y);y+=6;
+    doc.setFont("helvetica","normal");
+  }
+
+  const pageH=297;
+  if(y+60>pageH-10){doc.addPage();y=0;header();}
+  secHdr("CONDICOES GERAIS");y+=4;
+  const conds=s.modalidade==="parte"
+    ?["1. O produto sera analisado e testado pela Loja no momento da entrega. Caso seja identificada qualquer irregularidade, como danos fisicos, problemas de funcionamento ou inconsistencias com as informacoes fornecidas, o valor de entrada podera ser renegociado.","2. Caso o produto apresente qualquer tipo de bloqueio ou irregularidade posteriormente a entrega, o Cliente compromete-se a resolver a situacao. A Loja nao se responsabiliza por eventuais problemas decorrentes de restricoes associadas ao produto apos o recebimento.","3. O valor registrado neste documento refere-se exclusivamente ao desconto concedido como parte do pagamento de outro produto adquirido pelo Cliente na loja, nao configurando pagamento em dinheiro.","4. Este registro e celebrado em carater irrevogavel e irretratavel, obrigando as partes e seus sucessores ao seu fiel cumprimento."]
+    :["1. O produto sera analisado e testado pelo Comprador, que podera recusar a compra caso identifique qualquer irregularidade, como danos fisicos, problemas de funcionamento ou inconsistencias com as informacoes fornecidas pelo Vendedor.","2. Caso o produto apresente qualquer tipo de bloqueio ou irregularidade posteriormente a compra, o Vendedor compromete-se a resolver a situacao ou a reembolsar integralmente o valor pago pelo Comprador.","3. O Comprador nao se responsabiliza por eventuais problemas ou bloqueios decorrentes de restricoes associadas ao produto apos a compra.","4. Este contrato e celebrado em carater irrevogavel e irretratavel, obrigando as partes e seus sucessores ao seu fiel cumprimento."];
+  doc.setFontSize(8.5);
+  conds.forEach(c=>{const lines=doc.splitTextToSize(c,W-2*M);doc.text(lines,M,y);y+=lines.length*4.5+3;});
+  y+=2;
+  if(y+30>pageH-10){doc.addPage();y=0;header();}
+  secHdr("FORO");y+=4;
+  doc.setFontSize(8.5);
+  const foroTxt=s.modalidade==="parte"
+    ?"Fica eleito o Foro da Comarca de São Paulo / SP, para dirimir quaisquer duvidas ou controversias oriundas deste instrumento, com renuncia a qualquer outro, por mais privilegiado que seja."
+    :"Fica eleito o Foro da Comarca de São Paulo / SP, para dirimir quaisquer duvidas ou controversias oriundas deste contrato, com renuncia a qualquer outro, por mais privilegiado que seja.";
+  const foroLines=doc.splitTextToSize(foroTxt,W-2*M);
+  doc.text(foroLines,M,y);y+=foroLines.length*4.5+10;
+
+  // ASSINATURAS — 3 campos
+  if(y+50>pageH-10){doc.addPage();y=0;header();}
+  secHdr("ASSINATURAS");
+  y+=8;
+  const sigColW=(W-2*M)/3;
+  const sigPad=8;
+  const sigLineW=sigColW-sigPad*2;
+
+  // Dados de cada coluna adaptados por modalidade
+  const sigData=s.modalidade==="parte"
+    ?[
+      { titulo:"CLIENTE", nome: s.nome||"", role:"Assinatura do Cliente" },
+      { titulo:"COLABORADOR RESPONSAVEL", nome: s.responsavel||"", role:"Colaborador responsavel pelo recebimento" },
+      { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
+    ]
+    :[
+      { titulo:"CLIENTE (VENDEDOR)", nome: s.nome||"", role:"Assinatura do Cliente / Vendedor" },
+      { titulo:"COLABORADOR RESPONSAVEL PELOS TESTES", nome: s.responsavel||"", role:"Colaborador responsavel pelos testes" },
+      { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
+    ];
+
+  sigData.forEach((col,i)=>{
+    const x=M+sigColW*i+sigPad;
+
+    // Nome puxado do formulário (topo da coluna)
+    doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(20,20,20);
+    const nomeDisplay=col.nome||"";
+    doc.text(doc.splitTextToSize(nomeDisplay,sigLineW)[0],x,y);
+
+    // Linha de assinatura
+    doc.setDrawColor(40,40,40);doc.setLineWidth(0.6);
+    doc.line(x,y+22,x+sigLineW,y+22);
+
+    // Role / legenda abaixo da linha
+    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
+    doc.text(col.role,x,y+27);
+  });
+
+  doc.setTextColor(0,0,0);
+  y+=44;
+
+  // ── ANEXO: DOCUMENTO RG ─────────────────────────────
+  const temRg=rgData.frente||rgData.verso;
+  if(temRg){
+    if(y+10>pageH-10){doc.addPage();y=0;header();}
+    secHdr("ANEXO — DOCUMENTO DE IDENTIFICACAO (RG)");
+    y+=6;
+    doc.setFontSize(8);doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
+    doc.text("Documento fornecido pelo cliente no momento da negociacao para fins de registro.",M,y);
+    doc.setTextColor(0,0,0);y+=8;
+
+    const maxImgW=(W-2*M)/2-6;
+    const maxImgH=80;
+
+    if(rgData.frente){
+      const {w,h}=await getImgDimsPdf(rgData.frente,maxImgW,maxImgH);
+      if(y+h+10>pageH-10){doc.addPage();y=0;header();y+=4;}
+      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text("FRENTE DO RG:",M,y);y+=3;
+      const mtype=rgData.frente.match(/data:(image\/[a-z]+);/)?.[1]||"image/jpeg";
+      const fmt2=mtype.includes("png")?"PNG":"JPEG";
+      doc.addImage(rgData.frente,fmt2,M,y,w,h);
+      if(rgData.verso){
+        // Verso ao lado se couber, senão abaixo
+        const {w:wv,h:hv}=await getImgDimsPdf(rgData.verso,maxImgW,maxImgH);
+        const xVerso=M+maxImgW+8;
+        doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text("VERSO DO RG:",xVerso,y-3);
+        const mtypeV=rgData.verso.match(/data:(image\/[a-z]+);/)?.[1]||"image/jpeg";
+        const fmtV=mtypeV.includes("png")?"PNG":"JPEG";
+        doc.addImage(rgData.verso,fmtV,xVerso,y,wv,hv);
+        y+=Math.max(h,hv)+8;
+      } else {
+        y+=h+8;
+      }
+    } else if(rgData.verso){
+      const {w,h}=await getImgDimsPdf(rgData.verso,maxImgW,maxImgH);
+      if(y+h+10>pageH-10){doc.addPage();y=0;header();y+=4;}
+      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.text("VERSO DO RG:",M,y);y+=3;
+      const mtype=rgData.verso.match(/data:(image\/[a-z]+);/)?.[1]||"image/jpeg";
+      const fmt2=mtype.includes("png")?"PNG":"JPEG";
+      doc.addImage(rgData.verso,fmt2,M,y,w,h);
+      y+=h+8;
+    }
+  }
+
+  const dataFmt=s.data?s.data.split("-").reverse().join("/"):"__-__-____";
+  const pdfPrefix=s.modalidade==="parte"?"Revend_EntradaPagamento_":"Revend_Orcamento_";
+  doc.save(pdfPrefix+(s.nome||"cliente").replace(/\s+/g,"_")+"_"+dataFmt.replace(/\//g,"-")+".pdf");
+}
+
+renderTabela(null);calcular();
+
+// ── RG UPLOAD ──────────────────────────────────────────
+const rgData={frente:null,verso:null};
+
+function onRgUpload(lado){
+  const input=document.getElementById("rg-"+lado);
+  const file=input.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    rgData[lado]=e.target.result;
+    const prev=document.getElementById("rg-"+lado+"-preview");
+    const img=document.getElementById("rg-"+lado+"-img");
+    img.src=e.target.result;
+    prev.style.display="block";
+  };
+  reader.readAsDataURL(file);
+}
+
+function limparRg(lado){
+  rgData[lado]=null;
+  document.getElementById("rg-"+lado).value="";
+  document.getElementById("rg-"+lado+"-preview").style.display="none";
+}
+
+function getImgDimsPdf(base64,maxW,maxH){
+  // Retorna {w,h} respeitando proporção dentro de maxW x maxH
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=function(){
+      const ratio=img.width/img.height;
+      let w=maxW,h=maxW/ratio;
+      if(h>maxH){h=maxH;w=maxH*ratio;}
+      resolve({w,h});
+    };
+    img.src=base64;
+  });
+}
+
+</script>

@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha de Reposição de Materiais</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .controls input[type="date"] {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .controls button:hover { filter: brightness(0.9); }
+
+        .save-btn     { background: #10b981; }
+        .export-btn   { background: #f59e0b; }
+        .update-btn   { background: #3b82f6; }
+        .print-btn    { background: #8b5cf6; }
+        .clear-btn    { background: #6b7280; }
+
+        .content {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .category { margin-bottom: 30px; }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            font-size: 13px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover { background: #f8f9fa; }
+
+        .item-name { font-weight: 600; color: #1f2937; }
+
+        .checkbox-cell { text-align: center; }
+
+        .checkbox-cell input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        input[type="number"] {
+            width: 70px;
+            padding: 6px;
+            border: 2px solid #dee2e6;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .guide { font-size: 11px; color: #6b7280; font-style: italic; }
+
+        .last-order { font-size: 11px; color: #059669; font-weight: 600; }
+        .last-order.none { color: #6b7280; font-weight: 400; }
+
+        .stock-date { font-size: 11px; color: #3b82f6; font-weight: 600; }
+        .stock-date.none { color: #6b7280; font-weight: 400; }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-badge.low { background: #fef3c7; color: #92400e; }
+        .status-badge.ok  { background: #d1fae5; color: #065f46; }
+        .status-badge.out { background: #fee2e2; color: #991b1b; }
+
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .summary-card h3 { font-size: 12px; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; }
+        .summary-card p { font-size: 24px; font-weight: 700; color: #667eea; }
+
+        /* Print styles */
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; }
+            .controls, .summary, .no-print { display: none !important; }
+            .content { max-height: none; overflow: visible; }
+            .print-only { display: block !important; }
+        }
+
+        .print-only { display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📦 Planilha de Reposição de Materiais</h1>
+        <p>Controle de Estoque e Pedidos</p>
+    </div>
+
+    <div class="controls no-print">
+        <label style="font-weight:600;">
+            📅 Data do Pedido:
+            <input type="date" id="orderDate">
+        </label>
+        <button class="save-btn"   onclick="saveOrder()">💾 Salvar Pedido</button>
+        <button class="export-btn" onclick="exportData()">📤 Exportar Pedido</button>
+        <button class="update-btn" onclick="atualizarEstoque()">🔄 Atualizar Estoque</button>
+        <button class="print-btn"  onclick="imprimirUltimoPedido()">🖨️ Imprimir Último Pedido</button>
+        <button class="clear-btn"  onclick="clearAll()">🗑️ Limpar Seleção</button>
+    </div>
+
+    <div class="content" id="tableContent"></div>
+
+    <div class="summary no-print">
+        <div class="summary-card">
+            <h3>📦 Itens em Falta</h3>
+            <p id="countOut">0</p>
+        </div>
+        <div class="summary-card">
+            <h3>⚠️ Estoque Baixo</h3>
+            <p id="countLow">0</p>
+        </div>
+        <div class="summary-card">
+            <h3>✅ Estoque OK</h3>
+            <p id="countOk">0</p>
+        </div>
+        <div class="summary-card">
+            <h3>🛒 Selecionados</h3>
+            <p id="countSelected">0</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const materials = {
+        escritorio: {
+            title: "📝 Materiais de Escritório",
+            items: [
+                { name: "Sulfite",               current: "5 pacotes", status: "ok",  guide: "5-10 pacotes", key: "SULFITE" },
+                { name: "Durex",                 current: "20 rolos",  status: "ok",  guide: "15-20 rolos",  key: "DUREX" },
+                { name: "Canetas",               current: "0",         status: "out", guide: "2-3 caixas",   key: "CANETAS" },
+                { name: "Canetas Permanentes",   current: "2 un",      status: "low", guide: "5-10 un",      key: "CANETAS_PERM" },
+                { name: "Álcool",                current: "3 un",      status: "low", guide: "5-6 un",       key: "ALCOOL_ESC" },
+                { name: "Clips",                 current: "1 pct",     status: "low", guide: "2-3 pct",      key: "CLIPS" },
+                { name: "Grampos",               current: "2 cx",      status: "ok",  guide: "3-5 cx",       key: "GRAMPO" },
+                { name: "Elástico",              current: "1 pct",     status: "low", guide: "2-3 pct",      key: "ELASTICO" },
+                { name: "Saquinho p/ Celular",   current: "0",         status: "out", guide: "2-3 pct",      key: "SAQ_CEL" },
+                { name: "Zip Lock",              current: "2 pct",     status: "ok",  guide: "3-5 pct",      key: "ZIP" },
+                { name: "Saquinho Documento",    current: "1 pct",     status: "low", guide: "2-3 pct",      key: "SAQ_DOC" },
+                { name: "Post-it",               current: "1 pct",     status: "low", guide: "3-5 pct",      key: "POSTIT" },
+                { name: "Etiquetas",             current: "0",         status: "out", guide: "2 cartelas",   key: "ETIQ" },
+                { name: "Régua",                 current: "0",         status: "out", guide: "3-5 un",       key: "REGUA" },
+                { name: "Pastas",                current: "2",         status: "low", guide: "10-15 un",     key: "PASTAS" },
+                { name: "Tesoura",               current: "2 un",      status: "ok",  guide: "3-4 un",       key: "TESOURA" }
+            ]
+        },
+        higiene: {
+            title: "🧹 Materiais de Higiene",
+            items: [
+                { name: "Papel Higiênico", current: "3 pct", status: "low", guide: "5-6 pct",  key: "PAPEL_HIG" },
+                { name: "Detergente",      current: "3 un",  status: "low", guide: "5-6 un",   key: "DETER" },
+                { name: "Lustra Móveis",   current: "1 un",  status: "low", guide: "2-3 un",   key: "LUSTRA" },
+                { name: "Óleo Peroba",     current: "1 un",  status: "low", guide: "2 un",     key: "PEROBA" },
+                { name: "Desinfetante",    current: "2 un",  status: "low", guide: "4-5 un",   key: "DESINF" },
+                { name: "Álcool",          current: "2 un",  status: "low", guide: "4-5 un",   key: "ALCOOL_HIG" },
+                { name: "Esponja",         current: "1 pct", status: "low", guide: "2-3 pct",  key: "ESPONJA" },
+                { name: "Multiuso",        current: "3 un",  status: "ok",  guide: "4-5 un",   key: "MULTI" },
+                { name: "Toalha Papel",    current: "4 pct", status: "ok",  guide: "6-8 pct",  key: "TOALHA" },
+                { name: "Água Sanitária",  current: "1 un",  status: "low", guide: "2-3 un",   key: "AGUA_SAN" },
+                { name: "Pano Limpeza",    current: "2 pct", status: "ok",  guide: "3-4 pct",  key: "PANO_L" },
+                { name: "Pano Chão",       current: "2 un",  status: "ok",  guide: "3-4 un",   key: "PANO_C" },
+                { name: "Lixo 50L",        current: "2 pct", status: "low", guide: "4-5 pct",  key: "LIXO50" },
+                { name: "Lixo 15L",        current: "2 pct", status: "low", guide: "3-4 pct",  key: "LIXO15" },
+                { name: "Bom Ar",          current: "3 un",  status: "ok",  guide: "4-6 un",   key: "BOMAR" }
+            ]
+        },
+        cozinha: {
+            title: "☕ Materiais Clientes/Cozinha",
+            items: [
+                { name: "Cápsulas Café",     current: "6 cx",  status: "ok",  guide: "8-10 cx",  key: "CAPS" },
+                { name: "Colher Café",        current: "1 pct", status: "ok",  guide: "2 pct",    key: "COLHER" },
+                { name: "Biscoitos",          current: "4 pct", status: "ok",  guide: "6-8 pct",  key: "BISC" },
+                { name: "Pó Café",            current: "3 un",  status: "low", guide: "5-6 pct",  key: "PO_CAFE" },
+                { name: "Açúcar",             current: "3 un",  status: "low", guide: "5-6 pct",  key: "ACUCAR" },
+                { name: "Chá",                current: "2 cx",  status: "low", guide: "4-5 cx",   key: "CHA" },
+                { name: "Rosquinha",          current: "3 pct", status: "ok",  guide: "5-6 pct",  key: "ROSQ" },
+                { name: "Filtro Café",        current: "2 pct", status: "low", guide: "4-5 pct",  key: "FILTRO" },
+                { name: "Copo Descartável",   current: "1 cx",  status: "ok",  guide: "2 cx",     key: "COPO_DESC" },
+                { name: "Copo Isopor",        current: "1 cx",  status: "ok",  guide: "2 cx",     key: "COPO_ISO" }
+            ]
+        }
+    };
+
+    // ── helpers para localStorage ──────────────────────────────────────────
+    function getOrders()  { return JSON.parse(localStorage.getItem('orders')  || '{}'); }
+    function getStock()   { return JSON.parse(localStorage.getItem('stockUpdates') || '{}'); }
+    function saveOrders(o){ localStorage.setItem('orders', JSON.stringify(o)); }
+    function saveStock(s) { localStorage.setItem('stockUpdates', JSON.stringify(s)); }
+
+    // ── renderização ───────────────────────────────────────────────────────
+    function renderTables() {
+        let html = '';
+        for (let cat in materials) {
+            const category = materials[cat];
+            html += `
+                <div class="category">
+                    <div class="category-title">${category.title}</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Atual</th>
+                                <th>Atualizado em</th>
+                                <th>Status</th>
+                                <th>Comprar?</th>
+                                <th>Qtd Pedido</th>
+                                <th>Qtd Estoque</th>
+                                <th>Guia Padrão</th>
+                                <th>Último Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            category.items.forEach(item => {
+                const badge = item.status === 'ok' ? 'OK' : item.status === 'low' ? 'BAIXO' : 'FALTA';
+                html += `
+                    <tr data-item="${item.key}">
+                        <td class="item-name">${item.name}</td>
+                        <td class="current-stock">${item.current}</td>
+                        <td class="stock-date none">—</td>
+                        <td><span class="status-badge ${item.status}">${badge}</span></td>
+                        <td class="checkbox-cell"><input type="checkbox" class="need-buy"></td>
+                        <td><input type="number" class="qty-input" min="0" value="0" placeholder="pedido"></td>
+                        <td><input type="number" class="qty-stock" min="0" value="" placeholder="estoque"></td>
+                        <td class="guide">${item.guide}</td>
+                        <td class="last-order none">Nenhum</td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table></div>`;
+        }
+        document.getElementById('tableContent').innerHTML = html;
+        document.querySelectorAll('.need-buy').forEach(cb => cb.addEventListener('change', updateCount));
+    }
+
+    // ── carrega dados salvos ───────────────────────────────────────────────
+    function loadData() {
+        const orders = getOrders();
+        const stock  = getStock();
+
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const key = row.getAttribute('data-item');
+
+            // último pedido
+            if (orders[key] && orders[key].length > 0) {
+                const last = orders[key][orders[key].length - 1];
+                const cell = row.querySelector('.last-order');
+                cell.textContent = `${last.date} — ${last.qty} un`;
+                cell.classList.remove('none');
+            }
+
+            // atualização de estoque
+            if (stock[key]) {
+                row.querySelector('.current-stock').textContent = stock[key].qty;
+                const dt = row.querySelector('.stock-date');
+                dt.textContent = stock[key].date;
+                dt.classList.remove('none');
+            }
+        });
+    }
+
+    // ── Salvar Pedido ──────────────────────────────────────────────────────
+    function saveOrder() {
+        const date = document.getElementById('orderDate').value;
+        if (!date) return alert('Selecione a data!');
+
+        const orders = getOrders();
+        let count = 0;
+
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const cb  = row.querySelector('.need-buy');
+            const qty = row.querySelector('.qty-input');
+            const key = row.getAttribute('data-item');
+
+            if (cb.checked && qty.value > 0) {
+                if (!orders[key]) orders[key] = [];
+                orders[key].push({
+                    date: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR'),
+                    qty:  qty.value,
+                    rawDate: date   // ← guarda data original para comparação
+                });
+                count++;
+            }
+        });
+
+        if (count === 0) return alert('Nenhum item selecionado com quantidade!');
+
+        saveOrders(orders);
+        alert(`✅ ${count} itens salvos no pedido!`);
+        loadData();
+        clearAll();
+    }
+
+    // ── 🔄 Atualizar Estoque ───────────────────────────────────────────────
+    function atualizarEstoque() {
+        const stockData = getStock();
+        const hoje = new Date().toLocaleDateString('pt-BR');
+        let count = 0;
+
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const qtyInput = row.querySelector('.qty-stock');
+            const key      = row.getAttribute('data-item');
+
+            if (qtyInput && qtyInput.value !== '') {
+                const val = qtyInput.value.trim();
+                // atualiza UI
+                row.querySelector('.current-stock').textContent = val;
+                const dt = row.querySelector('.stock-date');
+                dt.textContent = hoje;
+                dt.classList.remove('none');
+                // persiste
+                stockData[key] = { qty: val, date: hoje };
+                // limpa campo após atualizar
+                qtyInput.value = '';
+                count++;
+            }
+        });
+
+        if (count === 0) return alert('Preencha a coluna "Qtd Estoque" nos itens que deseja atualizar.');
+
+        saveStock(stockData);
+        alert(`✅ Estoque de ${count} item(ns) atualizado com sucesso!`);
+        updateCount();
+    }
+
+    // ── 🖨️ Imprimir Último Pedido ─────────────────────────────────────────
+    function imprimirUltimoPedido() {
+        const orders = getOrders();
+
+        // descobre a data mais recente entre todos os pedidos salvos
+        let latestRaw = '';
+        for (let key in orders) {
+            const arr = orders[key];
+            arr.forEach(entry => {
+                const raw = entry.rawDate || '';
+                if (raw > latestRaw) latestRaw = raw;
+            });
+        }
+
+        if (!latestRaw) return alert('Nenhum pedido salvo encontrado.');
+
+        // formata data para exibição
+        const latestFormatted = new Date(latestRaw + 'T12:00:00').toLocaleDateString('pt-BR');
+
+        // monta mapa key → nome (para lookup)
+        const nameMap = {};
+        for (let cat in materials) {
+            materials[cat].items.forEach(item => { nameMap[item.key] = item.name; });
+        }
+
+        // agrupa itens do último pedido por categoria, sem duplicar
+        const result = {}; // cat → [{name, qty}]
+
+        for (let cat in materials) {
+            materials[cat].items.forEach(item => {
+                const arr = orders[item.key];
+                if (!arr) return;
+                // pega APENAS entradas com a data mais recente
+                const entries = arr.filter(e => (e.rawDate || '') === latestRaw);
+                if (entries.length === 0) return;
+                // soma quantidades caso haja duplicata no mesmo dia
+                const totalQty = entries.reduce((sum, e) => sum + Number(e.qty), 0);
+                if (!result[cat]) result[cat] = [];
+                result[cat].push({ name: item.name, qty: totalQty });
+            });
+        }
+
+        const hasItems = Object.values(result).some(arr => arr.length > 0);
+        if (!hasItems) return alert('Nenhum item encontrado no último pedido.');
+
+        // monta HTML para impressão
+        let body = `
+            <html><head><meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; padding: 30px; }
+                h2   { color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 8px; }
+                h3   { color: #374151; margin: 20px 0 8px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+                th   { background: #4f46e5; color: white; padding: 8px; text-align: left; font-size: 12px; }
+                td   { padding: 7px 8px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
+                tr:nth-child(even) td { background: #f9fafb; }
+                .footer { margin-top: 30px; font-size: 11px; color: #9ca3af; }
+            </style>
+            </head><body>
+            <h2>🛒 Pedido de Compra — ${latestFormatted}</h2>
+        `;
+
+        for (let cat in result) {
+            if (!result[cat] || result[cat].length === 0) continue;
+            body += `<h3>${materials[cat].title}</h3>
+                <table>
+                    <thead><tr><th>Item</th><th>Quantidade</th></tr></thead>
+                    <tbody>`;
+            result[cat].forEach(it => {
+                body += `<tr><td>${it.name}</td><td>${it.qty} un</td></tr>`;
+            });
+            body += `</tbody></table>`;
+        }
+
+        body += `<div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
+                 </body></html>`;
+
+        const win = window.open('', '', 'width=800,height=700');
+        win.document.write(body);
+        win.document.close();
+        win.focus();
+        setTimeout(() => win.print(), 400);
+    }
+
+    // ── 📤 Exportar Pedido (itens marcados, sem duplicar por categoria) ────
+    function exportData() {
+        const date = document.getElementById('orderDate').value;
+        const label = date
+            ? new Date(date + 'T12:00:00').toLocaleDateString('pt-BR')
+            : new Date().toLocaleDateString('pt-BR');
+
+        // coleta itens marcados e indexa por key para evitar duplicatas
+        const selected = {}; // key → {name, qty, cat}
+        document.querySelectorAll('tbody tr').forEach(row => {
+            const cb  = row.querySelector('.need-buy');
+            const qty = row.querySelector('.qty-input');
+            const key = row.getAttribute('data-item');
+            if (cb.checked && qty.value > 0) {
+                // descobre categoria
+                let cat = null;
+                for (let c in materials) {
+                    if (materials[c].items.find(i => i.key === key)) { cat = c; break; }
+                }
+                selected[key] = {
+                    name: row.querySelector('.item-name').textContent,
+                    qty:  qty.value,
+                    cat
+                };
+            }
+        });
+
+        if (Object.keys(selected).length === 0) return alert('Nenhum item selecionado com quantidade!');
+
+        // agrupa por categoria
+        let text = `📦 PEDIDO — ${label}\n${'='.repeat(40)}\n\n`;
+        for (let cat in materials) {
+            const itens = Object.values(selected).filter(i => i.cat === cat);
+            if (itens.length === 0) continue;
+            text += `=== ${materials[cat].title} ===\n`;
+            itens.forEach(i => { text += `• ${i.name} — ${i.qty} un\n`; });
+            text += '\n';
+        }
+
+        navigator.clipboard.writeText(text)
+            .then(() => alert('✅ Lista copiada para a área de transferência!'))
+            .catch(() => {
+                // fallback se clipboard não disponível
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('✅ Lista copiada!');
+            });
+    }
+
+    // ── Limpar ─────────────────────────────────────────────────────────────
+    function clearAll() {
+        document.querySelectorAll('.need-buy').forEach(cb => cb.checked = false);
+        document.querySelectorAll('.qty-input').forEach(i => i.value = 0);
+        document.querySelectorAll('.qty-stock').forEach(i => i.value = '');
+        updateCount();
+    }
+
+    // ── Contadores do resumo ───────────────────────────────────────────────
+    function updateCount() {
+        document.getElementById('countOut').textContent      = document.querySelectorAll('.status-badge.out').length;
+        document.getElementById('countLow').textContent      = document.querySelectorAll('.status-badge.low').length;
+        document.getElementById('countOk').textContent       = document.querySelectorAll('.status-badge.ok').length;
+        document.getElementById('countSelected').textContent = document.querySelectorAll('.need-buy:checked').length;
+    }
+
+    // ── init ───────────────────────────────────────────────────────────────
+    document.getElementById('orderDate').valueAsDate = new Date();
+    renderTables();
+    loadData();
+    updateCount();
+</script>
+</body>
+</html>
