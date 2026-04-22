@@ -167,7 +167,7 @@
         <div class="header-divider"></div>
         <div class="header-info">
             <h1>Estoque por Modelos</h1>
-            <p>Controle de Estoque · Pedidos · Reposição · <span id="syncStatus" style="opacity:0.8">💾 LocalStorage</span></p>
+            <p>Controle de Estoque · Pedidos · Reposição · <span id="syncStatus" style="opacity:0.8">🔄 Conectando...</span></p>
         </div>
         <div class="apple-badge">
             <span>📱 iPhone XR → 17 Pro Max</span>
@@ -210,36 +210,52 @@
     </div>
 </div>
 
-<!-- LOCALSTORAGE -->
-<script>
-// ═══ LOCALSTORAGE FUNCTIONS ════════════════════════════════════════════════
-function lsGet(key, defaultValue = {}) {
-    try {
-        const data = localStorage.getItem(key);
-        return data ? JSON.parse(data) : defaultValue;
-    } catch (e) {
-        console.error('lsGet error:', e);
-        return defaultValue;
-    }
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ═══ FIREBASE CONFIG ═══════════════════════════════════════════════════════
+const firebaseConfig = {
+    apiKey: "AIzaSyB4UkZ7F8kODJ1zvaSMLtuGGuP_tU4J2KU",
+    authDomain: "estoque-acess-revend.firebaseapp.com",
+    projectId: "estoque-acess-revend",
+    storageBucket: "estoque-acess-revend.firebasestorage.app",
+    messagingSenderId: "502696954527",
+    appId: "1:502696954527:web:87d8ff3038215462f070aa"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+// ── Referências dos documentos no Firestore ──────────────────────────────
+const docOrders     = doc(db, 'estoque', 'pedidos');
+const docStock      = doc(db, 'estoque', 'estoque');
+const docModels     = doc(db, 'estoque', 'modelos');
+const docStockMdls  = doc(db, 'estoque', 'stockModelos');
+
+// ── Helpers de leitura/escrita ───────────────────────────────────────────
+async function fbGet(ref) {
+    try { const s = await getDoc(ref); return s.exists() ? s.data().value : {}; }
+    catch(e) { console.error('fbGet', e); return {}; }
+}
+async function fbSet(ref, value) {
+    try { await setDoc(ref, { value }); }
+    catch(e) { console.error('fbSet', e); showBanner('❌ Erro ao salvar. Verifique a conexão.','err'); }
 }
 
-function lsSet(key, value) {
-    try {
-        localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-        console.error('lsSet error:', e);
-        showBanner('❌ Erro ao salvar. Espaço insuficiente.', 'err');
-    }
-}
+// ── Exposição global para o resto do código ──────────────────────────────
+window._fb = { fbGet, fbSet, docOrders, docStock, docModels, docStockMdls, db, doc, onSnapshot };
 
-function showBanner(msg, type = 'loading') {
+// ── Banner de sincronização ──────────────────────────────────────────────
+window.showBanner = function(msg, type='loading') {
     const b = document.getElementById('syncBanner');
     const s = document.getElementById('syncSpinner');
     const m = document.getElementById('syncMsg');
     b.className = 'show ' + type;
     s.style.display = type === 'loading' ? 'block' : 'none';
     m.textContent = msg;
-    if (type !== 'loading') setTimeout(() => { b.className = ''; }, 2500);
+    if (type !== 'loading') setTimeout(()=>{ b.className=''; }, 2500);
 }
 
 // ═══ MODELOS ═══════════════════════════════════════════════════════════════
@@ -401,7 +417,7 @@ let currentModalKey  = null;
 let currentModalMode = 'order';
 let currentFilter    = 'all';
 
-// Dados em memória (espelho do localStorage)
+// Dados em memória (espelho do Firestore)
 let _orders = {};
 let _stock  = {};
 let _models = {};
@@ -439,10 +455,10 @@ async function desfazerUltimaAlteracao() {
     _stockM = JSON.parse(snap.stockModels);
     stockModels = JSON.parse(snap.stockModels);
     selectedModels = JSON.parse(snap.models);
-    lsSet('revend_orders', _orders);
-    lsSet('revend_stock', _stock);
-    lsSet('revend_models', _models);
-    lsSet('revend_stockModelos', _stockM);
+    await fbSet(window._fb.docOrders,    _orders);
+    await fbSet(window._fb.docStock,     _stock);
+    await fbSet(window._fb.docModels,    _models);
+    await fbSet(window._fb.docStockMdls, _stockM);
     loadData();
     updateUndoBtn();
     showBanner(`↩️ Desfeito: ${snap.label}`,'ok');
@@ -453,8 +469,8 @@ window.desfazerUltimaAlteracao = desfazerUltimaAlteracao;
 const getOrders = () => _orders;
 const getStock  = () => _stock;
 
-async function setOrders(o) { _orders = o; lsSet('revend_orders', o); }
-async function setStock(s)  { _stock  = s; lsSet('revend_stock', s); }
+async function setOrders(o) { _orders = o; await fbSet(window._fb.docOrders, o); }
+async function setStock(s)  { _stock  = s; await fbSet(window._fb.docStock,  s); }
 
 function getItemInfo(key) {
     for (const brand of catalog)
@@ -653,8 +669,8 @@ async function confirmModels() {
                 _stock  = sd;
                 _stockM = {..._stockM, [key]: sel};
                 showBanner('Salvando estoque...','loading');
-                lsSet('revend_stock', _stock);
-                lsSet('revend_stockModelos', _stockM);
+                await fbSet(window._fb.docStock,     _stock);
+                await fbSet(window._fb.docStockMdls, _stockM);
                 showBanner('✅ Estoque salvo!','ok');
                 const row = document.querySelector(`tr[data-item="${key}"]`);
                 if (row) {
@@ -687,7 +703,7 @@ async function confirmModels() {
             sum.classList.add('none');
         }
         _models = JSON.parse(JSON.stringify(selectedModels));
-        lsSet('revend_models', _models);
+        await fbSet(window._fb.docModels, _models);
     }
     closeModal();
 }
@@ -783,7 +799,7 @@ async function saveOrder() {
     showBanner('Salvando pedido...','loading');
     _models = JSON.parse(JSON.stringify(selectedModels));
     await setOrders(orders);
-    lsSet('revend_models', _models);
+    await fbSet(window._fb.docModels, _models);
     showBanner(`✅ ${count} itens salvos!`,'ok');
     loadData();
     clearAll();
@@ -832,7 +848,7 @@ async function atualizarEstoque() {
     showBanner('Salvando estoque...','loading');
     _stockM = JSON.parse(JSON.stringify(stockModels));
     await setStock(sd);
-    lsSet('revend_stockModelos', _stockM);
+    await fbSet(window._fb.docStockMdls, _stockM);
     showBanner(`✅ Estoque de ${count} item(ns) atualizado!`,'ok');
     updateCount();
 }
@@ -986,10 +1002,10 @@ async function importarDadosJSON(event) {
             _stockM = dados.stockModelos || {};
             selectedModels = _models;
             stockModels    = _stockM;
-            lsSet('revend_orders', _orders);
-            lsSet('revend_stock', _stock);
-            lsSet('revend_models', _models);
-            lsSet('revend_stockModelos', _stockM);
+            await fbSet(window._fb.docOrders,    _orders);
+            await fbSet(window._fb.docStock,     _stock);
+            await fbSet(window._fb.docModels,    _models);
+            await fbSet(window._fb.docStockMdls, _stockM);
             loadData();
             showBanner('✅ Dados importados com sucesso!','ok');
         } catch { alert('❌ Erro ao ler o arquivo.'); }
@@ -999,27 +1015,66 @@ async function importarDadosJSON(event) {
 }
 window.importarDadosJSON = importarDadosJSON;
 
-// ═══ INIT — carrega dados do localStorage ═══════════════════════════════════
+// ═══ INIT — carrega dados do Firebase ══════════════════════════════════════
 async function init() {
     document.getElementById('orderDate').valueAsDate = new Date();
     renderTables();
-    showBanner('Carregando dados locais...','loading');
+    showBanner('Conectando ao Firebase...','loading');
 
     try {
-        _orders = lsGet('revend_orders', {});
-        _stock  = lsGet('revend_stock', {});
-        _models = lsGet('revend_models', {});
-        _stockM = lsGet('revend_stockModelos', {});
+        const [orders, stock, models, stockM] = await Promise.all([
+            fbGet(window._fb.docOrders),
+            fbGet(window._fb.docStock),
+            fbGet(window._fb.docModels),
+            fbGet(window._fb.docStockMdls),
+        ]);
+
+        _orders = orders || {};
+        _stock  = stock  || {};
+        _models = models || {};
+        _stockM = stockM || {};
         selectedModels = _models;
         stockModels    = _stockM;
 
         loadData();
         updateUndoBtn();
-        document.getElementById('syncStatus').textContent = '💾 LocalStorage — dados locais';
-        showBanner('✅ Dados carregados com sucesso!','ok');
+        document.getElementById('syncStatus').textContent = '🟢 Online — dados em tempo real';
+        showBanner('✅ Conectado! Dados carregados.','ok');
+
+        // ── Listener em tempo real — atualiza automaticamente quando outro usuário salva ──
+        onSnapshot(window._fb.docStock, snap => {
+            if (snap.exists()) {
+                const nova = snap.data().value || {};
+                // só recarrega se mudou algo
+                if (JSON.stringify(nova) !== JSON.stringify(_stock)) {
+                    _stock = nova;
+                    loadData();
+                }
+            }
+        });
+        onSnapshot(window._fb.docOrders, snap => {
+            if (snap.exists()) {
+                const nova = snap.data().value || {};
+                if (JSON.stringify(nova) !== JSON.stringify(_orders)) {
+                    _orders = nova;
+                    loadData();
+                }
+            }
+        });
+        onSnapshot(window._fb.docStockMdls, snap => {
+            if (snap.exists()) {
+                const nova = snap.data().value || {};
+                if (JSON.stringify(nova) !== JSON.stringify(_stockM)) {
+                    _stockM = nova;
+                    stockModels = nova;
+                    loadData();
+                }
+            }
+        });
 
     } catch(e) {
-        showBanner('❌ Erro ao carregar dados locais.','err');
+        document.getElementById('syncStatus').textContent = '🔴 Offline';
+        showBanner('❌ Erro ao conectar ao Firebase. Verifique as regras do Firestore.','err');
         console.error(e);
     }
 }
