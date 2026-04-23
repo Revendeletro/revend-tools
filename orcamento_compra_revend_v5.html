@@ -267,7 +267,8 @@ function getPrecoAtual(m){
     const vMin=precosParteMin[m]||0;
     const vMax=precosPartePagamento[m]||0;
     if(!m||(!vMin&&!vMax))return 0;
-    const pct=(parseInt(document.getElementById("parteRange").value)||50)/100;
+    const raw=document.getElementById("parteRange").value;
+    const pct=(raw===""||raw===null?50:parseInt(raw))/100;
     return Math.round(vMin+(vMax-vMin)*pct);
   }
   return precos[m]||0;
@@ -877,7 +878,8 @@ function onParteSlider(){
   const m=document.getElementById("modelo").value;
   const vMin=precosParteMin[m]||0;
   const vMax=precosPartePagamento[m]||0;
-  const pct=(parseInt(document.getElementById("parteRange").value)||50)/100;
+  const raw=document.getElementById("parteRange").value;
+  const pct=(raw===""||raw===null?50:parseInt(raw))/100;
   const val=Math.round(vMin+(vMax-vMin)*pct);
   document.getElementById("valor-base").textContent=fmt(val);
   calcular();
@@ -892,7 +894,7 @@ function atualizarSliderParte(m){
     const vMax=precosPartePagamento[m]||0;
     document.getElementById("lbl-min").textContent=fmt(vMin);
     document.getElementById("lbl-max").textContent=fmt(vMax);
-    document.getElementById("parteRange").value=50;
+    document.getElementById("parteRange").value=0;
     wrap.style.display="";
   } else {
     wrap.style.display="none";
