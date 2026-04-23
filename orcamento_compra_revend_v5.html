@@ -356,18 +356,28 @@ function calcular(){
   const vFAutRaw=document.getElementById("valorFinalAut").value;
   const vFAut=vFAutRaw!==""?parseFloat(vFAutRaw)||0:null;
 
-  // Desconto aplicado: se Desc.Autorizado preenchido → substitui os descontos da tabela
-  // Se não preenchido → usa os descontos marcados normalmente
-  const descontoEfetivo = dAut!==null ? dAut : totalDescontos;
-
-  // Valor base após desconto efetivo
-  const base72h = Math.max(0, preco - descontoEfetivo);
-  const valPix  = Math.round(base72h*0.95*100)/100;
-  const val72h  = base72h;
-  const val7d   = Math.round(base72h*1.03*100)/100;
+  // Hierarquia:
+  // 1. Sem nada autorizado:    Valor Base - Descontos tabela = Valor 72h
+  // 2. So Desc.Autorizado:     Valor Base - Desc.Aut = Valor 72h (ignora checkboxes)
+  // 3. Valor Final Autorizado: vFAut - Desc.Aut (se houver) = Valor 72h
+  let base72h, descontoExibido;
+  if(vFAut!==null){
+    const subDesc=dAut!==null?dAut:0;
+    base72h=Math.max(0,vFAut-subDesc);
+    descontoExibido=subDesc;
+  } else if(dAut!==null){
+    base72h=Math.max(0,preco-dAut);
+    descontoExibido=dAut;
+  } else {
+    base72h=Math.max(0,preco-totalDescontos);
+    descontoExibido=totalDescontos;
+  }
+  const valPix=Math.round(base72h*0.95*100)/100;
+  const val72h=base72h;
+  const val7d=Math.round(base72h*1.03*100)/100;
 
   // Desconto exibido na linha "Desconto Total"
-  document.getElementById("desc-total").textContent = "-"+fmt(descontoEfetivo);
+  document.getElementById("desc-total").textContent="-"+fmt(descontoExibido);
 
   // Destacar o campo descAut visualmente quando ativo
   const descAutEl=document.getElementById("descAut");
@@ -396,8 +406,8 @@ function calcular(){
   if(prazoVal==="pix")finalCalc=valPix;
   else if(prazoVal==="7d")finalCalc=val7d;
 
-  // Valor Final Autorizado sobrescreve tudo se preenchido
-  const finalExibido = vFAut!==null ? vFAut : finalCalc;
+  // Valor Final: quando vFAut preenchido, os prazos já derivam dele, então finalCalc já é correto
+  const finalExibido = finalCalc;
 
   const vfEl=document.getElementById("valor-final");
   vfEl.textContent=fmt(finalExibido);
@@ -410,7 +420,6 @@ function calcular(){
     vfEl.style.color="#155724";
     vfEl.style.outline="";
   }
-
   // Destacar o campo valorFinalAut visualmente quando ativo
   const vfAutEl=document.getElementById("valorFinalAut");
   if(vFAut!==null && vFAut>0){
@@ -454,19 +463,28 @@ function getState(){
     else if(chk){defeitos.push({label:item.label,cond:item.cond,val,checked:false});}
   });
 
-  // Desconto efetivo: descAut substitui descontos normais se preenchido
-  const descontoEfetivo = dAut!==null ? dAut : totalDescontos;
-  const base72h = Math.max(0, preco - descontoEfetivo);
+  // Hierarquia (mesma de calcular()):
+  // 1. Sem nada: Valor Base - tabela; 2. Desc.Aut: Valor Base - Desc.Aut; 3. vFAut: vFAut - Desc.Aut
   const prazoSel=(document.querySelector('input[name="prazo"]:checked')||{value:"72h"}).value;
+  let base72h, descontoExibido;
+  if(vFAut!==null){
+    const subDesc=dAut!==null?dAut:0;
+    base72h=Math.max(0,vFAut-subDesc);
+    descontoExibido=subDesc;
+  } else if(dAut!==null){
+    base72h=Math.max(0,preco-dAut);
+    descontoExibido=dAut;
+  } else {
+    base72h=Math.max(0,preco-totalDescontos);
+    descontoExibido=totalDescontos;
+  }
   const valPix=Math.round(base72h*0.95*100)/100;
   const val72h=base72h;
   const val7d=Math.round(base72h*1.03*100)/100;
-
-  // Valor final: vFAut sobrescreve tudo se preenchido
   let finalCalc=val72h;
   if(prazoSel==="pix")finalCalc=valPix;
   else if(prazoSel==="7d")finalCalc=val7d;
-  const finalReal = vFAut!==null ? vFAut : finalCalc;
+  const finalReal=finalCalc;
 
   return{
     modalidade,
@@ -485,7 +503,7 @@ function getState(){
     dAut,            // null se não preenchido
     vFAut,           // null se não preenchido
     totalDescontos,
-    descontoEfetivo,
+    descontoEfetivo:descontoExibido,
     defeitos,aprovado:document.getElementById("aprovado").checked,
     prazo:prazoSel,
     valPix,val72h,val7d,
