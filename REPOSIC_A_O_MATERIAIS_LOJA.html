@@ -3,590 +3,654 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planilha de Reposição de Materiais</title>
+    <title>Reposição de Materiais | Revend</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #3a3a3a; padding: 20px; min-height: 100vh; }
 
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
+        /* SYNC BANNER */
+        #syncBanner {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            background: #c8102e; color: white; text-align: center;
+            font-size: 13px; font-weight: 700; padding: 10px;
+            display: none; align-items: center; justify-content: center; gap: 10px;
         }
+        #syncBanner.show { display: flex; }
+        #syncBanner.ok  { background: #16a34a; }
+        #syncBanner.err { background: #b91c1c; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-            overflow: hidden;
-        }
+        .container { max-width: 1500px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.35); overflow: hidden; }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
+        /* HEADER */
+        .header { background: #c8102e; color: white; padding: 22px 30px; display: flex; align-items: center; gap: 18px; position: relative; overflow: hidden; }
+        .header::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 220px; background: linear-gradient(to left, rgba(0,0,0,0.18), transparent); }
+        .header-logo { display: flex; flex-direction: column; gap: 2px; }
+        .header-logo .logo-mark { font-size: 22px; font-weight: 900; letter-spacing: -1px; line-height: 1; font-style: italic; color: white; }
+        .header-logo .logo-mark span { color: rgba(255,255,255,0.7); font-weight: 400; font-style: normal; font-size: 13px; display: block; letter-spacing: 0; }
+        .header-divider { width: 2px; height: 44px; background: rgba(255,255,255,0.3); border-radius: 2px; }
+        .header-info h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+        .header-info p  { font-size: 12px; opacity: 0.75; margin-top: 3px; }
+        .header-badge { display: inline-flex; gap: 8px; margin-left: auto; position: relative; z-index: 1; flex-wrap: wrap; justify-content: flex-end; }
+        .header-badge span { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); padding: 3px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 
-        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        /* CONTROLS */
+        .controls { padding: 14px 20px; background: #f5f5f5; border-bottom: 2px solid #e0e0e0; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .controls label { font-weight: 700; font-size: 13px; color: #333; }
+        .controls input[type="date"] { padding: 8px 12px; border: 2px solid #ccc; border-radius: 6px; font-weight: 600; font-size: 13px; background: white; }
+        .btn { padding: 9px 18px; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px; transition: all 0.2s; white-space: nowrap; }
+        .btn:hover { filter: brightness(0.88); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-save   { background: #c8102e; }
+        .btn-export { background: #e07b00; }
+        .btn-update { background: #c8102e; }
+        .btn-print  { background: #6d28d9; }
+        .btn-clear  { background: #999; }
+        .btn-undo   { background: #e07b00; }
 
-        .controls {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 2px solid #e9ecef;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+        /* TOOLBAR */
+        .toolbar { padding: 10px 20px; background: white; border-bottom: 1px solid #e0e0e0; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 200px; padding: 8px 14px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px; outline: none; transition: border-color 0.2s; }
+        .search-box:focus { border-color: #c8102e; }
+        .filter-btn { padding: 7px 14px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; color: #666; }
+        .filter-btn.active, .filter-btn:hover { background: #c8102e; color: white; border-color: #c8102e; }
 
-        .controls input[type="date"] {
-            padding: 10px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            font-weight: 600;
-        }
+        /* CONTENT */
+        .content { padding: 20px; max-height: 68vh; overflow-y: auto; }
+        .category { margin-bottom: 40px; }
+        .category-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding: 12px 20px; background: #c8102e; border-radius: 8px; color: white; }
+        .category-header h2 { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; }
+        .category-header .cat-count { margin-left: auto; background: rgba(255,255,255,0.18); padding: 3px 12px; border-radius: 20px; font-size: 11px; }
 
-        .controls button {
-            padding: 10px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-bottom: 4px; }
+        thead { background: #2a2a2a; color: white; position: sticky; top: 0; z-index: 5; }
+        th { padding: 10px 8px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 9px 8px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tbody tr:hover { background: #fff5f6; }
+        tbody tr.hidden-row { display: none; }
 
-        .controls button:hover { filter: brightness(0.9); }
-
-        .save-btn     { background: #10b981; }
-        .export-btn   { background: #f59e0b; }
-        .update-btn   { background: #3b82f6; }
-        .print-btn    { background: #8b5cf6; }
-        .clear-btn    { background: #6b7280; }
-
-        .content {
-            padding: 20px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .category { margin-bottom: 30px; }
-
-        .category-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #667eea;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #667eea;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            font-size: 13px;
-        }
-
-        thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            position: sticky;
-            top: 0;
-        }
-
-        th {
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 11px;
-            text-transform: uppercase;
-        }
-
-        td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #e9ecef;
-            vertical-align: middle;
-        }
-
-        tbody tr:hover { background: #f8f9fa; }
-
-        .item-name { font-weight: 600; color: #1f2937; }
-
+        .item-name { font-weight: 600; color: #222; }
         .checkbox-cell { text-align: center; }
-
-        .checkbox-cell input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        input[type="number"] {
-            width: 70px;
-            padding: 6px;
-            border: 2px solid #dee2e6;
-            border-radius: 4px;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .guide { font-size: 11px; color: #6b7280; font-style: italic; }
-
-        .last-order { font-size: 11px; color: #059669; font-weight: 600; }
-        .last-order.none { color: #6b7280; font-weight: 400; }
-
-        .stock-date { font-size: 11px; color: #3b82f6; font-weight: 600; }
-        .stock-date.none { color: #6b7280; font-weight: 400; }
-
-        .status-badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
+        .checkbox-cell input[type="checkbox"] { width: 17px; height: 17px; cursor: pointer; accent-color: #c8102e; }
+        input[type="number"] { width: 64px; padding: 5px 6px; border: 2px solid #e0e0e0; border-radius: 6px; text-align: center; font-weight: 700; font-size: 12px; background: white; }
+        input[type="number"]:focus { outline: none; border-color: #c8102e; }
+        .current-stock-cell { font-weight: 700; color: #222; font-size: 13px; }
+        .stock-date { font-size: 10px; color: #c8102e; font-weight: 600; }
+        .stock-date.none { color: #aaa; font-weight: 400; }
+        .last-order { font-size: 10px; color: #2a9d58; font-weight: 600; }
+        .last-order.none { color: #aaa; font-weight: 400; }
+        .guide { font-size: 11px; color: #888; font-style: italic; }
+        .status-badge { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
         .status-badge.low { background: #fef3c7; color: #92400e; }
         .status-badge.ok  { background: #d1fae5; color: #065f46; }
         .status-badge.out { background: #fee2e2; color: #991b1b; }
 
-        .summary {
-            margin-top: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
+        /* SUMMARY */
+        .summary { padding: 16px 20px; background: #f5f5f5; border-top: 2px solid #e0e0e0; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+        .summary-card { background: white; padding: 14px; border-radius: 8px; border-left: 4px solid #c8102e; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .summary-card h3 { font-size: 11px; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-card p  { font-size: 22px; font-weight: 800; color: #c8102e; }
 
-        .summary-card {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
+        /* FIREBASE STATUS */
+        #firebaseStatus { font-size: 11px; color: rgba(255,255,255,0.8); }
 
-        .summary-card h3 { font-size: 12px; color: #6b7280; margin-bottom: 8px; text-transform: uppercase; }
-        .summary-card p { font-size: 24px; font-weight: 700; color: #667eea; }
-
-        /* Print styles */
         @media print {
             body { background: white; padding: 0; }
             .container { box-shadow: none; border-radius: 0; }
-            .controls, .summary, .no-print { display: none !important; }
+            .controls, .toolbar, .summary, .no-print, #syncBanner { display: none !important; }
             .content { max-height: none; overflow: visible; }
-            .print-only { display: block !important; }
         }
-
-        .print-only { display: none; }
     </style>
 </head>
 <body>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner">
+    <div class="spinner" id="syncSpinner"></div>
+    <span id="syncMsg">Sincronizando...</span>
+</div>
+
+<!-- MAIN -->
 <div class="container">
     <div class="header">
-        <h1>📦 Planilha de Reposição de Materiais</h1>
-        <p>Controle de Estoque e Pedidos</p>
+        <div class="header-logo">
+            <div class="logo-mark">revend<span>Eletro</span></div>
+        </div>
+        <div class="header-divider"></div>
+        <div class="header-info">
+            <h1>📦 Reposição de Materiais</h1>
+            <p>Controle de Estoque · Pedidos · Reposição · <span id="syncStatus">🔥 Firebase</span></p>
+        </div>
+        <div class="header-badge">
+            <span>📝 Escritório</span>
+            <span>🧹 Higiene</span>
+            <span>☕ Cozinha</span>
+        </div>
     </div>
 
     <div class="controls no-print">
-        <label style="font-weight:600;">
-            📅 Data do Pedido:
-            <input type="date" id="orderDate">
-        </label>
-        <button class="save-btn"   onclick="saveOrder()">💾 Salvar Pedido</button>
-        <button class="export-btn" onclick="exportData()">📤 Exportar Pedido</button>
-        <button class="update-btn" onclick="atualizarEstoque()">🔄 Atualizar Estoque</button>
-        <button class="print-btn"  onclick="imprimirUltimoPedido()">🖨️ Imprimir Último Pedido</button>
-        <button class="clear-btn"  onclick="clearAll()">🗑️ Limpar Seleção</button>
+        <label>📅 Data do Pedido: <input type="date" id="orderDate"></label>
+        <button class="btn btn-save"   onclick="saveOrder()">💾 Salvar Pedido</button>
+        <button class="btn btn-export" onclick="exportData()">📤 Exportar Pedido</button>
+        <button class="btn btn-update" onclick="atualizarEstoque()">🔄 Atualizar Estoque</button>
+        <button class="btn btn-print"  onclick="imprimirUltimoPedido()">🖨️ Imprimir Último</button>
+        <button class="btn btn-clear"  onclick="clearAll()">🗑️ Limpar Seleção</button>
+        <button class="btn btn-undo"   id="undoBtn" style="opacity:0.45;" onclick="desfazer()" disabled title="Nada para desfazer">↩️ Desfazer</button>
+    </div>
+
+    <div class="toolbar no-print">
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍  Buscar material..." oninput="filterRows()">
+        <button class="filter-btn active" onclick="setFilter('all',this)">Todos</button>
+        <button class="filter-btn"        onclick="setFilter('out',this)">❌ Em Falta</button>
+        <button class="filter-btn"        onclick="setFilter('low',this)">⚠️ Baixo</button>
+        <button class="filter-btn"        onclick="setFilter('ok',this)">✅ OK</button>
+        <button class="filter-btn"        onclick="setFilter('sel',this)">🛒 Selecionados</button>
     </div>
 
     <div class="content" id="tableContent"></div>
 
     <div class="summary no-print">
-        <div class="summary-card">
-            <h3>📦 Itens em Falta</h3>
-            <p id="countOut">0</p>
-        </div>
-        <div class="summary-card">
-            <h3>⚠️ Estoque Baixo</h3>
-            <p id="countLow">0</p>
-        </div>
-        <div class="summary-card">
-            <h3>✅ Estoque OK</h3>
-            <p id="countOk">0</p>
-        </div>
-        <div class="summary-card">
-            <h3>🛒 Selecionados</h3>
-            <p id="countSelected">0</p>
-        </div>
+        <div class="summary-card"><h3>📦 Em Falta</h3><p id="countOut">0</p></div>
+        <div class="summary-card"><h3>⚠️ Estoque Baixo</h3><p id="countLow">0</p></div>
+        <div class="summary-card"><h3>✅ Estoque OK</h3><p id="countOk">0</p></div>
+        <div class="summary-card"><h3>🛒 Selecionados</h3><p id="countSelected">0</p></div>
+        <div class="summary-card"><h3>📋 Total Itens</h3><p id="countTotal">0</p></div>
     </div>
 </div>
 
-<script>
-    const materials = {
-        escritorio: {
-            title: "📝 Materiais de Escritório",
-            items: [
-                { name: "Sulfite",               current: "5 pacotes", status: "ok",  guide: "5-10 pacotes", key: "SULFITE" },
-                { name: "Durex",                 current: "20 rolos",  status: "ok",  guide: "15-20 rolos",  key: "DUREX" },
-                { name: "Canetas",               current: "0",         status: "out", guide: "2-3 caixas",   key: "CANETAS" },
-                { name: "Canetas Permanentes",   current: "2 un",      status: "low", guide: "5-10 un",      key: "CANETAS_PERM" },
-                { name: "Álcool",                current: "3 un",      status: "low", guide: "5-6 un",       key: "ALCOOL_ESC" },
-                { name: "Clips",                 current: "1 pct",     status: "low", guide: "2-3 pct",      key: "CLIPS" },
-                { name: "Grampos",               current: "2 cx",      status: "ok",  guide: "3-5 cx",       key: "GRAMPO" },
-                { name: "Elástico",              current: "1 pct",     status: "low", guide: "2-3 pct",      key: "ELASTICO" },
-                { name: "Saquinho p/ Celular",   current: "0",         status: "out", guide: "2-3 pct",      key: "SAQ_CEL" },
-                { name: "Zip Lock",              current: "2 pct",     status: "ok",  guide: "3-5 pct",      key: "ZIP" },
-                { name: "Saquinho Documento",    current: "1 pct",     status: "low", guide: "2-3 pct",      key: "SAQ_DOC" },
-                { name: "Post-it",               current: "1 pct",     status: "low", guide: "3-5 pct",      key: "POSTIT" },
-                { name: "Etiquetas",             current: "0",         status: "out", guide: "2 cartelas",   key: "ETIQ" },
-                { name: "Régua",                 current: "0",         status: "out", guide: "3-5 un",       key: "REGUA" },
-                { name: "Pastas",                current: "2",         status: "low", guide: "10-15 un",     key: "PASTAS" },
-                { name: "Tesoura",               current: "2 un",      status: "ok",  guide: "3-4 un",       key: "TESOURA" }
-            ]
-        },
-        higiene: {
-            title: "🧹 Materiais de Higiene",
-            items: [
-                { name: "Papel Higiênico", current: "3 pct", status: "low", guide: "5-6 pct",  key: "PAPEL_HIG" },
-                { name: "Detergente",      current: "3 un",  status: "low", guide: "5-6 un",   key: "DETER" },
-                { name: "Lustra Móveis",   current: "1 un",  status: "low", guide: "2-3 un",   key: "LUSTRA" },
-                { name: "Óleo Peroba",     current: "1 un",  status: "low", guide: "2 un",     key: "PEROBA" },
-                { name: "Desinfetante",    current: "2 un",  status: "low", guide: "4-5 un",   key: "DESINF" },
-                { name: "Álcool",          current: "2 un",  status: "low", guide: "4-5 un",   key: "ALCOOL_HIG" },
-                { name: "Esponja",         current: "1 pct", status: "low", guide: "2-3 pct",  key: "ESPONJA" },
-                { name: "Multiuso",        current: "3 un",  status: "ok",  guide: "4-5 un",   key: "MULTI" },
-                { name: "Toalha Papel",    current: "4 pct", status: "ok",  guide: "6-8 pct",  key: "TOALHA" },
-                { name: "Água Sanitária",  current: "1 un",  status: "low", guide: "2-3 un",   key: "AGUA_SAN" },
-                { name: "Pano Limpeza",    current: "2 pct", status: "ok",  guide: "3-4 pct",  key: "PANO_L" },
-                { name: "Pano Chão",       current: "2 un",  status: "ok",  guide: "3-4 un",   key: "PANO_C" },
-                { name: "Lixo 50L",        current: "2 pct", status: "low", guide: "4-5 pct",  key: "LIXO50" },
-                { name: "Lixo 15L",        current: "2 pct", status: "low", guide: "3-4 pct",  key: "LIXO15" },
-                { name: "Bom Ar",          current: "3 un",  status: "ok",  guide: "4-6 un",   key: "BOMAR" }
-            ]
-        },
-        cozinha: {
-            title: "☕ Materiais Clientes/Cozinha",
-            items: [
-                { name: "Cápsulas Café",     current: "6 cx",  status: "ok",  guide: "8-10 cx",  key: "CAPS" },
-                { name: "Colher Café",        current: "1 pct", status: "ok",  guide: "2 pct",    key: "COLHER" },
-                { name: "Biscoitos",          current: "4 pct", status: "ok",  guide: "6-8 pct",  key: "BISC" },
-                { name: "Pó Café",            current: "3 un",  status: "low", guide: "5-6 pct",  key: "PO_CAFE" },
-                { name: "Açúcar",             current: "3 un",  status: "low", guide: "5-6 pct",  key: "ACUCAR" },
-                { name: "Chá",                current: "2 cx",  status: "low", guide: "4-5 cx",   key: "CHA" },
-                { name: "Rosquinha",          current: "3 pct", status: "ok",  guide: "5-6 pct",  key: "ROSQ" },
-                { name: "Filtro Café",        current: "2 pct", status: "low", guide: "4-5 pct",  key: "FILTRO" },
-                { name: "Copo Descartável",   current: "1 cx",  status: "ok",  guide: "2 cx",     key: "COPO_DESC" },
-                { name: "Copo Isopor",        current: "1 cx",  status: "ok",  guide: "2 cx",     key: "COPO_ISO" }
-            ]
-        }
-    };
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-    // ── helpers para localStorage ──────────────────────────────────────────
-    function getOrders()  { return JSON.parse(localStorage.getItem('orders')  || '{}'); }
-    function getStock()   { return JSON.parse(localStorage.getItem('stockUpdates') || '{}'); }
-    function saveOrders(o){ localStorage.setItem('orders', JSON.stringify(o)); }
-    function saveStock(s) { localStorage.setItem('stockUpdates', JSON.stringify(s)); }
+// ══════════════════════════════════════════════════════════════
+// 🔥 CONFIGURAÇÃO FIREBASE
+// ══════════════════════════════════════════════════════════════
+const firebaseConfig = {
+    apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+    authDomain:        "materiais-revend.firebaseapp.com",
+    databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
+    projectId:         "materiais-revend",
+    storageBucket:     "materiais-revend.firebasestorage.app",
+    messagingSenderId: "509931102943",
+    appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
+};
 
-    // ── renderização ───────────────────────────────────────────────────────
-    function renderTables() {
-        let html = '';
-        for (let cat in materials) {
-            const category = materials[cat];
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ══════════════════════════════════════════════════════════════
+// CATÁLOGO DE MATERIAIS
+// ══════════════════════════════════════════════════════════════
+const materials = {
+    escritorio: {
+        title: "📝 Materiais de Escritório",
+        items: [
+            { name: "Sulfite",               current: "—", status: "ok",  guide: "5-10 pacotes",  key: "SULFITE" },
+            { name: "Durex",                 current: "—", status: "ok",  guide: "15-20 rolos",   key: "DUREX" },
+            { name: "Canetas",               current: "—", status: "out", guide: "2-3 caixas",    key: "CANETAS" },
+            { name: "Canetas Permanentes",   current: "—", status: "low", guide: "5-10 un",       key: "CANETAS_PERM" },
+            { name: "Álcool",                current: "—", status: "low", guide: "5-6 un",        key: "ALCOOL_ESC" },
+            { name: "Clips",                 current: "—", status: "low", guide: "2-3 pct",       key: "CLIPS" },
+            { name: "Grampos",               current: "—", status: "ok",  guide: "3-5 cx",        key: "GRAMPO" },
+            { name: "Elástico",              current: "—", status: "low", guide: "2-3 pct",       key: "ELASTICO" },
+            { name: "Saquinho p/ Celular",   current: "—", status: "out", guide: "2-3 pct",       key: "SAQ_CEL" },
+            { name: "Zip Lock",              current: "—", status: "ok",  guide: "3-5 pct",       key: "ZIP" },
+            { name: "Saquinho Documento",    current: "—", status: "low", guide: "2-3 pct",       key: "SAQ_DOC" },
+            { name: "Post-it",               current: "—", status: "low", guide: "3-5 pct",       key: "POSTIT" },
+            { name: "Etiquetas",             current: "—", status: "out", guide: "2 cartelas",    key: "ETIQ" },
+            { name: "Régua",                 current: "—", status: "out", guide: "3-5 un",        key: "REGUA" },
+            { name: "Pastas",                current: "—", status: "low", guide: "10-15 un",      key: "PASTAS" },
+            { name: "Tesoura",               current: "—", status: "ok",  guide: "3-4 un",        key: "TESOURA" }
+        ]
+    },
+    higiene: {
+        title: "🧹 Materiais de Higiene",
+        items: [
+            { name: "Papel Higiênico", current: "—", status: "low", guide: "5-6 pct",  key: "PAPEL_HIG" },
+            { name: "Detergente",      current: "—", status: "low", guide: "5-6 un",   key: "DETER" },
+            { name: "Lustra Móveis",   current: "—", status: "low", guide: "2-3 un",   key: "LUSTRA" },
+            { name: "Óleo Peroba",     current: "—", status: "low", guide: "2 un",     key: "PEROBA" },
+            { name: "Desinfetante",    current: "—", status: "low", guide: "4-5 un",   key: "DESINF" },
+            { name: "Álcool",          current: "—", status: "low", guide: "4-5 un",   key: "ALCOOL_HIG" },
+            { name: "Esponja",         current: "—", status: "low", guide: "2-3 pct",  key: "ESPONJA" },
+            { name: "Multiuso",        current: "—", status: "ok",  guide: "4-5 un",   key: "MULTI" },
+            { name: "Toalha Papel",    current: "—", status: "ok",  guide: "6-8 pct",  key: "TOALHA" },
+            { name: "Água Sanitária",  current: "—", status: "low", guide: "2-3 un",   key: "AGUA_SAN" },
+            { name: "Pano Limpeza",    current: "—", status: "ok",  guide: "3-4 pct",  key: "PANO_L" },
+            { name: "Pano Chão",       current: "—", status: "ok",  guide: "3-4 un",   key: "PANO_C" },
+            { name: "Lixo 50L",        current: "—", status: "low", guide: "4-5 pct",  key: "LIXO50" },
+            { name: "Lixo 15L",        current: "—", status: "low", guide: "3-4 pct",  key: "LIXO15" },
+            { name: "Bom Ar",          current: "—", status: "ok",  guide: "4-6 un",   key: "BOMAR" }
+        ]
+    },
+    cozinha: {
+        title: "☕ Materiais Clientes/Cozinha",
+        items: [
+            { name: "Cápsulas Café",    current: "—", status: "ok",  guide: "8-10 cx",  key: "CAPS" },
+            { name: "Colher Café",       current: "—", status: "ok",  guide: "2 pct",    key: "COLHER" },
+            { name: "Biscoitos",         current: "—", status: "ok",  guide: "6-8 pct",  key: "BISC" },
+            { name: "Pó Café",           current: "—", status: "low", guide: "5-6 pct",  key: "PO_CAFE" },
+            { name: "Açúcar",            current: "—", status: "low", guide: "5-6 pct",  key: "ACUCAR" },
+            { name: "Chá",               current: "—", status: "low", guide: "4-5 cx",   key: "CHA" },
+            { name: "Rosquinha",         current: "—", status: "ok",  guide: "5-6 pct",  key: "ROSQ" },
+            { name: "Filtro Café",       current: "—", status: "low", guide: "4-5 pct",  key: "FILTRO" },
+            { name: "Copo Descartável",  current: "—", status: "ok",  guide: "2 cx",     key: "COPO_DESC" },
+            { name: "Copo Isopor",       current: "—", status: "ok",  guide: "2 cx",     key: "COPO_ISO" }
+        ]
+    }
+};
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let _orders = {};
+let _stock  = {};
+let _undoStack = [];
+let currentFilter = 'all';
+
+function snapshotState(label) {
+    _undoStack.push({ label, orders: JSON.parse(JSON.stringify(_orders)), stock: JSON.parse(JSON.stringify(_stock)) });
+    if (_undoStack.length > 15) _undoStack.shift();
+    updateUndoBtn();
+}
+
+function updateUndoBtn() {
+    const btn = document.getElementById('undoBtn');
+    if (_undoStack.length > 0) {
+        btn.disabled = false; btn.style.opacity = '1';
+        btn.title = `Desfazer: ${_undoStack[_undoStack.length-1].label}`;
+    } else {
+        btn.disabled = true; btn.style.opacity = '0.45'; btn.title = 'Nada para desfazer';
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// BANNER
+// ══════════════════════════════════════════════════════════════
+function showBanner(msg, type = 'loading') {
+    const b = document.getElementById('syncBanner');
+    const s = document.getElementById('syncSpinner');
+    const m = document.getElementById('syncMsg');
+    b.className = 'show ' + type;
+    s.style.display = type === 'loading' ? 'block' : 'none';
+    m.textContent = msg;
+    if (type !== 'loading') setTimeout(() => { b.className = ''; }, 2500);
+}
+
+// ══════════════════════════════════════════════════════════════
+// FIREBASE HELPERS
+// ══════════════════════════════════════════════════════════════
+async function fbGet(path) {
+    try {
+        const snap = await get(ref(db, path));
+        return snap.exists() ? snap.val() : null;
+    } catch(e) { return null; }
+}
+
+async function fbSet(path, value) {
+    try {
+        await set(ref(db, path), value);
+        return true;
+    } catch(e) {
+        showBanner('❌ Erro ao salvar no Firebase.', 'err');
+        return false;
+    }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════
+function renderTables() {
+    let html = '';
+    for (let cat in materials) {
+        const category = materials[cat];
+        const count = category.items.length;
+        html += `
+            <div class="category">
+                <div class="category-header">
+                    <h2>${category.title}</h2>
+                    <span class="cat-count">${count} itens</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Qtd Atual</th>
+                            <th>Atualizado em</th>
+                            <th>Status</th>
+                            <th>Comprar?</th>
+                            <th>Qtd Pedido</th>
+                            <th>Qtd Estoque</th>
+                            <th>Guia Padrão</th>
+                            <th>Último Pedido</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        category.items.forEach(item => {
+            const badge = item.status === 'ok' ? 'OK' : item.status === 'low' ? 'BAIXO' : 'FALTA';
             html += `
-                <div class="category">
-                    <div class="category-title">${category.title}</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Atual</th>
-                                <th>Atualizado em</th>
-                                <th>Status</th>
-                                <th>Comprar?</th>
-                                <th>Qtd Pedido</th>
-                                <th>Qtd Estoque</th>
-                                <th>Guia Padrão</th>
-                                <th>Último Pedido</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <tr data-item="${item.key}" data-status="${item.status}">
+                    <td class="item-name">${item.name}</td>
+                    <td class="current-stock-cell"><span class="current-stock">${item.current}</span></td>
+                    <td><span class="stock-date none">—</span></td>
+                    <td><span class="status-badge ${item.status}">${badge}</span></td>
+                    <td class="checkbox-cell"><input type="checkbox" class="need-buy"></td>
+                    <td><input type="number" class="qty-input" min="0" value="0" placeholder="pedido"></td>
+                    <td><input type="number" class="qty-stock" min="0" value="" placeholder="estoque"></td>
+                    <td class="guide">${item.guide}</td>
+                    <td class="last-order none">Nenhum</td>
+                </tr>
             `;
-            category.items.forEach(item => {
-                const badge = item.status === 'ok' ? 'OK' : item.status === 'low' ? 'BAIXO' : 'FALTA';
-                html += `
-                    <tr data-item="${item.key}">
-                        <td class="item-name">${item.name}</td>
-                        <td class="current-stock">${item.current}</td>
-                        <td class="stock-date none">—</td>
-                        <td><span class="status-badge ${item.status}">${badge}</span></td>
-                        <td class="checkbox-cell"><input type="checkbox" class="need-buy"></td>
-                        <td><input type="number" class="qty-input" min="0" value="0" placeholder="pedido"></td>
-                        <td><input type="number" class="qty-stock" min="0" value="" placeholder="estoque"></td>
-                        <td class="guide">${item.guide}</td>
-                        <td class="last-order none">Nenhum</td>
-                    </tr>
-                `;
-            });
-            html += `</tbody></table></div>`;
+        });
+        html += `</tbody></table></div>`;
+    }
+    document.getElementById('tableContent').innerHTML = html;
+    document.querySelectorAll('.need-buy').forEach(cb => cb.addEventListener('change', updateCount));
+}
+
+function loadData() {
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const key = row.getAttribute('data-item');
+
+        // último pedido
+        if (_orders[key] && _orders[key].length > 0) {
+            const last = _orders[key][_orders[key].length - 1];
+            const cell = row.querySelector('.last-order');
+            cell.textContent = `${last.date} — ${last.qty} un`;
+            cell.classList.remove('none');
+        } else {
+            const cell = row.querySelector('.last-order');
+            cell.textContent = 'Nenhum'; cell.className = 'last-order none';
         }
-        document.getElementById('tableContent').innerHTML = html;
-        document.querySelectorAll('.need-buy').forEach(cb => cb.addEventListener('change', updateCount));
-    }
 
-    // ── carrega dados salvos ───────────────────────────────────────────────
-    function loadData() {
-        const orders = getOrders();
-        const stock  = getStock();
-
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const key = row.getAttribute('data-item');
-
-            // último pedido
-            if (orders[key] && orders[key].length > 0) {
-                const last = orders[key][orders[key].length - 1];
-                const cell = row.querySelector('.last-order');
-                cell.textContent = `${last.date} — ${last.qty} un`;
-                cell.classList.remove('none');
+        // atualização de estoque
+        if (_stock[key]) {
+            row.querySelector('.current-stock').textContent = _stock[key].qty;
+            const dt = row.querySelector('.stock-date');
+            dt.textContent = _stock[key].date; dt.classList.remove('none');
+            // atualiza status badge baseado em qty numérico se disponível
+        } else {
+            const cs = row.querySelector('.current-stock');
+            // pega valor padrão do catálogo
+            for (let cat in materials) {
+                const found = materials[cat].items.find(i => i.key === key);
+                if (found) { cs.textContent = found.current; break; }
             }
+        }
+    });
+    updateCount();
+}
 
-            // atualização de estoque
-            if (stock[key]) {
-                row.querySelector('.current-stock').textContent = stock[key].qty;
-                const dt = row.querySelector('.stock-date');
-                dt.textContent = stock[key].date;
-                dt.classList.remove('none');
-            }
-        });
-    }
+// ══════════════════════════════════════════════════════════════
+// SALVAR PEDIDO
+// ══════════════════════════════════════════════════════════════
+async function saveOrder() {
+    const date = document.getElementById('orderDate').value;
+    if (!date) return alert('Selecione a data!');
 
-    // ── Salvar Pedido ──────────────────────────────────────────────────────
-    function saveOrder() {
-        const date = document.getElementById('orderDate').value;
-        if (!date) return alert('Selecione a data!');
+    const newOrders = JSON.parse(JSON.stringify(_orders));
+    let count = 0;
 
-        const orders = getOrders();
-        let count = 0;
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cb  = row.querySelector('.need-buy');
+        const qty = row.querySelector('.qty-input');
+        const key = row.getAttribute('data-item');
+        if (cb.checked && qty.value > 0) {
+            if (!newOrders[key]) newOrders[key] = [];
+            newOrders[key].push({
+                date: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR'),
+                qty:  qty.value,
+                rawDate: date
+            });
+            count++;
+        }
+    });
 
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const cb  = row.querySelector('.need-buy');
-            const qty = row.querySelector('.qty-input');
-            const key = row.getAttribute('data-item');
-
-            if (cb.checked && qty.value > 0) {
-                if (!orders[key]) orders[key] = [];
-                orders[key].push({
-                    date: new Date(date + 'T12:00:00').toLocaleDateString('pt-BR'),
-                    qty:  qty.value,
-                    rawDate: date   // ← guarda data original para comparação
-                });
-                count++;
-            }
-        });
-
-        if (count === 0) return alert('Nenhum item selecionado com quantidade!');
-
-        saveOrders(orders);
-        alert(`✅ ${count} itens salvos no pedido!`);
+    if (count === 0) return alert('Nenhum item selecionado com quantidade!');
+    snapshotState('Salvar Pedido');
+    showBanner('Salvando pedido...', 'loading');
+    const ok = await fbSet('materiais/pedidos', newOrders);
+    if (ok) {
+        _orders = newOrders;
         loadData();
         clearAll();
+        showBanner(`✅ ${count} itens salvos no pedido!`, 'ok');
     }
+}
+window.saveOrder = saveOrder;
 
-    // ── 🔄 Atualizar Estoque ───────────────────────────────────────────────
-    function atualizarEstoque() {
-        const stockData = getStock();
-        const hoje = new Date().toLocaleDateString('pt-BR');
-        let count = 0;
+// ══════════════════════════════════════════════════════════════
+// ATUALIZAR ESTOQUE
+// ══════════════════════════════════════════════════════════════
+async function atualizarEstoque() {
+    const newStock = JSON.parse(JSON.stringify(_stock));
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let count = 0;
 
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const qtyInput = row.querySelector('.qty-stock');
-            const key      = row.getAttribute('data-item');
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const qtyInput = row.querySelector('.qty-stock');
+        const key      = row.getAttribute('data-item');
+        if (qtyInput && qtyInput.value !== '') {
+            const val = qtyInput.value.trim();
+            row.querySelector('.current-stock').textContent = val;
+            const dt = row.querySelector('.stock-date');
+            dt.textContent = hoje; dt.classList.remove('none');
+            newStock[key] = { qty: val, date: hoje };
+            qtyInput.value = '';
+            count++;
+        }
+    });
 
-            if (qtyInput && qtyInput.value !== '') {
-                const val = qtyInput.value.trim();
-                // atualiza UI
-                row.querySelector('.current-stock').textContent = val;
-                const dt = row.querySelector('.stock-date');
-                dt.textContent = hoje;
-                dt.classList.remove('none');
-                // persiste
-                stockData[key] = { qty: val, date: hoje };
-                // limpa campo após atualizar
-                qtyInput.value = '';
-                count++;
-            }
-        });
-
-        if (count === 0) return alert('Preencha a coluna "Qtd Estoque" nos itens que deseja atualizar.');
-
-        saveStock(stockData);
-        alert(`✅ Estoque de ${count} item(ns) atualizado com sucesso!`);
+    if (count === 0) return alert('Preencha a coluna "Qtd Estoque" nos itens que deseja atualizar.');
+    snapshotState('Atualizar Estoque');
+    showBanner('Atualizando estoque...', 'loading');
+    const ok = await fbSet('materiais/estoque', newStock);
+    if (ok) {
+        _stock = newStock;
         updateCount();
+        showBanner(`✅ Estoque de ${count} item(ns) atualizado!`, 'ok');
     }
+}
+window.atualizarEstoque = atualizarEstoque;
 
-    // ── 🖨️ Imprimir Último Pedido ─────────────────────────────────────────
-    function imprimirUltimoPedido() {
-        const orders = getOrders();
-
-        // descobre a data mais recente entre todos os pedidos salvos
-        let latestRaw = '';
-        for (let key in orders) {
-            const arr = orders[key];
-            arr.forEach(entry => {
-                const raw = entry.rawDate || '';
-                if (raw > latestRaw) latestRaw = raw;
-            });
-        }
-
-        if (!latestRaw) return alert('Nenhum pedido salvo encontrado.');
-
-        // formata data para exibição
-        const latestFormatted = new Date(latestRaw + 'T12:00:00').toLocaleDateString('pt-BR');
-
-        // monta mapa key → nome (para lookup)
-        const nameMap = {};
-        for (let cat in materials) {
-            materials[cat].items.forEach(item => { nameMap[item.key] = item.name; });
-        }
-
-        // agrupa itens do último pedido por categoria, sem duplicar
-        const result = {}; // cat → [{name, qty}]
-
-        for (let cat in materials) {
-            materials[cat].items.forEach(item => {
-                const arr = orders[item.key];
-                if (!arr) return;
-                // pega APENAS entradas com a data mais recente
-                const entries = arr.filter(e => (e.rawDate || '') === latestRaw);
-                if (entries.length === 0) return;
-                // soma quantidades caso haja duplicata no mesmo dia
-                const totalQty = entries.reduce((sum, e) => sum + Number(e.qty), 0);
-                if (!result[cat]) result[cat] = [];
-                result[cat].push({ name: item.name, qty: totalQty });
-            });
-        }
-
-        const hasItems = Object.values(result).some(arr => arr.length > 0);
-        if (!hasItems) return alert('Nenhum item encontrado no último pedido.');
-
-        // monta HTML para impressão
-        let body = `
-            <html><head><meta charset="UTF-8">
-            <style>
-                body { font-family: Arial, sans-serif; padding: 30px; }
-                h2   { color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 8px; }
-                h3   { color: #374151; margin: 20px 0 8px; }
-                table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
-                th   { background: #4f46e5; color: white; padding: 8px; text-align: left; font-size: 12px; }
-                td   { padding: 7px 8px; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-                tr:nth-child(even) td { background: #f9fafb; }
-                .footer { margin-top: 30px; font-size: 11px; color: #9ca3af; }
-            </style>
-            </head><body>
-            <h2>🛒 Pedido de Compra — ${latestFormatted}</h2>
-        `;
-
-        for (let cat in result) {
-            if (!result[cat] || result[cat].length === 0) continue;
-            body += `<h3>${materials[cat].title}</h3>
-                <table>
-                    <thead><tr><th>Item</th><th>Quantidade</th></tr></thead>
-                    <tbody>`;
-            result[cat].forEach(it => {
-                body += `<tr><td>${it.name}</td><td>${it.qty} un</td></tr>`;
-            });
-            body += `</tbody></table>`;
-        }
-
-        body += `<div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')}</div>
-                 </body></html>`;
-
-        const win = window.open('', '', 'width=800,height=700');
-        win.document.write(body);
-        win.document.close();
-        win.focus();
-        setTimeout(() => win.print(), 400);
+// ══════════════════════════════════════════════════════════════
+// DESFAZER
+// ══════════════════════════════════════════════════════════════
+async function desfazer() {
+    if (_undoStack.length === 0) return;
+    const snap = _undoStack.pop();
+    updateUndoBtn();
+    showBanner(`↩️ Desfazendo: ${snap.label}...`, 'loading');
+    const ok1 = await fbSet('materiais/pedidos', snap.orders);
+    const ok2 = await fbSet('materiais/estoque', snap.stock);
+    if (ok1 && ok2) {
+        _orders = snap.orders; _stock = snap.stock;
+        loadData();
+        showBanner('✅ Ação desfeita!', 'ok');
     }
+}
+window.desfazerUltimaAlteracao = desfazer;
 
-    // ── 📤 Exportar Pedido (itens marcados, sem duplicar por categoria) ────
-    function exportData() {
-        const date = document.getElementById('orderDate').value;
-        const label = date
-            ? new Date(date + 'T12:00:00').toLocaleDateString('pt-BR')
-            : new Date().toLocaleDateString('pt-BR');
+// ══════════════════════════════════════════════════════════════
+// IMPRIMIR ÚLTIMO PEDIDO
+// ══════════════════════════════════════════════════════════════
+function imprimirUltimoPedido() {
+    let latestRaw = '';
+    for (let key in _orders) {
+        _orders[key].forEach(e => { if ((e.rawDate||'') > latestRaw) latestRaw = e.rawDate||''; });
+    }
+    if (!latestRaw) return alert('Nenhum pedido salvo encontrado.');
 
-        // coleta itens marcados e indexa por key para evitar duplicatas
-        const selected = {}; // key → {name, qty, cat}
-        document.querySelectorAll('tbody tr').forEach(row => {
-            const cb  = row.querySelector('.need-buy');
-            const qty = row.querySelector('.qty-input');
-            const key = row.getAttribute('data-item');
-            if (cb.checked && qty.value > 0) {
-                // descobre categoria
-                let cat = null;
-                for (let c in materials) {
-                    if (materials[c].items.find(i => i.key === key)) { cat = c; break; }
-                }
-                selected[key] = {
-                    name: row.querySelector('.item-name').textContent,
-                    qty:  qty.value,
-                    cat
-                };
-            }
+    const latestFormatted = new Date(latestRaw + 'T12:00:00').toLocaleDateString('pt-BR');
+    const result = {};
+
+    for (let cat in materials) {
+        materials[cat].items.forEach(item => {
+            const arr = _orders[item.key];
+            if (!arr) return;
+            const entries = arr.filter(e => (e.rawDate||'') === latestRaw);
+            if (entries.length === 0) return;
+            const totalQty = entries.reduce((sum, e) => sum + Number(e.qty), 0);
+            if (!result[cat]) result[cat] = [];
+            result[cat].push({ name: item.name, qty: totalQty });
         });
+    }
 
-        if (Object.keys(selected).length === 0) return alert('Nenhum item selecionado com quantidade!');
+    const hasItems = Object.values(result).some(arr => arr.length > 0);
+    if (!hasItems) return alert('Nenhum item encontrado no último pedido.');
 
-        // agrupa por categoria
-        let text = `📦 PEDIDO — ${label}\n${'='.repeat(40)}\n\n`;
-        for (let cat in materials) {
-            const itens = Object.values(selected).filter(i => i.cat === cat);
-            if (itens.length === 0) continue;
-            text += `=== ${materials[cat].title} ===\n`;
-            itens.forEach(i => { text += `• ${i.name} — ${i.qty} un\n`; });
-            text += '\n';
+    let body = `<html><head><meta charset="UTF-8">
+    <style>body{font-family:Arial,sans-serif;padding:30px;}h2{color:#c8102e;border-bottom:2px solid #c8102e;padding-bottom:8px;}h3{color:#374151;margin:20px 0 8px;}table{width:100%;border-collapse:collapse;margin-bottom:16px;}th{background:#c8102e;color:white;padding:8px;text-align:left;font-size:12px;}td{padding:7px 8px;border-bottom:1px solid #e5e7eb;font-size:13px;}tr:nth-child(even) td{background:#fdf2f2;}.footer{margin-top:30px;font-size:11px;color:#9ca3af;}</style>
+    </head><body>
+    <h2>🛒 Pedido de Compra — ${latestFormatted}</h2>`;
+
+    for (let cat in result) {
+        if (!result[cat] || result[cat].length === 0) continue;
+        body += `<h3>${materials[cat].title}</h3><table><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>`;
+        result[cat].forEach(it => { body += `<tr><td>${it.name}</td><td>${it.qty} un</td></tr>`; });
+        body += `</tbody></table>`;
+    }
+    body += `<div class="footer">Gerado em ${new Date().toLocaleString('pt-BR')}</div></body></html>`;
+
+    const win = window.open('', '', 'width=800,height=700');
+    win.document.write(body); win.document.close(); win.focus();
+    setTimeout(() => win.print(), 400);
+}
+window.imprimirUltimoPedido = imprimirUltimoPedido;
+
+// ══════════════════════════════════════════════════════════════
+// EXPORTAR PEDIDO
+// ══════════════════════════════════════════════════════════════
+function exportData() {
+    const date = document.getElementById('orderDate').value;
+    const label = date ? new Date(date + 'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+
+    const selected = {};
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const cb  = row.querySelector('.need-buy');
+        const qty = row.querySelector('.qty-input');
+        const key = row.getAttribute('data-item');
+        if (cb.checked && qty.value > 0) {
+            let cat = null;
+            for (let c in materials) {
+                if (materials[c].items.find(i => i.key === key)) { cat = c; break; }
+            }
+            selected[key] = { name: row.querySelector('.item-name').textContent, qty: qty.value, cat };
         }
+    });
 
-        navigator.clipboard.writeText(text)
-            .then(() => alert('✅ Lista copiada para a área de transferência!'))
-            .catch(() => {
-                // fallback se clipboard não disponível
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                alert('✅ Lista copiada!');
-            });
+    if (Object.keys(selected).length === 0) return alert('Nenhum item selecionado com quantidade!');
+
+    let text = `📦 PEDIDO — ${label}\n${'='.repeat(40)}\n\n`;
+    for (let cat in materials) {
+        const itens = Object.values(selected).filter(i => i.cat === cat);
+        if (itens.length === 0) continue;
+        text += `=== ${materials[cat].title} ===\n`;
+        itens.forEach(i => { text += `• ${i.name} — ${i.qty} un\n`; });
+        text += '\n';
     }
 
-    // ── Limpar ─────────────────────────────────────────────────────────────
-    function clearAll() {
-        document.querySelectorAll('.need-buy').forEach(cb => cb.checked = false);
-        document.querySelectorAll('.qty-input').forEach(i => i.value = 0);
-        document.querySelectorAll('.qty-stock').forEach(i => i.value = '');
-        updateCount();
-    }
+    navigator.clipboard.writeText(text)
+        .then(() => alert('✅ Lista copiada para a área de transferência!'))
+        .catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            alert('✅ Lista copiada!');
+        });
+}
+window.exportData = exportData;
 
-    // ── Contadores do resumo ───────────────────────────────────────────────
-    function updateCount() {
-        document.getElementById('countOut').textContent      = document.querySelectorAll('.status-badge.out').length;
-        document.getElementById('countLow').textContent      = document.querySelectorAll('.status-badge.low').length;
-        document.getElementById('countOk').textContent       = document.querySelectorAll('.status-badge.ok').length;
-        document.getElementById('countSelected').textContent = document.querySelectorAll('.need-buy:checked').length;
-    }
+// ══════════════════════════════════════════════════════════════
+// LIMPAR
+// ══════════════════════════════════════════════════════════════
+function clearAll() {
+    document.querySelectorAll('.need-buy').forEach(cb => cb.checked = false);
+    document.querySelectorAll('.qty-input').forEach(i => i.value = 0);
+    document.querySelectorAll('.qty-stock').forEach(i => i.value = '');
+    updateCount();
+}
+window.clearAll = clearAll;
 
-    // ── init ───────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════
+// BUSCA / FILTRO
+// ══════════════════════════════════════════════════════════════
+function filterRows() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const name   = row.querySelector('.item-name')?.textContent.toLowerCase() || '';
+        const status = row.getAttribute('data-status') || '';
+        const chk    = row.querySelector('.need-buy')?.checked;
+        const ms = currentFilter === 'all'
+            || (currentFilter === 'out' && status === 'out')
+            || (currentFilter === 'low' && status === 'low')
+            || (currentFilter === 'ok'  && status === 'ok')
+            || (currentFilter === 'sel' && chk);
+        row.classList.toggle('hidden-row', !(name.includes(q) && ms));
+    });
+}
+window.filterRows = filterRows;
+
+function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active'); filterRows();
+}
+window.setFilter = setFilter;
+
+function updateCount() {
+    document.getElementById('countOut').textContent      = document.querySelectorAll('.status-badge.out').length;
+    document.getElementById('countLow').textContent      = document.querySelectorAll('.status-badge.low').length;
+    document.getElementById('countOk').textContent       = document.querySelectorAll('.status-badge.ok').length;
+    document.getElementById('countSelected').textContent = document.querySelectorAll('.need-buy:checked').length;
+    document.getElementById('countTotal').textContent    = document.querySelectorAll('tbody tr').length;
+    filterRows();
+}
+window.updateCount = updateCount;
+
+// ══════════════════════════════════════════════════════════════
+// INIT — carrega do Firebase e escuta mudanças em tempo real
+// ══════════════════════════════════════════════════════════════
+async function init() {
     document.getElementById('orderDate').valueAsDate = new Date();
     renderTables();
-    loadData();
-    updateCount();
+    showBanner('Conectando ao Firebase...', 'loading');
+
+    try {
+        // Carrega dados iniciais
+        const [ordersSnap, stockSnap] = await Promise.all([
+            fbGet('materiais/pedidos'),
+            fbGet('materiais/estoque')
+        ]);
+        _orders = ordersSnap || {};
+        _stock  = stockSnap  || {};
+        loadData();
+
+        // Escuta mudanças em tempo real (sincronização entre dispositivos)
+        onValue(ref(db, 'materiais/pedidos'), snap => {
+            _orders = snap.val() || {};
+            loadData();
+        });
+        onValue(ref(db, 'materiais/estoque'), snap => {
+            _stock = snap.val() || {};
+            loadData();
+        });
+
+        document.getElementById('syncStatus').textContent = '🔥 Firebase — online';
+        showBanner('✅ Conectado ao Firebase!', 'ok');
+        updateUndoBtn();
+
+    } catch(e) {
+        showBanner('❌ Erro ao conectar ao Firebase. Verifique a configuração.', 'err');
+        document.getElementById('syncStatus').textContent = '❌ Firebase — erro de conexão';
+        console.error('Firebase error:', e);
+    }
+}
+
+init();
 </script>
 </body>
 </html>
