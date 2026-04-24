@@ -371,6 +371,11 @@ body {
       <div class="nav-icon">💬</div>
       <div class="nav-info"><div class="nav-name">Script de Atendimento</div><div class="nav-desc">Guia de atendimento</div></div>
     </div>
+    <div class="nav-item" data-key="tabela" onclick="openTool('tabela')">
+      <div class="nav-icon">💰</div>
+      <div class="nav-info"><div class="nav-name">Tabela de Valores</div><div class="nav-desc">Preços e propostas</div></div>
+      <span class="nav-tag green">Tabela</span>
+    </div>
 
     <div class="sb-sep"></div>
     <div class="sb-sec">Sistema</div>
@@ -420,6 +425,13 @@ body {
           <div class="tc-name">Script de Atendimento</div>
           <div class="tc-desc">Guia completo de atendimento ao cliente para toda a equipe Revend.</div>
           <div class="tc-tag red">Atendimento</div>
+        </div>
+
+        <div class="tool-card" onclick="openTool('tabela')">
+          <div class="tc-icon">💰</div>
+          <div class="tc-name">Tabela de Valores</div>
+          <div class="tc-desc">Tabela de preços e propostas para consulta rápida durante o atendimento.</div>
+          <div class="tc-tag green">Tabela</div>
         </div>
 
       </div>
@@ -482,6 +494,11 @@ const TOOLS = {
     name: 'Script de Atendimento',
     icon: '💬',
     file: 'script_atendimento_revend_v3.html',
+  },
+  tabela: {
+    name: 'Tabela de Valores',
+    icon: '💰',
+    file: 'tabela_proposta.html',
   },
 };
 // ═════════════════════════════════════════════════════════
