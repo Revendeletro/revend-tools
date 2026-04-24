@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Preços | Revend</title>
+    <style>
+        :root {
+            --red: #c8102e;
+            --red-dark: #a00d24;
+            --red-light: #fde8ec;
+            --red-border: #f5aab8;
+            --dark: #2a2a2a;
+            --bg: #3a3a3a;
+            --gray: #f5f5f5;
+            --border: #e0e0e0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); padding: 20px; padding-bottom: 100px; min-height: 100vh; }
+
+        /* ── SYNC BANNER ── */
+        #syncBanner {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            background: var(--red); color: white; text-align: center;
+            font-size: 13px; font-weight: 700; padding: 10px;
+            display: none; align-items: center; justify-content: center; gap: 10px;
+        }
+        #syncBanner.show { display: flex; }
+        #syncBanner.ok   { background: #16a34a; }
+        #syncBanner.err  { background: #b91c1c; }
+        .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── CONTAINER ── */
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.35); overflow: hidden; }
+
+        /* ── HEADER ── */
+        .header { background: var(--red); color: white; padding: 20px 28px; display: flex; align-items: center; gap: 16px; position: relative; overflow: hidden; }
+        .header::after { content:''; position:absolute; right:0; top:0; bottom:0; width:200px; background:linear-gradient(to left,rgba(0,0,0,0.18),transparent); pointer-events:none; }
+        .logo-mark { font-size: 22px; font-weight: 900; letter-spacing: -1px; font-style: italic; color: white; line-height: 1; }
+        .logo-mark small { color: rgba(255,255,255,0.65); font-weight: 400; font-style: normal; font-size: 12px; display: block; letter-spacing: 0; }
+        .h-divider { width: 2px; height: 40px; background: rgba(255,255,255,0.28); border-radius: 2px; }
+        .header-info h1 { font-size: 19px; font-weight: 800; }
+        .header-info p  { font-size: 11px; opacity: 0.72; margin-top: 2px; }
+        .header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; position: relative; z-index: 1; }
+        .live-pill { background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.24); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+        .live-dot { width: 7px; height: 7px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+        /* ── MODO GESTOR BADGE ── */
+        #gestorBadge { display:none; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+        body.gestor-mode #gestorBadge { display: flex; align-items: center; gap: 5px; }
+
+        /* ── TOOLBAR ── */
+        .toolbar { background: var(--gray); border-bottom: 2px solid var(--border); display: flex; flex-direction: column; gap: 0; }
+        .tabs-row { display: flex; gap: 4px; padding: 10px 16px 0; overflow-x: auto; }
+        .tab-btn { padding: 8px 16px; border: 2px solid var(--border); border-bottom: none; border-radius: 7px 7px 0 0; background: white; cursor: pointer; font-size: 12px; font-weight: 700; color: #666; white-space: nowrap; transition: all 0.15s; margin-bottom: -2px; }
+        .tab-btn:hover { color: var(--red); border-color: var(--red-border); }
+        .tab-btn.active { background: white; color: var(--red); border-color: var(--red); border-bottom-color: white; z-index: 1; }
+        .search-row { display: flex; gap: 8px; padding: 10px 16px; align-items: center; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 180px; padding: 8px 14px; border: 2px solid var(--border); border-radius: 6px; font-size: 13px; outline: none; }
+        .search-box:focus { border-color: var(--red); }
+        .filter-chip { padding: 6px 13px; border: 2px solid var(--border); border-radius: 20px; background: white; cursor: pointer; font-size: 11px; font-weight: 700; color: #777; transition: all 0.15s; }
+        .filter-chip.active, .filter-chip:hover { background: var(--red); color: white; border-color: var(--red); }
+        .toolbar-sep { width: 1px; height: 24px; background: var(--border); }
+        #gestorBtn { padding: 7px 14px; background: var(--dark); color: rgba(255,255,255,0.8); border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all 0.2s; white-space: nowrap; }
+        #gestorBtn:hover { background: #111; color: white; }
+        body.gestor-mode #gestorBtn { background: #92400e; color: white; }
+        .last-upd { font-size: 11px; color: #aaa; font-weight: 600; margin-left: auto; white-space: nowrap; }
+
+        /* ── CONTENT ── */
+        .content { padding: 20px; max-height: 66vh; overflow-y: auto; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* ── CATEGORY GROUP ── */
+        .cat-group { margin-bottom: 30px; }
+        .cat-header { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: var(--red); border-radius: 7px; color: white; margin-bottom: 12px; }
+        .cat-header h2 { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cat-count { margin-left: auto; background: rgba(255,255,255,0.18); padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+        /* ── TABLE ── */
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        thead { background: var(--dark); color: white; position: sticky; top: 0; z-index: 4; }
+        th { padding: 10px 12px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+        td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+        tbody tr:hover { background: #fff5f6; }
+        tbody tr.hidden-row { display: none; }
+        .item-name { font-weight: 700; color: #1a1a1a; }
+
+        /* ── PRICE CELLS ── */
+        .price-avista { font-size: 15px; font-weight: 800; color: #065f46; }
+        .price-credito { font-size: 15px; font-weight: 800; color: #1d4ed8; }
+        .price-empty { color: #d1d5db; font-size: 12px; font-style: italic; }
+
+        /* ── CONDITION BADGE ── */
+        .cond-badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+        .cond-novo   { background: #d1fae5; color: #065f46; }
+        .cond-semi   { background: #fef3c7; color: #92400e; }
+
+        /* ── EDIT INPUTS (gestor mode) ── */
+        .price-input { width: 110px; padding: 5px 8px; border: 2px solid var(--red-border); border-radius: 6px; font-size: 13px; font-weight: 700; background: var(--red-light); color: #1a1a1a; outline: none; transition: border-color 0.15s; }
+        .price-input:focus { border-color: var(--red); }
+        .price-input.saved { border-color: #6ee7b7; background: #ecfdf5; }
+        .obs-input { width: 100%; padding: 5px 8px; border: 2px solid var(--border); border-radius: 6px; font-size: 12px; background: white; outline: none; }
+        .obs-input:focus { border-color: var(--red); }
+        .save-row-btn { padding: 5px 12px; background: var(--red); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; transition: background 0.15s; white-space: nowrap; }
+        .save-row-btn:hover { background: var(--red-dark); }
+        .save-row-btn.saved { background: #059669; }
+
+        /* ── GESTOR columns hidden by default ── */
+        .gestor-only { display: none; }
+        body.gestor-mode .gestor-only { display: table-cell; }
+        body.gestor-mode th.gestor-only { display: table-cell; }
+
+        /* show static prices in vendor mode, inputs in gestor mode */
+        .price-display { display: inline; }
+        .price-edit    { display: none; }
+        body.gestor-mode .price-display { display: none; }
+        body.gestor-mode .price-edit    { display: inline-flex; gap: 6px; align-items: center; }
+
+        /* ── MODAL (senha) ── */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-overlay.open { display: flex; }
+        .modal-box { background: white; border-radius: 12px; width: 340px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+        .modal-header { background: var(--red); color: white; padding: 18px 22px; }
+        .modal-header h3 { font-size: 15px; font-weight: 800; }
+        .modal-header p  { font-size: 11px; opacity: 0.75; margin-top: 3px; }
+        .modal-body { padding: 22px; }
+        .modal-body label { font-size: 12px; font-weight: 700; color: #555; display: block; margin-bottom: 6px; }
+        .modal-body input { width: 100%; padding: 10px 14px; border: 2px solid var(--border); border-radius: 7px; font-size: 14px; outline: none; letter-spacing: 3px; }
+        .modal-body input:focus { border-color: var(--red); }
+        .modal-error { color: var(--red); font-size: 12px; font-weight: 700; margin-top: 6px; display: none; }
+        .modal-footer { display: flex; gap: 8px; padding: 0 22px 20px; }
+        .btn-modal-ok { flex: 1; padding: 10px; background: var(--red); color: white; border: none; border-radius: 7px; font-weight: 800; font-size: 13px; cursor: pointer; }
+        .btn-modal-ok:hover { background: var(--red-dark); }
+        .btn-modal-cancel { padding: 10px 16px; background: var(--gray); color: #555; border: 2px solid var(--border); border-radius: 7px; font-weight: 700; font-size: 13px; cursor: pointer; }
+
+        /* ── SUMMARY ── */
+        .summary { padding: 14px 20px; background: var(--gray); border-top: 2px solid var(--border); display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+        .sum-card { background: white; padding: 12px 14px; border-radius: 8px; border-left: 4px solid var(--red); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+        .sum-card h3 { font-size: 10px; color: #999; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+        .sum-card p  { font-size: 20px; font-weight: 800; color: var(--red); }
+
+        /* ── PARCELAMENTO POPUP ── */
+        .parc-popup {
+            display: none; position: fixed; z-index: 3000;
+            background: white; border-radius: 12px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.28);
+            width: 340px; overflow: hidden;
+            animation: popIn 0.18s ease;
+        }
+        @keyframes popIn { from { opacity:0; transform: scale(0.94) translateY(-6px); } to { opacity:1; transform: scale(1) translateY(0); } }
+        .parc-popup.open { display: block; }
+        .parc-header {
+            background: var(--red); color: white;
+            padding: 14px 18px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .parc-header-left h3 { font-size: 13px; font-weight: 800; }
+        .parc-header-left p  { font-size: 11px; opacity: 0.78; margin-top: 2px; font-weight: 500; }
+        .parc-close { background: rgba(255,255,255,0.2); border: none; color: white; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; transition: background 0.15s; flex-shrink: 0; }
+        .parc-close:hover { background: rgba(255,255,255,0.35); }
+        .parc-table-wrap { max-height: 360px; overflow-y: auto; }
+        .parc-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .parc-table thead { background: #f8f8f8; position: sticky; top: 0; }
+        .parc-table th { padding: 8px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: #666; border-bottom: 2px solid #eee; }
+        .parc-table td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; }
+        .parc-table tbody tr:hover { background: #fff5f6; }
+        .parc-table tbody tr:last-child td { border-bottom: none; }
+        .parc-parcela { font-weight: 800; color: #1a1a1a; font-size: 13px; }
+        .parc-valor   { font-weight: 700; color: #1d4ed8; font-size: 13px; }
+        .parc-total   { font-weight: 600; color: #555; font-size: 12px; }
+        .parc-debito  { background: #f0fdf4; }
+        .parc-debito .parc-parcela { color: #065f46; }
+        .parc-backdrop { display: none; position: fixed; inset: 0; z-index: 2999; }
+        .parc-backdrop.open { display: block; }
+        /* price-credito clickable */
+        .price-credito-btn {
+            cursor: pointer; font-size: 15px; font-weight: 800; color: #1d4ed8;
+            background: none; border: none; padding: 0;
+            text-decoration: underline dotted; text-underline-offset: 3px;
+            transition: color 0.15s;
+        }
+        .price-credito-btn:hover { color: #1e40af; }
+
+        /* ── READONLY BAR ── */
+        .readonly-bar { background: #1e293b; color: rgba(255,255,255,0.6); text-align: center; font-size: 11px; padding: 5px; font-weight: 600; letter-spacing: 0.3px; }
+        body.gestor-mode .readonly-bar { background: #78350f; color: #fde68a; }
+
+        @media (max-width: 700px) {
+            body { padding: 8px; }
+            .header { padding: 14px; flex-wrap: wrap; }
+            .header-right { width: 100%; }
+            .content { max-height: none; }
+            .tabs-row { gap: 2px; }
+            .tab-btn { padding: 6px 10px; font-size: 11px; }
+            th, td { padding: 8px 8px; font-size: 12px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border-radius: 0; }
+            #syncBanner, .toolbar, .summary, .readonly-bar, .modal-overlay, .gestor-only { display: none !important; }
+            .content { max-height: none; overflow: visible; }
+            .tab-panel { display: block !important; }
+        }
+
+        /* ── CHECKBOX SELEÇÃO ── */
+        .sel-col { width: 38px; text-align: center; }
+        .sel-check {
+            width: 18px; height: 18px; cursor: pointer; accent-color: var(--red);
+            transform: scale(1.2);
+        }
+        tbody tr.selecionado { background: #fff0f2 !important; }
+        tbody tr.selecionado td { border-bottom-color: #f5aab8; }
+
+        /* ── PAINEL DE PROPOSTA ── */
+        #propostaPanel {
+            display: none;
+            position: fixed; bottom: 0; left: 0; right: 0; z-index: 4000;
+            background: white; border-top: 3px solid var(--red);
+            box-shadow: 0 -8px 32px rgba(0,0,0,0.2);
+            animation: slideUp 0.25s ease;
+        }
+        #propostaPanel.visible { display: block; }
+        @keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        .proposta-bar {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 20px; background: var(--red); color: white;
+            cursor: pointer;
+        }
+        .proposta-bar h3 { font-size: 13px; font-weight: 800; flex: 1; }
+        .proposta-count {
+            background: white; color: var(--red);
+            padding: 2px 10px; border-radius: 20px;
+            font-size: 12px; font-weight: 900;
+        }
+        .proposta-toggle { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 10px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; }
+        .proposta-body {
+            padding: 16px 20px; display: none; max-height: 60vh; overflow-y: auto;
+        }
+        .proposta-body.open { display: block; }
+        .proposta-itens { margin-bottom: 14px; }
+        .proposta-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border: 1px solid #f0f0f0; border-radius: 8px;
+            margin-bottom: 6px; background: #fafafa;
+        }
+        .proposta-item-nome { font-weight: 700; font-size: 13px; color: #1a1a1a; }
+        .proposta-item-preco { font-size: 13px; font-weight: 700; color: #065f46; }
+        .proposta-item-rm { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; }
+        .proposta-item-rm:hover { color: var(--red); }
+        .proposta-total {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 12px; background: var(--red); color: white; border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .proposta-total span { font-size: 13px; font-weight: 700; }
+        .proposta-total strong { font-size: 18px; font-weight: 900; }
+        .proposta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn-whatsapp {
+            flex: 1; min-width: 160px;
+            background: #25d366; color: white; border: none;
+            padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background 0.15s;
+        }
+        .btn-whatsapp:hover { background: #1fb855; }
+        .btn-copiar {
+            flex: 1; min-width: 160px;
+            background: var(--dark); color: white; border: none;
+            padding: 12px 20px; border-radius: 8px; font-size: 14px; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: background 0.15s;
+        }
+        .btn-copiar:hover { background: #111; }
+        .btn-limpar-sel {
+            background: none; color: #999; border: 2px solid #ddd;
+            padding: 12px 20px; border-radius: 8px; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .btn-limpar-sel:hover { border-color: var(--red); color: var(--red); }
+        .msg-copiada {
+            font-size: 11px; color: #059669; font-weight: 700;
+            display: none; align-items: center; gap: 4px;
+        }
+        .msg-copiada.show { display: flex; }
+
+        /* ── PARCELAMENTO RÁPIDO ── */
+        .parc-rapido {
+            padding: 10px 14px; background: #f8faff;
+            border: 2px solid #dbeafe; border-radius: 10px; margin-bottom: 10px;
+        }
+        .parc-rapido-label { font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 8px; }
+        .parc-rapido-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .parc-rapido-chip {
+            display: flex; align-items: center; gap: 6px;
+            padding: 6px 12px; border-radius: 8px;
+            background: white; border: 2px solid #bfdbfe;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .parc-rapido-chip:hover { background: #1d4ed8; border-color: #1d4ed8; color: white; }
+        .parc-rapido-chip:hover .parc-chip-nome,
+        .parc-rapido-chip:hover .parc-chip-valor { color: white; }
+        .parc-chip-nome { font-size: 11px; font-weight: 700; color: #1a1a1a; }
+        .parc-chip-valor { font-size: 11px; font-weight: 800; color: #1d4ed8; }
+        .parc-chip-original { font-size: 10px; font-weight: 600; color: #aaa; text-decoration: line-through; }
+        .parc-chip-seta { font-size: 10px; color: #aaa; }
+        .parc-chip-icon { font-size: 12px; }
+        .parc-rapido-chip:hover .parc-chip-nome,
+        .parc-rapido-chip:hover .parc-chip-valor,
+        .parc-rapido-chip:hover .parc-chip-original,
+        .parc-rapido-chip:hover .parc-chip-seta { color: white; }
+
+        /* ── UPGRADE ROW ── */
+        .upgrade-row {
+            width: 100%; padding: 10px 14px; background: #f0fdf4;
+            border: 2px solid #6ee7b7; border-radius: 10px; margin-bottom: 10px;
+        }
+        .upgrade-label { font-size: 11px; font-weight: 800; color: #065f46; display: block; margin-bottom: 6px; }
+        .upgrade-modelo-input {
+            width: 100%; padding: 7px 10px; border: 2px solid #6ee7b7; border-radius: 7px;
+            font-size: 13px; font-weight: 600; color: #1a1a1a; outline: none; background: white;
+            margin-bottom: 6px;
+        }
+        .upgrade-modelo-input:focus { border-color: #059669; }
+        .upgrade-modelo-input::placeholder { color: #aaa; font-weight: 400; }
+        .upgrade-input-wrap { display: flex; align-items: center; gap: 0; background: white; border: 2px solid #6ee7b7; border-radius: 7px; overflow: hidden; }
+        .upgrade-prefix { padding: 7px 10px; font-size: 13px; font-weight: 700; color: #065f46; background: #ecfdf5; border-right: 1px solid #6ee7b7; }
+        .upgrade-input { flex: 1; padding: 7px 10px; border: none; font-size: 14px; font-weight: 800; color: #065f46; outline: none; background: white; }
+        .upgrade-clear { padding: 7px 10px; background: none; border: none; border-left: 1px solid #e0e0e0; color: #bbb; cursor: pointer; font-size: 13px; transition: color 0.15s; }
+        .upgrade-clear:hover { color: #c8102e; }
+        .upgrade-hint { font-size: 10px; color: #6b7280; margin-top: 4px; display: block; font-style: italic; }
+
+        /* ── PARC: botão de imagem ── */
+        .parc-footer {
+            padding: 12px 14px; border-top: 1px solid #f0f0f0;
+            display: flex; gap: 8px;
+        }
+        .btn-parc-img {
+            flex: 1; background: #25d366; color: white; border: none;
+            padding: 9px 14px; border-radius: 7px; font-size: 12px; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: background 0.15s;
+        }
+        .btn-parc-img:hover { background: #1fb855; }
+        .btn-parc-copy {
+            flex: 1; background: var(--dark); color: white; border: none;
+            padding: 9px 14px; border-radius: 7px; font-size: 12px; font-weight: 800;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+            transition: background 0.15s;
+        }
+        .btn-parc-copy:hover { background: #111; }
+
+        /* ── "a partir de" acima do preço ── */
+        .price-apartir-wrap {
+            display: inline-flex; flex-direction: column; align-items: flex-start; line-height: 1.2;
+        }
+        .price-apartir-label {
+            font-size: 10px; font-weight: 600; color: #888; line-height: 1;
+        }
+
+        /* ── CANVAS offscreen para imagem ── */
+        #imgCanvas { display: none; }
+
+        /* ── CORES ── */
+        .cores-row {
+            display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;
+        }
+        .cor-chip {
+            display: inline-flex; align-items: center; gap: 4px;
+            padding: 3px 9px 3px 5px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.15s;
+            user-select: none;
+        }
+        .cor-chip:hover { opacity: 0.85; }
+        .cor-chip.ativa { border-color: rgba(0,0,0,0.18); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+        .cor-dot { width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid rgba(0,0,0,0.22); flex-shrink: 0; }
+
+        /* painel de cores expandido (no modo gestor) */
+        .cores-gestor { display: none; margin-top: 8px; }
+        body.gestor-mode .cores-gestor { display: block; }
+        .cores-gestor-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+        .cor-gestor-item {
+            display: flex; align-items: center; gap: 5px;
+            background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px;
+            padding: 4px 8px;
+        }
+        .cor-gestor-dot { width: 12px; height: 12px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.15); flex-shrink: 0; }
+        .cor-gestor-nome { font-size: 11px; font-weight: 700; color: #555; min-width: 60px; }
+        .cor-gestor-price {
+            width: 90px; padding: 3px 6px; border: 1.5px solid var(--red-border);
+            border-radius: 5px; font-size: 11px; font-weight: 700;
+            background: var(--red-light); outline: none;
+        }
+        .cor-gestor-price:focus { border-color: var(--red); }
+        .cor-gestor-price.saved { border-color: #6ee7b7; background: #ecfdf5; }
+        .cor-gestor-toggle {
+            width: 18px; height: 18px; cursor: pointer; accent-color: var(--red);
+            flex-shrink: 0;
+        }
+        .cor-add-row { display: flex; gap: 5px; margin-top: 4px; align-items: center; }
+        .cor-add-input {
+            padding: 4px 8px; border: 1.5px solid var(--border); border-radius: 6px;
+            font-size: 11px; outline: none; width: 110px;
+        }
+        .cor-add-input:focus { border-color: var(--red); }
+        .cor-add-color { width: 26px; height: 26px; border-radius: 5px; border: 1.5px solid var(--border); cursor: pointer; padding: 0; }
+        .cor-add-btn {
+            padding: 4px 10px; background: var(--red); color: white; border: none;
+            border-radius: 6px; font-size: 11px; font-weight: 800; cursor: pointer;
+        }
+        .cor-add-btn:hover { background: var(--red-dark); }
+        .cor-rm-btn {
+            background: none; border: none; color: #ccc; cursor: pointer;
+            font-size: 12px; padding: 0 2px; line-height: 1;
+        }
+        .cor-rm-btn:hover { color: var(--red); }
+    </style>
+</head>
+<body>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner">
+    <div class="spinner" id="syncSpinner"></div>
+    <span id="syncMsg">Conectando...</span>
+</div>
+
+<!-- MODAL SENHA -->
+<div class="modal-overlay" id="modalSenha">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>🔐 Acesso Gestor</h3>
+            <p>Digite a senha para editar os preços</p>
+        </div>
+        <div class="modal-body">
+            <label>Senha</label>
+            <input type="password" id="inputSenha" placeholder="••••••" onkeydown="if(event.key==='Enter')confirmarSenha()">
+            <div class="modal-error" id="senhaError">Senha incorreta. Tente novamente.</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="fecharModal()">Cancelar</button>
+            <button class="btn-modal-ok" onclick="confirmarSenha()">Entrar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+    <div class="readonly-bar" id="modeBar">👁️ MODO VENDEDOR — somente visualização</div>
+
+    <div class="header">
+        <div class="logo-mark">revend<small>Eletro</small></div>
+        <div class="h-divider"></div>
+        <div class="header-info">
+            <h1>💰 Tabela de Preços</h1>
+            <p><span id="syncStatus">Conectando ao Firebase...</span></p>
+        </div>
+        <div class="header-right">
+            <div class="live-pill"><span class="live-dot"></span> Ao vivo</div>
+            <div id="gestorBadge">✏️ Modo Gestor</div>
+        </div>
+    </div>
+
+    <div class="toolbar">
+        <div class="tabs-row" id="tabsRow"></div>
+        <div class="search-row">
+            <input class="search-box" type="text" id="searchBox" placeholder="🔍 Buscar produto..." oninput="filterRows()">
+            <button class="filter-chip active" onclick="setFilter('all',this)">Todos</button>
+            <button class="filter-chip" onclick="setFilter('composto',this)">💰 Com preço</button>
+            <button class="filter-chip" onclick="setFilter('vazio',this)">⚠️ Sem preço</button>
+            <div class="toolbar-sep"></div>
+            <button id="gestorBtn" onclick="abrirModal()">🔐 Gestor</button>
+            <span class="last-upd" id="lastUpd">—</span>
+        </div>
+    </div>
+
+    <div class="content" id="mainContent"></div>
+
+    <div class="summary">
+        <div class="sum-card"><h3>📋 Total Produtos</h3><p id="cTotal">—</p></div>
+        <div class="sum-card"><h3>💰 Com Preço</h3><p id="cComPreco">—</p></div>
+        <div class="sum-card"><h3>⚠️ Sem Preço</h3><p id="cSemPreco">—</p></div>
+        <div class="sum-card"><h3>✏️ Modo</h3><p id="cModo" style="font-size:13px;padding-top:4px;">Vendedor</p></div>
+    </div>
+</div>
+
+<!-- PARCELAMENTO POPUP -->
+<div class="parc-backdrop" id="parcBackdrop" onclick="fecharParc()"></div>
+<div class="parc-popup" id="parcPopup">
+    <div class="parc-header">
+        <div class="parc-header-left">
+            <h3 id="parcProduto">Parcelamento</h3>
+            <p id="parcSubtitle">Simulação de parcelamento</p>
+        </div>
+        <button class="parc-close" onclick="fecharParc()">✕</button>
+    </div>
+    <div class="parc-table-wrap">
+        <table class="parc-table">
+            <thead><tr>
+                <th>Forma</th>
+                <th>Parcela</th>
+                <th>Total</th>
+            </tr></thead>
+            <tbody id="parcTableBody"></tbody>
+        </table>
+    </div>
+    <div class="parc-footer">
+        <button class="btn-parc-img" onclick="exportarParcImagem()">📸 Salvar como imagem</button>
+        <button class="btn-parc-copy" onclick="copiarParcTexto()">📋 Copiar texto</button>
+    </div>
+</div>
+
+<!-- PAINEL PROPOSTA -->
+<div id="propostaPanel">
+    <div class="proposta-bar" onclick="togglePropostaBody()">
+        <h3>🛒 Proposta selecionada — <span id="propostaNomeCount"></span></h3>
+        <span class="proposta-count" id="propostaCount">0</span>
+        <button class="proposta-toggle" id="propostaToggleBtn">▲ Ver</button>
+    </div>
+    <div class="proposta-body" id="propostaBody">
+        <div class="proposta-itens" id="propostaItens"></div>
+        <div class="proposta-total">
+            <span>Total à vista:</span>
+            <strong id="propostaTotal">R$ 0,00</strong>
+        </div>
+        <!-- SIMULAR PARCELAMENTO -->
+        <div class="parc-rapido" id="parcRapido" style="display:none">
+            <div class="parc-rapido-label">💳 Simular parcelamento</div>
+            <div class="parc-rapido-chips" id="parcRapidoChips"></div>
+        </div>
+        <div class="proposta-actions">
+            <div class="upgrade-row">
+                <label class="upgrade-label">♻️ Upgrade — aparelho do cliente</label>
+                <input type="text" id="upgradeModelo" class="upgrade-modelo-input" placeholder="Ex: iPhone 12 128GB">
+                <div class="upgrade-input-wrap">
+                    <span class="upgrade-prefix">R$</span>
+                    <input type="text" id="upgradeValor" class="upgrade-input" placeholder="0,00"
+                        onfocus="this.select()" onblur="formatInput(this);atualizarProposta()" oninput="atualizarProposta()">
+                    <button class="upgrade-clear" onclick="document.getElementById('upgradeValor').value='';document.getElementById('upgradeModelo').value=''" title="Limpar tudo">✕</button>
+                </div>
+                <span class="upgrade-hint">O valor será descontado dos preços na proposta</span>
+            </div>
+            <button class="btn-whatsapp" onclick="enviarWhatsApp()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                Enviar pelo WhatsApp
+            </button>
+            <button class="btn-copiar" onclick="copiarProposta()">
+                📋 Copiar mensagem
+            </button>
+            <button class="btn-limpar-sel" onclick="limparSelecao()">🗑️ Limpar</button>
+            <span class="msg-copiada" id="msgCopiada">✅ Copiado!</span>
+        </div>
+    </div>
+</div>
+
+<canvas id="imgCanvas"></canvas>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp }             from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+    authDomain:        "materiais-revend.firebaseapp.com",
+    databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
+    projectId:         "materiais-revend",
+    storageBucket:     "materiais-revend.firebasestorage.app",
+    messagingSenderId: "509931102943",
+    appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// ════════════════════════════════════════════
+// SENHA DO GESTOR — altere aqui
+// ════════════════════════════════════════════
+const SENHA_GESTOR = "Revend@2026";
+
+// ════════════════════════════════════════════
+// CATÁLOGO COMPLETO
+// ════════════════════════════════════════════
+const catalog = [
+    {
+        id: "iphone17",
+        tab: "🔥 iPhone 17",
+        groups: [
+            { title: "iPhone 17 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 17 256GB",
+                "iPhone 17 Air 256GB",
+                "iPhone 17 Pro 256GB",
+                "iPhone 17 Pro 512GB",
+                "iPhone 17 Pro Max 256GB",
+                "iPhone 17 Pro Max 512GB",
+                "iPhone 17 Pro Max 1TB",
+                "iPhone 17 Pro Max 2TB",
+            ]},
+            { title: "iPhone 17 — SEM CAIXA · Garantia 6 meses", items: [
+                "iPhone 17 256GB (SC)",
+                "iPhone 17 512GB (SC)",
+                "iPhone 17 Air 256GB (SC)",
+                "iPhone 17 Air 512GB (SC)",
+                "iPhone 17 Pro 256GB (SC)",
+                "iPhone 17 Pro 512GB (SC)",
+                "iPhone 17 Pro Max 256GB (SC)",
+                "iPhone 17 Pro Max 512GB (SC)",
+                "iPhone 17 Pro Max 1TB (SC)",
+                "iPhone 17 Pro Max 2TB (SC)",
+            ]},
+        ]
+    },
+    {
+        id: "iphone-lacrado",
+        tab: "📱 iPhone Lacrado",
+        groups: [
+            { title: "iPhone 13 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 13 128GB",
+            ]},
+            { title: "iPhone 14 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 14 128GB",
+                "iPhone 14 256GB",
+            ]},
+            { title: "iPhone 15 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 15 128GB",
+                "iPhone 15 256GB",
+                "iPhone 15 Plus 128GB",
+            ]},
+            { title: "iPhone 16E — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 16E 128GB",
+                "iPhone 16E 256GB",
+            ]},
+            { title: "iPhone 16 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 16 128GB",
+                "iPhone 16 256GB",
+                "iPhone 16 Plus 128GB",
+                "iPhone 16 Plus 256GB",
+                "iPhone 16 Pro 128GB",
+                "iPhone 16 Pro Max 512GB",
+            ]},
+        ]
+    },
+    {
+        id: "iphone-cpo",
+        tab: "📦 iPhone CPO",
+        groups: [
+            { title: "iPhone 13 — CPO · Garantia 1 ano Apple", items: [
+                "iPhone 13 128GB CPO",
+                "iPhone 13 256GB CPO",
+                "iPhone 13 Pro 128GB CPO",
+                "iPhone 13 Pro 256GB CPO",
+                "iPhone 13 Pro Max 128GB CPO",
+                "iPhone 13 Pro Max 256GB CPO",
+            ]},
+            { title: "iPhone 14 — CPO · Garantia 1 ano Apple", items: [
+                "iPhone 14 512GB CPO",
+                "iPhone 14 Plus 256GB CPO",
+                "iPhone 14 Pro 128GB CPO",
+                "iPhone 14 Pro 512GB CPO",
+                "iPhone 14 Pro Max 128GB CPO",
+                "iPhone 14 Pro Max 256GB CPO",
+            ]},
+            { title: "iPhone 15 — CPO · Garantia 1 ano Apple", items: [
+                "iPhone 15 Pro 128GB CPO",
+                "iPhone 15 Pro 256GB CPO",
+                "iPhone 15 Pro 512GB CPO",
+                "iPhone 15 Pro Max 256GB CPO",
+                "iPhone 15 Pro Max 512GB CPO",
+            ]},
+            { title: "iPhone 16 — CPO · Garantia 1 ano Apple", items: [
+                "iPhone 16 128GB CPO",
+                "iPhone 16 Pro 128GB CPO",
+                "iPhone 16 Pro 256GB CPO",
+                "iPhone 16 Pro 1TB CPO",
+                "iPhone 16 Pro Max 256GB CPO",
+                "iPhone 16 Pro Max 512GB CPO",
+            ]},
+        ]
+    },
+    {
+        id: "iphone-sc",
+        tab: "🔓 iPhone Sem Caixa",
+        groups: [
+            { title: "iPhone XR / 11 / 12 — SEM CAIXA · Garantia Revend 90 dias", items: [
+                "iPhone XR 64GB SC",
+                "iPhone XR 128GB SC",
+                "iPhone 11 64GB SC",
+                "iPhone 11 128GB SC",
+                "iPhone 12 64GB SC",
+                "iPhone 12 128GB SC",
+                "iPhone 12 Pro 128GB SC",
+                "iPhone 12 Pro 256GB SC",
+                "iPhone 12 Pro Max 128GB SC",
+                "iPhone 12 Pro Max 256GB SC",
+            ]},
+            { title: "iPhone 13 / 14 — SEM CAIXA · Garantia Revend 90 dias", items: [
+                "iPhone 13 128GB SC",
+                "iPhone 13 256GB SC",
+                "iPhone 13 Pro 128GB SC",
+                "iPhone 13 Pro 256GB SC",
+                "iPhone 13 Pro Max 128GB SC",
+                "iPhone 13 Pro Max 256GB SC",
+                "iPhone 14 128GB SC",
+                "iPhone 14 256GB SC",
+                "iPhone 14 Plus 128GB SC",
+                "iPhone 14 Pro 128GB SC",
+                "iPhone 14 Pro 256GB SC",
+                "iPhone 14 Pro Max 128GB SC",
+                "iPhone 14 Pro Max 256GB SC",
+                "iPhone 14 Pro Max 512GB SC",
+            ]},
+            { title: "iPhone 15 / 16 — SEM CAIXA · Garantia Revend 6 meses", items: [
+                "iPhone 15 128GB SC",
+                "iPhone 15 256GB SC",
+                "iPhone 15 Plus 128GB SC",
+                "iPhone 15 Plus 256GB SC",
+                "iPhone 15 Pro 128GB SC",
+                "iPhone 15 Pro 256GB SC",
+                "iPhone 15 Pro Max 256GB SC",
+                "iPhone 15 Pro Max 512GB SC",
+                "iPhone 16 128GB SC",
+                "iPhone 16 256GB SC",
+                "iPhone 16 Plus 128GB SC",
+                "iPhone 16 Plus 512GB SC",
+                "iPhone 16 Pro 128GB SC",
+                "iPhone 16 Pro 256GB SC",
+                "iPhone 16 Pro 1TB SC",
+                "iPhone 16 Pro Max 256GB SC",
+                "iPhone 16 Pro Max 512GB SC",
+                "iPhone 16 Pro Max 1TB SC",
+            ]},
+        ]
+    },
+    {
+        id: "watch",
+        tab: "⌚ Apple Watch",
+        groups: [
+            { title: "Apple Watch SE 2 — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Watch SE 2 40mm GPS",
+                "Apple Watch SE 2 40mm GPS + CEL",
+                "Apple Watch SE 2 44mm GPS",
+                "Apple Watch SE 2 44mm GPS + CEL",
+            ]},
+            { title: "Apple Watch SE 3 — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Watch SE 3 40mm GPS",
+                "Apple Watch SE 3 44mm GPS",
+            ]},
+            { title: "Apple Watch S9 — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Watch S9 41mm GPS",
+                "Apple Watch S9 45mm GPS",
+            ]},
+            { title: "Apple Watch S10 / S11 — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Watch S10 46mm GPS",
+                "Apple Watch S11 42mm GPS",
+                "Apple Watch S11 46mm GPS",
+            ]},
+            { title: "Apple Watch Ultra — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Watch Ultra 2 49mm",
+                "Apple Watch Ultra 3 49mm",
+            ]},
+        ]
+    },
+    {
+        id: "ipad",
+        tab: "📱 iPad",
+        groups: [
+            { title: "iPad / iPad Mini — LACRADO · Garantia 1 ano Apple", items: [
+                "iPad 9 256GB",
+                "iPad 10 64GB",
+                "iPad 10 256GB",
+                "iPad 11 A16 128GB",
+                "iPad 11 A16 256GB",
+                "iPad 11 A16 512GB",
+                "iPad Mini 6 64GB",
+                "iPad Mini 6 256GB",
+                "iPad Mini 7 A17Pro 128GB",
+                "iPad Mini 7 A17Pro 256GB",
+            ]},
+            { title: "iPad Air — LACRADO · Garantia 1 ano Apple", items: [
+                "iPad Air M3 11\" 128GB WiFi",
+                "iPad Air M3 11\" 128GB WiFi + CEL",
+                "iPad Air M3 11\" 256GB WiFi",
+                "iPad Air M3 13\" 128GB WiFi",
+                "iPad Air M3 13\" 256GB WiFi",
+            ]},
+            { title: "iPad Pro M4 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPad Pro M4 11\" 256GB WiFi",
+                "iPad Pro M4 11\" 256GB WiFi + CEL",
+                "iPad Pro M4 11\" 512GB WiFi",
+                "iPad Pro M4 13\" 256GB WiFi",
+                "iPad Pro M4 13\" 512GB WiFi",
+            ]},
+            { title: "iPad Pro M5 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPad Pro M5 11\" 256GB WiFi",
+                "iPad Pro M5 13\" 256GB WiFi",
+                "iPad Pro M5 13\" 512GB WiFi",
+                "iPad Pro M5 13\" 512GB WiFi + CEL",
+            ]},
+        ]
+    },
+    {
+        id: "airpods",
+        tab: "🎧 AirPods",
+        groups: [
+            { title: "AirPods — LACRADO · Garantia 1 ano Apple", items: [
+                "AirPods 4",
+                "AirPods 4 ANC",
+                "AirPods Pro 2",
+                "AirPods Pro 3",
+                "AirPods Max",
+                "AirTag",
+                "AirTag Pack (4 un)",
+            ]},
+        ]
+    },
+    {
+        id: "mac",
+        tab: "💻 Mac",
+        groups: [
+            { title: "Mac Mini — LACRADO · Garantia 1 ano Apple", items: [
+                "Mac Mini M2 8GB 256GB",
+                "Mac Mini M4 16GB 256GB",
+            ]},
+            { title: "MacBook Air — LACRADO · Garantia 1 ano Apple", items: [
+                "MacBook Air M1 13\" 8GB 256GB",
+                "MacBook Air M2 13\" 16GB 256GB",
+                "MacBook Air M3 13\" 24GB 512GB",
+                "MacBook Air M3 15\" 8GB 512GB",
+                "MacBook Air M4 13\" 16GB 256GB",
+                "MacBook Air M4 13\" 16GB 512GB",
+                "MacBook Air M4 13\" 24GB 512GB",
+                "MacBook Air M4 15\" 16GB 256GB",
+                "MacBook Air M4 15\" 16GB 512GB",
+            ]},
+            { title: "MacBook Pro — LACRADO · Garantia 1 ano Apple", items: [
+                "MacBook Pro M4 14\" 16GB 512GB",
+                "MacBook Pro M4 14\" 16GB 1TB",
+                "MacBook Pro M4 Pro 14\" 24GB 512GB",
+                "MacBook Pro M4 Max 14\" 36GB 1TB",
+                "MacBook Pro M4 Pro 16\" 24GB 512GB",
+                "MacBook Pro M4 Pro 16\" 48GB 512GB",
+                "MacBook Pro M4 Max 16\" 64GB 2TB",
+                "MacBook Pro M4 Max 16\" 128GB 1TB",
+                "MacBook Pro M5 14\" 16GB 512GB",
+                "MacBook Pro M5 14\" 16GB 1TB",
+                "MacBook Pro M5 14\" 24GB 1TB",
+            ]},
+            { title: "iMac — LACRADO · Garantia 1 ano Apple", items: [
+                "iMac M4 24\" 16GB 256GB",
+                "iMac M4 24\" 16GB 512GB",
+                "iMac M4 24\" 24GB 512GB",
+            ]},
+        ]
+    },
+    {
+        id: "acessorios",
+        tab: "🛡️ Acessórios",
+        groups: [
+            { title: "Cabos IWILL Lightning",    items: ["Cabo Hard USB-C p/ Lightning (1,2 m)","Cabo Strong Lightning TPE (1,2 m)","Cabo Strong Lightning TPE (2 m)","Cabo Strong Lightning Nylon (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (2 m)"] },
+            { title: "Carregadores IWILL",       items: ["Carregador 2 Saídas (USB + USB-C) 20W","Carregador 2 Saídas USB-C 35W IWILL","Carregador USB-C 20W IWILL","Carregador USB-C 20W COLORS"] },
+            { title: "Power Bank & Adaptadores", items: ["Power Bank Speed 20W USB-C (10000mAh)","Adaptador Hub 3 em 1 (USB - HDMI - USB-C)"] },
+            { title: "Fones IWILL",              items: ["Fone EarPods Lightning","Fone EarPods Tipo C"] },
+            { title: "Capas iPhone",             items: ["Capa Luxy","Capa Luxy Focus","Capa Silk","Capa Clear MagSafe","Capa Colors MagSafe","Capa Silicone Apple","Capa Space Anti-Impacto","Capa Space Color","Capa Glass","Capa Auto Focus","Capa Double Lux","Capa Duall","Capa Clarity","Capa Perfect C/ Kit Lentes","Capa Fashion C/ Kit Lentes","Capa New Skin","Kit King Kong (Capa + Película Tela + Câmera)"] },
+            { title: "Capas iPad & Watch",       items: ["Capa iPad","Capa Apple Watch Transparente"] },
+            { title: "Pulseiras Apple Watch",    items: ["Pulseira Apple Watch (Loop, Milanesa, Nylon)","Pulseira Apple Watch GSHIELD","Pulseira Apple Watch IWILL"] },
+            { title: "Películas",                items: ["Película Normal","Película Privacidade","Película King - Resistente","Película Câmera Traseira Completa","Película Câmera Traseira Individual","Película iPad","Película Apple Watch Ultra","Película Apple Watch SE/S8/S9/S10"] },
+            { title: "Outros Acessórios",        items: ["Protetor de Cabo"] },
+        ]
+    }
+];
+
+// ════════════════════════════════════════════
+// PREÇOS PADRÃO (tabela 18/03/2026 + 04/04/2026)
+// Carregados antes do Firebase; sobrescritos ao conectar
+// ════════════════════════════════════════════
+const DEFAULT_PRECOS = {
+  // ── iPhone 17 Lacrado ──
+  "IPHONE17_IPHONE17256GB": { avista: 5649.99 },
+  "IPHONE17_IPHONE17AIR256GB": { avista: 5649.99 },
+  "IPHONE17_IPHONE17PRO256GB": { avista: 7799.99 },
+  "IPHONE17_IPHONE17PRO512GB": { avista: 9599.99 },
+  "IPHONE17_IPHONE17PROMAX256GB": { avista: 8599.99 },
+  "IPHONE17_IPHONE17PROMAX512GB": { avista: 10199.99 },
+  "IPHONE17_IPHONE17PROMAX1TB": { avista: 11349.99 },
+  "IPHONE17_IPHONE17PROMAX2TB": { avista: 12699.99 },
+  // ── iPhone 17 Sem Caixa ──
+  "IPHONE17_IPHONE17256GBSC": { avista: 5249.99 },
+  "IPHONE17_IPHONE17512GBSC": { avista: 6349.99 },
+  "IPHONE17_IPHONE17AIR256GBSC": { avista: 5699.99 },
+  "IPHONE17_IPHONE17AIR512GBSC": { avista: 6399.99 },
+  "IPHONE17_IPHONE17PRO256GBSC": { avista: 7349.99 },
+  "IPHONE17_IPHONE17PRO512GBSC": { avista: 8299.99 },
+  "IPHONE17_IPHONE17PROMAX256GBSC": { avista: 8199.99 },
+  "IPHONE17_IPHONE17PROMAX512GBSC": { avista: 9399.99 },
+  "IPHONE17_IPHONE17PROMAX1TBSC": { avista: 10099.99 },
+  "IPHONE17_IPHONE17PROMAX2TBSC": { avista: 11449.99 },
+  // ── iPhone Lacrado ──
+  "IPHONELACRADO_IPHONE13128GB": { avista: 3399.99 },
+  "IPHONELACRADO_IPHONE14128GB": { avista: 3749.99 },
+  "IPHONELACRADO_IPHONE14256GB": { avista: 3999.99 },
+  "IPHONELACRADO_IPHONE15128GB": { avista: 4049.99 },
+  "IPHONELACRADO_IPHONE15256GB": { avista: 4849.99 },
+  "IPHONELACRADO_IPHONE15PLUS128GB": { avista: 4499.99 },
+  "IPHONELACRADO_IPHONE16E128GB": { avista: 3699.99 },
+  "IPHONELACRADO_IPHONE16E256GB": { avista: 4499.99 },
+  "IPHONELACRADO_IPHONE16128GB": { avista: 4699.99 },
+  "IPHONELACRADO_IPHONE16256GB": { avista: 5399.99 },
+  "IPHONELACRADO_IPHONE16PLUS128GB": { avista: 5149.99 },
+  "IPHONELACRADO_IPHONE16PLUS256GB": { avista: 6149.99 },
+  "IPHONELACRADO_IPHONE16PRO128GB": { avista: 5849.99 },
+  "IPHONELACRADO_IPHONE16PROMAX512GB": { avista: 8499.99 },
+  // ── iPhone CPO ──
+  "IPHONECPO_IPHONE13128GBCPO": { avista: 3099.99 },
+  "IPHONECPO_IPHONE13256GBCPO": { avista: 3449.99 },
+  "IPHONECPO_IPHONE13PRO128GBCPO": { avista: 3449.99 },
+  "IPHONECPO_IPHONE13PRO256GBCPO": { avista: 3849.99 },
+  "IPHONECPO_IPHONE13PROMAX128GBCPO": { avista: 3899.99 },
+  "IPHONECPO_IPHONE13PROMAX256GBCPO": { avista: 4449.99 },
+  "IPHONECPO_IPHONE14512GBCPO": { avista: 3949.99 },
+  "IPHONECPO_IPHONE14PLUS256GBCPO": { avista: 3899.99 },
+  "IPHONECPO_IPHONE14PRO128GBCPO": { avista: 4149.99 },
+  "IPHONECPO_IPHONE14PRO512GBCPO": { avista: 5149.99 },
+  "IPHONECPO_IPHONE14PROMAX128GBCPO": { avista: 4499.99 },
+  "IPHONECPO_IPHONE14PROMAX256GBCPO": { avista: 5149.99 },
+  "IPHONECPO_IPHONE15PRO128GBCPO": { avista: 4799.99 },
+  "IPHONECPO_IPHONE15PRO256GBCPO": { avista: 5179.99 },
+  "IPHONECPO_IPHONE15PRO512GBCPO": { avista: 5749.99 },
+  "IPHONECPO_IPHONE15PROMAX256GBCPO": { avista: 5799.99 },
+  "IPHONECPO_IPHONE15PROMAX512GBCPO": { avista: 6849.99 },
+  "IPHONECPO_IPHONE16128GBCPO": { avista: 4299.99 },
+  "IPHONECPO_IPHONE16PRO128GBCPO": { avista: 5399.99 },
+  "IPHONECPO_IPHONE16PRO256GBCPO": { avista: 6099.99 },
+  "IPHONECPO_IPHONE16PRO1TBCPO": { avista: 7599.99 },
+  "IPHONECPO_IPHONE16PROMAX256GBCPO": { avista: 6749.99 },
+  "IPHONECPO_IPHONE16PROMAX512GBCPO": { avista: 7049.99 },
+  // ── iPhone Sem Caixa ──
+  "IPHONESC_IPHONEXR64GBSC": { avista: 949.99 },
+  "IPHONESC_IPHONEXR128GBSC": { avista: 1099.99 },
+  "IPHONESC_IPHONE1164GBSC": { avista: 1349.99 },
+  "IPHONESC_IPHONE11128GBSC": { avista: 1549.99 },
+  "IPHONESC_IPHONE1264GBSC": { avista: 1699.99 },
+  "IPHONESC_IPHONE12128GBSC": { avista: 1849.99 },
+  "IPHONESC_IPHONE12PRO128GBSC": { avista: 2099.99 },
+  "IPHONESC_IPHONE12PRO256GBSC": { avista: 2349.99 },
+  "IPHONESC_IPHONE12PROMAX128GBSC": { avista: 2599.99 },
+  "IPHONESC_IPHONE12PROMAX256GBSC": { avista: 2849.99 },
+  "IPHONESC_IPHONE13128GBSC": { avista: 2249.99 },
+  "IPHONESC_IPHONE13256GBSC": { avista: 2599.99 },
+  "IPHONESC_IPHONE13PRO128GBSC": { avista: 2749.99 },
+  "IPHONESC_IPHONE13PRO256GBSC": { avista: 3049.99 },
+  "IPHONESC_IPHONE13PROMAX128GBSC": { avista: 3099.99 },
+  "IPHONESC_IPHONE13PROMAX256GBSC": { avista: 3599.99 },
+  "IPHONESC_IPHONE14128GBSC": { avista: 2399.99 },
+  "IPHONESC_IPHONE14256GBSC": { avista: 2799.99 },
+  "IPHONESC_IPHONE14PLUS128GBSC": { avista: 2699.99 },
+  "IPHONESC_IPHONE14PRO128GBSC": { avista: 3139.99 },
+  "IPHONESC_IPHONE14PRO256GBSC": { avista: 3399.99 },
+  "IPHONESC_IPHONE14PROMAX128GBSC": { avista: 3649.99 },
+  "IPHONESC_IPHONE14PROMAX256GBSC": { avista: 3949.99 },
+  "IPHONESC_IPHONE14PROMAX512GBSC": { avista: 4199.99 },
+  "IPHONESC_IPHONE15128GBSC": { avista: 3049.99 },
+  "IPHONESC_IPHONE15256GBSC": { avista: 3449.99 },
+  "IPHONESC_IPHONE15PLUS128GBSC": { avista: 3349.99 },
+  "IPHONESC_IPHONE15PLUS256GBSC": { avista: 3749.99 },
+  "IPHONESC_IPHONE15PRO128GBSC": { avista: 3699.99 },
+  "IPHONESC_IPHONE15PRO256GBSC": { avista: 3949.99 },
+  "IPHONESC_IPHONE15PROMAX256GBSC": { avista: 4499.99 },
+  "IPHONESC_IPHONE15PROMAX512GBSC": { avista: 4749.99 },
+  "IPHONESC_IPHONE16128GBSC": { avista: 3999.99 },
+  "IPHONESC_IPHONE16256GBSC": { avista: 4349.99 },
+  "IPHONESC_IPHONE16PLUS128GBSC": { avista: 4449.99 },
+  "IPHONESC_IPHONE16PLUS512GBSC": { avista: 4949.99 },
+  "IPHONESC_IPHONE16PRO128GBSC": { avista: 4699.99 },
+  "IPHONESC_IPHONE16PRO256GBSC": { avista: 4899.99 },
+  "IPHONESC_IPHONE16PRO1TBSC": { avista: 5699.99 },
+  "IPHONESC_IPHONE16PROMAX256GBSC": { avista: 5699.99 },
+  "IPHONESC_IPHONE16PROMAX512GBSC": { avista: 6949.99 },
+  "IPHONESC_IPHONE16PROMAX1TBSC": { avista: 6299.99 },
+  // ── Apple Watch ──
+  "WATCH_APPLEWATCHSE240MMGPS": { avista: 1749.99 },
+  "WATCH_APPLEWATCHSE240MMGPSCEL": { avista: 2149.99 },
+  "WATCH_APPLEWATCHSE244MMGPS": { avista: 1799.99 },
+  "WATCH_APPLEWATCHSE244MMGPSCEL": { avista: 1949.99 },
+  "WATCH_APPLEWATCHSE340MMGPS": { avista: 2199.99 },
+  "WATCH_APPLEWATCHSE344MMGPS": { avista: 2249.99 },
+  "WATCH_APPLEWATCHS941MMGPS": { avista: 1799.99 },
+  "WATCH_APPLEWATCHS945MMGPS": { avista: 2099.99 },
+  "WATCH_APPLEWATCHS1046MMGPS": { avista: 2549.99 },
+  "WATCH_APPLEWATCHS1142MMGPS": { avista: 2679.99 },
+  "WATCH_APPLEWATCHS1146MMGPS": { avista: 2799.99 },
+  "WATCH_APPLEWATCHULTRA249MM": { avista: 4599.99 },
+  "WATCH_APPLEWATCHULTRA349MM": { avista: 5399.99 },
+  // ── iPad ──
+  "IPAD_IPAD9256GB": { avista: 2849.99 },
+  "IPAD_IPAD1064GB": { avista: 2699.99 },
+  "IPAD_IPAD10256GB": { avista: 2999.99 },
+  "IPAD_IPAD11A16128GB": { avista: 2849.99 },
+  "IPAD_IPAD11A16256GB": { avista: 3349.99 },
+  "IPAD_IPAD11A16512GB": { avista: 4749.99 },
+  "IPAD_IPADMINI664GB": { avista: 2549.99 },
+  "IPAD_IPADMINI6256GB": { avista: 3999.99 },
+  "IPAD_IPADMINI7A17PRO128GB": { avista: 3549.99 },
+  "IPAD_IPADMINI7A17PRO256GB": { avista: 4099.99 },
+  "IPAD_IPADAIRM311128GBWIFI": { avista: 4799.99 },
+  "IPAD_IPADAIRM311128GBWIFICEL": { avista: 5999.99 },
+  "IPAD_IPADAIRM311256GBWIFI": { avista: 4749.99 },
+  "IPAD_IPADAIRM313128GBWIFI": { avista: 5699.99 },
+  "IPAD_IPADAIRM313256GBWIFI": { avista: 6199.99 },
+  "IPAD_IPADPROM411256GBWIFI": { avista: 6599.99 },
+  "IPAD_IPADPROM411256GBWIFICEL": { avista: 7199.99 },
+  "IPAD_IPADPROM411512GBWIFI": { avista: 8699.99 },
+  "IPAD_IPADPROM413256GBWIFI": { avista: 8599.99 },
+  "IPAD_IPADPROM413512GBWIFI": { avista: 9899.99 },
+  "IPAD_IPADPROM511256GBWIFI": { avista: 6999.99 },
+  "IPAD_IPADPROM513256GBWIFI": { avista: 8799.99 },
+  "IPAD_IPADPROM513512GBWIFI": { avista: 11349.99 },
+  "IPAD_IPADPROM513512GBWIFICEL": { avista: 12749.99 },
+  // ── AirPods ──
+  "AIRPODS_AIRPODS4": { avista: 1149.99 },
+  "AIRPODS_AIRPODS4ANC": { avista: 1399.99 },
+  "AIRPODS_AIRPODSPRO2": { avista: 1599.99 },
+  "AIRPODS_AIRPODSPRO3": { avista: 2099.99 },
+  "AIRPODS_AIRPODSMAX": { avista: 3449.99 },
+  "AIRPODS_AIRTAG": { avista: 349.99 },
+  "AIRPODS_AIRTAGPACK4UN": { avista: 849.99 },
+  // ── Mac ──
+  "MAC_MACMINIM28GB256GB": { avista: 3749.99 },
+  "MAC_MACMINIM416GB256GB": { avista: 4349.99 },
+  "MAC_MACBOOKAIRM1138GB256GB": { avista: 4599.99 },
+  "MAC_MACBOOKAIRM21316GB256GB": { avista: 5599.99 },
+  "MAC_MACBOOKAIRM31324GB512GB": { avista: 7499.99 },
+  "MAC_MACBOOKAIRM3158GB512GB": { avista: 7299.99 },
+  "MAC_MACBOOKAIRM41316GB256GB": { avista: 6299.99 },
+  "MAC_MACBOOKAIRM41316GB512GB": { avista: 8349.99 },
+  "MAC_MACBOOKAIRM41324GB512GB": { avista: 9999.99 },
+  "MAC_MACBOOKAIRM41516GB256GB": { avista: 7499.99 },
+  "MAC_MACBOOKAIRM41516GB512GB": { avista: 9399.99 },
+  "MAC_MACBOOKPROM41416GB512GB": { avista: 10499.99 },
+  "MAC_MACBOOKPROM41416GB1TB": { avista: 12999.99 },
+  "MAC_MACBOOKPROM4PRO1424GB512GB": { avista: 14299.99 },
+  "MAC_MACBOOKPROM4MAX1436GB1TB": { avista: 21999.99 },
+  "MAC_MACBOOKPROM4PRO1624GB512GB": { avista: 16399.99 },
+  "MAC_MACBOOKPROM4PRO1648GB512GB": { avista: 20349.99 },
+  "MAC_MACBOOKPROM4MAX1664GB2TB": { avista: 36499.99 },
+  "MAC_MACBOOKPROM4MAX16128GB1TB": { avista: 39499.99 },
+  "MAC_MACBOOKPROM51416GB512GB": { avista: 11249.99 },
+  "MAC_MACBOOKPROM51416GB1TB": { avista: 12349.99 },
+  "MAC_MACBOOKPROM51424GB1TB": { avista: 14799.99 },
+  "MAC_IMACM42416GB256GB": { avista: 10199.99 },
+  "MAC_IMACM42416GB512GB": { avista: 14299.99 },
+  "MAC_IMACM42424GB512GB": { avista: 15299.99 },
+};
+
+// ════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════
+let _precos = { ...DEFAULT_PRECOS };   // { "KEY": { avista, credito, obs, updAt } }
+let activeTab    = catalog[0].id;
+let currentFilter = 'all';
+let gestorMode   = false;
+
+function itemKey(tabId, itemName) {
+    const t = tabId.replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
+    const i = itemName.replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
+    return t + "_" + i;
+}
+
+// ════════════════════════════════════════════
+// BANNER
+// ════════════════════════════════════════════
+function showBanner(msg, type='loading') {
+    const b = document.getElementById('syncBanner');
+    b.className = 'show ' + type;
+    document.getElementById('syncSpinner').style.display = type==='loading' ? 'block' : 'none';
+    document.getElementById('syncMsg').textContent = msg;
+    if (type !== 'loading') setTimeout(() => b.className='', 2500);
+}
+
+// ════════════════════════════════════════════
+// FORMAT BRL
+// ════════════════════════════════════════════
+function parseBRL(s) {
+    if (s === null || s === undefined || s === '') return null;
+    if (typeof s === 'number') return isNaN(s) ? null : s;
+    let clean = String(s).replace(/R\$\s*/g,'').trim();
+    // Format pt-BR: dot = thousands sep, comma = decimal
+    if (clean.includes(',')) {
+        clean = clean.replace(/\./g,'').replace(',','.');
+    }
+    // No comma: dot is decimal (e.g. "8349.99") - leave as is
+    const n = parseFloat(clean);
+    return isNaN(n) ? null : n;
+}
+
+function fmtBRL(v) {
+    if (v === null || v === undefined || v === '') return '';
+    const n = typeof v === 'number' ? v : parseBRL(v);
+    if (n === null || isNaN(n)) return '';
+    return n.toLocaleString('pt-BR', { style:'currency', currency:'BRL' });
+}
+
+// ════════════════════════════════════════════
+// CORES — definições por categoria de produto
+// ════════════════════════════════════════════
+const CORES_PADRAO = {
+    // iPhone básico (XR, 11, 12, 13, 14, 15, 16, 16e, 17)
+    iphone_basico: [
+        { nome: 'Preto',    hex: '#1c1c1e' },
+        { nome: 'Branco',   hex: '#f5f5f0' },
+        { nome: 'Rosa',     hex: '#f4a7b9' },
+        { nome: 'Verde',    hex: '#4caf82' },
+        { nome: 'Amarelo',  hex: '#f5e642' },
+        { nome: 'Azul',     hex: '#4a90d9' },
+        { nome: 'Roxo',     hex: '#9b59b6' },
+        { nome: 'Laranja',  hex: '#e8750a' },
+        { nome: 'Vermelho', hex: '#c8102e' },
+    ],
+    // iPhone Pro / Pro Max (17)
+    iphone_pro: [
+        { nome: 'Laranja', hex: '#e8750a' },
+        { nome: 'Azul',    hex: '#4a90d9' },
+        { nome: 'Prata',   hex: '#c8c8c8' },
+    ],
+    // Apple Watch
+    watch: [
+        { nome: 'Meia-noite',  hex: '#1c1c2e' },
+        { nome: 'Estelar',     hex: '#f0ece4' },
+        { nome: 'Rosa',        hex: '#f4a7b9' },
+        { nome: 'Verde',       hex: '#4caf82' },
+        { nome: 'Azul',        hex: '#4a90d9' },
+        { nome: 'Prata',       hex: '#c0c0c0' },
+        { nome: 'Preto',       hex: '#1c1c1e' },
+        { nome: 'Titânio',     hex: '#c4b49a' },
+    ],
+    // iPad
+    ipad: [
+        { nome: 'Azul',        hex: '#4a90d9' },
+        { nome: 'Rosa',        hex: '#f4a7b9' },
+        { nome: 'Amarelo',     hex: '#f5e642' },
+        { nome: 'Verde',       hex: '#4caf82' },
+        { nome: 'Prata',       hex: '#c8c8c8' },
+        { nome: 'Cinza-espacial', hex: '#3a3a3c' },
+        { nome: 'Preto',       hex: '#1c1c1e' },
+    ],
+    // Mac
+    mac: [
+        { nome: 'Prata',       hex: '#c8c8c8' },
+        { nome: 'Cinza-espacial', hex: '#3a3a3c' },
+        { nome: 'Meia-noite',  hex: '#1c1c2e' },
+        { nome: 'Estelar',     hex: '#f0ece4' },
+        { nome: 'Azul',        hex: '#4a90d9' },
+        { nome: 'Verde',       hex: '#4caf82' },
+        { nome: 'Rosa',        hex: '#f4a7b9' },
+        { nome: 'Roxo',        hex: '#9b59b6' },
+        { nome: 'Laranja',     hex: '#e8750a' },
+        { nome: 'Amarelo',     hex: '#f5e642' },
+    ],
+};
+
+// Determina qual paleta usar para um produto
+function paleta(tabId, itemName) {
+    const n = itemName.toUpperCase();
+    if (tabId === 'watch') return 'watch';
+    if (tabId === 'ipad')  return 'ipad';
+    if (tabId === 'mac')   return 'mac';
+    // iPhones
+    if (/PRO/.test(n)) return 'iphone_pro';
+    if (/IPHONE/.test(n) || /IPHONE/i.test(itemName)) return 'iphone_basico';
+    return null; // sem cores (AirPods, acessórios)
+}
+
+// Estado: { "KEY_CORNAME": { hex, ativo, avista } }
+// Carregado/salvo no Firebase em 'cores/KEY'
+let _cores = {}; // { "KEY": { "Preto": { hex, ativo, avista }, ... } }
+
+function coresDoItem(key) {
+    return _cores[key] || {};
+}
+
+function coresAtivas(key) {
+    const c = coresDoItem(key);
+    return Object.entries(c).filter(([,v]) => v.ativo).map(([nome, v]) => ({ nome, ...v }));
+}
+
+// Texto de cor para exibição na tabela (modo vendedor)
+function renderCoresDisplay(key, avistaPadrao) {
+    const ativas = coresAtivas(key);
+    if (!ativas.length) return '';
+    // Ordena pela menor preço primeiro (cores sem preço específico usam avistaPadrao)
+    const ordenadas = [...ativas].sort((a, b) => {
+        const pa = a.avista || avistaPadrao || Infinity;
+        const pb = b.avista || avistaPadrao || Infinity;
+        return pa - pb;
+    });
+    return `<div class="cores-row">${ordenadas.map(c => {
+        const preco = c.avista ? ` · ${fmtBRL(c.avista)}` : '';
+        return `<span class="cor-chip ativa" style="background:${hexContrast(c.hex)};color:${hexFg(c.hex)}">
+            <span class="cor-dot" style="background:${c.hex}"></span>${c.nome}${preco}
+        </span>`;
+    }).join('')}</div>`;
+}
+
+// Chip bg é sempre neutro claro; fg é sempre escuro para contraste legível
+function hexContrast(hex) {
+    return '#f0f0f0'; // fundo sempre claro — o ponto colorido já representa a cor
+}
+function hexFg(hex) {
+    return '#1a1a1a'; // texto sempre escuro sobre fundo claro
+}
+
+// Retorna preço de exibição para a célula "À Vista":
+// se houver cores ativas com preços distintos do padrão, mostra "a partir de" em cima do valor
+function precoExibirAvista(key, avistaPadrao) {
+    const ativas = coresAtivas(key);
+    const precosCores = ativas.map(c => c.avista || avistaPadrao).filter(Boolean);
+    if (precosCores.length > 1) {
+        const min = Math.min(...precosCores);
+        const max = Math.max(...precosCores);
+        if (min !== max) {
+            return { valor: fmtBRL(min), prefixo: 'a partir de ', diferente: true };
+        }
+    }
+    return { valor: fmtBRL(avistaPadrao), prefixo: '', diferente: false };
+}
+
+function renderPrecoAvista(key, avistaPadrao) {
+    const ep = precoExibirAvista(key, avistaPadrao);
+    if (ep.diferente) {
+        return `<span class="price-apartir-wrap"><span class="price-apartir-label">a partir de</span><span class="price-avista">${ep.valor}</span></span>`;
+    }
+    return `<span class="price-avista">${ep.valor}</span>`;
+}
+
+// Render do painel de cores no modo gestor
+function renderCoresGestor(key, tabId, itemName) {
+    const pal = paleta(tabId, itemName);
+    if (!pal) return '';
+
+    const coresSalvas = coresDoItem(key);
+    // Mescla paleta padrão + cores customizadas salvas
+    const todasCores = {};
+    // Primeiro padrão
+    CORES_PADRAO[pal].forEach(c => {
+        todasCores[c.nome] = { hex: c.hex, ativo: false, avista: '', ...coresSalvas[c.nome] };
+    });
+    // Depois customizadas (não estão na paleta padrão)
+    Object.entries(coresSalvas).forEach(([nome, v]) => {
+        if (!todasCores[nome]) todasCores[nome] = { hex: v.hex || '#888888', ativo: v.ativo || false, avista: v.avista || '' };
+    });
+
+    const itens = Object.entries(todasCores).map(([nome, v]) => {
+        const esc = nome.replace(/'/g,"\\'");
+        return `
+        <div class="cor-gestor-item" id="cgi_${key}_${btoa(encodeURIComponent(nome)).replace(/=/g,'')}" data-cor="${nome.replace(/"/g,'&quot;')}">
+            <span class="cor-gestor-dot" style="background:${v.hex}"></span>
+            <span class="cor-gestor-nome">${nome}</span>
+            <input type="checkbox" class="cor-gestor-toggle" id="cgt_${key}_${esc}"
+                ${v.ativo ? 'checked' : ''}
+                onchange="toggleCor('${key}','${esc}',this.checked)">
+            <input class="cor-gestor-price" id="cgp_${key}_${esc}" type="text"
+                value="${v.avista || ''}" placeholder="Preço"
+                title="Preço específico desta cor (deixe vazio = preço padrão)"
+                onfocus="this.select()" onblur="formatInput(this);salvarCores('${key}')"
+                oninput="markCorDirty('${key}','${esc}')">
+            <button class="cor-rm-btn" onclick="removerCor('${key}','${esc}')" title="Remover cor">✕</button>
+        </div>`;
+    }).join('');
+
+    return `
+    <div class="cores-gestor" id="cg_${key}">
+        <div style="font-size:10px;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;">🎨 Cores disponíveis</div>
+        <div class="cores-gestor-grid" id="cgrid_${key}">${itens}</div>
+        <div class="cor-add-row">
+            <input class="cor-add-input" id="caname_${key}" placeholder="Nova cor..." maxlength="24">
+            <input type="color" class="cor-add-color" id="cahex_${key}" value="#888888">
+            <button class="cor-add-btn" onclick="adicionarCor('${key}')">+ Adicionar</button>
+        </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════
+// RENDER TABS
+// ════════════════════════════════════════════
+function renderTabs() {
+    const row = document.getElementById('tabsRow');
+    row.innerHTML = catalog.map(c =>
+        `<button class="tab-btn ${c.id===activeTab?'active':''}" onclick="switchTab('${c.id}',this)">${c.tab}</button>`
+    ).join('');
+}
+
+// ════════════════════════════════════════════
+// RENDER CONTENT
+// ════════════════════════════════════════════
+function renderAll() {
+    const content = document.getElementById('mainContent');
+    let html = '';
+
+    catalog.forEach(section => {
+        const totalItems = section.groups.reduce((s,g)=>s+g.items.length,0);
+        html += `<div class="tab-panel ${section.id===activeTab?'active':''}" id="tab-${section.id}">`;
+
+        section.groups.forEach(group => {
+            html += `
+            <div class="cat-group">
+                <div class="cat-header">
+                    <h2>${group.title}</h2>
+                    <span class="cat-count">${group.items.length} itens</span>
+                </div>
+                <table>
+                    <thead><tr>
+                        <th class="sel-col">✓</th>
+                        <th>Produto</th>
+                        <th>💳 Preço à Vista</th>
+                        <th>💰 Preço no Crédito</th>
+                        <th class="gestor-only">Obs / Notas</th>
+                        <th class="gestor-only">Última Atualização</th>
+                        <th class="gestor-only">Ação</th>
+                    </tr></thead>
+                    <tbody>`;
+
+            group.items.forEach(itemName => {
+                const key = itemKey(section.id, itemName);
+                const p   = _precos[key] || {};
+                const av  = p.avista  ? fmtBRL(p.avista)  : null;
+                const cr  = p.credito ? fmtBRL(p.credito) : null;
+                const ob  = p.obs || '';
+                const dt  = p.updAt || '—';
+                const hasPrice = av || cr;
+                const temCores = !!paleta(section.id, itemName);
+
+                html += `
+                <tr data-key="${key}" data-tab="${section.id}" data-has-price="${hasPrice?'1':'0'}" data-name="${itemName.replace(/"/g,'&quot;')}" data-avista="${p.avista||''}" data-credito="${p.credito||''}">
+                    <td class="sel-col">
+                        ${hasPrice ? `<input type="checkbox" class="sel-check" onchange="toggleSel(this)" title="Adicionar à proposta">` : ''}
+                    </td>
+                    <td class="item-name">
+                        ${itemName}
+                        ${temCores ? renderCoresDisplay(key, p.avista) : ''}
+                        ${temCores ? renderCoresGestor(key, section.id, itemName) : ''}
+                    </td>
+
+                    <!-- À VISTA -->
+                    <td>
+                        <span class="price-display ${av?'price-avista':'price-empty'}" id="avd_${key}">${av ? renderPrecoAvista(key, p.avista) : 'Não informado'}</span>
+                        <span class="price-edit">
+                            <input class="price-input" id="av_${key}" type="text" value="${p.avista||''}" placeholder="0,00"
+                                onfocus="this.select()" onblur="formatInput(this)" oninput="markDirty('${key}')">
+                        </span>
+                    </td>
+
+                    <!-- CRÉDITO -->
+                    <td>
+                        <span class="price-display">
+                            ${(cr || av)
+                                ? `<button class="price-credito-btn" onclick="abrirParc(this,'${itemName.replace(/'/g,"\\'")}',${p.credito||p.avista||0})" title="Ver parcelamento">${cr ? '💳 ' + cr : '<span style=\'color:#aaa;font-size:12px;font-weight:600;text-decoration:none\'>Ver parcelas</span>'}</button>`
+                                : `<span class="price-empty">Não informado</span>`
+                            }
+                        </span>
+                        <span class="price-edit">
+                            <input class="price-input" id="cr_${key}" type="text" value="${p.credito||''}" placeholder="0,00"
+                                onfocus="this.select()" onblur="formatInput(this)" oninput="markDirty('${key}')">
+                        </span>
+                    </td>
+
+                    <!-- GESTOR ONLY -->
+                    <td class="gestor-only">
+                        <input class="obs-input" id="ob_${key}" type="text" value="${ob}" placeholder="Observação..." oninput="markDirty('${key}')">
+                    </td>
+                    <td class="gestor-only" style="font-size:11px;color:#aaa;white-space:nowrap;">${dt}</td>
+                    <td class="gestor-only">
+                        <button class="save-row-btn" id="sav_${key}" onclick="salvarItem('${key}')">💾 Salvar</button>
+                    </td>
+                </tr>`;
+            });
+
+            html += `</tbody></table></div>`;
+        });
+
+        html += `</div>`;
+    });
+
+    content.innerHTML = html;
+    updateCounts();
+    filterRows();
+}
+
+// ════════════════════════════════════════════
+// MARK DIRTY
+// ════════════════════════════════════════════
+function markDirty(key) {
+    const btn = document.getElementById('sav_' + key);
+    if (btn) { btn.textContent = '💾 Salvar'; btn.classList.remove('saved'); btn.style.background=''; }
+}
+window.markDirty = markDirty;
+
+// ════════════════════════════════════════════
+// FORMAT INPUT (BRL mask)
+// ════════════════════════════════════════════
+function formatInput(el) {
+    const raw = el.value.trim();
+    if (!raw) return;
+    const normalized = raw.startsWith(',') ? '0' + raw : raw;
+    const n = parseBRL(normalized);
+    if (n !== null) {
+        // Formata com separador de milhar pt-BR sem o símbolo R$
+        el.value = n.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+}
+window.formatInput = formatInput;
+
+// ════════════════════════════════════════════
+// SALVAR ITEM (gestor)
+// ════════════════════════════════════════════
+async function salvarItem(key) {
+    const av = parseBRL(document.getElementById('av_'+key)?.value);
+    const cr = parseBRL(document.getElementById('cr_'+key)?.value);
+    const ob = document.getElementById('ob_'+key)?.value || '';
+    const now = new Date().toLocaleString('pt-BR');
+
+    showBanner('Salvando preço...', 'loading');
+    try {
+        await set(ref(db, 'precos/' + key), {
+            avista:  av  ?? null,
+            credito: cr  ?? null,
+            obs:     ob,
+            updAt:   now
+        });
+        const btn = document.getElementById('sav_'+key);
+        if (btn) { btn.textContent = '✅ Salvo!'; btn.classList.add('saved'); btn.style.background='#059669'; }
+        showBanner('✅ Preço salvo!', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao salvar. Verifique conexão.', 'err');
+    }
+}
+window.salvarItem = salvarItem;
+
+// ════════════════════════════════════════════
+// CORES — gestor functions
+// ════════════════════════════════════════════
+function markCorDirty(key, corNome) {
+    const btn = document.getElementById('sav_' + key);
+    if (btn) { btn.textContent = '💾 Salvar'; btn.classList.remove('saved'); btn.style.background = ''; }
+    const inp = document.getElementById(`cgp_${key}_${corNome}`);
+    if (inp) inp.classList.remove('saved');
+}
+window.markCorDirty = markCorDirty;
+
+function toggleCor(key, corNome, ativo) {
+    if (!_cores[key]) _cores[key] = {};
+    if (!_cores[key][corNome]) _cores[key][corNome] = { hex: '#888888', ativo: false, avista: '' };
+    _cores[key][corNome].ativo = ativo;
+    salvarCores(key);
+}
+window.toggleCor = toggleCor;
+
+function adicionarCor(key) {
+    const nomeEl = document.getElementById('caname_' + key);
+    const hexEl  = document.getElementById('cahex_'  + key);
+    const nome = (nomeEl?.value || '').trim();
+    if (!nome) { nomeEl?.focus(); return; }
+    const hex = hexEl?.value || '#888888';
+
+    if (!_cores[key]) _cores[key] = {};
+    _cores[key][nome] = { hex, ativo: true, avista: '' };
+    nomeEl.value = '';
+    hexEl.value  = '#888888';
+
+    // Re-render color panel FIRST (so DOM is updated before salvarCores reads it)
+    const row = document.querySelector(`tr[data-key="${key}"]`);
+    if (row) {
+        const tab   = row.getAttribute('data-tab');
+        const nome_ = row.getAttribute('data-name');
+        const cgEl  = document.getElementById('cg_' + key);
+        if (cgEl) cgEl.outerHTML = renderCoresGestor(key, tab, nome_);
+        const avista = parseFloat(row.getAttribute('data-avista')) || 0;
+        const newDisplay = renderCoresDisplay(key, avista);
+        const cdEl = row.querySelector('.cores-row');
+        if (cdEl) cdEl.outerHTML = newDisplay || '';
+        else {
+            const nameEl = row.querySelector('.item-name');
+            if (nameEl && newDisplay) {
+                const cg = nameEl.querySelector('.cores-gestor');
+                if (cg) cg.insertAdjacentHTML('beforebegin', newDisplay);
+                else nameEl.insertAdjacentHTML('beforeend', newDisplay);
+            }
+        }
+    }
+
+    // Save AFTER re-render so all inputs exist in DOM
+    salvarCores(key);
+}
+window.adicionarCor = adicionarCor;
+
+function removerCor(key, corNome) {
+    if (!_cores[key]) return;
+    delete _cores[key][corNome];
+    salvarCores(key);
+    // Find by data-cor attribute (safer than ID with special chars)
+    const cgrid = document.getElementById('cgrid_' + key);
+    if (cgrid) {
+        const el = cgrid.querySelector(`[data-cor="${corNome.replace(/"/g,'\\"')}"]`);
+        if (el) el.remove();
+    }
+    // Update display chips
+    const row = document.querySelector(`tr[data-key="${key}"]`);
+    if (row) {
+        const cdEl = row.querySelector('.cores-row');
+        const avista = parseFloat(row.getAttribute('data-avista')) || 0;
+        const newDisplay = renderCoresDisplay(key, avista);
+        if (cdEl) cdEl.outerHTML = newDisplay || '<div class="cores-row"></div>';
+    }
+}
+window.removerCor = removerCor;
+
+async function salvarCores(key) {
+    // Coleta todos os valores atuais dos inputs de preço
+    const snap = {};
+    const cgrid = document.getElementById('cgrid_' + key);
+    if (cgrid) {
+        cgrid.querySelectorAll('.cor-gestor-item').forEach(el => {
+            const nomeEl = el.querySelector('.cor-gestor-nome');
+            const cb     = el.querySelector('.cor-gestor-toggle');
+            const prEl   = el.querySelector('.cor-gestor-price');
+            const dot    = el.querySelector('.cor-gestor-dot');
+            if (!nomeEl) return;
+            const nome = nomeEl.textContent;
+            snap[nome] = {
+                hex:    dot?.style.background || '#888888',
+                ativo:  cb?.checked || false,
+                avista: parseBRL(prEl?.value) || null,
+            };
+        });
+    } else {
+        // Usa o estado em memória
+        Object.assign(snap, _cores[key] || {});
+    }
+    _cores[key] = snap;
+
+    // Atualiza display no modo vendedor
+    const row = document.querySelector(`tr[data-key="${key}"]`);
+    if (row) {
+        const avista = parseFloat(row.getAttribute('data-avista')) || 0;
+        // Atualiza célula de preço base com "a partir de" se necessário
+        const avdEl = document.getElementById('avd_' + key);
+        if (avdEl && avista) {
+            avdEl.innerHTML = renderPrecoAvista(key, avista);
+        }
+        const newDisplay = renderCoresDisplay(key, avista);
+        let cdEl = row.querySelector('.cores-row');
+        const nameCell = row.querySelector('.item-name');
+        if (cdEl) {
+            cdEl.outerHTML = newDisplay || '';
+        } else if (newDisplay && nameCell) {
+            // Insert before .cores-gestor if exists, else just append
+            const cg = nameCell.querySelector('.cores-gestor');
+            if (cg) cg.insertAdjacentHTML('beforebegin', newDisplay);
+            else nameCell.insertAdjacentHTML('beforeend', newDisplay);
+        }
+        // Mark price inputs as saved
+        cgrid?.querySelectorAll('.cor-gestor-price').forEach(i => i.classList.add('saved'));
+    }
+
+    try {
+        await set(ref(db, 'cores/' + key), snap);
+    } catch(e) {
+        showBanner('❌ Erro ao salvar cores.', 'err');
+    }
+}
+window.salvarCores = salvarCores;
+
+// ════════════════════════════════════════════
+// TABS
+// ════════════════════════════════════════════
+function switchTab(id, btn) {
+    activeTab = id;
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    const panel = document.getElementById('tab-' + id);
+    if (panel) panel.classList.add('active');
+    if (btn)   btn.classList.add('active');
+    filterRows();
+}
+window.switchTab = switchTab;
+
+// ════════════════════════════════════════════
+// FILTER
+// ════════════════════════════════════════════
+function filterRows() {
+    const q = (document.getElementById('searchBox').value || '').toLowerCase();
+    document.querySelectorAll('tbody tr').forEach(row => {
+        const name    = row.querySelector('.item-name')?.textContent.toLowerCase() || '';
+        const tab     = row.getAttribute('data-tab') || '';
+        const hasPr   = row.getAttribute('data-has-price') === '1';
+
+        const matchTab = tab === activeTab;
+        if (!matchTab) { row.classList.add('hidden-row'); return; }
+
+        const matchQ = !q || name.includes(q);
+        const matchF =
+            currentFilter === 'all'      ||
+            (currentFilter === 'composto' && hasPr)  ||
+            (currentFilter === 'vazio'    && !hasPr);
+
+        row.classList.toggle('hidden-row', !(matchQ && matchF));
+    });
+    updateCounts();
+}
+window.filterRows = filterRows;
+
+function setFilter(f, btn) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterRows();
+}
+window.setFilter = setFilter;
+
+// ════════════════════════════════════════════
+// COUNTS
+// ════════════════════════════════════════════
+function updateCounts() {
+    const allRows     = [...document.querySelectorAll('tbody tr')];
+    const visibleRows = allRows.filter(r => !r.classList.contains('hidden-row'));
+    const comPreco    = allRows.filter(r => r.getAttribute('data-has-price') === '1').length;
+    const semPreco    = allRows.length - comPreco;
+    document.getElementById('cTotal').textContent    = allRows.length;
+    document.getElementById('cComPreco').textContent = comPreco;
+    document.getElementById('cSemPreco').textContent = semPreco;
+}
+
+// ════════════════════════════════════════════
+// GESTOR MODE
+// ════════════════════════════════════════════
+function abrirModal() {
+    if (gestorMode) {
+        sairGestor(); return;
+    }
+    document.getElementById('inputSenha').value = '';
+    document.getElementById('senhaError').style.display = 'none';
+    document.getElementById('modalSenha').classList.add('open');
+    setTimeout(() => document.getElementById('inputSenha').focus(), 100);
+}
+window.abrirModal = abrirModal;
+
+function fecharModal() {
+    document.getElementById('modalSenha').classList.remove('open');
+}
+window.fecharModal = fecharModal;
+
+function confirmarSenha() {
+    const v = document.getElementById('inputSenha').value;
+    if (v === SENHA_GESTOR) {
+        fecharModal();
+        entrarGestor();
+    } else {
+        document.getElementById('senhaError').style.display = 'block';
+        document.getElementById('inputSenha').value = '';
+        document.getElementById('inputSenha').focus();
+    }
+}
+window.confirmarSenha = confirmarSenha;
+
+function entrarGestor() {
+    gestorMode = true;
+    document.body.classList.add('gestor-mode');
+    document.getElementById('gestorBtn').textContent = '🔓 Sair do Gestor';
+    document.getElementById('modeBar').textContent = '✏️ MODO GESTOR — edição de preços ativada';
+    document.getElementById('cModo').textContent = 'Gestor';
+}
+
+function sairGestor() {
+    if (!confirm('Sair do modo gestor?')) return;
+    gestorMode = false;
+    document.body.classList.remove('gestor-mode');
+    document.getElementById('gestorBtn').textContent = '🔐 Gestor';
+    document.getElementById('modeBar').textContent = '👁️ MODO VENDEDOR — somente visualização';
+    document.getElementById('cModo').textContent = 'Vendedor';
+}
+
+// ════════════════════════════════════════════
+// PARCELAMENTO
+// Taxas: débito 2%, 1x 4%, 2x 5%, 3x 6%...
+// A partir de 9x as taxas sobem de forma não-linear
+// ════════════════════════════════════════════
+const TAXAS = {
+    debito: 0.02,
+    1:  0.04,
+    2:  0.05,
+    3:  0.06,
+    4:  0.07,
+    5:  0.08,
+    6:  0.09,
+    7:  0.10,
+    8:  0.11,
+    9:  0.121,
+    10: 0.134,
+    11: 0.147,
+    12: 0.16,
+    13: 0.173,
+    14: 0.146,
+    15: 0.199,
+    16: 0.202,
+    17: 0.215,
+    18: 0.228,
+};
+
+function abrirParc(btnEl, produto, valorBase) {
+    if (!valorBase) return;
+    _parcAtual = { produto, valorBase };
+    const popup    = document.getElementById('parcPopup');
+    const backdrop = document.getElementById('parcBackdrop');
+
+    document.getElementById('parcProduto').textContent = produto;
+
+    const upgradeVal   = parseBRL(document.getElementById('upgradeValor')?.value) || 0;
+    const upgradeModelo = (document.getElementById('upgradeModelo')?.value || '').trim();
+    let subtitulo;
+    if (upgradeVal && upgradeModelo) {
+        subtitulo = 'Simulação com seu ' + upgradeModelo + ' como parte do pagamento';
+    } else {
+        subtitulo = 'Base: ' + fmtBRL(valorBase);
+    }
+
+    _parcAtual = { produto, valorBase, subtitulo };
+    document.getElementById('parcProduto').textContent = produto;
+    document.getElementById('parcSubtitle').textContent = subtitulo;
+
+    const tbody = document.getElementById('parcTableBody');
+    let rows = '';
+
+    // Débito
+    const totalDeb = valorBase * (1 + TAXAS.debito);
+    rows += `<tr class="parc-debito">
+        <td class="parc-parcela">Débito</td>
+        <td class="parc-valor">${fmtBRL(totalDeb)}</td>
+        <td class="parc-total">—</td>
+    </tr>`;
+
+    // 1x a 18x
+    for (let n = 1; n <= 18; n++) {
+        const taxa  = TAXAS[n];
+        const total = valorBase * (1 + taxa);
+        const parc  = total / n;
+        rows += `<tr>
+            <td class="parc-parcela">${n}x</td>
+            <td class="parc-valor">${fmtBRL(parc)}</td>
+            <td class="parc-total">${fmtBRL(total)}</td>
+        </tr>`;
+    }
+    tbody.innerHTML = rows;
+
+    // Posicionar o popup
+    // O popup usa position:fixed, então coordenadas são relativas ao viewport
+    popup.style.position = 'fixed';
+    const rect = btnEl.getBoundingClientRect();
+    const pw = 340;
+    const ph = 420; // altura estimada do popup
+    let left = rect.left;
+    let top  = rect.top - ph - 8; // abre acima por padrão (melhor para painel fixo no rodapé)
+
+    // Se não cabe acima, abre abaixo
+    if (top < 8) top = rect.bottom + 8;
+    // Ajuste horizontal
+    if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
+    if (left < 8) left = 8;
+    // Garante que não sai do topo
+    if (top < 8) top = 8;
+
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+    popup.classList.add('open');
+    backdrop.classList.add('open');
+}
+window.abrirParc = abrirParc;
+
+function fecharParc() {
+    document.getElementById('parcPopup').classList.remove('open');
+    document.getElementById('parcBackdrop').classList.remove('open');
+}
+window.fecharParc = fecharParc;
+
+// Fecha com ESC
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharParc(); });
+
+// ════════════════════════════════════════════
+// PARCELAMENTO — EXPORTAR IMAGEM / TEXTO
+// ════════════════════════════════════════════
+let _parcAtual = { produto: '', valorBase: 0 };
+
+function gerarLinhasParc() {
+    const { produto, valorBase } = _parcAtual;
+    if (!valorBase) return [];
+    const linhas = [];
+    const totalDeb = valorBase * (1 + TAXAS.debito);
+    linhas.push({ forma: 'Débito', parcela: fmtBRL(totalDeb), total: '—' });
+    for (let n = 1; n <= 18; n++) {
+        const total = valorBase * (1 + TAXAS[n]);
+        linhas.push({ forma: n + 'x', parcela: fmtBRL(total / n), total: fmtBRL(total) });
+    }
+    return linhas;
+}
+
+function copiarParcTexto() {
+    const { produto, valorBase, subtitulo } = _parcAtual;
+    if (!valorBase) return;
+    const linhas = gerarLinhasParc();
+    let txt = `💳 *Simulação de Parcelamento*\n📱 *${produto}*\n${subtitulo || ('💰 Base: ' + fmtBRL(valorBase))}\n\n`;
+    txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+    txt += `Forma     | Parcela      | Total\n`;
+    txt += `━━━━━━━━━━━━━━━━━━━━\n`;
+    linhas.forEach(l => {
+        const forma = l.forma.padEnd(9);
+        const parc  = l.parcela.padEnd(13);
+        txt += `${forma}| ${parc}| ${l.total}\n`;
+    });
+    txt += `\n_Revend Eletro — preços sujeitos a alteração_`;
+    navigator.clipboard.writeText(txt).then(() => {
+        const btn = document.querySelector('.btn-parc-copy');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '✅ Copiado!';
+        setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+}
+window.copiarParcTexto = copiarParcTexto;
+
+function exportarParcImagem() {
+    const { produto, valorBase } = _parcAtual;
+    if (!valorBase) return;
+    const linhas = gerarLinhasParc();
+
+    const W = 480, LINHA_H = 32, PAD = 20;
+    const HEADER_H = 80, FOOT_H = 36;
+    const H = HEADER_H + 34 + linhas.length * LINHA_H + FOOT_H + PAD;
+
+    const canvas = document.getElementById('imgCanvas');
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d');
+
+    // fundo
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, W, H);
+
+    // header vermelho
+    ctx.fillStyle = '#c8102e';
+    ctx.fillRect(0, 0, W, HEADER_H);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 18px system-ui, sans-serif';
+    ctx.fillText('💳 Parcelamento — ' + produto, PAD, 30);
+    ctx.font = '13px system-ui, sans-serif';
+    ctx.globalAlpha = 0.8;
+    ctx.fillText('Base: ' + fmtBRL(valorBase), PAD, 52);
+    ctx.globalAlpha = 1;
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.globalAlpha = 0.6;
+    ctx.fillText('Revend Eletro', PAD, 70);
+    ctx.globalAlpha = 1;
+
+    // col headers
+    let y = HEADER_H + 22;
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(0, HEADER_H, W, 28);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px system-ui, sans-serif';
+    ctx.fillText('FORMA', PAD, y);
+    ctx.fillText('PARCELA', 160, y);
+    ctx.fillText('TOTAL', 340, y);
+
+    // linhas
+    linhas.forEach((l, i) => {
+        y = HEADER_H + 28 + 6 + i * LINHA_H + 20;
+        const bg = i === 0 ? '#f0fdf4' : (i % 2 === 0 ? '#f9f9f9' : '#ffffff');
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, y - 20, W, LINHA_H);
+
+        ctx.fillStyle = i === 0 ? '#065f46' : '#1a1a1a';
+        ctx.font = 'bold 13px system-ui, sans-serif';
+        ctx.fillText(l.forma, PAD, y);
+
+        ctx.fillStyle = '#1d4ed8';
+        ctx.font = 'bold 13px system-ui, sans-serif';
+        ctx.fillText(l.parcela, 160, y);
+
+        ctx.fillStyle = '#555555';
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.fillText(l.total, 340, y);
+
+        // linha divisória
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, y + 12);
+        ctx.lineTo(W, y + 12);
+        ctx.stroke();
+    });
+
+    // footer
+    const footY = H - FOOT_H;
+    ctx.fillStyle = '#f5f5f5';
+    ctx.fillRect(0, footY, W, FOOT_H);
+    ctx.fillStyle = '#999';
+    ctx.font = '10px system-ui, sans-serif';
+    ctx.fillText('Preços sujeitos a alteração · Revend Eletro', PAD, footY + 22);
+
+    // download
+    canvas.toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'parcelamento_' + produto.replace(/\s+/g, '_') + '.png';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+}
+window.exportarParcImagem = exportarParcImagem;
+
+// ════════════════════════════════════════════
+// PROPOSTA — SELEÇÃO DE PRODUTOS
+// ════════════════════════════════════════════
+let proposta = {}; // { key: { nome, avista, credito } }
+
+function toggleSel(checkbox) {
+    const row = checkbox.closest('tr');
+    const key = row.getAttribute('data-key');
+    const nome = row.getAttribute('data-name');
+    const avista = parseFloat(row.getAttribute('data-avista')) || 0;
+    const credito = parseFloat(row.getAttribute('data-credito')) || avista;
+
+    if (checkbox.checked) {
+        proposta[key] = { nome, avista, credito, key };
+        row.classList.add('selecionado');
+    } else {
+        delete proposta[key];
+        row.classList.remove('selecionado');
+    }
+    atualizarProposta();
+}
+window.toggleSel = toggleSel;
+window.atualizarProposta = atualizarProposta;
+
+function atualizarProposta() {
+    const itens = Object.values(proposta);
+    const panel = document.getElementById('propostaPanel');
+    const count = document.getElementById('propostaCount');
+    const nomeCount = document.getElementById('propostaNomeCount');
+
+    if (itens.length === 0) {
+        panel.classList.remove('visible');
+        return;
+    }
+    panel.classList.add('visible');
+    count.textContent = itens.length;
+
+    // Detecta modelo principal para o título
+    function modeloBase(nome) {
+        return nome.replace(/\s+\d+GB.*$/i,'').replace(/\s*SC\s*$/i,'').replace(/\s*CPO\s*$/i,'').trim();
+    }
+    // Se todos são do mesmo modelo base, mostra o modelo; caso contrário "Produtos Apple"
+    const primeiroModelo = modeloBase(itens[0].nome);
+    const mesmosModelos = itens.every(i => modeloBase(i.nome) === primeiroModelo);
+    const tituloContagem = mesmosModelos
+        ? (itens.length === 1 ? primeiroModelo : primeiroModelo + ' · ' + itens.length + ' opções')
+        : 'Produtos Apple · ' + itens.length + ' opções';
+    nomeCount.textContent = tituloContagem;
+
+    const keys = Object.keys(proposta);
+    const itensHtml = itens.map((item, idx) => {
+        const { tipo } = detectarTipoProduto(item.nome);
+        const badge = labelTipo(tipo);
+        const badgeColor = tipo === 'lacrado' ? '#065f46' : '#1d4ed8';
+        const badgeBg   = tipo === 'lacrado' ? '#d1fae5' : '#dbeafe';
+        return `
+        <div class="proposta-item">
+            <div style="flex:1">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+                    <span style="background:${badgeBg};color:${badgeColor};font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px;">${badge}</span>
+                </div>
+                <div class="proposta-item-nome">${item.nome}</div>
+                <div style="font-size:11px;color:#888;margin-top:2px;">
+                    💰 <span class="proposta-item-preco">${fmtBRL(item.avista)}</span>
+                    ${item.credito && item.credito !== item.avista ? `&nbsp;·&nbsp;💳 <span style="color:#1d4ed8;font-weight:700">${fmtBRL(item.credito)}</span>` : ''}
+                </div>
+            </div>
+            <button class="proposta-item-rm" onclick="removerItem('${keys[idx]}')" title="Remover">✕</button>
+        </div>`;
+    }).join('');
+    document.getElementById('propostaItens').innerHTML = itensHtml;
+
+    // Esconde o total (proposta é de opções, não soma)
+    const totalEl = document.getElementById('propostaTotal');
+    if (itens.length === 1) {
+        totalEl.closest('.proposta-total').style.display = 'flex';
+        totalEl.textContent = fmtBRL(itens[0].avista);
+        totalEl.previousElementSibling?.remove?.();
+        totalEl.closest('.proposta-total').querySelector('span').textContent = '💰 Valor à vista:';
+    } else {
+        totalEl.closest('.proposta-total').style.display = 'none';
+    }
+
+    // ── PARCELAMENTO RÁPIDO ──
+    const parcRapido = document.getElementById('parcRapido');
+    const parcChips  = document.getElementById('parcRapidoChips');
+    const upgradeVal = parseBRL(document.getElementById('upgradeValor')?.value) || 0;
+    const temUpgrade = upgradeVal > 0;
+
+    // Gera lista de opções: SC + Open Box calculado + Lacrado
+    const opcoes = [];
+    itens.forEach(item => {
+        const { tipo, geracao } = detectarTipoProduto(item.nome);
+        const nomeExib = item.nome.replace(/\s+SC\s*$/i,'').replace(/\s+CPO\s*$/i,'').trim();
+
+        if (tipo === 'sc') {
+            // Sem Caixa
+            const vlSC = Math.max(0, (item.avista||0) - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Sem Caixa', valor: vlSC, original: item.avista });
+            // Open Box automático
+            const acrescimo = geracao >= 15 ? 300 : 250;
+            const vlOB = Math.max(0, (item.avista||0) + acrescimo - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Open Box', valor: vlOB, original: item.avista + acrescimo });
+        } else {
+            // Lacrado / CPO
+            const vlLac = Math.max(0, (item.avista||0) - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Lacrado', valor: vlLac, original: item.avista });
+        }
+    });
+
+    if (opcoes.length) {
+        parcRapido.style.display = 'block';
+        // Atualiza label da seção conforme upgrade
+        document.querySelector('.parc-rapido-label').textContent =
+            temUpgrade ? '💳 Simular parcelamento · valor de diferença' : '💳 Simular parcelamento';
+        parcChips.innerHTML = opcoes.map(op => {
+            const subLabel = temUpgrade
+                ? `<span class="parc-chip-original">${fmtBRL(op.original)}</span><span class="parc-chip-seta">→</span>`
+                : '';
+            return `
+            <button class="parc-rapido-chip" onclick="abrirParc(this,'${op.label.replace(/'/g,"\\'")}',${op.valor})" title="Simular parcelamento">
+                <span class="parc-chip-icon">💳</span>
+                <span class="parc-chip-nome">${op.label}</span>
+                ${subLabel}
+                <span class="parc-chip-valor">${fmtBRL(op.valor)}</span>
+            </button>`;
+        }).join('');
+    } else {
+        parcRapido.style.display = 'none';
+    }
+}
+
+function removerItem(key) {
+    delete proposta[key];
+    // uncheck the row
+    const row = document.querySelector(`tr[data-key="${key}"]`);
+    if (row) {
+        row.classList.remove('selecionado');
+        const cb = row.querySelector('.sel-check');
+        if (cb) cb.checked = false;
+    }
+    atualizarProposta();
+}
+window.removerItem = removerItem;
+
+function togglePropostaBody() {
+    const body = document.getElementById('propostaBody');
+    const btn = document.getElementById('propostaToggleBtn');
+    body.classList.toggle('open');
+    btn.textContent = body.classList.contains('open') ? '▼ Fechar' : '▲ Ver';
+}
+window.togglePropostaBody = togglePropostaBody;
+
+// ════════════════════════════════════════════
+// TIPOS DE PRODUTO
+// ─────────────────────────────────────────────
+// SC  = Sem Caixa          → sufixo "SC" no nome
+// CPO = Lacrado certificado → sufixo "CPO" no nome (tratado como Lacrado)
+// lacrado = Lacrado novo   → sem sufixo SC/CPO (tab iphone17 / iphonelacrado)
+// openbox = Opção montada pelo vendedor: SC + completo na caixa + garantia +3 meses + Fonte Turbo
+//           NÃO existe como item no catálogo — gerado automaticamente a partir do SC selecionado
+// ════════════════════════════════════════════
+function detectarTipoProduto(nome) {
+    const n = nome.toUpperCase();
+
+    let tipo = 'lacrado'; // padrão: produto sem sufixo = lacrado
+    if (/\bSC\b/.test(n) || n.endsWith(' SC')) tipo = 'sc';
+    else if (/\bCPO\b/.test(n))               tipo = 'lacrado'; // CPO = lacrado certificado
+
+    // Geração do iPhone (ex: "iPhone 15 Pro Max" → 15)
+    let geracao = 0;
+    const m = nome.match(/iPhone\s+(\d+)/i);
+    if (m) geracao = parseInt(m[1]);
+
+    const isIphone = /iphone/i.test(nome);
+
+    return { tipo, geracao, isIphone };
+}
+
+// Garantia base por tipo e geração
+// iPhone 15+ = garantia maior; 14 e inferior = menor
+function garantiaBase(tipo, geracao) {
+    const novo = geracao >= 15;
+    if (tipo === 'sc')      return novo ? 6  : 3;   // meses
+    if (tipo === 'lacrado') return 12;               // sempre 1 ano Apple
+    return 0;
+}
+
+function garantiaStr(meses) {
+    if (meses === 12) return '1 ano';
+    return meses + ' meses';
+}
+
+// Bullets de garantia por tipo
+function bulletsTipo(tipo, geracao) {
+    const meses = garantiaBase(tipo, geracao);
+    if (tipo === 'sc') {
+        return [
+            'Melhor custo-benefício',
+            `Ótimo estado e Garantia ${garantiaStr(meses)} Revend`,
+        ];
+    }
+    if (tipo === 'openbox') {
+        // Open Box = SC + completo na caixa + +3 meses extra + Fonte Turbo
+        // geracao passado aqui já é o do item SC específico
+        const mesesSC = garantiaBase('sc', geracao);
+        const mesesOB = mesesSC + 3;
+        return [
+            'Produto praticamente novo',
+            'Completo na caixa',
+            `*Garantia de ${garantiaStr(mesesOB)} + Fonte Turbo inclusa*`,
+        ];
+    }
+    if (tipo === 'lacrado') {
+        return [
+            'Produto novo e lacrado',
+            '*1 ano de garantia Apple*',
+        ];
+    }
+    return [];
+}
+
+function emojiTipo(tipo) {
+    return tipo === 'lacrado' ? '◽️' : '◼️';
+}
+
+function labelTipo(tipo) {
+    if (tipo === 'sc')      return 'Sem Caixa';
+    if (tipo === 'openbox') return 'Open Box';
+    if (tipo === 'lacrado') return 'Lacrado (Novo)';
+    return 'Disponível';
+}
+
+// Remove sufixos SC / CPO do nome para exibição limpa
+function nomeBase(nome) {
+    return nome.replace(/\s+SC\s*$/i, '').replace(/\s+CPO\s*$/i, '').trim();
+}
+
+// Extrai armazenamento (ex: "256GB", "1TB")
+function extrairStorage(nome) {
+    const m = nome.match(/(\d+\s*(?:GB|TB))/i);
+    return m ? m[1].replace(/\s+/,'').toUpperCase() : '';
+}
+
+// Modelo base sem storage nem sufixo (ex: "iPhone 15 Pro Max")
+function modeloBase(nome) {
+    return nome
+        .replace(/\s+\d+\s*(?:GB|TB).*$/i, '')
+        .replace(/\s+SC\s*$/i, '')
+        .replace(/\s+CPO\s*$/i, '')
+        .trim();
+}
+
+function gerarMensagem() {
+    const itens = Object.values(proposta);
+    if (!itens.length) return '';
+
+    const todosIphone = itens.every(i => /iphone/i.test(i.nome));
+
+    // Verifica se todos são do mesmo modelo base para definir título
+    const primeiroModelo = modeloBase(itens[0].nome);
+    const mesmosModelos  = itens.every(i => modeloBase(i.nome) === primeiroModelo);
+    const modeloPrincipal = mesmosModelos ? primeiroModelo : 'Produtos Apple';
+
+    // Valor de upgrade (aparelho do cliente)
+    const upgradeEl = document.getElementById('upgradeValor');
+    const upgradeModeloEl = document.getElementById('upgradeModelo');
+    const valorUpgrade = upgradeEl ? (parseBRL(upgradeEl.value) || 0) : 0;
+    const modeloUpgrade = upgradeModeloEl ? (upgradeModeloEl.value.trim()) : '';
+
+    // Menor geração presente (para definir garantias conservadoras)
+    const geracoes = itens.map(i => detectarTipoProduto(i.nome).geracao).filter(g => g > 0);
+    const menorGer = geracoes.length ? Math.min(...geracoes) : 0;
+
+    // Agrupa por tipo de condição
+    const porTipo = { sc: [], lacrado: [] };
+    itens.forEach(item => {
+        const { tipo, geracao } = detectarTipoProduto(item.nome);
+        if (!porTipo[tipo]) porTipo[tipo] = [];
+        porTipo[tipo].push({ ...item, tipo, geracao });
+    });
+
+    let msg = '';
+
+    if (todosIphone) {
+        const tituloMsg = mesmosModelos ? modeloPrincipal : 'Produtos Apple';
+        msg += `📱 *Proposta – ${tituloMsg}*\n\n`;
+        msg += mesmosModelos
+            ? `Montei uma proposta especial para você adquirir o *${modeloPrincipal}*, com opções exclusivas para escolher a que mais faz sentido pra você 👇\n\n`
+            : `Montei uma proposta especial com as melhores opções disponíveis para você 👇\n\n`;
+        msg += `🔹 *Opções Disponíveis*\n`;
+
+        // Linha de upgrade logo abaixo do título de opções
+        if (valorUpgrade) {
+            const textoModelo = modeloUpgrade ? `*${modeloUpgrade}*` : `seu aparelho`;
+            msg += `\n♻️ Dando seu ${textoModelo} como parte do pagamento os valores ficariam assim:\n`;
+        }
+
+        // Helper: preço com upgrade subtraído (nunca negativo)
+        function precoFinal(valor) { return Math.max(0, (valor || 0) - valorUpgrade); }
+
+        // Bloco de upgrade — inserido antes dos preços se tiver valor (mantido vazio, já usado acima)
+        function blocoUpgrade() {
+            return '';
+        }
+
+        // Ordem: Sem Caixa → Open Box (gerado a partir do SC) → Lacrado
+        // 1. SEM CAIXA
+        if (porTipo.sc && porTipo.sc.length) {
+            msg += `\n *Sem Caixa*\n`;
+            porTipo.sc.forEach(item => {
+                const storage = extrairStorage(item.nome);
+                msg += `${emojiTipo('sc')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
+                if (valorUpgrade) {
+                    msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(precoFinal(item.avista))}*\n`;
+                } else {
+                    msg += `💰 *${fmtBRL(item.avista)}*\n`;
+                }
+                const cores = coresAtivas(item.key);
+                if (cores.length > 1) {
+                    const coresTxt = cores.map(c => {
+                        const base = c.avista || item.avista;
+                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista)})` : c.nome);
+                    }).join(' · ');
+                    msg += `🎨 Cores: ${coresTxt}\n`;
+                }
+            });
+            bulletsTipo('sc', menorGer).forEach(b => { msg += `✅ ${b}\n`; });
+        }
+
+        // 2. OPEN BOX — gerado automaticamente a partir dos itens SC
+        if (porTipo.sc && porTipo.sc.length) {
+            msg += `\n\n *Open Box*\n`;
+            porTipo.sc.forEach(item => {
+                const storage = extrairStorage(item.nome);
+                msg += `${emojiTipo('openbox')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
+                const acrescimo = item.geracao >= 15 ? 300 : 250;
+                const precoOB = (item.avista || 0) + acrescimo;
+                if (valorUpgrade) {
+                    msg += `💰 ~~${fmtBRL(precoOB)}~~ → *${fmtBRL(precoFinal(precoOB))}*\n`;
+                } else {
+                    msg += `💰 ${fmtBRL(precoOB)}\n`;
+                }
+                const cores = coresAtivas(item.key);
+                if (cores.length > 1) {
+                    const coresTxt = cores.map(c => {
+                        const base = (c.avista || item.avista) + acrescimo;
+                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista + acrescimo)})` : c.nome);
+                    }).join(' · ');
+                    msg += `🎨 Cores: ${coresTxt}\n`;
+                }
+            });
+            const gerOB = porTipo.sc[0].geracao || menorGer;
+            bulletsTipo('openbox', gerOB).forEach(b => { msg += `✅ ${b}\n`; });
+        }
+
+        // 3. LACRADO
+        if (porTipo.lacrado && porTipo.lacrado.length) {
+            msg += `\n\n *Lacrado (Novo)*\n`;
+            porTipo.lacrado.forEach(item => {
+                const storage = extrairStorage(item.nome);
+                msg += `${emojiTipo('lacrado')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
+                if (valorUpgrade) {
+                    msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(precoFinal(item.avista))}*\n`;
+                } else {
+                    msg += `💰 ${fmtBRL(item.avista)}\n`;
+                }
+                const cores = coresAtivas(item.key);
+                if (cores.length > 1) {
+                    const coresTxt = cores.map(c => {
+                        const base = c.avista || item.avista;
+                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista)})` : c.nome);
+                    }).join(' · ');
+                    msg += `🎨 Cores: ${coresTxt}\n`;
+                }
+            });
+            bulletsTipo('lacrado', menorGer).forEach(b => { msg += `✅ ${b}\n`; });
+        }
+
+        if (valorUpgrade) {
+            const textoModeloFinal = modeloUpgrade ? `${modeloUpgrade}` : `seu aparelho`;
+            msg += `\n\n♻️ *Valor estimado do ${textoModeloFinal}:* ${fmtBRL(valorUpgrade)}\n`;
+            msg += `_(valores já com desconto do seu aparelho como entrada)_\n`;
+        }
+
+        msg += `\n\n📌 *Importante*\n\n`;
+        msg += `✔️ Emitimos *Nota Fiscal*\n`;
+        msg += `✔️ Procedência garantida\n`;
+        msg += `✔️ Suporte completo na configuração e transferência de dados\n\n`;
+        if (!valorUpgrade) {
+            msg += `Se quiser, já faço a *simulação de parcelamento* ou avalio seu *iPhone usado como parte do pagamento* 😉\n\n`;
+        }
+        msg += `Qual opção você mais gostou?`;
+
+    } else {
+        // Proposta genérica para não-iPhone ou mix
+        msg += `🛒 *Proposta – Produtos Apple*\n\n`;
+        msg += `Segue a proposta com as opções disponíveis para você 👇\n\n`;
+        msg += `🔹 *Opções Disponíveis*\n\n`;
+        if (valorUpgrade) {
+            const textoModeloGen2 = modeloUpgrade ? `*${modeloUpgrade}*` : `seu aparelho`;
+            msg += `♻️ Dando seu ${textoModeloGen2} como parte do pagamento os valores ficariam assim:\n\n`;
+        }
+        itens.forEach(item => {
+            msg += `◼️ *${item.nome}*\n`;
+            if (valorUpgrade) {
+                msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(Math.max(0,(item.avista||0)-valorUpgrade))}*\n`;
+            } else {
+                msg += `💰 *${fmtBRL(item.avista)}*\n`;
+            }
+            if (item.credito && item.credito !== item.avista)
+                msg += `💳 Crédito: ${fmtBRL(item.credito)}\n`;
+            msg += `\n`;
+        });
+        if (valorUpgrade) {
+            const textoModeloGen = modeloUpgrade ? `${modeloUpgrade}` : `seu aparelho`;
+            msg += `♻️ *Valor estimado do ${textoModeloGen}:* ${fmtBRL(valorUpgrade)}\n`;
+            msg += `_(valores já com desconto do seu aparelho como entrada)_\n\n`;
+        }
+        msg += `📌 *Importante*\n\n`;
+        msg += `✔️ Emitimos *Nota Fiscal*\n`;
+        msg += `✔️ Procedência garantida\n`;
+        msg += `✔️ Suporte completo após a compra\n\n`;
+        msg += `Qual opção você mais gostou?`;
+    }
+
+    return msg;
+}
+
+function copiarProposta() {
+    const msg = gerarMensagem();
+    if (!msg) return;
+    navigator.clipboard.writeText(msg).then(() => {
+        const el = document.getElementById('msgCopiada');
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2500);
+    });
+}
+window.copiarProposta = copiarProposta;
+
+function enviarWhatsApp() {
+    const msg = gerarMensagem();
+    if (!msg) return;
+    const url = 'https://wa.me/?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+}
+window.enviarWhatsApp = enviarWhatsApp;
+
+function limparSelecao() {
+    proposta = {};
+    document.querySelectorAll('.sel-check').forEach(cb => {
+        cb.checked = false;
+        cb.closest('tr')?.classList.remove('selecionado');
+    });
+    atualizarProposta();
+}
+window.limparSelecao = limparSelecao;
+
+// ════════════════════════════════════════════
+// TIMESTAMP
+// ════════════════════════════════════════════
+function updateTimestamp() {
+    document.getElementById('lastUpd').textContent =
+        '🕐 ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+}
+
+// ════════════════════════════════════════════
+// INIT — Firebase real-time listener
+// ════════════════════════════════════════════
+showBanner('Conectando ao Firebase...', 'loading');
+renderTabs();
+renderAll();
+
+onValue(ref(db, 'precos'), snap => {
+    const firebaseData = snap.val() || {};
+    _precos = { ...DEFAULT_PRECOS, ...firebaseData };
+    renderAll();
+    updateTimestamp();
+    document.getElementById('syncStatus').textContent = '🔥 Firebase · online · atualizado em tempo real';
+    showBanner('✅ Preços carregados!', 'ok');
+});
+
+onValue(ref(db, 'cores'), snap => {
+    _cores = snap.val() || {};
+    // Re-render só os chips de cor (não re-renderiza tudo para não perder checkboxes da proposta)
+    document.querySelectorAll('tbody tr[data-key]').forEach(row => {
+        const key    = row.getAttribute('data-key');
+        const tab    = row.getAttribute('data-tab');
+        const nome   = row.getAttribute('data-name');
+        const avista = parseFloat(row.getAttribute('data-avista')) || 0;
+        if (!paleta(tab, nome)) return;
+        const nameCell = row.querySelector('.item-name');
+        if (!nameCell) return;
+
+        // Update price base cell ("a partir de")
+        const avdEl = document.getElementById('avd_' + key);
+        if (avdEl && avista) {
+            avdEl.innerHTML = renderPrecoAvista(key, avista);
+        }
+        // Update display chips
+        let cdEl = nameCell.querySelector('.cores-row');
+        const newDisplay = renderCoresDisplay(key, avista);
+        if (cdEl) { if (newDisplay) cdEl.outerHTML = newDisplay; else cdEl.remove(); }
+        else if (newDisplay) {
+            const cg = nameCell.querySelector('.cores-gestor');
+            if (cg) cg.insertAdjacentHTML('beforebegin', newDisplay);
+            else nameCell.insertAdjacentHTML('beforeend', newDisplay);
+        }
+
+        // Update gestor panel if visible
+        const cgEl = document.getElementById('cg_' + key);
+        if (cgEl) cgEl.outerHTML = renderCoresGestor(key, tab, nome);
+    });
+});
+
+// Fecha modal clicando fora
+document.getElementById('modalSenha').addEventListener('click', e => {
+    if (e.target === document.getElementById('modalSenha')) fecharModal();
+});
+</script>
+</body>
+</html>
