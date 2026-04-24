@@ -1698,43 +1698,36 @@ const TAXAS = {
 
 function abrirParc(btnEl, produto, valorBase) {
     if (!valorBase) return;
-    _parcAtual = { produto, valorBase };
+
     const popup    = document.getElementById('parcPopup');
     const backdrop = document.getElementById('parcBackdrop');
 
-    document.getElementById('parcProduto').textContent = produto;
+    // Popup normal da tabela: SEMPRE usa valor base puro, sem upgrade
+    _parcAtual = {
+        produto,
+        valorBase,
+        valorLiquido: valorBase,   // sem desconto — upgrade só aparece na proposta
+        upgradeVal: 0,
+        upgradeModelo: '',
+        subtitulo: 'Base: ' + fmtBRL(valorBase),
+    };
 
-    const upgradeVal   = parseBRL(document.getElementById('upgradeValor')?.value) || 0;
-    const upgradeModelo = (document.getElementById('upgradeModelo')?.value || '').trim();
-    const valorLiquido = Math.max(0, valorBase - upgradeVal);
-    let subtitulo;
-    if (upgradeVal && upgradeModelo) {
-        subtitulo = 'Simulação com seu ' + upgradeModelo + ' como parte do pagamento';
-    } else if (upgradeVal) {
-        subtitulo = 'Simulação com aparelho (R$ ' + fmtBRL(upgradeVal) + ') como parte do pagamento';
-    } else {
-        subtitulo = 'Base: ' + fmtBRL(valorBase);
-    }
-
-    _parcAtual = { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo, subtitulo };
-    document.getElementById('parcProduto').textContent = produto;
-    document.getElementById('parcSubtitle').textContent = subtitulo;
+    document.getElementById('parcProduto').textContent  = produto;
+    document.getElementById('parcSubtitle').textContent = 'Base: ' + fmtBRL(valorBase);
 
     const tbody = document.getElementById('parcTableBody');
     let rows = '';
 
     // Débito
-    const totalDeb = valorLiquido * (1 + TAXAS.debito);
+    const totalDeb = valorBase * (1 + TAXAS.debito);
     rows += `<tr class="parc-debito">
         <td class="parc-parcela">Débito</td>
         <td class="parc-valor">${fmtBRL(totalDeb)}</td>
         <td class="parc-total">—</td>
     </tr>`;
 
-    // 1x a 18x
     for (let n = 1; n <= 18; n++) {
-        const taxa  = TAXAS[n];
-        const total = valorLiquido * (1 + taxa);
+        const total = valorBase * (1 + TAXAS[n]);
         const parc  = total / n;
         rows += `<tr>
             <td class="parc-parcela">${n}x</td>
@@ -1744,29 +1737,82 @@ function abrirParc(btnEl, produto, valorBase) {
     }
     tbody.innerHTML = rows;
 
-    // Posicionar o popup
-    // O popup usa position:fixed, então coordenadas são relativas ao viewport
+    // Posicionar
     popup.style.position = 'fixed';
     const rect = btnEl.getBoundingClientRect();
-    const pw = 340;
-    const ph = 420; // altura estimada do popup
+    const pw = 340, ph = 420;
     let left = rect.left;
-    let top  = rect.top - ph - 8; // abre acima por padrão (melhor para painel fixo no rodapé)
-
-    // Se não cabe acima, abre abaixo
+    let top  = rect.top - ph - 8;
     if (top < 8) top = rect.bottom + 8;
-    // Ajuste horizontal
     if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
     if (left < 8) left = 8;
-    // Garante que não sai do topo
     if (top < 8) top = 8;
-
     popup.style.left = left + 'px';
     popup.style.top  = top  + 'px';
     popup.classList.add('open');
     backdrop.classList.add('open');
 }
 window.abrirParc = abrirParc;
+
+// Versão usada pelos chips da proposta — pode receber upgrade
+function abrirParcProposta(btnEl, produto, valorBase, upgradeVal, upgradeModelo) {
+    if (!valorBase) return;
+    upgradeVal   = upgradeVal   || 0;
+    upgradeModelo = upgradeModelo || '';
+    const valorLiquido = Math.max(0, valorBase - upgradeVal);
+
+    let subtitulo;
+    if (upgradeVal && upgradeModelo) {
+        subtitulo = `${fmtBRL(valorBase)} − ${fmtBRL(upgradeVal)} (${upgradeModelo}) = *${fmtBRL(valorLiquido)}*`;
+    } else if (upgradeVal) {
+        subtitulo = `${fmtBRL(valorBase)} − ${fmtBRL(upgradeVal)} (aparelho) = ${fmtBRL(valorLiquido)}`;
+    } else {
+        subtitulo = 'Base: ' + fmtBRL(valorBase);
+    }
+
+    _parcAtual = { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo, subtitulo };
+
+    const popup    = document.getElementById('parcPopup');
+    const backdrop = document.getElementById('parcBackdrop');
+
+    document.getElementById('parcProduto').textContent  = produto;
+    document.getElementById('parcSubtitle').textContent = upgradeVal
+        ? `${fmtBRL(valorBase)} − ${fmtBRL(upgradeVal)}${upgradeModelo ? ' (' + upgradeModelo + ')' : ''} = ${fmtBRL(valorLiquido)}`
+        : 'Base: ' + fmtBRL(valorBase);
+
+    const tbody = document.getElementById('parcTableBody');
+    let rows = '';
+    const totalDeb = valorLiquido * (1 + TAXAS.debito);
+    rows += `<tr class="parc-debito">
+        <td class="parc-parcela">Débito</td>
+        <td class="parc-valor">${fmtBRL(totalDeb)}</td>
+        <td class="parc-total">—</td>
+    </tr>`;
+    for (let n = 1; n <= 18; n++) {
+        const total = valorLiquido * (1 + TAXAS[n]);
+        rows += `<tr>
+            <td class="parc-parcela">${n}x</td>
+            <td class="parc-valor">${fmtBRL(total / n)}</td>
+            <td class="parc-total">${fmtBRL(total)}</td>
+        </tr>`;
+    }
+    tbody.innerHTML = rows;
+
+    popup.style.position = 'fixed';
+    const rect = btnEl.getBoundingClientRect();
+    const pw = 340, ph = 420;
+    let left = rect.left;
+    let top  = rect.top - ph - 8;
+    if (top < 8) top = rect.bottom + 8;
+    if (left + pw > window.innerWidth - 10) left = window.innerWidth - pw - 10;
+    if (left < 8) left = 8;
+    if (top < 8) top = 8;
+    popup.style.left = left + 'px';
+    popup.style.top  = top  + 'px';
+    popup.classList.add('open');
+    backdrop.classList.add('open');
+}
+window.abrirParcProposta = abrirParcProposta;
 
 function fecharParc() {
     document.getElementById('parcPopup').classList.remove('open');
@@ -1797,19 +1843,27 @@ function gerarLinhasParc() {
 }
 
 function copiarParcTexto() {
-    const { produto, valorBase, subtitulo } = _parcAtual;
+    const { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo } = _parcAtual;
     if (!valorBase) return;
     const linhas = gerarLinhasParc();
-    let txt = `💳 *Simulação de Parcelamento*\n📱 *${produto}*\n${subtitulo || ('💰 Base: ' + fmtBRL(valorBase))}\n\n`;
+
+    let cabecalho = '';
+    if (upgradeVal) {
+        const nomeAp = upgradeModelo || 'aparelho';
+        cabecalho = `♻️ ${fmtBRL(valorBase)} − ${fmtBRL(upgradeVal)} (${nomeAp}) = ${fmtBRL(valorLiquido)}`;
+    } else {
+        cabecalho = `💰 Base: ${fmtBRL(valorBase)}`;
+    }
+
+    let txt = `💳 *Simulação de Parcelamento*\n📱 *${produto}*\n${cabecalho}\n\n`;
     txt += `━━━━━━━━━━━━━━━━━━━━\n`;
     txt += `Forma     | Parcela      | Total\n`;
     txt += `━━━━━━━━━━━━━━━━━━━━\n`;
     linhas.forEach(l => {
-        const forma = l.forma.padEnd(9);
-        const parc  = l.parcela.padEnd(13);
-        txt += `${forma}| ${parc}| ${l.total}\n`;
+        txt += `${l.forma.padEnd(9)}| ${l.parcela.padEnd(13)}| ${l.total}\n`;
     });
     txt += `\n_Revend Eletro — preços sujeitos a alteração_`;
+
     navigator.clipboard.writeText(txt).then(() => {
         const btn = document.querySelector('.btn-parc-copy');
         const orig = btn.innerHTML;
@@ -1820,20 +1874,21 @@ function copiarParcTexto() {
 window.copiarParcTexto = copiarParcTexto;
 
 function exportarParcImagem() {
-    const { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo, subtitulo } = _parcAtual;
+    const { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo } = _parcAtual;
     if (!valorBase) return;
-    const base = (valorLiquido != null && valorLiquido >= 0) ? valorLiquido : valorBase;
     const linhas = gerarLinhasParc();
+    const temUpgrade = upgradeVal > 0;
 
     const W = 480, LINHA_H = 32, PAD = 20;
-    const HEADER_H = 80, FOOT_H = 36;
+    const HEADER_H = temUpgrade ? 96 : 76;
+    const FOOT_H = 36;
     const H = HEADER_H + 34 + linhas.length * LINHA_H + FOOT_H + PAD;
 
     const canvas = document.getElementById('imgCanvas');
     canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d');
 
-    // fundo
+    // fundo branco
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, W, H);
 
@@ -1841,22 +1896,31 @@ function exportarParcImagem() {
     ctx.fillStyle = '#c8102e';
     ctx.fillRect(0, 0, W, HEADER_H);
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px system-ui, sans-serif';
+
+    // título
+    ctx.font = 'bold 17px system-ui, sans-serif';
     ctx.fillText('💳 Parcelamento — ' + produto, PAD, 30);
-    ctx.font = '13px system-ui, sans-serif';
-    ctx.globalAlpha = 0.8;
-    if (upgradeVal && upgradeModelo) {
-        ctx.fillText('Simulação com seu ' + upgradeModelo + ' como entrada', PAD, 52);
+
+    if (temUpgrade) {
+        const nomeAp = upgradeModelo || 'aparelho';
+        // linha 1: valor base
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.globalAlpha = 0.75;
+        ctx.fillText('Valor base: ' + fmtBRL(valorBase), PAD, 52);
+        // linha 2: desconto aparelho
+        ctx.fillText('Desconto (' + nomeAp + '): − ' + fmtBRL(upgradeVal), PAD, 68);
         ctx.globalAlpha = 1;
-        ctx.font = '11px system-ui, sans-serif';
-        ctx.globalAlpha = 0.6;
-        ctx.fillText('Valor a pagar: ' + fmtBRL(base) + '  (Base: ' + fmtBRL(valorBase) + ' - R$ ' + fmtBRL(upgradeVal) + ')', PAD, 70);
+        // linha 3: valor final em destaque
+        ctx.font = 'bold 14px system-ui, sans-serif';
+        ctx.fillText('💰 Valor a pagar: ' + fmtBRL(valorLiquido), PAD, 86);
     } else {
-        ctx.fillText('Base: ' + fmtBRL(valorBase), PAD, 52);
+        ctx.font = '12px system-ui, sans-serif';
+        ctx.globalAlpha = 0.75;
+        ctx.fillText('💰 Base: ' + fmtBRL(valorBase), PAD, 52);
+        ctx.globalAlpha = 0.5;
+        ctx.font = '10px system-ui, sans-serif';
+        ctx.fillText('Revend Eletro', PAD, 66);
         ctx.globalAlpha = 1;
-        ctx.font = '11px system-ui, sans-serif';
-        ctx.globalAlpha = 0.6;
-        ctx.fillText('Revend Eletro', PAD, 70);
     }
     ctx.globalAlpha = 1;
 
@@ -1889,7 +1953,6 @@ function exportarParcImagem() {
         ctx.font = '12px system-ui, sans-serif';
         ctx.fillText(l.total, 340, y);
 
-        // linha divisória
         ctx.strokeStyle = '#f0f0f0';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -1906,7 +1969,6 @@ function exportarParcImagem() {
     ctx.font = '10px system-ui, sans-serif';
     ctx.fillText('Preços sujeitos a alteração · Revend Eletro', PAD, footY + 22);
 
-    // download
     canvas.toBlob(blob => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -2030,15 +2092,21 @@ function atualizarProposta() {
 
     if (opcoes.length) {
         parcRapido.style.display = 'block';
-        // Atualiza label da seção conforme upgrade
         document.querySelector('.parc-rapido-label').textContent =
             temUpgrade ? '💳 Simular parcelamento · valor de diferença' : '💳 Simular parcelamento';
+
+        const upgradeModeloVal = (document.getElementById('upgradeModelo')?.value || '').trim();
+
         parcChips.innerHTML = opcoes.map(op => {
             const subLabel = temUpgrade
                 ? `<span class="parc-chip-original">${fmtBRL(op.original)}</span><span class="parc-chip-seta">→</span>`
                 : '';
+            // Passa upgrade para abrirParcProposta para que a imagem/texto mostre o desconto
+            const upgradeJS = temUpgrade
+                ? `,${upgradeVal},'${upgradeModeloVal.replace(/'/g,"\\'")}'`
+                : '';
             return `
-            <button class="parc-rapido-chip" onclick="abrirParc(this,'${op.label.replace(/'/g,"\\'")}',${op.valor})" title="Simular parcelamento">
+            <button class="parc-rapido-chip" onclick="abrirParcProposta(this,'${op.label.replace(/'/g,"\\'")}',${op.original}${upgradeJS})" title="Simular parcelamento">
                 <span class="parc-chip-icon">💳</span>
                 <span class="parc-chip-nome">${op.label}</span>
                 ${subLabel}
@@ -2301,6 +2369,27 @@ function gerarMensagem() {
             const textoModeloFinal = modeloUpgrade ? `${modeloUpgrade}` : `seu aparelho`;
             msg += `\n\n♻️ *Valor estimado do ${textoModeloFinal}:* ${fmtBRL(valorUpgrade)}\n`;
             msg += `_(valores já com desconto do seu aparelho como entrada)_\n`;
+        }
+
+        // ── PARCELAMENTO NA PROPOSTA ──
+        // Mostra as principais opções de parcelamento do primeiro item com preço
+        const itenComPreco = itens.find(i => i.avista > 0);
+        if (itenComPreco) {
+            const baseParc = Math.max(0, (itenComPreco.avista || 0) - valorUpgrade);
+            const nomeParc = nomeBase(modeloBase(itenComPreco.nome)) + (extrairStorage(itenComPreco.nome) ? ' ' + extrairStorage(itenComPreco.nome) : '');
+            const opcParcDisplay = [1, 3, 6, 9, 12, 18];
+            msg += `\n\n💳 *Simulação de Parcelamento${valorUpgrade ? ' (valor de diferença)' : ''}* — ${nomeParc}\n`;
+            if (valorUpgrade) {
+                const nomeAp = modeloUpgrade || 'aparelho';
+                msg += `_${fmtBRL(itenComPreco.avista)} − ${fmtBRL(valorUpgrade)} (${nomeAp}) = ${fmtBRL(baseParc)}_\n`;
+            }
+            msg += `\`\`\`\n`;
+            msg += `Débito  → ${fmtBRL(baseParc * (1 + TAXAS.debito))}\n`;
+            opcParcDisplay.forEach(n => {
+                const total = baseParc * (1 + TAXAS[n]);
+                msg += `${String(n + 'x').padEnd(7)} → ${fmtBRL(total / n)}/mês  (total ${fmtBRL(total)})\n`;
+            });
+            msg += `\`\`\``;
         }
 
         msg += `\n\n📌 *Importante*\n\n`;
