@@ -1706,14 +1706,17 @@ function abrirParc(btnEl, produto, valorBase) {
 
     const upgradeVal   = parseBRL(document.getElementById('upgradeValor')?.value) || 0;
     const upgradeModelo = (document.getElementById('upgradeModelo')?.value || '').trim();
+    const valorLiquido = Math.max(0, valorBase - upgradeVal);
     let subtitulo;
     if (upgradeVal && upgradeModelo) {
         subtitulo = 'Simulação com seu ' + upgradeModelo + ' como parte do pagamento';
+    } else if (upgradeVal) {
+        subtitulo = 'Simulação com aparelho (R$ ' + fmtBRL(upgradeVal) + ') como parte do pagamento';
     } else {
         subtitulo = 'Base: ' + fmtBRL(valorBase);
     }
 
-    _parcAtual = { produto, valorBase, subtitulo };
+    _parcAtual = { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo, subtitulo };
     document.getElementById('parcProduto').textContent = produto;
     document.getElementById('parcSubtitle').textContent = subtitulo;
 
@@ -1721,7 +1724,7 @@ function abrirParc(btnEl, produto, valorBase) {
     let rows = '';
 
     // Débito
-    const totalDeb = valorBase * (1 + TAXAS.debito);
+    const totalDeb = valorLiquido * (1 + TAXAS.debito);
     rows += `<tr class="parc-debito">
         <td class="parc-parcela">Débito</td>
         <td class="parc-valor">${fmtBRL(totalDeb)}</td>
@@ -1731,7 +1734,7 @@ function abrirParc(btnEl, produto, valorBase) {
     // 1x a 18x
     for (let n = 1; n <= 18; n++) {
         const taxa  = TAXAS[n];
-        const total = valorBase * (1 + taxa);
+        const total = valorLiquido * (1 + taxa);
         const parc  = total / n;
         rows += `<tr>
             <td class="parc-parcela">${n}x</td>
@@ -1780,13 +1783,14 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharParc()
 let _parcAtual = { produto: '', valorBase: 0 };
 
 function gerarLinhasParc() {
-    const { produto, valorBase } = _parcAtual;
+    const { produto, valorBase, valorLiquido } = _parcAtual;
     if (!valorBase) return [];
+    const base = (valorLiquido != null && valorLiquido >= 0) ? valorLiquido : valorBase;
     const linhas = [];
-    const totalDeb = valorBase * (1 + TAXAS.debito);
+    const totalDeb = base * (1 + TAXAS.debito);
     linhas.push({ forma: 'Débito', parcela: fmtBRL(totalDeb), total: '—' });
     for (let n = 1; n <= 18; n++) {
-        const total = valorBase * (1 + TAXAS[n]);
+        const total = base * (1 + TAXAS[n]);
         linhas.push({ forma: n + 'x', parcela: fmtBRL(total / n), total: fmtBRL(total) });
     }
     return linhas;
@@ -1816,8 +1820,9 @@ function copiarParcTexto() {
 window.copiarParcTexto = copiarParcTexto;
 
 function exportarParcImagem() {
-    const { produto, valorBase } = _parcAtual;
+    const { produto, valorBase, valorLiquido, upgradeVal, upgradeModelo, subtitulo } = _parcAtual;
     if (!valorBase) return;
+    const base = (valorLiquido != null && valorLiquido >= 0) ? valorLiquido : valorBase;
     const linhas = gerarLinhasParc();
 
     const W = 480, LINHA_H = 32, PAD = 20;
@@ -1840,11 +1845,19 @@ function exportarParcImagem() {
     ctx.fillText('💳 Parcelamento — ' + produto, PAD, 30);
     ctx.font = '13px system-ui, sans-serif';
     ctx.globalAlpha = 0.8;
-    ctx.fillText('Base: ' + fmtBRL(valorBase), PAD, 52);
-    ctx.globalAlpha = 1;
-    ctx.font = '11px system-ui, sans-serif';
-    ctx.globalAlpha = 0.6;
-    ctx.fillText('Revend Eletro', PAD, 70);
+    if (upgradeVal && upgradeModelo) {
+        ctx.fillText('Simulação com seu ' + upgradeModelo + ' como entrada', PAD, 52);
+        ctx.globalAlpha = 1;
+        ctx.font = '11px system-ui, sans-serif';
+        ctx.globalAlpha = 0.6;
+        ctx.fillText('Valor a pagar: ' + fmtBRL(base) + '  (Base: ' + fmtBRL(valorBase) + ' - R$ ' + fmtBRL(upgradeVal) + ')', PAD, 70);
+    } else {
+        ctx.fillText('Base: ' + fmtBRL(valorBase), PAD, 52);
+        ctx.globalAlpha = 1;
+        ctx.font = '11px system-ui, sans-serif';
+        ctx.globalAlpha = 0.6;
+        ctx.fillText('Revend Eletro', PAD, 70);
+    }
     ctx.globalAlpha = 1;
 
     // col headers
