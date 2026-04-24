@@ -2014,8 +2014,18 @@ function atualizarProposta() {
         panel.classList.remove('visible');
         return;
     }
+
+    const wasVisible = panel.classList.contains('visible');
     panel.classList.add('visible');
     count.textContent = itens.length;
+
+    // Abre o corpo automaticamente na primeira vez que o painel aparece
+    if (!wasVisible) {
+        const body = document.getElementById('propostaBody');
+        const btn  = document.getElementById('propostaToggleBtn');
+        body.classList.add('open');
+        btn.textContent = '▼ Fechar';
+    }
 
     // Detecta modelo principal para o título
     function modeloBase(nome) {
@@ -2057,8 +2067,8 @@ function atualizarProposta() {
     if (itens.length === 1) {
         totalEl.closest('.proposta-total').style.display = 'flex';
         totalEl.textContent = fmtBRL(itens[0].avista);
-        totalEl.previousElementSibling?.remove?.();
-        totalEl.closest('.proposta-total').querySelector('span').textContent = '💰 Valor à vista:';
+        const spanLabel = totalEl.closest('.proposta-total').querySelector('span');
+        if (spanLabel) spanLabel.textContent = '💰 Valor à vista:';
     } else {
         totalEl.closest('.proposta-total').style.display = 'none';
     }
