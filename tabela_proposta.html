@@ -539,7 +539,7 @@
                     <span class="upgrade-prefix">R$</span>
                     <input type="text" id="upgradeValor" class="upgrade-input" placeholder="0,00"
                         onfocus="this.select()" onblur="formatInput(this);atualizarProposta()" oninput="atualizarProposta()">
-                    <button class="upgrade-clear" onclick="document.getElementById('upgradeValor').value='';document.getElementById('upgradeModelo').value=''" title="Limpar tudo">✕</button>
+                    <button class="upgrade-clear" onclick="document.getElementById('upgradeValor').value='';document.getElementById('upgradeModelo').value='';atualizarProposta();" title="Limpar tudo">✕</button>
                 </div>
                 <span class="upgrade-hint">O valor será descontado dos preços na proposta</span>
             </div>
@@ -558,22 +558,10 @@
 
 <canvas id="imgCanvas"></canvas>
 
-<!-- FIREBASE -->
-<script type="module">
-import { initializeApp }             from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue, set, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
-const firebaseConfig = {
-    apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
-    authDomain:        "materiais-revend.firebaseapp.com",
-    databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
-    projectId:         "materiais-revend",
-    storageBucket:     "materiais-revend.firebasestorage.app",
-    messagingSenderId: "509931102943",
-    appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
-};
-const app = initializeApp(firebaseConfig);
-const db  = getDatabase(app);
+<!-- LÓGICA GLOBAL — acessível por onclick/onblur sem restrição de módulo ES -->
+<script>
+// db será injetado pelo módulo Firebase abaixo
+let db = null;
 
 // ════════════════════════════════════════════
 // SENHA DO GESTOR — altere aqui
@@ -1421,7 +1409,8 @@ async function salvarItem(key) {
 
     showBanner('Salvando preço...', 'loading');
     try {
-        await set(ref(db, 'precos/' + key), {
+        if (!window._fbSalvarPreco) throw new Error('Firebase não inicializado');
+        await window._fbSalvarPreco(key, {
             avista:  av  ?? null,
             credito: cr  ?? null,
             obs:     ob,
@@ -1563,7 +1552,8 @@ async function salvarCores(key) {
     }
 
     try {
-        await set(ref(db, 'cores/' + key), snap);
+        if (!window._fbSalvarCores) throw new Error('Firebase não inicializado');
+        await window._fbSalvarCores(key, snap);
     } catch(e) {
         showBanner('❌ Erro ao salvar cores.', 'err');
     }
@@ -2381,14 +2371,45 @@ function updateTimestamp() {
         '🕐 ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 }
 
-// ════════════════════════════════════════════
-// INIT — Firebase real-time listener
-// ════════════════════════════════════════════
-showBanner('Conectando ao Firebase...', 'loading');
-renderTabs();
-renderAll();
+// Fecha modal clicando fora
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('modalSenha').addEventListener('click', e => {
+        if (e.target === document.getElementById('modalSenha')) fecharModal();
+    });
+    // Init sem Firebase (mostra dados default enquanto Firebase carrega)
+    showBanner('Conectando ao Firebase...', 'loading');
+    renderTabs();
+    renderAll();
+});
+</script>
 
-onValue(ref(db, 'precos'), snap => {
+<!-- FIREBASE MODULE — apenas init + listeners -->
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+    authDomain:        "materiais-revend.firebaseapp.com",
+    databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
+    projectId:         "materiais-revend",
+    storageBucket:     "materiais-revend.firebasestorage.app",
+    messagingSenderId: "509931102943",
+    appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
+};
+const app = initializeApp(firebaseConfig);
+const _db  = getDatabase(app);
+
+// Expõe funções Firebase para o código global usar
+window._fbSalvarPreco = async (key, dados) => {
+    await set(ref(_db, 'precos/' + key), dados);
+};
+window._fbSalvarCores = async (key, dados) => {
+    await set(ref(_db, 'cores/' + key), dados);
+};
+
+// Listeners em tempo real
+onValue(ref(_db, 'precos'), snap => {
     const firebaseData = snap.val() || {};
     _precos = { ...DEFAULT_PRECOS, ...firebaseData };
     renderAll();
@@ -2397,9 +2418,8 @@ onValue(ref(db, 'precos'), snap => {
     showBanner('✅ Preços carregados!', 'ok');
 });
 
-onValue(ref(db, 'cores'), snap => {
+onValue(ref(_db, 'cores'), snap => {
     _cores = snap.val() || {};
-    // Re-render só os chips de cor (não re-renderiza tudo para não perder checkboxes da proposta)
     document.querySelectorAll('tbody tr[data-key]').forEach(row => {
         const key    = row.getAttribute('data-key');
         const tab    = row.getAttribute('data-tab');
@@ -2409,12 +2429,10 @@ onValue(ref(db, 'cores'), snap => {
         const nameCell = row.querySelector('.item-name');
         if (!nameCell) return;
 
-        // Update price base cell ("a partir de")
         const avdEl = document.getElementById('avd_' + key);
         if (avdEl && avista) {
             avdEl.innerHTML = renderPrecoAvista(key, avista);
         }
-        // Update display chips
         let cdEl = nameCell.querySelector('.cores-row');
         const newDisplay = renderCoresDisplay(key, avista);
         if (cdEl) { if (newDisplay) cdEl.outerHTML = newDisplay; else cdEl.remove(); }
@@ -2424,15 +2442,9 @@ onValue(ref(db, 'cores'), snap => {
             else nameCell.insertAdjacentHTML('beforeend', newDisplay);
         }
 
-        // Update gestor panel if visible
         const cgEl = document.getElementById('cg_' + key);
         if (cgEl) cgEl.outerHTML = renderCoresGestor(key, tab, nome);
     });
-});
-
-// Fecha modal clicando fora
-document.getElementById('modalSenha').addEventListener('click', e => {
-    if (e.target === document.getElementById('modalSenha')) fecharModal();
 });
 </script>
 </body>
