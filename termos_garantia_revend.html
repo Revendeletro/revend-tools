@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Termos de Garantia — Revend</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:13px;background:#f0f0f0;padding:16px}
+.wrapper{max-width:900px;margin:0 auto}
+.header{background:#1a1a1a;color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0}
+.company-info{font-size:10px;text-align:right;line-height:1.7;opacity:.9}
+.title-bar{background:#222;color:#fff;text-align:center;padding:10px;font-size:20px;font-weight:700;letter-spacing:1px}
+.form-wrap{border:.5px solid #ccc;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;background:#fff}
+.sec-hdr{background:#444;color:#fff;text-align:center;padding:5px;font-size:11px;font-weight:700;letter-spacing:.8px}
+.row2{display:grid;grid-template-columns:1fr 1fr;border-bottom:.5px solid #ccc}
+.row3{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:.5px solid #ccc}
+.row4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:.5px solid #ccc}
+.cell{padding:7px 10px;border-right:.5px solid #ccc;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cell:last-child{border-right:none}
+.cell.full{grid-column:1/-1}
+.lbl{font-weight:700;font-size:11px;white-space:nowrap}
+input[type=text],input[type=date],select,textarea{border:.5px solid #bbb;border-radius:4px;padding:3px 6px;font-size:12px;background:#fff;color:#222;width:100%}
+textarea{resize:vertical;min-height:50px}
+.tipo-selector{background:#2a2a2a;padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;border-bottom:2px solid #c0392b}
+.tipo-label{cursor:pointer;flex:1;min-width:180px;border:2px solid #555;border-radius:6px;padding:8px 12px;display:flex;align-items:center;gap:8px;background:transparent;transition:all .2s}
+.tipo-label.ativo{border-color:#c0392b;background:#fff5f5}
+.tipo-label.ativo-green{border-color:#1a6b3c;background:#f0fff4}
+.tipo-label.ativo-blue{border-color:#1a3c6b;background:#f0f6ff}
+.tipo-label.ativo-orange{border-color:#b5500a;background:#fff8f0}
+.tipo-icon{font-size:18px}
+.tipo-title{font-size:11px;font-weight:700}
+.tipo-sub{font-size:10px;color:#999;margin-top:1px}
+.btn-pdf{background:#c0392b;color:#fff;border:none;padding:9px 20px;border-radius:5px;cursor:pointer;font-size:13px;font-weight:700;margin-top:10px}
+.btn-pdf:hover{background:#a93226}
+.btn-limpar{background:#555;color:#fff;border:none;padding:9px 16px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700;margin-top:10px}
+.btn-limpar:hover{background:#333}
+.footer-btns{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+.prazo-opts{padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:.5px solid #ccc}
+.prazo-card{cursor:pointer;flex:1;min-width:160px;border:2px solid #e0e0e0;border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;transition:all .2s}
+.prazo-card.ativo{border-color:#c0392b;background:#fff5f5}
+.meses-opts{padding:10px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:.5px solid #ccc}
+.mes-card{cursor:pointer;flex:1;min-width:120px;border:2px solid #e0e0e0;border-radius:8px;padding:10px 12px;text-align:center;transition:all .2s}
+.mes-card.ativo{border-color:#1a6b3c;background:#f0fff4}
+.info-box{padding:10px 14px;background:#fffbf0;border-bottom:.5px solid #ccc;font-size:11px;color:#666;line-height:1.7}
+.info-box b{color:#333}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- CABEÇALHO -->
+<div class="header">
+  <img src="data:image/jpeg;base64,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" style="height:40px;filter:brightness(0) invert(1)">
+  <div class="company-info">Revend Eletro Comercio de Equipamentos Eletronicos Ltda.<br>Rua Tuiuti, 1951 - Tatuapé | São Paulo CEP:03307-005 | CNPJ: 28.724.816/0001-87</div>
+</div>
+<div class="title-bar" id="title-bar">EMISSÃO DE TERMOS E GARANTIAS</div>
+
+<!-- SELETOR DE TIPO -->
+<div class="tipo-selector">
+  <span style="color:#aaa;font-size:11px;font-weight:700;letter-spacing:.8px;white-space:nowrap">TIPO DE TERMO:</span>
+
+  <label class="tipo-label ativo" id="lbl-tipo-garantia3">
+    <input type="radio" name="tipo" value="garantia3" onchange="onTipo()" checked style="accent-color:#c0392b;width:15px;height:15px">
+    <div>
+      <div class="tipo-title" style="color:#c0392b">🛡️ GARANTIA 03 MESES</div>
+      <div class="tipo-sub">Compra de produto Apple — Revend</div>
+    </div>
+  </label>
+
+  <label class="tipo-label" id="lbl-tipo-garantia6">
+    <input type="radio" name="tipo" value="garantia6" onchange="onTipo()" style="accent-color:#c0392b;width:15px;height:15px">
+    <div>
+      <div class="tipo-title" style="color:#666">🛡️ GARANTIA 06 MESES</div>
+      <div class="tipo-sub">Compra de produto Apple — Revend</div>
+    </div>
+  </label>
+
+  <label class="tipo-label" id="lbl-tipo-garantia9">
+    <input type="radio" name="tipo" value="garantia9" onchange="onTipo()" style="accent-color:#c0392b;width:15px;height:15px">
+    <div>
+      <div class="tipo-title" style="color:#666">🛡️ GARANTIA 09 MESES</div>
+      <div class="tipo-sub">Compra de produto Apple — Revend</div>
+    </div>
+  </label>
+
+  <label class="tipo-label" id="lbl-tipo-manutencao">
+    <input type="radio" name="tipo" value="manutencao" onchange="onTipo()" style="accent-color:#1a6b3c;width:15px;height:15px">
+    <div>
+      <div class="tipo-title" style="color:#666">🔧 GARANTIA MANUTENÇÃO</div>
+      <div class="tipo-sub">Assistência técnica realizada</div>
+    </div>
+  </label>
+
+  <label class="tipo-label" id="lbl-tipo-entrega">
+    <input type="radio" name="tipo" value="entrega" onchange="onTipo()" style="accent-color:#1a3c6b;width:15px;height:15px">
+    <div>
+      <div class="tipo-title" style="color:#666">📦 TERMO DE ENTREGA</div>
+      <div class="tipo-sub">Venda por site ou link de pagamento</div>
+    </div>
+  </label>
+</div>
+
+<div class="form-wrap">
+
+  <!-- INFO BOX dinâmica -->
+  <div class="info-box" id="info-box">
+    <b>TERMO DE GARANTIA — 03 MESES (REVEND):</b> Para produtos Apple vendidos fisicamente na loja. Cobre defeitos de funcionamento. Não cobre danos físicos, oxidação, quedas ou uso indevido.
+  </div>
+
+  <!-- DADOS DO RESPONSÁVEL/VENDA -->
+  <div class="sec-hdr">DADOS DA VENDA</div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">RESPONSÁVEL:</span><input type="text" id="responsavel" placeholder="Nome do colaborador"></div>
+    <div class="cell"><span class="lbl">Nº VENDA / OS:</span><input type="text" id="nvenda" placeholder="Número da venda ou OS"></div>
+    <div class="cell"><span class="lbl">DATA DA VENDA:</span><input type="date" id="data"></div>
+  </div>
+
+  <!-- DADOS DO CLIENTE -->
+  <div class="sec-hdr">DADOS DO CLIENTE</div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">NOME COMPLETO:</span><input type="text" id="nome" placeholder="Nome completo do cliente"></div>
+    <div class="cell"><span class="lbl">CPF:</span><input type="text" id="cpf" placeholder="000.000.000-00"></div>
+    <div class="cell"><span class="lbl">CONTATO:</span><input type="text" id="contato" placeholder="(11) 99999-9999"></div>
+  </div>
+  <div class="row2">
+    <div class="cell"><span class="lbl">RG:</span><input type="text" id="rg" placeholder="RG do cliente"></div>
+    <div class="cell"><span class="lbl">ENDEREÇO:</span><input type="text" id="endereco" placeholder="Rua, nº, bairro, cidade"></div>
+  </div>
+  <!-- Campo e-mail apenas para ENTREGA -->
+  <div class="row2 hidden" id="row-email">
+    <div class="cell"><span class="lbl">E-MAIL:</span><input type="text" id="email" placeholder="email@exemplo.com"></div>
+    <div class="cell"><span class="lbl">FORMA DE PAGAMENTO:</span><input type="text" id="pagamento" placeholder="Pix, cartão, link, etc."></div>
+  </div>
+
+  <!-- DADOS DO PRODUTO -->
+  <div class="sec-hdr">DADOS DO PRODUTO</div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">MODELO:</span><input type="text" id="modelo" placeholder="Ex: iPhone 15 Pro 256GB"></div>
+    <div class="cell"><span class="lbl">COR:</span><input type="text" id="cor" placeholder="Ex: Preto Titânio"></div>
+    <div class="cell"><span class="lbl">IMEI / Nº SÉRIE:</span><input type="text" id="imei" placeholder="IMEI ou número de série"></div>
+  </div>
+  <div class="row3">
+    <div class="cell"><span class="lbl">VALOR PAGO (R$):</span><input type="text" id="valor" placeholder="Ex: 3.990,00"></div>
+    <div class="cell"><span class="lbl">CONDIÇÃO:</span>
+      <select id="condicao">
+        <option value="Novo (lacrado)">Novo (lacrado)</option>
+        <option value="Seminovo" selected>Seminovo</option>
+        <option value="Usado">Usado</option>
+        <option value="Recondicionado">Recondicionado</option>
+      </select>
+    </div>
+    <div class="cell"><span class="lbl">SAÚDE BATERIA:</span><input type="text" id="bateria" placeholder="Ex: 91%"></div>
+  </div>
+
+  <!-- CAMPO ACESSÓRIOS (apenas para entrega) -->
+  <div class="row2 hidden" id="row-acessorios">
+    <div class="cell"><span class="lbl">ACESSÓRIOS INCLUSOS:</span><input type="text" id="acessorios" placeholder="Ex: Cabo USB-C, adaptador, caixa original"></div>
+    <div class="cell"><span class="lbl">ENDEREÇO DE ENTREGA:</span><input type="text" id="end-entrega" placeholder="Rua, nº, bairro, cidade, CEP"></div>
+  </div>
+
+  <!-- PRAZO DE GARANTIA — apenas para manutenção -->
+  <div id="prazo-manutencao" class="hidden">
+    <div class="sec-hdr">PRAZO DE GARANTIA DA MANUTENÇÃO</div>
+    <div class="meses-opts">
+      <label class="mes-card ativo" id="lbl-m3">
+        <input type="radio" name="prazo_man" value="3" onchange="onPrazoMan()" checked style="accent-color:#1a6b3c">
+        <div style="font-weight:700;font-size:13px;color:#1a6b3c">3 meses</div>
+        <div style="font-size:10px;color:#888;margin-top:2px">Padrão assistência</div>
+      </label>
+      <label class="mes-card" id="lbl-m6">
+        <input type="radio" name="prazo_man" value="6" onchange="onPrazoMan()" style="accent-color:#1a6b3c">
+        <div style="font-weight:700;font-size:13px;color:#555">6 meses</div>
+        <div style="font-size:10px;color:#888;margin-top:2px">Prazo estendido</div>
+      </label>
+    </div>
+    <div class="sec-hdr">SERVIÇOS REALIZADOS</div>
+    <div style="padding:8px 10px;border-bottom:.5px solid #ccc">
+      <textarea id="servicos" placeholder="Descreva os serviços realizados, peças trocadas, etc. Ex: Substituição de tela original, troca de bateria, higienização interna..."></textarea>
+    </div>
+  </div>
+
+  <!-- OBSERVAÇÕES GERAIS -->
+  <div class="sec-hdr">OBSERVAÇÕES (OPCIONAL)</div>
+  <div style="padding:8px 10px;border-bottom:.5px solid #ccc">
+    <textarea id="obs" placeholder="Observações adicionais sobre o produto, condições especiais, etc."></textarea>
+  </div>
+
+</div>
+
+<div class="footer-btns">
+  <button class="btn-limpar" onclick="limpar()">🗑 Limpar Formulário</button>
+  <button class="btn-pdf" id="btn-gerar" onclick="gerarPDF()">⬇ Gerar PDF — Termo de Garantia 03 Meses</button>
+</div>
+
+</div><!-- /wrapper -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// ── Inicialização ───────────────────────────────────────
+document.getElementById("data").value = new Date().toISOString().split("T")[0];
+
+const tipoInfos = {
+  garantia3: {
+    cor: "#c0392b", corAtivo: "ativo", icon: "🛡️",
+    titulo: "GARANTIA 03 MESES",
+    btnTxt: "⬇ Gerar PDF — Termo de Garantia 03 Meses",
+    info: "<b>TERMO DE GARANTIA — 03 MESES (REVEND):</b> Para produtos Apple vendidos fisicamente na loja. Cobre defeitos de funcionamento. Não cobre danos físicos, oxidação, quedas ou uso indevido."
+  },
+  garantia6: {
+    cor: "#c0392b", corAtivo: "ativo", icon: "🛡️",
+    titulo: "GARANTIA 06 MESES",
+    btnTxt: "⬇ Gerar PDF — Termo de Garantia 06 Meses",
+    info: "<b>TERMO DE GARANTIA — 06 MESES (REVEND):</b> Para produtos Apple vendidos fisicamente na loja com cobertura estendida. Cobre defeitos de funcionamento. Não cobre danos físicos, oxidação, quedas ou uso indevido."
+  },
+  garantia9: {
+    cor: "#c0392b", corAtivo: "ativo", icon: "🛡️",
+    titulo: "GARANTIA 09 MESES",
+    btnTxt: "⬇ Gerar PDF — Termo de Garantia 09 Meses",
+    info: "<b>TERMO DE GARANTIA — 09 MESES (REVEND):</b> Para produtos Apple vendidos fisicamente na loja com cobertura premium. Cobre defeitos de funcionamento. Não cobre danos físicos, oxidação, quedas ou uso indevido."
+  },
+  manutencao: {
+    cor: "#1a6b3c", corAtivo: "ativo-green", icon: "🔧",
+    titulo: "GARANTIA MANUTENÇÃO",
+    btnTxt: "⬇ Gerar PDF — Garantia de Manutenção",
+    info: "<b>GARANTIA DE MANUTENÇÃO / ASSISTÊNCIA TÉCNICA:</b> Cobre o serviço realizado e peças utilizadas pelo prazo selecionado. Não cobre danos físicos posteriores, oxidação ou uso indevido após o conserto."
+  },
+  entrega: {
+    cor: "#1a3c6b", corAtivo: "ativo-blue", icon: "📦",
+    titulo: "TERMO DE ENTREGA",
+    btnTxt: "⬇ Gerar PDF — Termo de Entrega",
+    info: "<b>TERMO DE ENTREGA:</b> Utilizado para vendas realizadas pelo site ou link de pagamento. Documenta o produto entregue, condições acordadas e responsabilidades das partes. Faz parte da documentação obrigatória."
+  }
+};
+
+function getTipo() {
+  return (document.querySelector('input[name="tipo"]:checked') || {value: "garantia3"}).value;
+}
+
+function onTipo() {
+  const t = getTipo();
+  const info = tipoInfos[t];
+
+  // Atualiza título
+  document.getElementById("title-bar").textContent = "EMISSÃO DE TERMO — " + info.titulo;
+
+  // Atualiza info box
+  document.getElementById("info-box").innerHTML = info.info;
+
+  // Atualiza botão
+  const btn = document.getElementById("btn-gerar");
+  btn.textContent = info.btnTxt;
+  btn.style.background = info.cor;
+
+  // Atualiza labels de tipo
+  Object.keys(tipoInfos).forEach(k => {
+    const lbl = document.getElementById("lbl-tipo-" + k);
+    if (!lbl) return;
+    lbl.className = "tipo-label" + (k === t ? " " + info.corAtivo : "");
+    const tTitle = lbl.querySelector(".tipo-title");
+    if (tTitle) tTitle.style.color = (k === t) ? tipoInfos[t].cor : "#666";
+  });
+
+  // Mostra/oculta campos específicos
+  document.getElementById("prazo-manutencao").classList.toggle("hidden", t !== "manutencao");
+  document.getElementById("row-email").classList.toggle("hidden", t !== "entrega");
+  document.getElementById("row-acessorios").classList.toggle("hidden", t !== "entrega");
+}
+
+function onPrazoMan() {}
+
+function limpar() {
+  ["responsavel","nvenda","nome","cpf","contato","rg","endereco","email","pagamento",
+   "modelo","cor","imei","valor","bateria","servicos","obs","acessorios","end-entrega"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  document.getElementById("data").value = new Date().toISOString().split("T")[0];
+  document.getElementById("condicao").selectedIndex = 1;
+}
+
+function fmtData(d) {
+  if (!d) return "__/__/____";
+  return d.split("-").reverse().join("/");
+}
+
+function addMeses(dataStr, meses) {
+  if (!dataStr) return "__/__/____";
+  const [y, m, d] = dataStr.split("-").map(Number);
+  const dt = new Date(y, m - 1 + meses, d);
+  return String(dt.getDate()).padStart(2,"0") + "/" + String(dt.getMonth()+1).padStart(2,"0") + "/" + dt.getFullYear();
+}
+
+function getState() {
+  const tipo = getTipo();
+  let meses = 3;
+  if (tipo === "garantia6") meses = 6;
+  if (tipo === "garantia9") meses = 9;
+  if (tipo === "manutencao") {
+    meses = parseInt((document.querySelector('input[name="prazo_man"]:checked')||{value:"3"}).value);
+  }
+  return {
+    tipo,
+    meses,
+    responsavel: document.getElementById("responsavel").value||"",
+    nvenda: document.getElementById("nvenda").value||"",
+    data: document.getElementById("data").value||"",
+    nome: document.getElementById("nome").value||"",
+    cpf: document.getElementById("cpf").value||"",
+    rg: document.getElementById("rg").value||"",
+    contato: document.getElementById("contato").value||"",
+    endereco: document.getElementById("endereco").value||"",
+    email: document.getElementById("email").value||"",
+    pagamento: document.getElementById("pagamento").value||"",
+    modelo: document.getElementById("modelo").value||"",
+    cor: document.getElementById("cor").value||"",
+    imei: document.getElementById("imei").value||"",
+    valor: document.getElementById("valor").value||"",
+    condicao: document.getElementById("condicao").value||"",
+    bateria: document.getElementById("bateria").value||"",
+    servicos: document.getElementById("servicos").value||"",
+    obs: document.getElementById("obs").value||"",
+    acessorios: document.getElementById("acessorios").value||"",
+    endEntrega: document.getElementById("end-entrega").value||"",
+  };
+}
+
+// ── GERADOR DE PDF ────────────────────────────────────────────────────────────
+const LOGO_B64 = "data:image/jpeg;base64,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";
+
+async function gerarPDF() {
+  const s = getState();
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const W = 210, M = 14;
+  let y = 0;
+
+  // ── Helpers ──────────────────────────────────────
+  function header() {
+    doc.setFillColor(25,25,25); doc.rect(0,0,W,24,"F");
+    doc.setFillColor(40,40,40); doc.rect(0,24,W,11,"F");
+    doc.setTextColor(255,255,255);
+    try {
+      doc.addImage(LOGO_B64,"JPEG",M,4,28,15);
+    } catch(e) {
+      doc.setFontSize(18); doc.setFont("helvetica","bold"); doc.text("revend",M,16);
+    }
+    doc.setFontSize(7.5); doc.setFont("helvetica","normal");
+    doc.text("Revend Eletro Comercio de Equipamentos Eletronicos Ltda.",W-M,8,{align:"right"});
+    doc.text("Rua Tuiuti, 1951 - Tatuapé | São Paulo CEP:03307-005 | CNPJ: 28.724.816/0001-87",W-M,13,{align:"right"});
+    const titulosMap = {
+      garantia3: "TERMO DE GARANTIA — 03 MESES",
+      garantia6: "TERMO DE GARANTIA — 06 MESES",
+      garantia9: "TERMO DE GARANTIA — 09 MESES",
+      manutencao: "GARANTIA DE MANUTENÇÃO / ASSISTÊNCIA TÉCNICA",
+      entrega: "TERMO DE ENTREGA DE PRODUTO"
+    };
+    doc.setFontSize(12); doc.setFont("helvetica","bold");
+    doc.text(titulosMap[s.tipo] || "TERMO", W/2, 30, {align:"center"});
+    doc.setTextColor(0,0,0); y = 38;
+  }
+
+  function secHdr(txt) {
+    doc.setFillColor(70,70,70); doc.rect(M,y,W-2*M,7,"F");
+    doc.setTextColor(255,255,255); doc.setFontSize(8); doc.setFont("helvetica","bold");
+    doc.text(txt, W/2, y+5, {align:"center"});
+    doc.setTextColor(0,0,0); y += 7;
+  }
+
+  function rowCells(pairs, h) {
+    const colW = (W-2*M)/pairs.length;
+    doc.setDrawColor(180,180,180); doc.setLineWidth(0.3); doc.rect(M,y,W-2*M,h);
+    pairs.forEach((p,i) => {
+      if(i>0) doc.line(M+colW*i, y, M+colW*i, y+h);
+      doc.setFontSize(7); doc.setFont("helvetica","bold"); doc.setTextColor(80,80,80);
+      doc.text(String(p[0]).toUpperCase()+":", M+colW*i+2, y+4);
+      doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(0,0,0);
+      const val = String(p[1]);
+      const lines = doc.splitTextToSize(val, colW-6);
+      doc.text(lines[0]||"", M+colW*i+2, y+9);
+    });
+    y += h;
+  }
+
+  function paragrafo(txt, extra=0) {
+    doc.setFontSize(9); doc.setFont("helvetica","normal"); doc.setTextColor(0,0,0);
+    const lines = doc.splitTextToSize(txt, W-2*M);
+    doc.text(lines, M, y);
+    y += lines.length * 4.5 + extra;
+  }
+
+  function checkNewPage(needed=50) {
+    if (y + needed > 285) { doc.addPage(); y = 0; header(); }
+  }
+
+  function assinaturas() {
+    checkNewPage(55);
+    secHdr("ASSINATURAS"); y += 8;
+    const sigColW = (W-2*M)/2;
+    const pad = 10;
+    const lw = sigColW - pad*2;
+
+    // Cliente
+    doc.setFontSize(8); doc.setFont("helvetica","bold"); doc.setTextColor(80,80,80);
+    doc.text("CLIENTE", M+pad, y);
+    doc.setFontSize(9); doc.setFont("helvetica","bold"); doc.setTextColor(20,20,20);
+    doc.text(doc.splitTextToSize(s.nome||"", lw)[0], M+pad, y+6);
+    doc.setDrawColor(40,40,40); doc.setLineWidth(0.6);
+    doc.line(M+pad, y+22, M+pad+lw, y+22);
+    doc.setFontSize(7); doc.setFont("helvetica","normal"); doc.setTextColor(100,100,100);
+    doc.text("Assinatura do Cliente", M+pad, y+27);
+
+    // Responsável
+    const x2 = M + sigColW + pad;
+    doc.setFontSize(8); doc.setFont("helvetica","bold"); doc.setTextColor(80,80,80);
+    doc.text("COLABORADOR RESPONSÁVEL", x2, y);
+    doc.setFontSize(9); doc.setFont("helvetica","bold"); doc.setTextColor(20,20,20);
+    doc.text(doc.splitTextToSize(s.responsavel||"", lw)[0], x2, y+6);
+    doc.setDrawColor(40,40,40); doc.setLineWidth(0.6);
+    doc.line(x2, y+22, x2+lw, y+22);
+    doc.setFontSize(7); doc.setFont("helvetica","normal"); doc.setTextColor(100,100,100);
+    doc.text("Assinatura do Colaborador", x2, y+27);
+
+    doc.setTextColor(0,0,0); y += 40;
+  }
+
+  function rodape() {
+    checkNewPage(20);
+    doc.setFontSize(7.5); doc.setFont("helvetica","normal"); doc.setTextColor(120,120,120);
+    doc.text("Revend Eletro — Rua Tuiuti, 1951 — Tatuapé — São Paulo/SP — Tel: (11) 3392-2892", W/2, 290, {align:"center"});
+    doc.text("CNPJ: 28.724.816/0001-87", W/2, 294, {align:"center"});
+  }
+
+  // ── DATA DE VALIDADE ────────────────────────────
+  const dataVenda = fmtData(s.data);
+  const dataFim = s.tipo !== "entrega" ? addMeses(s.data, s.meses) : null;
+
+  // ════════════════════════════════════════════════
+  // TERMOS DE GARANTIA (3/6/9 meses)
+  // ════════════════════════════════════════════════
+  if (s.tipo.startsWith("garantia")) {
+    header();
+
+    // Faixa colorida com prazo de validade
+    doc.setFillColor(192,57,43); doc.rect(M, y, W-2*M, 12, "F");
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont("helvetica","bold");
+    doc.text("VALIDADE DA GARANTIA: " + dataVenda + " até " + dataFim + " (" + s.meses + " meses)", W/2, y+8, {align:"center"});
+    doc.setTextColor(0,0,0); y += 16;
+
+    secHdr("DADOS DA VENDA");
+    rowCells([["Nº Venda", s.nvenda], ["Data da Venda", dataVenda], ["Responsável", s.responsavel]], 12);
+
+    secHdr("IDENTIFICAÇÃO DO CLIENTE");
+    rowCells([["Nome Completo", s.nome], ["CPF", s.cpf], ["Contato", s.contato]], 12);
+    rowCells([["RG", s.rg], ["Endereço", s.endereco]], 12);
+
+    secHdr("DADOS DO PRODUTO");
+    rowCells([["Modelo", s.modelo], ["Cor", s.cor], ["IMEI / Nº Série", s.imei]], 12);
+    rowCells([["Condição", s.condicao], ["Saúde da Bateria", s.bateria||"—"], ["Valor Pago", s.valor ? "R$ "+s.valor : "—"]], 12);
+
+    y += 4;
+    secHdr("COBERTURA E CONDIÇÕES DA GARANTIA"); y += 4;
+
+    const coberturas = [
+      "1. A presente garantia cobre defeitos de funcionamento em condições normais de uso, conforme prazo acima.",
+      "2. Em caso de defeito coberto, a Revend realizará o reparo sem custo ou, a critério técnico, substituirá o produto por outro de igual configuração.",
+      "3. NÃO estão cobertos: danos físicos causados por quedas, impactos ou pressão; danos por líquidos, umidade ou oxidação; danos por uso inadequado, modificações não autorizadas ou reparos realizados fora da Revend.",
+      "4. NÃO está coberta a substituição da bateria, salvo se o defeito for comprovadamente de fabricação (saúde zerada sem uso).",
+      "5. A garantia é válida somente para o produto identificado pelo IMEI/Número de Série acima, sendo intransferível.",
+      "6. O cliente deve apresentar este termo no momento da solicitação do serviço em garantia."
+    ];
+    doc.setFontSize(8.5); doc.setFont("helvetica","normal");
+    coberturas.forEach(c => { const l = doc.splitTextToSize(c, W-2*M); doc.text(l,M,y); y += l.length*4.5+3; });
+
+    checkNewPage(30);
+    secHdr("FORO E DISPOSIÇÕES FINAIS"); y += 4;
+    paragrafo("Fica eleito o Foro da Comarca de São Paulo/SP para dirimir quaisquer controvérsias oriundas deste Termo. A Revend é responsável pela garantia acima descrita, observadas suas condições e limitações.", 6);
+
+    if (s.obs) { secHdr("OBSERVAÇÕES"); y += 4; paragrafo(s.obs, 6); }
+
+    assinaturas();
+    rodape();
+  }
+
+  // ════════════════════════════════════════════════
+  // GARANTIA DE MANUTENÇÃO
+  // ════════════════════════════════════════════════
+  else if (s.tipo === "manutencao") {
+    header();
+
+    doc.setFillColor(26,107,60); doc.rect(M, y, W-2*M, 12, "F");
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont("helvetica","bold");
+    doc.text("VALIDADE DA GARANTIA DO SERVIÇO: " + dataVenda + " até " + dataFim + " (" + s.meses + " meses)", W/2, y+8, {align:"center"});
+    doc.setTextColor(0,0,0); y += 16;
+
+    secHdr("DADOS DA ORDEM DE SERVIÇO");
+    rowCells([["Nº OS / Venda", s.nvenda], ["Data do Serviço", dataVenda], ["Técnico Responsável", s.responsavel]], 12);
+
+    secHdr("IDENTIFICAÇÃO DO CLIENTE");
+    rowCells([["Nome Completo", s.nome], ["CPF", s.cpf], ["Contato", s.contato]], 12);
+    rowCells([["RG", s.rg], ["Endereço", s.endereco]], 12);
+
+    secHdr("DADOS DO APARELHO");
+    rowCells([["Modelo", s.modelo], ["Cor", s.cor], ["IMEI / Nº Série", s.imei]], 12);
+    rowCells([["Condição na Entrada", s.condicao], ["Valor do Serviço", s.valor ? "R$ "+s.valor : "—"]], 12);
+
+    y += 4;
+    secHdr("SERVIÇOS E PEÇAS UTILIZADAS"); y += 4;
+    if (s.servicos) {
+      const sl = doc.splitTextToSize(s.servicos, W-2*M);
+      doc.setFontSize(9); doc.setFont("helvetica","normal");
+      doc.text(sl, M, y); y += sl.length*4.5+6;
+    } else {
+      paragrafo("Serviço(s) não especificado(s).", 6);
+    }
+
+    secHdr("TERMOS DA GARANTIA DO SERVIÇO"); y += 4;
+    const termsMAN = [
+      "1. A garantia cobre os serviços realizados e as peças substituídas pela Revend pelo prazo indicado acima.",
+      "2. Em caso de recorrência do mesmo defeito coberto, o reparo será realizado sem custo adicional.",
+      "3. NÃO estão cobertos: danos físicos causados por novas quedas, impactos, líquidos ou uso inadequado após o conserto.",
+      "4. A garantia é válida somente para o aparelho identificado pelo IMEI/Número de Série acima.",
+      "5. O cliente deve apresentar este termo no momento da solicitação do serviço em garantia.",
+      "6. Defeitos em componentes não relacionados ao serviço realizado não estão cobertos por esta garantia."
+    ];
+    doc.setFontSize(8.5); doc.setFont("helvetica","normal");
+    termsMAN.forEach(c => { const l = doc.splitTextToSize(c, W-2*M); doc.text(l,M,y); y += l.length*4.5+3; });
+
+    checkNewPage(30);
+    secHdr("FORO E DISPOSIÇÕES FINAIS"); y += 4;
+    paragrafo("Fica eleito o Foro da Comarca de São Paulo/SP para dirimir quaisquer controvérsias oriundas deste Termo.", 6);
+
+    if (s.obs) { secHdr("OBSERVAÇÕES"); y += 4; paragrafo(s.obs, 6); }
+
+    assinaturas();
+    rodape();
+  }
+
+  // ════════════════════════════════════════════════
+  // TERMO DE ENTREGA
+  // ════════════════════════════════════════════════
+  else if (s.tipo === "entrega") {
+    header();
+
+    doc.setFillColor(26,60,107); doc.rect(M, y, W-2*M, 12, "F");
+    doc.setTextColor(255,255,255); doc.setFontSize(9); doc.setFont("helvetica","bold");
+    doc.text("DOCUMENTAÇÃO DE ENTREGA — VENDA POR SITE / LINK DE PAGAMENTO", W/2, y+8, {align:"center"});
+    doc.setTextColor(0,0,0); y += 16;
+
+    secHdr("DADOS DA VENDA");
+    rowCells([["Nº Pedido / Venda", s.nvenda], ["Data da Venda", dataVenda], ["Responsável", s.responsavel]], 12);
+    rowCells([["Forma de Pagamento", s.pagamento||"—"], ["Valor Pago", s.valor ? "R$ "+s.valor : "—"]], 12);
+
+    secHdr("IDENTIFICAÇÃO DO COMPRADOR");
+    rowCells([["Nome Completo", s.nome], ["CPF", s.cpf], ["Contato", s.contato]], 12);
+    rowCells([["RG", s.rg], ["E-mail", s.email||"—"]], 12);
+    rowCells([["Endereço Cadastral", s.endereco], ["Endereço de Entrega", s.endEntrega||s.endereco]], 12);
+
+    secHdr("DADOS DO PRODUTO ENTREGUE");
+    rowCells([["Modelo", s.modelo], ["Cor", s.cor], ["IMEI / Nº Série", s.imei]], 12);
+    rowCells([["Condição", s.condicao], ["Saúde da Bateria", s.bateria||"—"], ["Acessórios Inclusos", s.acessorios||"—"]], 12);
+
+    y += 4;
+    secHdr("DECLARAÇÕES DO COMPRADOR"); y += 4;
+    const declsEntrega = [
+      "1. O Comprador declara ter recebido o produto acima descrito em perfeitas condições de funcionamento, com os acessórios listados.",
+      "2. O Comprador declara ter verificado o IMEI/Número de Série e confirma que corresponde ao produto adquirido.",
+      "3. O Comprador está ciente de que defeitos físicos (riscos, amassados) não constituem motivo para devolução, salvo se documentados no momento da entrega.",
+      "4. Em caso de arrependimento, o Comprador poderá solicitar a devolução no prazo de 7 (sete) dias corridos, conforme Art. 49 do Código de Defesa do Consumidor, devolvendo o produto nas mesmas condições recebidas.",
+      "5. O Comprador está ciente de que a garantia oferecida pela Revend Eletro está descrita em Termo de Garantia separado."
+    ];
+    doc.setFontSize(8.5); doc.setFont("helvetica","normal");
+    declsEntrega.forEach(c => { const l = doc.splitTextToSize(c, W-2*M); doc.text(l,M,y); y += l.length*4.5+3; });
+
+    checkNewPage(30);
+    secHdr("DECLARAÇÃO DA REVEND ELETRO"); y += 4;
+    paragrafo("A Revend Eletro declara que o produto acima foi vendido conforme descrito no anúncio ou proposta de venda, e que as informações técnicas fornecidas (IMEI, condição, bateria) são verdadeiras e verificáveis. Qualquer divergência entre o produto recebido e o descrito deve ser comunicada em até 24 horas após o recebimento.", 6);
+
+    secHdr("FORO E DISPOSIÇÕES FINAIS"); y += 4;
+    paragrafo("Fica eleito o Foro da Comarca de São Paulo/SP para dirimir quaisquer controvérsias oriundas deste Termo.", 6);
+
+    if (s.obs) { secHdr("OBSERVAÇÕES"); y += 4; paragrafo(s.obs, 6); }
+
+    assinaturas();
+    rodape();
+  }
+
+  // ── Salvar ──────────────────────────────────────
+  const prefixos = {garantia3:"Revend_Garantia3M_", garantia6:"Revend_Garantia6M_", garantia9:"Revend_Garantia9M_", manutencao:"Revend_GarantiaManutencao_", entrega:"Revend_TermoEntrega_"};
+  const pref = prefixos[s.tipo] || "Revend_Termo_";
+  const dataFmt = s.data ? s.data.split("-").reverse().join("-") : "sem-data";
+  doc.save(pref + (s.nome||"cliente").replace(/\s+/g,"_") + "_" + dataFmt + ".pdf");
+}
+</script>
+</body>
+</html>
