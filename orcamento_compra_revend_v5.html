@@ -165,28 +165,53 @@ table.dt tr:hover td{background:var(--color-background-secondary)}
   </div>
   </div><!-- /prazo-section -->
 
-  <!-- ASSINATURAS — visível apenas no PDF -->
-  <div id="assinaturas-section" style="display:none">
-  <div class="sec-hdr">ASSINATURAS</div>
+  <!-- ASSINATURAS DIGITAIS — Canvas interativo para assinar no iPad -->
+  <div id="assinaturas-section">
+  <div class="sec-hdr">✍️ ASSINATURAS DIGITAIS</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-top:.5px solid var(--color-border-tertiary)">
-    <div style="padding:14px 16px;border-right:.5px solid var(--color-border-tertiary)">
-      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">CLIENTE (VENDEDOR)</div>
-      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
-      <div id="sig-nome" style="font-size:11px;font-weight:700;color:#333"></div>
-      <div style="font-size:10px;color:#888;margin-top:2px">Assinatura do Cliente / Vendedor</div>
+
+    <!-- CLIENTE -->
+    <div style="padding:12px 14px;border-right:.5px solid var(--color-border-tertiary)">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:6px">CLIENTE (VENDEDOR)</div>
+      <div id="sig-nome" style="font-size:11px;font-weight:700;color:#333;margin-bottom:4px"></div>
+      <div style="position:relative;border:1.5px solid #c0392b;border-radius:6px;background:#fafafa;touch-action:none">
+        <canvas id="sig-canvas-cliente" style="display:block;width:100%;height:100px;border-radius:5px;cursor:crosshair;touch-action:none"></canvas>
+        <div id="sig-hint-cliente" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#bbb;pointer-events:none;text-align:center;line-height:1.5">✍️ Assine aqui<br><span style="font-size:9px">Toque e arraste</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+        <div style="font-size:9px;color:#888">Assinatura do Cliente / Vendedor</div>
+        <button onclick="limparAssinatura('cliente')" style="font-size:10px;color:#c0392b;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #c0392b">✕ Limpar</button>
+      </div>
     </div>
-    <div style="padding:14px 16px;border-right:.5px solid var(--color-border-tertiary)">
-      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">COLABORADOR RESPONSÁVEL PELOS TESTES</div>
-      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
-      <div id="sig-resp" style="font-size:11px;font-weight:700;color:#333"></div>
-      <div style="font-size:10px;color:#888;margin-top:2px">Responsável pelos testes</div>
+
+    <!-- COLABORADOR -->
+    <div style="padding:12px 14px;border-right:.5px solid var(--color-border-tertiary)">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:6px">COLABORADOR RESPONSÁVEL</div>
+      <div id="sig-resp" style="font-size:11px;font-weight:700;color:#333;margin-bottom:4px"></div>
+      <div style="position:relative;border:1.5px solid #444;border-radius:6px;background:#fafafa;touch-action:none">
+        <canvas id="sig-canvas-colaborador" style="display:block;width:100%;height:100px;border-radius:5px;cursor:crosshair;touch-action:none"></canvas>
+        <div id="sig-hint-colaborador" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#bbb;pointer-events:none;text-align:center;line-height:1.5">✍️ Assine aqui<br><span style="font-size:9px">Toque e arraste</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+        <div style="font-size:9px;color:#888">Responsável pelos testes</div>
+        <button onclick="limparAssinatura('colaborador')" style="font-size:10px;color:#c0392b;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #c0392b">✕ Limpar</button>
+      </div>
     </div>
-    <div style="padding:14px 16px">
-      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:8px">SUPERVISÃO (QUANDO NECESSÁRIO)</div>
-      <div style="height:60px;border-bottom:1.5px solid #333;margin-bottom:6px"></div>
-      <div style="font-size:11px;font-weight:700;color:#ccc;font-style:italic">Opcional</div>
-      <div style="font-size:10px;color:#888;margin-top:2px">Assinatura da Supervisão</div>
+
+    <!-- SUPERVISÃO -->
+    <div style="padding:12px 14px">
+      <div style="font-size:10px;font-weight:700;color:#666;letter-spacing:.5px;margin-bottom:6px">SUPERVISÃO (OPCIONAL)</div>
+      <div style="font-size:11px;font-weight:700;color:#ccc;font-style:italic;margin-bottom:4px">Opcional</div>
+      <div style="position:relative;border:1.5px solid #ccc;border-radius:6px;background:#fafafa;touch-action:none">
+        <canvas id="sig-canvas-supervisao" style="display:block;width:100%;height:100px;border-radius:5px;cursor:crosshair;touch-action:none"></canvas>
+        <div id="sig-hint-supervisao" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:11px;color:#bbb;pointer-events:none;text-align:center;line-height:1.5">✍️ Assine aqui<br><span style="font-size:9px">Toque e arraste</span></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:5px">
+        <div style="font-size:9px;color:#888">Assinatura da Supervisão</div>
+        <button onclick="limparAssinatura('supervisao')" style="font-size:10px;color:#c0392b;background:none;border:none;cursor:pointer;padding:2px 6px;border-radius:4px;border:1px solid #c0392b">✕ Limpar</button>
+      </div>
     </div>
+
   </div>
 </div><!-- /assinaturas-section -->
 
@@ -221,7 +246,7 @@ table.dt tr:hover td{background:var(--color-background-secondary)}
 
 </div>
 <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:10px">
-  <button class="btn-pdf" id="btn-gerar-pdf" onclick="gerarPDF()" style="background:#c0392b">⬇ Gerar PDF — Orçamento + Contrato</button>
+  <button class="btn-pdf" id="btn-gerar-pdf" onclick="gerarPDF()" style="background:#c0392b">⬇ Gerar PDF — Orçamento + Contrato + Assinaturas</button>
 </div>
 </div>
 
@@ -803,25 +828,44 @@ async function gerarPDF(){
       { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
     ];
 
+  // Coleta as assinaturas digitais dos canvas
+  const sigImgs={
+    cliente: getSigDataURL("cliente"),
+    colaborador: getSigDataURL("colaborador"),
+    supervisao: getSigDataURL("supervisao")
+  };
+  const sigKeys=["cliente","colaborador","supervisao"];
+
   sigData.forEach((col,i)=>{
     const x=M+sigColW*i+sigPad;
 
-    // Nome puxado do formulário (topo da coluna)
-    doc.setFontSize(9);doc.setFont("helvetica","bold");doc.setTextColor(20,20,20);
+    // Título da coluna
+    doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(80,80,80);
+    doc.text(col.titulo,x,y-1);
+
+    // Caixa de assinatura
+    const boxH=24;
+    doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);
+    doc.rect(x,y+1,sigLineW,boxH);
+
+    // Imagem da assinatura digital (se houver)
+    const sigImg=sigImgs[sigKeys[i]];
+    if(sigImg){
+      try{doc.addImage(sigImg,"PNG",x+1,y+1,sigLineW-2,boxH-2);}catch(e){}
+    }
+
+    // Linha abaixo da caixa
+    doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(20,20,20);
     const nomeDisplay=col.nome||"";
-    doc.text(doc.splitTextToSize(nomeDisplay,sigLineW)[0],x,y);
+    doc.text(doc.splitTextToSize(nomeDisplay,sigLineW)[0],x,y+boxH+6);
 
-    // Linha de assinatura
-    doc.setDrawColor(40,40,40);doc.setLineWidth(0.6);
-    doc.line(x,y+22,x+sigLineW,y+22);
-
-    // Role / legenda abaixo da linha
+    // Role / legenda
     doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
-    doc.text(col.role,x,y+27);
+    doc.text(col.role,x,y+boxH+11);
   });
 
   doc.setTextColor(0,0,0);
-  y+=44;
+  y+=50;
 
   // ── ANEXO: DOCUMENTO RG ─────────────────────────────
   const temRg=rgData.frente||rgData.verso;
@@ -873,7 +917,10 @@ async function gerarPDF(){
 
 renderTabela(null);calcular();
 
-// ── SLIDER PARTE DE PAGAMENTO ──────────────────────────────
+// Reinicializa canvas ao girar iPad
+window.addEventListener("resize",function(){
+  setTimeout(initSignaturePads,200);
+});
 function onParteSlider(){
   const m=document.getElementById("modelo").value;
   const vMin=precosParteMin[m]||0;
@@ -900,6 +947,83 @@ function atualizarSliderParte(m){
     wrap.style.display="none";
   }
 }
+
+// ── ASSINATURA DIGITAL ──────────────────────────────────
+const sigData={cliente:{canvas:null,ctx:null,drawing:false,hasData:false},colaborador:{canvas:null,ctx:null,drawing:false,hasData:false},supervisao:{canvas:null,ctx:null,drawing:false,hasData:false}};
+
+function initSignaturePads(){
+  ["cliente","colaborador","supervisao"].forEach(id=>{
+    const canvas=document.getElementById("sig-canvas-"+id);
+    if(!canvas)return;
+    // Resolve resolução real do canvas para telas retina
+    const dpr=window.devicePixelRatio||1;
+    const rect=canvas.getBoundingClientRect();
+    canvas.width=rect.width*dpr;
+    canvas.height=rect.height*dpr;
+    const ctx=canvas.getContext("2d");
+    ctx.scale(dpr,dpr);
+    ctx.strokeStyle="#1a1a1a";
+    ctx.lineWidth=2.5;
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+    sigData[id].canvas=canvas;
+    sigData[id].ctx=ctx;
+
+    function getPos(e){
+      const r=canvas.getBoundingClientRect();
+      const src=e.touches?e.touches[0]:e;
+      return{x:(src.clientX-r.left),y:(src.clientY-r.top)};
+    }
+    function start(e){
+      e.preventDefault();
+      const pos=getPos(e);
+      sigData[id].drawing=true;
+      ctx.beginPath();ctx.moveTo(pos.x,pos.y);
+      // Esconde dica
+      const hint=document.getElementById("sig-hint-"+id);
+      if(hint)hint.style.display="none";
+    }
+    function move(e){
+      if(!sigData[id].drawing)return;
+      e.preventDefault();
+      const pos=getPos(e);
+      ctx.lineTo(pos.x,pos.y);ctx.stroke();
+      sigData[id].hasData=true;
+    }
+    function end(e){e.preventDefault();sigData[id].drawing=false;}
+
+    canvas.addEventListener("mousedown",start);
+    canvas.addEventListener("mousemove",move);
+    canvas.addEventListener("mouseup",end);
+    canvas.addEventListener("mouseleave",end);
+    canvas.addEventListener("touchstart",start,{passive:false});
+    canvas.addEventListener("touchmove",move,{passive:false});
+    canvas.addEventListener("touchend",end,{passive:false});
+  });
+}
+
+function limparAssinatura(id){
+  const s=sigData[id];
+  if(!s.canvas)return;
+  const dpr=window.devicePixelRatio||1;
+  const w=s.canvas.getBoundingClientRect().width;
+  const h=s.canvas.getBoundingClientRect().height;
+  s.ctx.clearRect(0,0,w,h);
+  s.hasData=false;
+  const hint=document.getElementById("sig-hint-"+id);
+  if(hint)hint.style.display="";
+}
+
+function getSigDataURL(id){
+  const s=sigData[id];
+  if(!s.canvas||!s.hasData)return null;
+  return s.canvas.toDataURL("image/png");
+}
+
+// Inicializa após carregamento
+window.addEventListener("load",function(){
+  setTimeout(initSignaturePads,100);
+});
 
 // ── RG UPLOAD ──────────────────────────────────────────
 const rgData={frente:null,verso:null};
