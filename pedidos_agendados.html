@@ -115,6 +115,7 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 .btn-edit{background:var(--red-dim);color:var(--red)}.btn-edit:hover{background:var(--red);color:#fff}
 .btn-del{background:#f5f5f7;color:#8e8e93}.btn-del:hover{background:#fde8ec;color:var(--red)}
 .btn-wpp-row{background:#e8faf0;color:var(--wpp)}.btn-wpp-row:hover{background:var(--wpp);color:#fff}
+.btn-copy-row{background:#f0f0f5;color:#555}.btn-copy-row:hover{background:#e0e0ea;color:var(--preto)}
 
 /* ── STATUS BADGE ── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
@@ -169,11 +170,17 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 .det-btn-wpp-interno{background:#fff3e0;color:#e65100;border:1.5px solid #ffe0b2 !important}.det-btn-wpp-interno:hover{background:#e65100;color:#fff}
 .det-btn-edit{background:var(--red-dim);color:var(--red)}.det-btn-edit:hover{background:var(--red);color:#fff}
 .det-btn-del{background:#f5f5f7;color:#8e8e93}.det-btn-del:hover{background:#fde8ec;color:var(--red)}
+.det-btn-copy{background:#f0f0f5;color:#555;border:1.5px solid var(--brd)!important}.det-btn-copy:hover{background:#e0e0ea;color:var(--preto)}
+.det-btn-copy.copied{background:var(--verde)!important;color:#fff!important;border-color:var(--verde)!important}
 .det-wpp-section{padding:0 20px 6px;display:flex;flex-direction:column;gap:7px}
 .det-wpp-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;padding:0 2px}
 .det-wpp-row{display:flex;gap:8px}
 .det-divider{height:1px;background:var(--brd);margin:0 20px 10px}
 .det-secondary-row{display:flex;gap:8px;padding:0 20px 20px}
+
+/* Toast */
+#copyToast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:10px 22px;border-radius:30px;font-size:12px;font-weight:700;font-family:'Montserrat',sans-serif;opacity:0;pointer-events:none;transition:all .3s;z-index:99999;white-space:nowrap}
+#copyToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ══ MOBILE ══ */
 @media(max-width:768px){
@@ -201,6 +208,9 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 </style>
 </head>
 <body>
+
+<!-- TOAST COPIAR -->
+<div id="copyToast">✅ Mensagem copiada!</div>
 
 <!-- SYNC BANNER -->
 <div id="syncBanner" style="position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--red);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:9px;display:none;align-items:center;justify-content:center;gap:10px;font-family:'Montserrat',sans-serif">
@@ -436,12 +446,76 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 
 <script>
 // ════ ESTADO ════
-let pedidos = [];
-let filtroStatusAtivo = 'todos';
-let filtroVendedorAtivo = 'todos';
-let buscaAtiva = '';
-let editandoIdx = null;
-let _fbSalvar = null; // será injetado pelo módulo Firebase
+// IMPORTANTE: usar var (não let) para que window.pedidos e window._fbSalvar
+// sejam acessíveis pelo módulo Firebase (que roda em escopo isolado)
+var pedidos = [];
+var filtroStatusAtivo = 'todos';
+var filtroVendedorAtivo = 'todos';
+var buscaAtiva = '';
+var editandoIdx = null;
+var _fbSalvar = null; // será injetado pelo módulo Firebase
+
+// Armazena temporariamente as mensagens do detalhe aberto
+let _msgClienteTemp = '';
+let _msgInternoTemp = '';
+
+// ════ TOAST COPIAR ════
+function showToast(msg){
+  const t = document.getElementById('copyToast');
+  t.textContent = msg || '✅ Mensagem copiada!';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ════ COPIAR PARA CLIPBOARD ════
+function copiarMensagem(tipo, btnEl){
+  const texto = tipo === 'cliente' ? _msgClienteTemp : _msgInternoTemp;
+  if(!texto){ showToast('⚠️ Nenhuma mensagem para copiar'); return; }
+  navigator.clipboard.writeText(texto).then(()=>{
+    showToast('✅ Mensagem copiada! Cole no WhatsApp.');
+    if(btnEl){
+      const orig = btnEl.innerHTML;
+      btnEl.innerHTML = '✅ Copiado!';
+      btnEl.classList.add('copied');
+      setTimeout(()=>{ btnEl.innerHTML = orig; btnEl.classList.remove('copied'); }, 2200);
+    }
+  }).catch(()=>{
+    // Fallback: cria área de texto invisível
+    const ta = document.createElement('textarea');
+    ta.value = texto;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ Mensagem copiada! Cole no WhatsApp.');
+  });
+}
+
+function copiarPedidoIdx(idx, btnEl){
+  const p = pedidos[idx];
+  const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
+  const msg = `🔔 *VENDA CONFIRMADA — ${p.cod||''}*\n\n👤 *Cliente:* ${p.cliente||'—'}\n📞 *Telefone:* ${p.tel||'—'}\n📅 *Data:* ${dataFmt} às ${p.hora||'—'}h\n👨‍💼 *Vendedor:* ${p.vendedor||'—'}\n📱 *Produto:* ${p.produto||'—'}\n💰 *Valor:* ${p.valor||'—'}\n💳 *Pagamento:* ${p.pgto||'—'}${p.obs?'\n📝 *Obs:* '+p.obs:''}\n\n✅ Confirmado e registrado!`;
+  navigator.clipboard.writeText(msg).then(()=>{
+    showToast('✅ Pedido copiado! Cole no WhatsApp.');
+    if(btnEl){
+      const orig = btnEl.innerHTML;
+      btnEl.innerHTML = '✅';
+      setTimeout(()=>{ btnEl.innerHTML = orig; }, 2000);
+    }
+  }).catch(()=>{
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ Pedido copiado! Cole no WhatsApp.');
+  });
+}
 
 // ════ BANNER SYNC ════
 function showBanner(msg, tipo){
@@ -552,6 +626,7 @@ function renderTabela(){
       <td>${badge}</td>
       <td class="td-acoes" onclick="event.stopPropagation()">
         <button class="btn-edit" onclick="editarPedido(${idx})">✏️ Editar</button>
+        <button class="btn-copy-row" onclick="copiarPedidoIdx(${idx},this)" title="Copiar pedido para WhatsApp">📋</button>
         <button class="btn-del" onclick="deletarPedido(${idx})">🗑</button>
       </td>
     </tr>`;
@@ -595,16 +670,18 @@ function buscar(q){
 
 // ════ FIREBASE SAVE ════
 async function salvarFirebase(){
-  if(!_fbSalvar){
-    showBanner('⚠️ Firebase não conectado ainda', 'err');
+  // Usa window._fbSalvar para garantir que pega a função injetada pelo módulo
+  const fn = window._fbSalvar;
+  if(!fn){
+    showBanner('⚠️ Firebase ainda conectando... Tente em instantes.', 'err');
     return;
   }
   try {
     showBanner('Salvando...', 'loading');
-    await _fbSalvar(pedidos);
+    await fn(pedidos);
     showBanner('✅ Salvo no Firebase!', 'ok');
   } catch(e) {
-    console.error(e);
+    console.error('Erro ao salvar Firebase:', e);
     showBanner('❌ Erro ao salvar: ' + e.message, 'err');
   }
 }
@@ -680,7 +757,8 @@ function verDetalhe(idx){
   const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
   const tel = (p.tel||'').replace(/\D/g,'');
 
-  const msgCliente = encodeURIComponent(
+  // Mensagens sem encode (para copiar)
+  _msgClienteTemp =
 `Olá ${p.cliente}! 😊
 
 Passando para confirmar seu agendamento *${p.cod}* na Revend.
@@ -691,10 +769,9 @@ Passando para confirmar seu agendamento *${p.cod}* na Revend.
 💰 *Valor:* ${p.valor}
 💳 *Pagamento:* ${p.pgto}${p.obs ? `\n\n📝 *Obs:* ${p.obs}` : ''}
 
-Te esperamos! Qualquer dúvida, é só chamar. ✅`
-  );
+Te esperamos! Qualquer dúvida, é só chamar. ✅`;
 
-  const msgInterno = encodeURIComponent(
+  _msgInternoTemp =
 `🔔 *VENDA CONFIRMADA — ${p.cod}*
 
 👤 *Cliente:* ${p.cliente}
@@ -705,8 +782,11 @@ Te esperamos! Qualquer dúvida, é só chamar. ✅`
 💰 *Valor:* ${p.valor}
 💳 *Pagamento:* ${p.pgto}${p.obs ? `\n📝 *Obs:* ${p.obs}` : ''}
 
-✅ Confirmado e registrado!`
-  );
+✅ Confirmado e registrado!`;
+
+  // Encode para links wa.me
+  const msgClienteEnc = encodeURIComponent(_msgClienteTemp);
+  const msgInternoEnc = encodeURIComponent(_msgInternoTemp);
 
   document.getElementById('detalheGrid').innerHTML = `
     <div class="dg-item"><div class="dg-lbl">Código</div><div class="dg-val">${p.cod||'—'}</div></div>
@@ -722,31 +802,40 @@ Te esperamos! Qualquer dúvida, é só chamar. ✅`
     ${p.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${p.obs}</div></div>`:''}
   `;
 
+  // Seção cliente
   document.getElementById('detalheWppCliente').innerHTML = `
     <div class="det-wpp-section">
       <div class="det-wpp-label">📲 Enviar ao cliente</div>
       <div class="det-wpp-row">
-        ${tel ? `<a href="https://wa.me/55${tel}?text=${msgCliente}" target="_blank" style="flex:1;text-decoration:none">
+        ${tel ? `<a href="https://wa.me/55${tel}?text=${msgClienteEnc}" target="_blank" style="flex:1;text-decoration:none">
           <button class="det-btn det-btn-wpp" style="width:100%">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            Confirmação para o cliente
+            Abrir WhatsApp
           </button>
-        </a>` : `<button class="det-btn" style="flex:1;background:#f5f5f7;color:#8e8e93;cursor:not-allowed" disabled>📵 Sem telefone cadastrado</button>`}
+        </a>` : `<button class="det-btn" style="flex:1;background:#f5f5f7;color:#8e8e93;cursor:not-allowed" disabled>📵 Sem telefone</button>`}
+        <button class="det-btn det-btn-copy" onclick="copiarMensagem('cliente',this)" style="flex:0 0 auto;min-width:110px">
+          📋 Copiar msg
+        </button>
       </div>
     </div>
   `;
 
   document.getElementById('detDivider').style.display = 'block';
+
+  // Seção grupo interno — usa web.whatsapp.com em vez de api.whatsapp.com
   document.getElementById('detalheWppInterno').innerHTML = `
     <div class="det-wpp-section" style="padding-bottom:12px">
       <div class="det-wpp-label">🏪 Enviar ao grupo interno — Vendas Confirmadas</div>
       <div class="det-wpp-row">
-        <a href="https://wa.me/?text=${msgInterno}" target="_blank" style="flex:1;text-decoration:none">
+        <a href="https://web.whatsapp.com/send?text=${msgInternoEnc}" target="_blank" style="flex:1;text-decoration:none">
           <button class="det-btn det-btn-wpp-interno" style="width:100%">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-            Avisar grupo de vendas
+            Avisar grupo (Web)
           </button>
         </a>
+        <button class="det-btn det-btn-copy" onclick="copiarMensagem('interno',this)" style="flex:0 0 auto;min-width:110px">
+          📋 Copiar msg
+        </button>
       </div>
     </div>
   `;
@@ -767,6 +856,12 @@ function fecharOv(e, id){ if(e.target===document.getElementById(id)) fecharModal
 window.addEventListener('load',()=>{
   showBanner('Conectando ao Firebase...', 'loading');
   setTimeout(()=>{ document.getElementById('loading').classList.add('gone'); },600);
+  // Se em 8 segundos ainda não conectou, avisa
+  setTimeout(()=>{
+    if(!window._fbSalvar){
+      showBanner('⚠️ Verifique as regras do Firebase Realtime Database (read/write)', 'err');
+    }
+  }, 8000);
 });
 </script>
 
@@ -794,21 +889,22 @@ window._fbSalvar = async (dados) => {
 };
 
 // Listener em tempo real
+// IMPORTANTE: usar window.pedidos (não pedidos) pois módulos rodam em strict mode
 onValue(ref(db, 'pedidos_agendados'), snap => {
   const val = snap.val();
   if(Array.isArray(val)){
-    pedidos = val;
+    window.pedidos = val;
   } else if(val && typeof val === 'object'){
-    // caso venha como objeto Firebase (chaves numéricas)
-    pedidos = Object.values(val);
+    // caso venha como objeto Firebase (chaves numéricas ou string)
+    window.pedidos = Object.values(val).filter(v => v && typeof v === 'object');
   } else {
-    pedidos = [];
+    window.pedidos = [];
   }
-  render();
-  showBanner('🔥 Firebase · sincronizado em tempo real', 'ok');
+  window.render();
+  window.showBanner('🔥 Firebase sincronizado!', 'ok');
 }, err => {
-  console.error(err);
-  showBanner('❌ Erro Firebase: ' + err.message, 'err');
+  console.error('Firebase erro:', err);
+  window.showBanner('❌ Erro Firebase: ' + err.message, 'err');
 });
 </script>
 </body>
