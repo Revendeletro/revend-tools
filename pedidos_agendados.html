@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revend — Pedidos Agendados</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#c8102e; --red-dark:#a00d24; --red-dim:rgba(200,16,46,.10);
+  --preto:#111; --bg:#F2F2F7; --card:#fff; --brd:#E5E5EA; --txt2:#8E8E93;
+  --verde:#34C759; --azul:#007AFF; --amarelo:#FF9500; --wpp:#25D366;
+  --radius:18px; --sidebar:260px;
+  --shadow:0 2px 14px rgba(0,0,0,.07); --shadow-md:0 8px 32px rgba(0,0,0,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--preto);min-height:100vh}
+
+/* ══ LOADING ══ */
+#loading{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
+#loading.gone{opacity:0;pointer-events:none}
+.ld-logo{font-size:34px;font-weight:900;color:var(--red);letter-spacing:-1px}
+.ld-spin{width:36px;height:36px;border:3px solid #eee;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
+.ld-txt{font-size:12px;color:var(--txt2);font-weight:600}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══ LAYOUT ══ */
+.layout{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sidebar);background:#fff;border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:4px}.sidebar::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
+.sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.sb-logo-txt{font-size:22px;font-weight:900;color:var(--red);letter-spacing:-1px}
+.live-pill{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--verde);background:#e8fdf0;padding:4px 10px;border-radius:20px}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--verde);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sb-search{padding:10px 14px;border-bottom:1px solid var(--brd)}
+.inp-search{width:100%;padding:8px 14px;border:1.5px solid var(--brd);border-radius:20px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;outline:none;background:#fafafa;transition:border .15s}
+.inp-search:focus{border-color:var(--red);background:#fff}
+.sb-nav{padding:10px 10px 20px}
+.nav-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px}
+.nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:none;border-radius:10px;background:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:#555;text-align:left;transition:all .15s;margin-bottom:2px}
+.nav-btn:hover{background:var(--bg);color:var(--preto)}.nav-btn.on{background:var(--red-dim);color:var(--red)}
+.nav-btn .em{font-size:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:18px;text-align:center}
+.nav-badge.verde{background:var(--verde)}
+.nav-badge.amarelo{background:var(--amarelo)}
+.sb-stats{padding:12px 14px;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.stat-row:last-child{margin-bottom:0}
+.stat-lbl{font-size:10px;font-weight:700;color:var(--txt2)}
+.stat-val{font-size:14px;font-weight:900;color:var(--preto)}
+.stat-val.red{color:var(--red)}
+.stat-val.verde{color:var(--verde)}
+.sb-foot{padding:14px;background:#fff;margin-top:auto}
+.add-btn-sb{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,transform .1s;margin-bottom:8px}
+.add-btn-sb:hover{background:var(--red-dark);transform:scale(1.01)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--brd);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:90}
+.topbar-info h1{font-size:18px;font-weight:900;letter-spacing:-.4px}
+.topbar-info p{font-size:11px;color:var(--txt2);font-weight:600;margin-top:1px}
+.topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
+.tb-add-btn{padding:9px 18px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
+.tb-add-btn:hover{background:var(--red-dark)}
+.content{padding:24px 28px 70px;flex:1}
+
+/* ── HERO ── */
+.hero{background:linear-gradient(130deg,var(--red) 0%,var(--red-dark) 100%);border-radius:var(--radius);padding:22px 26px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;color:#fff;gap:16px;flex-wrap:wrap}
+.hero-left h2{font-size:22px;font-weight:900;letter-spacing:-.5px}.hero-left p{font-size:12px;opacity:.8;margin-top:3px;font-weight:600}
+.hero-stats{display:flex;gap:12px;flex-wrap:wrap}
+.hero-stat{background:rgba(0,0,0,.2);border-radius:12px;padding:10px 18px;text-align:center;min-width:80px}
+.hero-stat .hs-n{font-size:28px;font-weight:900;line-height:1;letter-spacing:-1px}
+.hero-stat .hs-l{font-size:9px;opacity:.8;font-weight:700;margin-top:2px}
+
+/* ── FILTROS ── */
+.filtros{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filtro-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--brd);background:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#555;cursor:pointer;transition:all .15s;white-space:nowrap}
+.filtro-btn:hover{border-color:#bbb;background:#f5f5f5}
+.filtro-btn.on{background:var(--red);color:#fff;border-color:var(--red)}
+.filtro-btn.agendado.on{background:var(--azul);border-color:var(--azul)}
+.filtro-btn.confirmado.on{background:var(--amarelo);border-color:var(--amarelo)}
+.filtro-btn.entregue.on{background:var(--verde);border-color:var(--verde)}
+.filtro-btn.cancelado.on{background:#8e8e93;border-color:#8e8e93}
+
+/* ── TABELA ── */
+.tbl-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid var(--brd)}
+.tbl-head-bar{padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.tbl-head-bar h3{font-size:13px;font-weight:800}
+.tbl-count{font-size:11px;color:var(--txt2);font-weight:600}
+.tbl-scroll{overflow-x:auto}
+.tbl-scroll::-webkit-scrollbar{height:4px}.tbl-scroll::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
+table{width:100%;border-collapse:collapse;min-width:900px}
+thead{background:#f5f5f7}
+thead th{padding:10px 14px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);border-bottom:1.5px solid var(--brd);white-space:nowrap}
+tbody tr{transition:background .12s;border-bottom:1px solid #f0f0f0}
+tbody tr:hover{background:#fff5f6}
+tbody tr:last-child{border-bottom:none}
+td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
+.td-cod{font-weight:800;color:var(--red);white-space:nowrap}
+.td-data{white-space:nowrap;color:var(--preto)}
+.td-hora{white-space:nowrap;font-weight:700;color:var(--azul)}
+.td-vendedor{white-space:nowrap}
+.td-cliente{font-weight:700;max-width:180px}
+.td-tel a{color:var(--wpp);text-decoration:none;font-weight:700;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.td-tel a:hover{text-decoration:underline}
+.td-produto{max-width:220px;font-weight:600;color:#333;line-height:1.4}
+.td-valor{font-weight:900;color:var(--preto);white-space:nowrap}
+.td-pgto{max-width:200px;font-size:11px;color:#555;line-height:1.4}
+.td-acoes{white-space:nowrap}
+.td-acoes button{padding:5px 10px;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;margin-right:4px}
+.btn-edit{background:var(--red-dim);color:var(--red)}.btn-edit:hover{background:var(--red);color:#fff}
+.btn-del{background:#f5f5f7;color:#8e8e93}.btn-del:hover{background:#fde8ec;color:var(--red)}
+.btn-wpp-row{background:#e8faf0;color:var(--wpp)}.btn-wpp-row:hover{background:var(--wpp);color:#fff}
+
+/* ── STATUS BADGE ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-agendado{background:rgba(0,122,255,.12);color:var(--azul)}.badge-agendado::before{background:var(--azul)}
+.badge-confirmado{background:rgba(255,149,0,.12);color:var(--amarelo)}.badge-confirmado::before{background:var(--amarelo)}
+.badge-entregue{background:rgba(52,199,89,.12);color:var(--verde)}.badge-entregue::before{background:var(--verde)}
+.badge-cancelado{background:rgba(142,142,147,.12);color:#636366}.badge-cancelado::before{background:#8e8e93}
+
+/* ── EMPTY ── */
+.empty-state{padding:60px 20px;text-align:center;color:var(--txt2)}
+.empty-state .es-ico{font-size:48px;margin-bottom:12px}
+.empty-state p{font-size:14px;font-weight:600}
+.empty-state span{font-size:12px;display:block;margin-top:4px}
+
+/* ══ MODAL ADD/EDIT ══ */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.modal-ov.on{display:flex;animation:fadein .2s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.modal-box{background:#fff;border-radius:22px;width:560px;max-width:calc(100vw - 24px);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.25);animation:slideup .22s ease}
+@keyframes slideup{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{background:linear-gradient(130deg,var(--red),var(--red-dark));color:#fff;padding:18px 20px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.modal-head h3{font-size:15px;font-weight:900}.modal-head p{font-size:11px;opacity:.8;margin-top:2px}
+.m-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.m-close:hover{background:rgba(255,255,255,.35)}
+.modal-body{overflow-y:auto;flex:1;padding:20px}
+.modal-body::-webkit-scrollbar{width:4px}.modal-body::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;outline:none;background:#fafafa;transition:border .15s;color:var(--preto)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--red);background:#fff}
+.form-group textarea{resize:vertical;min-height:70px}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--brd);display:flex;gap:10px;flex-shrink:0}
+.btn-salvar{flex:1;padding:13px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:background .15s}
+.btn-salvar:hover{background:var(--red-dark)}
+.btn-cancelar{padding:13px 20px;background:var(--bg);color:#555;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
+.btn-cancelar:hover{background:#e5e5ea}
+
+/* ══ MODAL DETALHE ══ */
+.detalhe-box{width:480px}
+.detalhe-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px}
+.dg-item{background:var(--bg);border-radius:10px;padding:10px 14px}
+.dg-item.full{grid-column:1/-1}
+.dg-lbl{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.dg-val{font-size:13px;font-weight:700;color:var(--preto);line-height:1.4}
+.dg-val.red{color:var(--red);font-size:18px;font-weight:900}
+.detalhe-actions{padding:0 20px 20px;display:flex;gap:8px;flex-wrap:wrap}
+.det-btn{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;min-width:100px}
+.det-btn-wpp{background:#e8faf0;color:var(--wpp)}.det-btn-wpp:hover{background:var(--wpp);color:#fff}
+.det-btn-wpp-interno{background:#fff3e0;color:#e65100;border:1.5px solid #ffe0b2 !important}.det-btn-wpp-interno:hover{background:#e65100;color:#fff}
+.det-btn-edit{background:var(--red-dim);color:var(--red)}.det-btn-edit:hover{background:var(--red);color:#fff}
+.det-btn-del{background:#f5f5f7;color:#8e8e93}.det-btn-del:hover{background:#fde8ec;color:var(--red)}
+.det-wpp-section{padding:0 20px 6px;display:flex;flex-direction:column;gap:7px}
+.det-wpp-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;padding:0 2px}
+.det-wpp-row{display:flex;gap:8px}
+.det-divider{height:1px;background:var(--brd);margin:0 20px 10px}
+.det-secondary-row{display:flex;gap:8px;padding:0 20px 20px}
+
+/* ══ MOBILE ══ */
+@media(max-width:768px){
+  .sidebar,.topbar{display:none}
+  .main{margin-left:0}
+  .content{padding:12px 12px 90px}
+  .hero{flex-direction:column;gap:12px}
+  .hero-stats{width:100%;justify-content:space-between}
+  .hero-stat{flex:1}
+  .mob-header{display:flex;align-items:center;justify-content:space-between;background:#fff;padding:13px 16px;position:sticky;top:0;z-index:200;border-bottom:1px solid var(--brd);box-shadow:0 1px 8px rgba(0,0,0,.06)}
+  .mob-logo{font-size:21px;font-weight:900;color:var(--red);letter-spacing:-.8px}
+  .mob-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--verde)}
+  .mob-search{padding:8px 12px;background:#fff;border-bottom:1px solid var(--brd);position:sticky;top:57px;z-index:190}
+  .mob-search .inp-search{font-size:13px}
+  .add-float{display:flex;position:fixed;bottom:16px;right:14px;background:var(--red);color:#fff;border:none;border-radius:50px;padding:13px 20px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;gap:7px;align-items:center;box-shadow:0 4px 20px rgba(200,16,46,.4);z-index:300;transition:all .2s}
+  .modal-ov.on{align-items:flex-end}
+  .modal-box,.detalhe-box{width:100%;max-width:100%;border-radius:22px 22px 0 0;max-height:92vh;animation:slideup-mob .25s ease}
+  @keyframes slideup-mob{from{transform:translateY(100%)}to{transform:none}}
+  .form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:1}
+  .filtros{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .filtros::-webkit-scrollbar{display:none}
+}
+@media(min-width:769px){.mob-header,.mob-search,.add-float{display:none}}
+</style>
+</head>
+<body>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner" style="position:fixed;top:0;left:0;right:0;z-index:10000;background:var(--red);color:#fff;text-align:center;font-size:12px;font-weight:700;padding:9px;display:none;align-items:center;justify-content:center;gap:10px;font-family:'Montserrat',sans-serif">
+  <div id="syncSpinner" style="width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
+  <span id="syncMsg">Conectando ao Firebase...</span>
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="ld-logo">revend</div>
+  <div class="ld-spin"></div>
+  <div class="ld-txt">Carregando pedidos agendados...</div>
+</div>
+
+<!-- MOBILE HEADER -->
+<div class="mob-header">
+  <div class="mob-logo">revend</div>
+  <div class="mob-live"><div class="live-dot"></div><span>pedidos</span></div>
+</div>
+<div class="mob-search"><input class="inp-search" type="search" id="mobSearch" placeholder="🔍 Buscar pedido..." oninput="buscar(this.value)"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <div class="sb-logo-txt">revend</div>
+      <div class="live-pill"><div class="live-dot"></div><span>ao vivo</span></div>
+    </div>
+    <div class="sb-search">
+      <input class="inp-search" type="search" id="deskSearch" placeholder="🔍 Buscar pedido..." oninput="buscar(this.value)">
+    </div>
+    <nav class="sb-nav">
+      <div class="nav-label">Filtrar por status</div>
+      <button class="nav-btn on" onclick="filtrarStatus('todos',this)">
+        <span class="em">📋</span> Todos os pedidos
+        <span class="nav-badge" id="badgeTodos">0</span>
+      </button>
+      <button class="nav-btn" onclick="filtrarStatus('Agendado',this)">
+        <span class="em">🕐</span> Agendados
+        <span class="nav-badge" id="badgeAgendado" style="background:var(--azul)">0</span>
+      </button>
+      <button class="nav-btn" onclick="filtrarStatus('Confirmado',this)">
+        <span class="em">✅</span> Confirmados
+        <span class="nav-badge" id="badgeConfirmado" style="background:var(--amarelo)">0</span>
+      </button>
+      <button class="nav-btn" onclick="filtrarStatus('Entregue',this)">
+        <span class="em">📦</span> Entregues
+        <span class="nav-badge" id="badgeEntregue" style="background:var(--verde)">0</span>
+      </button>
+      <button class="nav-btn" onclick="filtrarStatus('Cancelado',this)">
+        <span class="em">❌</span> Cancelados
+        <span class="nav-badge" id="badgeCancelado" style="background:#8e8e93">0</span>
+      </button>
+      <div class="nav-label" style="margin-top:8px">Filtrar por vendedor</div>
+      <div id="vendedorNav"></div>
+    </nav>
+    <div class="sb-stats" id="sbStats"></div>
+    <div class="sb-foot">
+      <button class="add-btn-sb" onclick="abrirModal()">
+        ＋ Novo Pedido Agendado
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-info">
+        <h1>Pedidos Agendados</h1>
+        <p>Gerencie os agendamentos dos vendedores</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="tb-add-btn" onclick="abrirModal()">＋ Novo Pedido</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-left">
+          <h2>Controle de Agendamentos</h2>
+          <p>Pedidos registrados pelos vendedores</p>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <div class="hs-n" id="heroTotal">0</div>
+            <div class="hs-l">Total</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-n" id="heroAgendado">0</div>
+            <div class="hs-l">Agendados</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-n" id="heroConfirmado">0</div>
+            <div class="hs-l">Confirmados</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hs-n" id="heroEntregue">0</div>
+            <div class="hs-l">Entregues</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filtros" id="filtros">
+        <button class="filtro-btn on" onclick="filtrarStatus('todos',this)" data-status="todos">📋 Todos</button>
+        <button class="filtro-btn agendado" onclick="filtrarStatus('Agendado',this)" data-status="Agendado">🕐 Agendado</button>
+        <button class="filtro-btn confirmado" onclick="filtrarStatus('Confirmado',this)" data-status="Confirmado">✅ Confirmado</button>
+        <button class="filtro-btn entregue" onclick="filtrarStatus('Entregue',this)" data-status="Entregue">📦 Entregue</button>
+        <button class="filtro-btn cancelado" onclick="filtrarStatus('Cancelado',this)" data-status="Cancelado">❌ Cancelado</button>
+      </div>
+
+      <!-- TABELA -->
+      <div class="tbl-wrap">
+        <div class="tbl-head-bar">
+          <h3>Pedidos</h3>
+          <span class="tbl-count" id="tblCount">0 pedidos</span>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Cód.</th>
+                <th>Data</th>
+                <th>Horário</th>
+                <th>Vendedor</th>
+                <th>Cliente</th>
+                <th>Telefone</th>
+                <th>Produto</th>
+                <th>Valor</th>
+                <th>Pagamento</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tblBody"></tbody>
+          </table>
+          <div class="empty-state" id="emptyState" style="display:none">
+            <div class="es-ico">📭</div>
+            <p>Nenhum pedido encontrado</p>
+            <span>Clique em "Novo Pedido" para adicionar</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD FLOAT MOBILE -->
+<button class="add-float" onclick="abrirModal()">＋ Novo Pedido</button>
+
+<!-- MODAL ADD/EDIT -->
+<div class="modal-ov" id="modalAdd" onclick="fecharOv(event,'modalAdd')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div><h3 id="modalTitulo">Novo Pedido Agendado</h3><p>Preencha os dados do agendamento</p></div>
+      <button class="m-close" onclick="fecharModal('modalAdd')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Código de Agendamento</label>
+          <input type="text" id="fCod" placeholder="Ex: ST0215">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="fStatus">
+            <option value="Agendado">🕐 Agendado</option>
+            <option value="Confirmado">✅ Confirmado</option>
+            <option value="Entregue">📦 Entregue</option>
+            <option value="Cancelado">❌ Cancelado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" id="fData">
+        </div>
+        <div class="form-group">
+          <label>Horário</label>
+          <input type="time" id="fHora">
+        </div>
+        <div class="form-group">
+          <label>Vendedor</label>
+          <input type="text" id="fVendedor" placeholder="Nome do vendedor">
+        </div>
+        <div class="form-group">
+          <label>Nome do Cliente</label>
+          <input type="text" id="fCliente" placeholder="Nome completo">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" id="fTel" placeholder="Ex: 11 94076-0105">
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="text" id="fValor" placeholder="Ex: 4350,00">
+        </div>
+        <div class="form-group full">
+          <label>Produto (iPhone / Capacidade / Cor)</label>
+          <input type="text" id="fProduto" placeholder="Ex: iPhone 15 Pro Max 256GB Natural ou Azul sem caixa">
+        </div>
+        <div class="form-group full">
+          <label>Forma de Pagamento</label>
+          <textarea id="fPgto" placeholder="Ex: À vista + 12 PM 256GB pré-avaliado em R$ 1.400 (sujeito a alteração)"></textarea>
+        </div>
+        <div class="form-group full">
+          <label>Observações</label>
+          <textarea id="fObs" placeholder="Informações adicionais..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancelar" onclick="fecharModal('modalAdd')">Cancelar</button>
+      <button class="btn-salvar" onclick="salvarPedido()">💾 Salvar Pedido</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE -->
+<div class="modal-ov" id="modalDetalhe" onclick="fecharOv(event,'modalDetalhe')">
+  <div class="modal-box detalhe-box">
+    <div class="modal-head">
+      <div><h3 id="dNome">Detalhes do Pedido</h3><p id="dCod"></p></div>
+      <button class="m-close" onclick="fecharModal('modalDetalhe')">✕</button>
+    </div>
+    <div class="detalhe-grid" id="detalheGrid"></div>
+    <div id="detalheWppCliente"></div>
+    <div class="det-divider" id="detDivider" style="display:none"></div>
+    <div id="detalheWppInterno"></div>
+    <div class="detalhe-actions" id="detalheActions"></div>
+  </div>
+</div>
+
+<script>
+// ════ ESTADO ════
+let pedidos = [];
+let filtroStatusAtivo = 'todos';
+let filtroVendedorAtivo = 'todos';
+let buscaAtiva = '';
+let editandoIdx = null;
+let _fbSalvar = null; // será injetado pelo módulo Firebase
+
+// ════ BANNER SYNC ════
+function showBanner(msg, tipo){
+  const b = document.getElementById('syncBanner');
+  const sp = document.getElementById('syncSpinner');
+  const tx = document.getElementById('syncMsg');
+  tx.textContent = msg;
+  b.style.display = 'flex';
+  b.style.background = tipo==='ok' ? '#16a34a' : tipo==='err' ? '#b91c1c' : 'var(--red)';
+  sp.style.display = tipo==='loading' ? 'block' : 'none';
+  if(tipo!=='loading') setTimeout(()=>{ b.style.display='none'; }, 2800);
+}
+
+// ════ RENDER ════
+function render(){
+  atualizarBadges();
+  atualizarHero();
+  atualizarStats();
+  renderVendedores();
+  renderTabela();
+}
+
+function filtrarPedidos(){
+  return pedidos.filter(p=>{
+    const matchStatus = filtroStatusAtivo==='todos' || p.status===filtroStatusAtivo;
+    const matchVendedor = filtroVendedorAtivo==='todos' || p.vendedor===filtroVendedorAtivo;
+    const q = buscaAtiva.toLowerCase();
+    const matchBusca = !q ||
+      (p.cod||'').toLowerCase().includes(q) ||
+      (p.cliente||'').toLowerCase().includes(q) ||
+      (p.vendedor||'').toLowerCase().includes(q) ||
+      (p.produto||'').toLowerCase().includes(q) ||
+      (p.tel||'').includes(q);
+    return matchStatus && matchVendedor && matchBusca;
+  });
+}
+
+function atualizarBadges(){
+  const cnt = s => pedidos.filter(p=>p.status===s).length;
+  document.getElementById('badgeTodos').textContent = pedidos.length;
+  document.getElementById('badgeAgendado').textContent = cnt('Agendado');
+  document.getElementById('badgeConfirmado').textContent = cnt('Confirmado');
+  document.getElementById('badgeEntregue').textContent = cnt('Entregue');
+  document.getElementById('badgeCancelado').textContent = cnt('Cancelado');
+}
+
+function atualizarHero(){
+  const cnt = s => pedidos.filter(p=>p.status===s).length;
+  document.getElementById('heroTotal').textContent = pedidos.length;
+  document.getElementById('heroAgendado').textContent = cnt('Agendado');
+  document.getElementById('heroConfirmado').textContent = cnt('Confirmado');
+  document.getElementById('heroEntregue').textContent = cnt('Entregue');
+}
+
+function atualizarStats(){
+  const el = document.getElementById('sbStats');
+  const total = pedidos.length;
+  const hoje = new Date().toISOString().slice(0,10);
+  const hojeQtd = pedidos.filter(p=>p.data===hoje).length;
+  el.innerHTML = `
+    <div class="stat-row"><span class="stat-lbl">Total de pedidos</span><span class="stat-val">${total}</span></div>
+    <div class="stat-row"><span class="stat-lbl">Agendados hoje</span><span class="stat-val red">${hojeQtd}</span></div>
+    <div class="stat-row"><span class="stat-lbl">Entregues</span><span class="stat-val verde">${pedidos.filter(p=>p.status==='Entregue').length}</span></div>
+  `;
+}
+
+function renderVendedores(){
+  const vends = [...new Set(pedidos.map(p=>p.vendedor).filter(Boolean))].sort();
+  const nav = document.getElementById('vendedorNav');
+  let html = `<button class="nav-btn ${filtroVendedorAtivo==='todos'?'on':''}" onclick="filtrarVendedor('todos',this)"><span class="em">👥</span> Todos os vendedores</button>`;
+  vends.forEach(v=>{
+    const cnt = pedidos.filter(p=>p.vendedor===v).length;
+    html += `<button class="nav-btn ${filtroVendedorAtivo===v?'on':''}" onclick="filtrarVendedor('${v}',this)"><span class="em">👤</span> ${v}<span class="nav-badge" style="background:var(--txt2)">${cnt}</span></button>`;
+  });
+  nav.innerHTML = html;
+}
+
+function renderTabela(){
+  const lista = filtrarPedidos();
+  const tbody = document.getElementById('tblBody');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('tblCount').textContent = `${lista.length} pedido${lista.length!==1?'s':''}`;
+
+  if(lista.length===0){
+    tbody.innerHTML='';
+    empty.style.display='block';
+    return;
+  }
+  empty.style.display='none';
+
+  tbody.innerHTML = lista.map(p=>{
+    const idx = pedidos.indexOf(p);
+    const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
+    const horaFmt = p.hora ? p.hora+'h' : '—';
+    const tel = (p.tel||'').replace(/\D/g,'');
+    const telLink = tel ? `<a href="https://wa.me/55${tel}" target="_blank">📱 ${p.tel}</a>` : p.tel||'—';
+    const badge = badgeHTML(p.status);
+    return `<tr onclick="verDetalhe(${idx})" style="cursor:pointer">
+      <td class="td-cod">${p.cod||'—'}</td>
+      <td class="td-data">${dataFmt}</td>
+      <td class="td-hora">${horaFmt}</td>
+      <td class="td-vendedor">${p.vendedor||'—'}</td>
+      <td class="td-cliente">${p.cliente||'—'}</td>
+      <td class="td-tel" onclick="event.stopPropagation()">${telLink}</td>
+      <td class="td-produto">${p.produto||'—'}</td>
+      <td class="td-valor">${p.valor||'—'}</td>
+      <td class="td-pgto">${p.pgto||'—'}</td>
+      <td>${badge}</td>
+      <td class="td-acoes" onclick="event.stopPropagation()">
+        <button class="btn-edit" onclick="editarPedido(${idx})">✏️ Editar</button>
+        <button class="btn-del" onclick="deletarPedido(${idx})">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function badgeHTML(status){
+  const map = {
+    'Agendado':  'badge-agendado',
+    'Confirmado':'badge-confirmado',
+    'Entregue':  'badge-entregue',
+    'Cancelado': 'badge-cancelado',
+  };
+  return `<span class="badge ${map[status]||'badge-agendado'}">${status||'Agendado'}</span>`;
+}
+
+// ════ FILTROS ════
+function filtrarStatus(status, btn){
+  filtroStatusAtivo = status;
+  document.querySelectorAll('.nav-btn, .filtro-btn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  document.querySelectorAll(`[data-status="${status}"]`).forEach(b=>b.classList.add('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.textContent.trim().includes(status==='todos'?'Todos os pedidos':status)) b.classList.add('on');
+  });
+  renderTabela();
+}
+
+function filtrarVendedor(vend, btn){
+  filtroVendedorAtivo = vend;
+  renderVendedores();
+  renderTabela();
+}
+
+function buscar(q){
+  buscaAtiva = q;
+  document.getElementById('deskSearch').value = q;
+  document.getElementById('mobSearch').value = q;
+  renderTabela();
+}
+
+// ════ FIREBASE SAVE ════
+async function salvarFirebase(){
+  if(!_fbSalvar){
+    showBanner('⚠️ Firebase não conectado ainda', 'err');
+    return;
+  }
+  try {
+    showBanner('Salvando...', 'loading');
+    await _fbSalvar(pedidos);
+    showBanner('✅ Salvo no Firebase!', 'ok');
+  } catch(e) {
+    console.error(e);
+    showBanner('❌ Erro ao salvar: ' + e.message, 'err');
+  }
+}
+
+// ════ MODAL ADD/EDIT ════
+function abrirModal(idx=null){
+  editandoIdx = idx;
+  document.getElementById('modalTitulo').textContent = idx!==null ? 'Editar Pedido' : 'Novo Pedido Agendado';
+  const p = idx!==null ? pedidos[idx] : {};
+  document.getElementById('fCod').value      = p.cod||autoCode();
+  document.getElementById('fStatus').value  = p.status||'Agendado';
+  document.getElementById('fData').value    = p.data||'';
+  document.getElementById('fHora').value    = p.hora||'';
+  document.getElementById('fVendedor').value= p.vendedor||'';
+  document.getElementById('fCliente').value = p.cliente||'';
+  document.getElementById('fTel').value     = p.tel||'';
+  document.getElementById('fValor').value   = p.valor||'';
+  document.getElementById('fProduto').value = p.produto||'';
+  document.getElementById('fPgto').value    = p.pgto||'';
+  document.getElementById('fObs').value     = p.obs||'';
+  document.getElementById('modalAdd').classList.add('on');
+}
+
+function editarPedido(idx){ abrirModal(idx); }
+
+function autoCode(){
+  const initials = ['AT','BK','CL','DM','ES','FP','GL','HR','IJ','JK'];
+  const ini = initials[Math.floor(Math.random()*initials.length)];
+  return ini + String(Math.floor(1000+Math.random()*9000));
+}
+
+function salvarPedido(){
+  const p = {
+    cod:      document.getElementById('fCod').value.trim().toUpperCase(),
+    status:   document.getElementById('fStatus').value,
+    data:     document.getElementById('fData').value,
+    hora:     document.getElementById('fHora').value,
+    vendedor: document.getElementById('fVendedor').value.trim(),
+    cliente:  document.getElementById('fCliente').value.trim(),
+    tel:      document.getElementById('fTel').value.trim(),
+    valor:    document.getElementById('fValor').value.trim(),
+    produto:  document.getElementById('fProduto').value.trim(),
+    pgto:     document.getElementById('fPgto').value.trim(),
+    obs:      document.getElementById('fObs').value.trim(),
+  };
+  if(!p.cod || !p.cliente){
+    alert('Preencha ao menos o código e o nome do cliente.');
+    return;
+  }
+  if(editandoIdx !== null){
+    pedidos[editandoIdx] = p;
+  } else {
+    pedidos.unshift(p);
+  }
+  fecharModal('modalAdd');
+  render();
+  salvarFirebase();
+}
+
+function deletarPedido(idx){
+  if(!confirm(`Excluir o pedido ${pedidos[idx].cod}?`)) return;
+  pedidos.splice(idx,1);
+  fecharModal('modalDetalhe');
+  render();
+  salvarFirebase();
+}
+
+// ════ MODAL DETALHE ════
+function verDetalhe(idx){
+  const p = pedidos[idx];
+  document.getElementById('dNome').textContent = p.cliente||'Pedido';
+  document.getElementById('dCod').textContent  = `Código: ${p.cod||'—'}`;
+  const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
+  const tel = (p.tel||'').replace(/\D/g,'');
+
+  const msgCliente = encodeURIComponent(
+`Olá ${p.cliente}! 😊
+
+Passando para confirmar seu agendamento *${p.cod}* na Revend.
+
+📅 *Data:* ${dataFmt}
+🕐 *Horário:* ${p.hora}h
+📱 *Produto:* ${p.produto}
+💰 *Valor:* ${p.valor}
+💳 *Pagamento:* ${p.pgto}${p.obs ? `\n\n📝 *Obs:* ${p.obs}` : ''}
+
+Te esperamos! Qualquer dúvida, é só chamar. ✅`
+  );
+
+  const msgInterno = encodeURIComponent(
+`🔔 *VENDA CONFIRMADA — ${p.cod}*
+
+👤 *Cliente:* ${p.cliente}
+📞 *Telefone:* ${p.tel}
+📅 *Data:* ${dataFmt} às ${p.hora}h
+👨‍💼 *Vendedor:* ${p.vendedor||'—'}
+📱 *Produto:* ${p.produto}
+💰 *Valor:* ${p.valor}
+💳 *Pagamento:* ${p.pgto}${p.obs ? `\n📝 *Obs:* ${p.obs}` : ''}
+
+✅ Confirmado e registrado!`
+  );
+
+  document.getElementById('detalheGrid').innerHTML = `
+    <div class="dg-item"><div class="dg-lbl">Código</div><div class="dg-val">${p.cod||'—'}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val">${badgeHTML(p.status)}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Data</div><div class="dg-val">${dataFmt}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Horário</div><div class="dg-val">${p.hora?p.hora+'h':'—'}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Vendedor</div><div class="dg-val">${p.vendedor||'—'}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Telefone</div><div class="dg-val">${p.tel||'—'}</div></div>
+    <div class="dg-item full"><div class="dg-lbl">Nome do Cliente</div><div class="dg-val">${p.cliente||'—'}</div></div>
+    <div class="dg-item full"><div class="dg-lbl">Produto</div><div class="dg-val">${p.produto||'—'}</div></div>
+    <div class="dg-item"><div class="dg-lbl">Valor</div><div class="dg-val red">${p.valor||'—'}</div></div>
+    <div class="dg-item full"><div class="dg-lbl">Forma de Pagamento</div><div class="dg-val">${p.pgto||'—'}</div></div>
+    ${p.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${p.obs}</div></div>`:''}
+  `;
+
+  document.getElementById('detalheWppCliente').innerHTML = `
+    <div class="det-wpp-section">
+      <div class="det-wpp-label">📲 Enviar ao cliente</div>
+      <div class="det-wpp-row">
+        ${tel ? `<a href="https://wa.me/55${tel}?text=${msgCliente}" target="_blank" style="flex:1;text-decoration:none">
+          <button class="det-btn det-btn-wpp" style="width:100%">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Confirmação para o cliente
+          </button>
+        </a>` : `<button class="det-btn" style="flex:1;background:#f5f5f7;color:#8e8e93;cursor:not-allowed" disabled>📵 Sem telefone cadastrado</button>`}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('detDivider').style.display = 'block';
+  document.getElementById('detalheWppInterno').innerHTML = `
+    <div class="det-wpp-section" style="padding-bottom:12px">
+      <div class="det-wpp-label">🏪 Enviar ao grupo interno — Vendas Confirmadas</div>
+      <div class="det-wpp-row">
+        <a href="https://wa.me/?text=${msgInterno}" target="_blank" style="flex:1;text-decoration:none">
+          <button class="det-btn det-btn-wpp-interno" style="width:100%">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            Avisar grupo de vendas
+          </button>
+        </a>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('detalheActions').innerHTML = `
+    <button class="det-btn det-btn-edit" onclick="fecharModal('modalDetalhe');editarPedido(${idx})">✏️ Editar</button>
+    <button class="det-btn det-btn-del" onclick="deletarPedido(${idx})">🗑 Excluir</button>
+  `;
+
+  document.getElementById('modalDetalhe').classList.add('on');
+}
+
+// ════ MODAL HELPERS ════
+function fecharModal(id){ document.getElementById(id).classList.remove('on'); }
+function fecharOv(e, id){ if(e.target===document.getElementById(id)) fecharModal(id); }
+
+// ════ INIT ════
+window.addEventListener('load',()=>{
+  showBanner('Conectando ao Firebase...', 'loading');
+  setTimeout(()=>{ document.getElementById('loading').classList.add('gone'); },600);
+});
+</script>
+
+<!-- FIREBASE MODULE -->
+<script type="module">
+import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+  authDomain:        "materiais-revend.firebaseapp.com",
+  databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
+  projectId:         "materiais-revend",
+  storageBucket:     "materiais-revend.firebasestorage.app",
+  messagingSenderId: "509931102943",
+  appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// Expõe função de salvar para o código global
+window._fbSalvar = async (dados) => {
+  await set(ref(db, 'pedidos_agendados'), dados);
+};
+
+// Listener em tempo real
+onValue(ref(db, 'pedidos_agendados'), snap => {
+  const val = snap.val();
+  if(Array.isArray(val)){
+    pedidos = val;
+  } else if(val && typeof val === 'object'){
+    // caso venha como objeto Firebase (chaves numéricas)
+    pedidos = Object.values(val);
+  } else {
+    pedidos = [];
+  }
+  render();
+  showBanner('🔥 Firebase · sincronizado em tempo real', 'ok');
+}, err => {
+  console.error(err);
+  showBanner('❌ Erro Firebase: ' + err.message, 'err');
+});
+</script>
+</body>
+</html>
