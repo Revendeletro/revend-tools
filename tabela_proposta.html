@@ -1140,6 +1140,27 @@ let gestorMode   = false;
 let _prodStatus = {};   // { KEY: 'desativado' | 'excluido' }
 let _prodNovos  = {};   // { KEY: { tabId, grupoIdx, nome, criadoEm } }
 
+// ── Ordenação natural para inserir novos produtos no lugar certo ──
+// Trata números (incluindo TB→GB), variantes (PRO MAX > PRO > PLUS > AIR > regular)
+// e legacy iPhone X/XR/XS de modo que o produto novo seja inserido em ordem.
+function _natKeyProduto(s) {
+    let n = String(s)
+        // Normaliza iPhone legacy para que ordem natural funcione
+        .replace(/iPhone\s+XR\b/gi, 'iPhone 10.5R')
+        .replace(/iPhone\s+XS\s+Max\b/gi, 'iPhone 10.6')
+        .replace(/iPhone\s+XS\b/gi, 'iPhone 10.5S')
+        .replace(/iPhone\s+X\b/gi, 'iPhone 10')
+        .toLowerCase()
+        // Converte TB → GB equivalente para comparar storage corretamente
+        .replace(/(\d+(?:\.\d+)?)\s*tb\b/gi, (_, num) => `${parseFloat(num) * 1024}gb`);
+    // Pad numéricos para natural sort
+    n = n.replace(/(\d+(?:\.\d+)?)/g, m => parseFloat(m).toFixed(2).padStart(13, '0'));
+    return n;
+}
+function _cmpProduto(a, b) {
+    return _natKeyProduto(a).localeCompare(_natKeyProduto(b));
+}
+
 // Retorna catálogo "efetivo" mesclado com produtos novos (mas SEM filtrar excluídos/desativados —
 // quem decide se renderiza é a função que monta a tabela, com base em _prodStatus)
 function catalogoEfetivo() {
@@ -1148,8 +1169,13 @@ function catalogoEfetivo() {
         ...sec,
         groups: sec.groups.map(g => ({ ...g, items: [...g.items] }))
     }));
-    // Insere produtos novos vindos do Firebase
-    Object.entries(_prodNovos).forEach(([key, info]) => {
+    // Insere produtos novos vindos do Firebase, em ordem determinística por criadoEm
+    const entradasOrdenadas = Object.entries(_prodNovos).sort((a, b) => {
+        const ta = a[1]?.criadoEm || '';
+        const tb = b[1]?.criadoEm || '';
+        return String(ta).localeCompare(String(tb));
+    });
+    entradasOrdenadas.forEach(([key, info]) => {
         if (!info || !info.tabId || !info.nome) return;
         const sec = eff.find(s => s.id === info.tabId);
         if (!sec) return;
@@ -1157,8 +1183,28 @@ function catalogoEfetivo() {
         // evita duplicar (caso o item já exista no catálogo base)
         const jaExiste = sec.groups.some(g => g.items.some(it => itemKey(sec.id, it) === key));
         if (!jaExiste) {
-            sec.groups[gi].items.push(info.nome);
+            // Para iPhones aplicamos sort total no fim; nos demais grupos inserimos
+            // o produto novo em posição ordenada preservando a ordem manual existente
+            // (Mac/AirPods têm ordem por hierarquia comercial, não alfabética).
+            if (sec.id.startsWith('iphone')) {
+                sec.groups[gi].items.push(info.nome);
+            } else {
+                const items = sec.groups[gi].items;
+                let pos = items.length;
+                for (let i = 0; i < items.length; i++) {
+                    if (_cmpProduto(info.nome, items[i]) < 0) { pos = i; break; }
+                }
+                items.splice(pos, 0, info.nome);
+            }
         }
+    });
+    // Aplica ordenação natural completa nas abas de iPhone — assim os iPhones
+    // (existentes + novos) ficam sempre em ordem: modelo → variante → armazenamento.
+    eff.forEach(sec => {
+        if (!sec.id.startsWith('iphone')) return;
+        sec.groups.forEach(g => {
+            g.items.sort((a, b) => _cmpProduto(a, b));
+        });
     });
     return eff;
 }
@@ -1823,7 +1869,7 @@ const TAXAS = {
     11: 0.147,
     12: 0.16,
     13: 0.173,
-    14: 0.146,
+    14: 0.186,
     15: 0.199,
     16: 0.202,
     17: 0.215,
