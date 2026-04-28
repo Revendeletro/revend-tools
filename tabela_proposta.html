@@ -417,6 +417,57 @@
             font-size: 12px; padding: 0 2px; line-height: 1;
         }
         .cor-rm-btn:hover { color: var(--red); }
+
+        /* ── GERENCIAMENTO DE PRODUTOS (gestor) ── */
+        .prod-actions { display: none; gap: 4px; margin-top: 6px; }
+        body.gestor-mode .prod-actions { display: inline-flex; flex-wrap: wrap; align-items: center; }
+        .prod-action-btn {
+            padding: 3px 9px; border-radius: 6px; font-size: 10px; font-weight: 800;
+            cursor: pointer; border: 1.5px solid; background: white; transition: all 0.15s;
+            display: inline-flex; align-items: center; gap: 3px;
+        }
+        .prod-action-btn.btn-desat { color: #92400e; border-color: #fcd34d; }
+        .prod-action-btn.btn-desat:hover { background: #fef3c7; }
+        .prod-action-btn.btn-reat  { color: #065f46; border-color: #6ee7b7; }
+        .prod-action-btn.btn-reat:hover  { background: #d1fae5; }
+        .prod-action-btn.btn-excl  { color: var(--red); border-color: var(--red-border); }
+        .prod-action-btn.btn-excl:hover  { background: var(--red-light); }
+        tbody tr.prod-desativado { opacity: 0.55; background: #fffbeb; }
+        tbody tr.prod-desativado .item-name::before { content: '⏸️ '; }
+        tbody tr.prod-desativado td:not(.gestor-only) { filter: grayscale(0.7); }
+        tbody tr.prod-excluido { opacity: 0.4; background: #fef2f2; }
+        tbody tr.prod-excluido .item-name { text-decoration: line-through; }
+        tbody tr.prod-excluido .item-name::before { content: '🗑️ '; text-decoration: none; display: inline-block; }
+        body:not(.gestor-mode) tr.prod-desativado,
+        body:not(.gestor-mode) tr.prod-excluido { display: none !important; }
+        tbody tr.prod-novo .item-name > :first-child + br + br,
+        tbody tr.prod-novo > .item-name {
+            position: relative;
+        }
+        tbody tr.prod-novo .item-name::after {
+            content: ' NOVO'; display: inline-block; margin-left: 6px;
+            font-size: 9px; font-weight: 800; padding: 1px 6px;
+            border-radius: 10px; background: #d1fae5; color: #065f46;
+        }
+        .grupo-add-row { display: none; padding: 10px; background: #fafafa; border: 2px dashed #d1d5db; border-radius: 8px; margin-top: 6px; text-align: center; }
+        body.gestor-mode .grupo-add-row { display: block; }
+        .grupo-add-btn {
+            background: var(--dark); color: white; border: none; border-radius: 6px;
+            padding: 7px 16px; font-size: 11px; font-weight: 800; cursor: pointer;
+            display: inline-flex; align-items: center; gap: 5px;
+        }
+        .grupo-add-btn:hover { background: #111; }
+
+        /* ── MODAL NOVO PRODUTO ── */
+        .modal-box-lg { width: 420px; max-width: calc(100vw - 24px); }
+        .modal-novo-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
+        .modal-novo-body label { font-size: 11px; font-weight: 800; color: #555; text-transform: uppercase; letter-spacing: 0.4px; }
+        .modal-novo-body input, .modal-novo-body select {
+            width: 100%; padding: 9px 12px; border: 2px solid var(--border); border-radius: 7px;
+            font-size: 13px; outline: none; font-family: inherit; letter-spacing: 0;
+        }
+        .modal-novo-body input:focus, .modal-novo-body select:focus { border-color: var(--red); }
+        .modal-novo-info { font-size: 11px; color: #888; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--red); }
     </style>
 </head>
 <body>
@@ -425,6 +476,42 @@
 <div id="syncBanner">
     <div class="spinner" id="syncSpinner"></div>
     <span id="syncMsg">Conectando...</span>
+</div>
+
+<!-- MODAL NOVO PRODUTO -->
+<div class="modal-overlay" id="modalNovoProduto">
+    <div class="modal-box modal-box-lg">
+        <div class="modal-header">
+            <h3 id="modalNovoTitle">➕ Novo Produto</h3>
+            <p>Adicione um novo item ao catálogo</p>
+        </div>
+        <div class="modal-novo-body">
+            <div>
+                <label>Categoria</label>
+                <select id="novoTabSelect"></select>
+            </div>
+            <div>
+                <label>Grupo</label>
+                <select id="novoGrupoSelect"></select>
+            </div>
+            <div>
+                <label>Nome do Produto</label>
+                <input type="text" id="novoNomeInput" placeholder="Ex: iPhone 17 Pro 1TB" maxlength="80">
+            </div>
+            <div>
+                <label>Preço à Vista (opcional)</label>
+                <input type="text" id="novoPrecoInput" placeholder="0,00" onblur="formatInput(this)">
+            </div>
+            <div class="modal-novo-info">
+                Os clientes irão ver este produto automaticamente assim que for salvo.
+            </div>
+            <div id="novoProdutoErro" style="color:var(--red);font-size:12px;font-weight:700;display:none;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-modal-cancel" onclick="fecharModalNovo()">Cancelar</button>
+            <button class="btn-modal-ok" onclick="salvarNovoProduto()">💾 Adicionar</button>
+        </div>
+    </div>
 </div>
 
 <!-- MODAL SENHA -->
@@ -1049,6 +1136,33 @@ let activeTab    = catalog[0].id;
 let currentFilter = 'all';
 let gestorMode   = false;
 
+// Gerenciamento de produtos (sincronizado via Firebase)
+let _prodStatus = {};   // { KEY: 'desativado' | 'excluido' }
+let _prodNovos  = {};   // { KEY: { tabId, grupoIdx, nome, criadoEm } }
+
+// Retorna catálogo "efetivo" mesclado com produtos novos (mas SEM filtrar excluídos/desativados —
+// quem decide se renderiza é a função que monta a tabela, com base em _prodStatus)
+function catalogoEfetivo() {
+    // Faz uma cópia profunda do catalog base
+    const eff = catalog.map(sec => ({
+        ...sec,
+        groups: sec.groups.map(g => ({ ...g, items: [...g.items] }))
+    }));
+    // Insere produtos novos vindos do Firebase
+    Object.entries(_prodNovos).forEach(([key, info]) => {
+        if (!info || !info.tabId || !info.nome) return;
+        const sec = eff.find(s => s.id === info.tabId);
+        if (!sec) return;
+        const gi = (typeof info.grupoIdx === 'number' && sec.groups[info.grupoIdx]) ? info.grupoIdx : 0;
+        // evita duplicar (caso o item já exista no catálogo base)
+        const jaExiste = sec.groups.some(g => g.items.some(it => itemKey(sec.id, it) === key));
+        if (!jaExiste) {
+            sec.groups[gi].items.push(info.nome);
+        }
+    });
+    return eff;
+}
+
 function itemKey(tabId, itemName) {
     const t = tabId.replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
     const i = itemName.replace(/[^a-zA-Z0-9]/g,"").toUpperCase();
@@ -1285,11 +1399,12 @@ function renderAll() {
     const content = document.getElementById('mainContent');
     let html = '';
 
-    catalog.forEach(section => {
+    const efetivo = catalogoEfetivo();
+    efetivo.forEach(section => {
         const totalItems = section.groups.reduce((s,g)=>s+g.items.length,0);
         html += `<div class="tab-panel ${section.id===activeTab?'active':''}" id="tab-${section.id}">`;
 
-        section.groups.forEach(group => {
+        section.groups.forEach((group, grupoIdx) => {
             html += `
             <div class="cat-group">
                 <div class="cat-header">
@@ -1317,16 +1432,31 @@ function renderAll() {
                 const dt  = p.updAt || '—';
                 const hasPrice = av || cr;
                 const temCores = !!paleta(section.id, itemName);
+                const status = _prodStatus[key] || '';
+                const isNovo = !!_prodNovos[key];
+                const trClass = [
+                    status === 'desativado' ? 'prod-desativado' : '',
+                    status === 'excluido'   ? 'prod-excluido'   : '',
+                    isNovo                  ? 'prod-novo'       : '',
+                ].filter(Boolean).join(' ');
+
+                // botões de gerenciamento (gestor)
+                const escNome = itemName.replace(/'/g,"\\'");
+                const btnDesat = status === 'desativado'
+                    ? `<button class="prod-action-btn btn-reat"  onclick="reativarProduto('${key}')" title="Reativar produto">▶️ Reativar</button>`
+                    : `<button class="prod-action-btn btn-desat" onclick="desativarProduto('${key}')" title="Desativar — fica oculto para o cliente">⏸️ Desativar</button>`;
+                const btnExcl  = `<button class="prod-action-btn btn-excl" onclick="excluirProduto('${key}','${escNome}',${isNovo?'true':'false'})" title="Excluir definitivamente">🗑️ Excluir</button>`;
 
                 html += `
-                <tr data-key="${key}" data-tab="${section.id}" data-has-price="${hasPrice?'1':'0'}" data-name="${itemName.replace(/"/g,'&quot;')}" data-avista="${p.avista||''}" data-credito="${p.credito||''}">
+                <tr class="${trClass}" data-key="${key}" data-tab="${section.id}" data-has-price="${hasPrice?'1':'0'}" data-name="${itemName.replace(/"/g,'&quot;')}" data-avista="${p.avista||''}" data-credito="${p.credito||''}" data-status="${status}" data-novo="${isNovo?'1':'0'}">
                     <td class="sel-col">
-                        ${hasPrice ? `<input type="checkbox" class="sel-check" onchange="toggleSel(this)" title="Adicionar à proposta">` : ''}
+                        ${hasPrice && status !== 'desativado' ? `<input type="checkbox" class="sel-check" onchange="toggleSel(this)" title="Adicionar à proposta">` : ''}
                     </td>
                     <td class="item-name">
                         ${itemName}
                         ${temCores ? renderCoresDisplay(key, p.avista) : ''}
                         ${temCores ? renderCoresGestor(key, section.id, itemName) : ''}
+                        <div class="prod-actions">${btnDesat}${btnExcl}</div>
                     </td>
 
                     <!-- À VISTA -->
@@ -1363,7 +1493,11 @@ function renderAll() {
                 </tr>`;
             });
 
-            html += `</tbody></table></div>`;
+            html += `</tbody></table>
+                <div class="grupo-add-row">
+                    <button class="grupo-add-btn" onclick="abrirModalNovo('${section.id}',${grupoIdx})">➕ Adicionar produto neste grupo</button>
+                </div>
+            </div>`;
         });
 
         html += `</div>`;
@@ -2476,6 +2610,128 @@ function limparSelecao() {
 window.limparSelecao = limparSelecao;
 
 // ════════════════════════════════════════════
+// GERENCIAMENTO DE PRODUTOS — INSERIR / EXCLUIR / DESATIVAR
+// ════════════════════════════════════════════
+
+function abrirModalNovo(tabId, grupoIdx) {
+    // Preenche selects dinamicamente
+    const tabSelect = document.getElementById('novoTabSelect');
+    const grupoSelect = document.getElementById('novoGrupoSelect');
+    tabSelect.innerHTML = catalog.map(c => `<option value="${c.id}" ${c.id===tabId?'selected':''}>${c.tab}</option>`).join('');
+    function refreshGrupos() {
+        const sec = catalog.find(c => c.id === tabSelect.value);
+        if (!sec) { grupoSelect.innerHTML = ''; return; }
+        grupoSelect.innerHTML = sec.groups.map((g, i) => `<option value="${i}" ${i===grupoIdx?'selected':''}>${g.title}</option>`).join('');
+    }
+    refreshGrupos();
+    tabSelect.onchange = refreshGrupos;
+
+    document.getElementById('novoNomeInput').value  = '';
+    document.getElementById('novoPrecoInput').value = '';
+    document.getElementById('novoProdutoErro').style.display = 'none';
+    document.getElementById('modalNovoProduto').classList.add('open');
+    setTimeout(() => document.getElementById('novoNomeInput').focus(), 100);
+}
+window.abrirModalNovo = abrirModalNovo;
+
+function fecharModalNovo() {
+    document.getElementById('modalNovoProduto').classList.remove('open');
+}
+window.fecharModalNovo = fecharModalNovo;
+
+async function salvarNovoProduto() {
+    const tabId    = document.getElementById('novoTabSelect').value;
+    const grupoIdx = parseInt(document.getElementById('novoGrupoSelect').value) || 0;
+    const nome     = (document.getElementById('novoNomeInput').value || '').trim();
+    const preco    = parseBRL(document.getElementById('novoPrecoInput').value);
+    const erro     = document.getElementById('novoProdutoErro');
+
+    if (!nome) { erro.textContent = 'Nome do produto é obrigatório.'; erro.style.display = 'block'; return; }
+    const key = itemKey(tabId, nome);
+
+    // Verifica duplicidade
+    const sec = catalog.find(c => c.id === tabId);
+    if (sec) {
+        const existe = sec.groups.some(g => g.items.some(it => itemKey(tabId, it) === key));
+        if (existe || _prodNovos[key]) {
+            erro.textContent = 'Já existe um produto com este nome nesta categoria.';
+            erro.style.display = 'block';
+            return;
+        }
+    }
+
+    showBanner('Adicionando produto...', 'loading');
+    try {
+        if (!window._fbSalvarNovoProduto) throw new Error('Firebase não inicializado');
+        await window._fbSalvarNovoProduto(key, {
+            tabId, grupoIdx, nome, criadoEm: new Date().toLocaleString('pt-BR')
+        });
+        // Se preço foi informado, salva também
+        if (preco) {
+            await window._fbSalvarPreco(key, {
+                avista: preco, credito: null, obs: '', updAt: new Date().toLocaleString('pt-BR')
+            });
+        }
+        // Caso o status anterior fosse 'excluido', limpa
+        if (_prodStatus[key]) {
+            await window._fbSalvarStatus(key, null);
+        }
+        showBanner('✅ Produto adicionado!', 'ok');
+        fecharModalNovo();
+    } catch(e) {
+        erro.textContent = 'Erro ao salvar: ' + e.message;
+        erro.style.display = 'block';
+        showBanner('❌ Erro ao adicionar produto.', 'err');
+    }
+}
+window.salvarNovoProduto = salvarNovoProduto;
+
+async function desativarProduto(key) {
+    if (!confirm('Desativar este produto? Ele ficará oculto para os clientes mas mantido aqui no painel.')) return;
+    showBanner('Desativando...', 'loading');
+    try {
+        await window._fbSalvarStatus(key, 'desativado');
+        showBanner('⏸️ Produto desativado', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao desativar.', 'err');
+    }
+}
+window.desativarProduto = desativarProduto;
+
+async function reativarProduto(key) {
+    showBanner('Reativando...', 'loading');
+    try {
+        await window._fbSalvarStatus(key, null);
+        showBanner('✅ Produto reativado', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao reativar.', 'err');
+    }
+}
+window.reativarProduto = reativarProduto;
+
+async function excluirProduto(key, nome, isNovo) {
+    const msg = isNovo
+        ? `Excluir definitivamente "${nome}"? Esta ação não pode ser desfeita.`
+        : `Excluir "${nome}"? O produto será removido do catálogo de clientes e vendedores.\n\nDica: se quiser apenas ocultar temporariamente, use "Desativar".`;
+    if (!confirm(msg)) return;
+    showBanner('Excluindo...', 'loading');
+    try {
+        if (isNovo) {
+            // Remove de produtos_novos e tudo relacionado
+            await window._fbSalvarNovoProduto(key, null);
+            await window._fbSalvarStatus(key, null);
+        } else {
+            // Marca como excluído (não remove do catálogo base, só esconde)
+            await window._fbSalvarStatus(key, 'excluido');
+        }
+        showBanner('🗑️ Produto excluído', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao excluir.', 'err');
+    }
+}
+window.excluirProduto = excluirProduto;
+
+// ════════════════════════════════════════════
 // TIMESTAMP
 // ════════════════════════════════════════════
 function updateTimestamp() {
@@ -2487,6 +2743,9 @@ function updateTimestamp() {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modalSenha').addEventListener('click', e => {
         if (e.target === document.getElementById('modalSenha')) fecharModal();
+    });
+    document.getElementById('modalNovoProduto').addEventListener('click', e => {
+        if (e.target === document.getElementById('modalNovoProduto')) fecharModalNovo();
     });
     // Init sem Firebase (mostra dados default enquanto Firebase carrega)
     showBanner('Conectando ao Firebase...', 'loading');
@@ -2519,6 +2778,13 @@ window._fbSalvarPreco = async (key, dados) => {
 window._fbSalvarCores = async (key, dados) => {
     await set(ref(_db, 'cores/' + key), dados);
 };
+window._fbSalvarNovoProduto = async (key, dados) => {
+    await set(ref(_db, 'produtos_novos/' + key), dados);
+};
+window._fbSalvarStatus = async (key, status) => {
+    // status = 'desativado' | 'excluido' | null (limpa)
+    await set(ref(_db, 'produtos_status/' + key), status);
+};
 
 // Listeners em tempo real
 onValue(ref(_db, 'precos'), snap => {
@@ -2528,6 +2794,16 @@ onValue(ref(_db, 'precos'), snap => {
     updateTimestamp();
     document.getElementById('syncStatus').textContent = '🔥 Firebase · online · atualizado em tempo real';
     showBanner('✅ Preços carregados!', 'ok');
+});
+
+onValue(ref(_db, 'produtos_status'), snap => {
+    _prodStatus = snap.val() || {};
+    renderAll();
+});
+
+onValue(ref(_db, 'produtos_novos'), snap => {
+    _prodNovos = snap.val() || {};
+    renderAll();
 });
 
 onValue(ref(_db, 'cores'), snap => {
