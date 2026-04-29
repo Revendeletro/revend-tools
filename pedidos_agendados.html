@@ -2,16 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="theme-color" content="#c8102e">
 <title>Revend — Pedidos Agendados</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --red:#c8102e; --red-dark:#a00d24; --red-dim:rgba(200,16,46,.10);
   --preto:#111; --bg:#F2F2F7; --card:#fff; --brd:#E5E5EA; --txt2:#8E8E93;
-  --verde:#34C759; --azul:#007AFF; --amarelo:#FF9500; --wpp:#25D366;
+  --verde:#34C759; --azul:#007AFF; --amarelo:#FF9500; --roxo:#AF52DE; --wpp:#25D366;
   --radius:18px; --sidebar:260px;
   --shadow:0 2px 14px rgba(0,0,0,.07); --shadow-md:0 8px 32px rgba(0,0,0,.13);
+  --content-pad:28px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -66,15 +68,63 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--preto)
 .topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
 .tb-add-btn{padding:9px 18px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
 .tb-add-btn:hover{background:var(--red-dark)}
-.content{padding:24px 28px 70px;flex:1}
+.content{padding:24px var(--content-pad) 70px;flex:1;max-width:100%}
 
-/* ── HERO ── */
-.hero{background:linear-gradient(130deg,var(--red) 0%,var(--red-dark) 100%);border-radius:var(--radius);padding:22px 26px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;color:#fff;gap:16px;flex-wrap:wrap}
-.hero-left h2{font-size:22px;font-weight:900;letter-spacing:-.5px}.hero-left p{font-size:12px;opacity:.8;margin-top:3px;font-weight:600}
-.hero-stats{display:flex;gap:12px;flex-wrap:wrap}
-.hero-stat{background:rgba(0,0,0,.2);border-radius:12px;padding:10px 18px;text-align:center;min-width:80px}
-.hero-stat .hs-n{font-size:28px;font-weight:900;line-height:1;letter-spacing:-1px}
-.hero-stat .hs-l{font-size:9px;opacity:.8;font-weight:700;margin-top:2px}
+/* ── HERO / CARDS PRINCIPAIS ── */
+.cards-principais{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
+.card-stat{background:#fff;border-radius:var(--radius);padding:18px 20px;border:1.5px solid var(--brd);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:pointer}
+.card-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+.card-stat .cs-ico{font-size:22px;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.card-stat .cs-n{font-size:32px;font-weight:900;line-height:1;letter-spacing:-1px;color:var(--preto)}
+.card-stat .cs-l{font-size:11px;color:var(--txt2);font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+.card-stat .cs-sub{font-size:10px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:4px}
+.card-hoje{background:linear-gradient(135deg,var(--red) 0%,var(--red-dark) 100%);color:#fff;border-color:var(--red-dark)}
+.card-hoje .cs-ico{background:rgba(255,255,255,.2)}
+.card-hoje .cs-n{color:#fff}
+.card-hoje .cs-l{color:rgba(255,255,255,.8)}
+.card-pendentes .cs-ico{background:rgba(0,122,255,.12);color:var(--azul)}
+.card-reservados .cs-ico{background:rgba(255,149,0,.12);color:var(--amarelo)}
+.card-concluidos .cs-ico{background:rgba(52,199,89,.12);color:var(--verde)}
+.card-cancelados .cs-ico{background:rgba(142,142,147,.12);color:#636366}
+
+/* ── MÉTRICAS / DASHBOARD ── */
+.metricas-wrap{background:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:22px;border:1.5px solid var(--brd);box-shadow:var(--shadow)}
+.metricas-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px}
+.metricas-head h3{font-size:14px;font-weight:900;letter-spacing:-.3px}
+.metricas-head p{font-size:11px;color:var(--txt2);font-weight:600;margin-top:2px}
+.periodo-tabs{display:flex;gap:6px;background:var(--bg);padding:4px;border-radius:12px}
+.periodo-tab{padding:7px 14px;border:none;background:none;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#555;cursor:pointer;transition:all .15s}
+.periodo-tab.on{background:#fff;color:var(--red);box-shadow:var(--shadow)}
+.metricas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.metrica-item{background:var(--bg);border-radius:12px;padding:12px 14px;border:1px solid var(--brd)}
+.metrica-item .mi-l{font-size:9px;color:var(--txt2);font-weight:800;text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:5px}
+.metrica-item .mi-n{font-size:22px;font-weight:900;color:var(--preto);margin-top:6px;letter-spacing:-.5px}
+.metrica-item .mi-s{font-size:10px;color:var(--txt2);font-weight:700;margin-top:2px}
+.metrica-item .mi-bar{height:5px;background:#e5e5ea;border-radius:5px;margin-top:8px;overflow:hidden}
+.metrica-item .mi-bar div{height:100%;border-radius:5px;transition:width .4s}
+.mi-azul{color:var(--azul)}.mi-verde{color:var(--verde)}.mi-amarelo{color:var(--amarelo)}.mi-cinza{color:#636366}.mi-roxo{color:var(--roxo)}
+
+/* ── AGENDA DO DIA ── */
+.agenda-wrap{background:#fff;border-radius:var(--radius);padding:18px 22px;margin-bottom:22px;border:1.5px solid var(--brd);box-shadow:var(--shadow)}
+.agenda-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.agenda-head h3{font-size:14px;font-weight:900;letter-spacing:-.3px;display:flex;align-items:center;gap:8px}
+.agenda-head .badge-data{background:var(--red);color:#fff;padding:3px 10px;border-radius:14px;font-size:10px;font-weight:800}
+.agenda-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.agenda-item{background:var(--bg);border-radius:12px;padding:12px 14px;border-left:4px solid var(--azul);display:flex;flex-direction:column;gap:4px;cursor:pointer;transition:all .15s}
+.agenda-item:hover{transform:translateX(2px);box-shadow:var(--shadow)}
+.agenda-item.reservado{border-left-color:var(--amarelo)}
+.agenda-item.atrasado{border-left-color:var(--red);background:#fff5f6}
+.ai-top{display:flex;justify-content:space-between;align-items:center}
+.ai-hora{font-size:14px;font-weight:900;color:var(--azul)}
+.ai-hora.reservado{color:var(--amarelo)}
+.ai-hora.atrasado{color:var(--red)}
+.ai-cod{font-size:10px;font-weight:800;color:var(--red);background:var(--red-dim);padding:2px 8px;border-radius:8px}
+.ai-cliente{font-size:13px;font-weight:800;color:var(--preto)}
+.ai-prod{font-size:11px;color:#555;font-weight:600;line-height:1.3}
+.ai-bot{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.ai-vend{font-size:10px;color:var(--txt2);font-weight:700}
+.ai-valor{font-size:12px;font-weight:900;color:var(--preto)}
+.agenda-empty{padding:30px;text-align:center;color:var(--txt2);font-weight:600;font-size:12px;background:var(--bg);border-radius:12px}
 
 /* ── FILTROS ── */
 .filtros{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
@@ -82,8 +132,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--preto)
 .filtro-btn:hover{border-color:#bbb;background:#f5f5f5}
 .filtro-btn.on{background:var(--red);color:#fff;border-color:var(--red)}
 .filtro-btn.agendado.on{background:var(--azul);border-color:var(--azul)}
-.filtro-btn.confirmado.on{background:var(--amarelo);border-color:var(--amarelo)}
-.filtro-btn.entregue.on{background:var(--verde);border-color:var(--verde)}
+.filtro-btn.reservado.on{background:var(--amarelo);border-color:var(--amarelo)}
+.filtro-btn.concluido.on{background:var(--verde);border-color:var(--verde)}
 .filtro-btn.cancelado.on{background:#8e8e93;border-color:#8e8e93}
 
 /* ── TABELA ── */
@@ -99,9 +149,12 @@ thead th{padding:10px 14px;text-align:left;font-size:9px;font-weight:800;text-tr
 tbody tr{transition:background .12s;border-bottom:1px solid #f0f0f0}
 tbody tr:hover{background:#fff5f6}
 tbody tr:last-child{border-bottom:none}
+tbody tr.atrasado{background:#fff5f6}
+tbody tr.atrasado:hover{background:#ffe8ec}
 td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 .td-cod{font-weight:800;color:var(--red);white-space:nowrap}
 .td-data{white-space:nowrap;color:var(--preto)}
+.td-data .data-flag{display:inline-block;font-size:9px;background:var(--red);color:#fff;padding:1px 6px;border-radius:8px;margin-left:5px;font-weight:800}
 .td-hora{white-space:nowrap;font-weight:700;color:var(--azul)}
 .td-vendedor{white-space:nowrap}
 .td-cliente{font-weight:700;max-width:180px}
@@ -116,13 +169,15 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 .btn-del{background:#f5f5f7;color:#8e8e93}.btn-del:hover{background:#fde8ec;color:var(--red)}
 .btn-wpp-row{background:#e8faf0;color:var(--wpp)}.btn-wpp-row:hover{background:var(--wpp);color:#fff}
 .btn-copy-row{background:#f0f0f5;color:#555}.btn-copy-row:hover{background:#e0e0ea;color:var(--preto)}
+.btn-concluir{background:#e8faf0;color:var(--verde)}.btn-concluir:hover{background:var(--verde);color:#fff}
+.btn-cancelar-row{background:#f5f5f7;color:#8e8e93}.btn-cancelar-row:hover{background:#8e8e93;color:#fff}
 
 /* ── STATUS BADGE ── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
 .badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .badge-agendado{background:rgba(0,122,255,.12);color:var(--azul)}.badge-agendado::before{background:var(--azul)}
-.badge-confirmado{background:rgba(255,149,0,.12);color:var(--amarelo)}.badge-confirmado::before{background:var(--amarelo)}
-.badge-entregue{background:rgba(52,199,89,.12);color:var(--verde)}.badge-entregue::before{background:var(--verde)}
+.badge-reservado{background:rgba(255,149,0,.12);color:var(--amarelo)}.badge-reservado::before{background:var(--amarelo)}
+.badge-concluido{background:rgba(52,199,89,.12);color:var(--verde)}.badge-concluido::before{background:var(--verde)}
 .badge-cancelado{background:rgba(142,142,147,.12);color:#636366}.badge-cancelado::before{background:#8e8e93}
 
 /* ── EMPTY ── */
@@ -164,32 +219,128 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
 .dg-lbl{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
 .dg-val{font-size:13px;font-weight:700;color:var(--preto);line-height:1.4}
 .dg-val.red{color:var(--red);font-size:18px;font-weight:900}
+.dg-item.cancelado{background:#fde8ec;border:1px solid #fbc7d0}
+.dg-item.cancelado .dg-lbl{color:var(--red)}
 .detalhe-actions{padding:0 20px 20px;display:flex;gap:8px;flex-wrap:wrap}
 .det-btn{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;min-width:100px}
 .det-btn-wpp{background:#e8faf0;color:var(--wpp)}.det-btn-wpp:hover{background:var(--wpp);color:#fff}
 .det-btn-wpp-interno{background:#fff3e0;color:#e65100;border:1.5px solid #ffe0b2 !important}.det-btn-wpp-interno:hover{background:#e65100;color:#fff}
 .det-btn-edit{background:var(--red-dim);color:var(--red)}.det-btn-edit:hover{background:var(--red);color:#fff}
 .det-btn-del{background:#f5f5f7;color:#8e8e93}.det-btn-del:hover{background:#fde8ec;color:var(--red)}
+.det-btn-concluir{background:#e8faf0;color:var(--verde)}.det-btn-concluir:hover{background:var(--verde);color:#fff}
+.det-btn-cancelar{background:#f5f5f7;color:#636366}.det-btn-cancelar:hover{background:#8e8e93;color:#fff}
+.det-btn-reservar{background:#fff7e6;color:var(--amarelo)}.det-btn-reservar:hover{background:var(--amarelo);color:#fff}
+.det-btn-reabrir{background:rgba(0,122,255,.12);color:var(--azul)}.det-btn-reabrir:hover{background:var(--azul);color:#fff}
 .det-btn-copy{background:#f0f0f5;color:#555;border:1.5px solid var(--brd)!important}.det-btn-copy:hover{background:#e0e0ea;color:var(--preto)}
 .det-btn-copy.copied{background:var(--verde)!important;color:#fff!important;border-color:var(--verde)!important}
 .det-wpp-section{padding:0 20px 6px;display:flex;flex-direction:column;gap:7px}
 .det-wpp-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;padding:0 2px}
 .det-wpp-row{display:flex;gap:8px}
 .det-divider{height:1px;background:var(--brd);margin:0 20px 10px}
-.det-secondary-row{display:flex;gap:8px;padding:0 20px 20px}
+.det-status-actions{padding:6px 20px 6px;display:flex;gap:8px;flex-wrap:wrap}
 
 /* Toast */
 #copyToast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:10px 22px;border-radius:30px;font-size:12px;font-weight:700;font-family:'Montserrat',sans-serif;opacity:0;pointer-events:none;transition:all .3s;z-index:99999;white-space:nowrap}
 #copyToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ══ MOBILE ══ */
+/* ══ DESKTOP GRANDE (>= 1440px) ══ */
+@media(min-width:1440px){
+  :root{--sidebar:280px;--content-pad:36px}
+}
+
+/* ══ MACBOOK 13" / TELAS MÉDIAS (1100-1279px) ══ */
+@media(max-width:1279px) and (min-width:1024px){
+  :root{--sidebar:230px;--content-pad:20px}
+  .topbar{padding:12px 20px}
+  .topbar-info h1{font-size:16px}
+  .cards-principais{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .card-stat{padding:14px 16px}
+  .card-stat .cs-n{font-size:26px}
+  .card-stat .cs-ico{width:36px;height:36px;font-size:18px}
+  .agenda-list{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+  .metricas-grid{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+  table{min-width:800px}
+  td,thead th{padding:9px 10px}
+  td{font-size:11px}
+}
+
+/* ══ TABLET / MACBOOK PEQUENO ou JANELA REDUZIDA (769-1023px) ══ */
+@media(max-width:1023px) and (min-width:769px){
+  :root{--sidebar:210px;--content-pad:18px}
+  .sb-logo{padding:16px 14px 12px}
+  .sb-logo-txt{font-size:18px}
+  .live-pill{display:none}
+  .nav-btn{padding:8px 10px;font-size:11px}
+  .nav-btn .em{font-size:14px}
+  .topbar{padding:10px 16px}
+  .topbar-info h1{font-size:15px}
+  .topbar-info p{font-size:10px}
+  .tb-add-btn{padding:8px 14px;font-size:11px}
+  .content{padding:16px var(--content-pad) 70px}
+  .cards-principais{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+  .card-stat{padding:12px 14px}
+  .card-stat .cs-n{font-size:22px}
+  .card-stat .cs-l{font-size:10px}
+  .card-stat .cs-ico{width:34px;height:34px;font-size:16px;margin-bottom:8px}
+  .card-stat .cs-sub{font-size:9px}
+  .agenda-wrap,.metricas-wrap{padding:14px 16px;margin-bottom:16px}
+  .agenda-head h3,.metricas-head h3{font-size:13px}
+  .agenda-list{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+  .agenda-item{padding:10px 12px}
+  .ai-cliente{font-size:12px}
+  .ai-prod{font-size:10px}
+  .metricas-grid{grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:10px}
+  .metrica-item{padding:10px 12px}
+  .metrica-item .mi-n{font-size:18px}
+  .periodo-tab{padding:6px 10px;font-size:10px}
+  .filtros{gap:6px;margin-bottom:14px}
+  .filtro-btn{padding:6px 12px;font-size:10px}
+  .tbl-head-bar{padding:12px 14px}
+  .tbl-head-bar h3{font-size:12px}
+  table{min-width:780px}
+  td,thead th{padding:8px 10px;font-size:11px}
+  thead th{font-size:9px}
+}
+
+/* ══ MOBILE (<= 768px) ══ */
 @media(max-width:768px){
+  :root{--content-pad:12px}
   .sidebar,.topbar{display:none}
   .main{margin-left:0}
-  .content{padding:12px 12px 90px}
-  .hero{flex-direction:column;gap:12px}
-  .hero-stats{width:100%;justify-content:space-between}
-  .hero-stat{flex:1}
+  .content{padding:12px var(--content-pad) 90px}
+  .cards-principais{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .card-stat{padding:14px 12px;border-radius:14px}
+  .card-stat .cs-ico{width:32px;height:32px;font-size:15px;margin-bottom:6px;border-radius:9px}
+  .card-stat .cs-n{font-size:22px}
+  .card-stat .cs-l{font-size:9px}
+  .card-stat .cs-sub{font-size:9px;margin-top:3px}
+  .agenda-wrap,.metricas-wrap{padding:14px 14px;margin-bottom:14px;border-radius:14px}
+  .agenda-head{margin-bottom:10px}
+  .agenda-head h3{font-size:13px}
+  .metricas-head{flex-direction:column;align-items:stretch;gap:10px;margin-bottom:12px}
+  .metricas-head h3{font-size:13px}
+  .metricas-head p{font-size:10px}
+  .periodo-tabs{width:100%;overflow-x:auto;flex-wrap:nowrap;padding:3px}
+  .periodo-tabs::-webkit-scrollbar{display:none}
+  .periodo-tab{padding:6px 12px;font-size:10px;white-space:nowrap;flex-shrink:0}
+  .metricas-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .metrica-item{padding:10px 12px}
+  .metrica-item .mi-n{font-size:18px}
+  .metrica-item .mi-l{font-size:8px}
+  .agenda-list{grid-template-columns:1fr;gap:8px}
+  .agenda-item{padding:10px 12px}
+  .ai-hora{font-size:13px}
+  .ai-cliente{font-size:12px}
+  .ai-prod{font-size:11px}
+  .tbl-wrap{border-radius:14px}
+  .tbl-head-bar{padding:12px 14px}
+  .tbl-head-bar h3{font-size:12px}
+  .tbl-count{font-size:10px}
+  table{min-width:780px;font-size:11px}
+  td,thead th{padding:8px 10px}
+  thead th{font-size:9px}
+  td{font-size:11px}
+  .td-acoes button{padding:4px 7px;font-size:9px;margin-right:2px}
   .mob-header{display:flex;align-items:center;justify-content:space-between;background:#fff;padding:13px 16px;position:sticky;top:0;z-index:200;border-bottom:1px solid var(--brd);box-shadow:0 1px 8px rgba(0,0,0,.06)}
   .mob-logo{font-size:21px;font-weight:900;color:var(--red);letter-spacing:-.8px}
   .mob-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--verde)}
@@ -201,9 +352,33 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
   @keyframes slideup-mob{from{transform:translateY(100%)}to{transform:none}}
   .form-grid{grid-template-columns:1fr}
   .form-group.full{grid-column:1}
-  .filtros{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
+  .filtros{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
   .filtros::-webkit-scrollbar{display:none}
+  .filtro-btn{flex-shrink:0;padding:7px 13px;font-size:10px}
+  .detalhe-grid{grid-template-columns:1fr;padding:16px;gap:8px}
+  .dg-item{padding:9px 12px}
+  .dg-val{font-size:12px}
+  .det-wpp-section{padding:0 16px 6px}
+  .detalhe-actions,.det-status-actions{padding-left:16px;padding-right:16px}
+  .det-btn{font-size:11px;padding:10px;min-width:80px}
 }
+
+/* ══ MOBILE PEQUENO (<= 380px) ══ */
+@media(max-width:380px){
+  .cards-principais{grid-template-columns:1fr}
+  .card-stat .cs-n{font-size:24px}
+  .metricas-grid{grid-template-columns:1fr}
+}
+
+/* ══ ALTURA REDUZIDA (laptops com pouca altura) ══ */
+@media(max-height:720px) and (min-width:769px){
+  .content{padding-top:14px}
+  .cards-principais{margin-bottom:14px}
+  .agenda-wrap,.metricas-wrap{margin-bottom:14px;padding:14px 18px}
+  .card-stat{padding:14px 16px}
+  .card-stat .cs-n{font-size:24px}
+}
+
 @media(min-width:769px){.mob-header,.mob-search,.add-float{display:none}}
 </style>
 </head>
@@ -245,7 +420,11 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
     </div>
     <nav class="sb-nav">
       <div class="nav-label">Filtrar por status</div>
-      <button class="nav-btn on" onclick="filtrarStatus('todos',this)">
+      <button class="nav-btn on" onclick="filtrarStatus('pendentes',this)">
+        <span class="em">⏳</span> Pendentes
+        <span class="nav-badge" id="badgePendentes" style="background:var(--red)">0</span>
+      </button>
+      <button class="nav-btn" onclick="filtrarStatus('todos',this)">
         <span class="em">📋</span> Todos os pedidos
         <span class="nav-badge" id="badgeTodos">0</span>
       </button>
@@ -253,13 +432,13 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
         <span class="em">🕐</span> Agendados
         <span class="nav-badge" id="badgeAgendado" style="background:var(--azul)">0</span>
       </button>
-      <button class="nav-btn" onclick="filtrarStatus('Confirmado',this)">
-        <span class="em">✅</span> Confirmados
-        <span class="nav-badge" id="badgeConfirmado" style="background:var(--amarelo)">0</span>
+      <button class="nav-btn" onclick="filtrarStatus('Reservado',this)">
+        <span class="em">🔖</span> Reservados
+        <span class="nav-badge" id="badgeReservado" style="background:var(--amarelo)">0</span>
       </button>
-      <button class="nav-btn" onclick="filtrarStatus('Entregue',this)">
-        <span class="em">📦</span> Entregues
-        <span class="nav-badge" id="badgeEntregue" style="background:var(--verde)">0</span>
+      <button class="nav-btn" onclick="filtrarStatus('Concluido',this)">
+        <span class="em">✅</span> Concluídos
+        <span class="nav-badge" id="badgeConcluido" style="background:var(--verde)">0</span>
       </button>
       <button class="nav-btn" onclick="filtrarStatus('Cancelado',this)">
         <span class="em">❌</span> Cancelados
@@ -280,7 +459,7 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
     <div class="topbar">
       <div class="topbar-info">
         <h1>Pedidos Agendados</h1>
-        <p>Gerencie os agendamentos dos vendedores</p>
+        <p>Gerencie os agendamentos pendentes e concluídos</p>
       </div>
       <div class="topbar-actions">
         <button class="tb-add-btn" onclick="abrirModal()">＋ Novo Pedido</button>
@@ -288,45 +467,81 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
     </div>
 
     <div class="content">
-      <!-- HERO -->
-      <div class="hero">
-        <div class="hero-left">
-          <h2>Controle de Agendamentos</h2>
-          <p>Pedidos registrados pelos vendedores</p>
+
+      <!-- CARDS PRINCIPAIS -->
+      <div class="cards-principais">
+        <div class="card-stat card-hoje" onclick="filtrarStatus('pendentes',null);scrollTo({top:document.getElementById('agendaDoDia').offsetTop-20,behavior:'smooth'})">
+          <div class="cs-ico">📅</div>
+          <div class="cs-n" id="cardHoje">0</div>
+          <div class="cs-l">Agendamentos do dia</div>
+          <div class="cs-sub" id="cardHojeSub" style="color:rgba(255,255,255,.85)">—</div>
         </div>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <div class="hs-n" id="heroTotal">0</div>
-            <div class="hs-l">Total</div>
+        <div class="card-stat card-pendentes" onclick="filtrarStatus('pendentes',null);scrollPendentes()">
+          <div class="cs-ico">⏳</div>
+          <div class="cs-n" id="cardPendentes">0</div>
+          <div class="cs-l">Pendentes</div>
+          <div class="cs-sub mi-azul" id="cardPendentesSub">— a concluir</div>
+        </div>
+        <div class="card-stat card-reservados" onclick="filtrarStatus('Reservado',null);scrollPendentes()">
+          <div class="cs-ico">🔖</div>
+          <div class="cs-n" id="cardReservados">0</div>
+          <div class="cs-l">Reservados</div>
+          <div class="cs-sub mi-amarelo" id="cardReservadosSub">—</div>
+        </div>
+        <div class="card-stat card-concluidos" onclick="filtrarStatus('Concluido',null);scrollPendentes()">
+          <div class="cs-ico">✅</div>
+          <div class="cs-n" id="cardConcluidos">0</div>
+          <div class="cs-l">Concluídos</div>
+          <div class="cs-sub mi-verde" id="cardConcluidosSub">—</div>
+        </div>
+        <div class="card-stat card-cancelados" onclick="filtrarStatus('Cancelado',null);scrollPendentes()">
+          <div class="cs-ico">❌</div>
+          <div class="cs-n" id="cardCancelados">0</div>
+          <div class="cs-l">Cancelados</div>
+          <div class="cs-sub mi-cinza" id="cardCanceladosSub">—</div>
+        </div>
+      </div>
+
+      <!-- AGENDA DO DIA -->
+      <div class="agenda-wrap" id="agendaDoDia">
+        <div class="agenda-head">
+          <h3>📅 Agendamentos do dia <span class="badge-data" id="hojeData">—</span></h3>
+        </div>
+        <div id="agendaList" class="agenda-list"></div>
+      </div>
+
+      <!-- MÉTRICAS -->
+      <div class="metricas-wrap">
+        <div class="metricas-head">
+          <div>
+            <h3>📊 Métricas de Agendamentos</h3>
+            <p>Análise de pedidos por período</p>
           </div>
-          <div class="hero-stat">
-            <div class="hs-n" id="heroAgendado">0</div>
-            <div class="hs-l">Agendados</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hs-n" id="heroConfirmado">0</div>
-            <div class="hs-l">Confirmados</div>
-          </div>
-          <div class="hero-stat">
-            <div class="hs-n" id="heroEntregue">0</div>
-            <div class="hs-l">Entregues</div>
+          <div class="periodo-tabs" id="periodoTabs">
+            <button class="periodo-tab" onclick="setPeriodo('dia',this)">Hoje</button>
+            <button class="periodo-tab" onclick="setPeriodo('semana',this)">Semana</button>
+            <button class="periodo-tab on" onclick="setPeriodo('mes',this)">Mês</button>
+            <button class="periodo-tab" onclick="setPeriodo('ano',this)">Ano</button>
+            <button class="periodo-tab" onclick="setPeriodo('todos',this)">Tudo</button>
           </div>
         </div>
+        <div class="metricas-grid" id="metricasGrid"></div>
       </div>
 
       <!-- FILTROS -->
       <div class="filtros" id="filtros">
-        <button class="filtro-btn on" onclick="filtrarStatus('todos',this)" data-status="todos">📋 Todos</button>
+        <button class="filtro-btn on" onclick="filtrarStatus('pendentes',this)" data-status="pendentes">⏳ Pendentes</button>
+        <button class="filtro-btn" onclick="filtrarStatus('todos',this)" data-status="todos">📋 Todos</button>
         <button class="filtro-btn agendado" onclick="filtrarStatus('Agendado',this)" data-status="Agendado">🕐 Agendado</button>
-        <button class="filtro-btn confirmado" onclick="filtrarStatus('Confirmado',this)" data-status="Confirmado">✅ Confirmado</button>
-        <button class="filtro-btn entregue" onclick="filtrarStatus('Entregue',this)" data-status="Entregue">📦 Entregue</button>
+        <button class="filtro-btn reservado" onclick="filtrarStatus('Reservado',this)" data-status="Reservado">🔖 Reservado</button>
+        <button class="filtro-btn concluido" onclick="filtrarStatus('Concluido',this)" data-status="Concluido">✅ Concluído</button>
         <button class="filtro-btn cancelado" onclick="filtrarStatus('Cancelado',this)" data-status="Cancelado">❌ Cancelado</button>
       </div>
 
       <!-- TABELA -->
-      <div class="tbl-wrap">
+      <div class="tbl-wrap" id="tblWrap">
         <div class="tbl-head-bar">
-          <h3>Pedidos</h3>
+          <h3 id="tblTitulo">Pedidos Pendentes</h3>
           <span class="tbl-count" id="tblCount">0 pedidos</span>
         </div>
         <div class="tbl-scroll">
@@ -349,9 +564,9 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
             <tbody id="tblBody"></tbody>
           </table>
           <div class="empty-state" id="emptyState" style="display:none">
-            <div class="es-ico">📭</div>
-            <p>Nenhum pedido encontrado</p>
-            <span>Clique em "Novo Pedido" para adicionar</span>
+            <div class="es-ico">🎉</div>
+            <p>Nenhum pedido pendente!</p>
+            <span>Todos os agendamentos foram concluídos</span>
           </div>
         </div>
       </div>
@@ -377,10 +592,10 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
         </div>
         <div class="form-group">
           <label>Status</label>
-          <select id="fStatus">
+          <select id="fStatus" onchange="onStatusChange()">
             <option value="Agendado">🕐 Agendado</option>
-            <option value="Confirmado">✅ Confirmado</option>
-            <option value="Entregue">📦 Entregue</option>
+            <option value="Reservado">🔖 Reservado</option>
+            <option value="Concluido">✅ Concluído</option>
             <option value="Cancelado">❌ Cancelado</option>
           </select>
         </div>
@@ -416,6 +631,10 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
           <label>Forma de Pagamento</label>
           <textarea id="fPgto" placeholder="Ex: À vista + 12 PM 256GB pré-avaliado em R$ 1.400 (sujeito a alteração)"></textarea>
         </div>
+        <div class="form-group full" id="grpMotivo" style="display:none">
+          <label style="color:var(--red)">⚠️ Motivo do Cancelamento *</label>
+          <textarea id="fMotivo" placeholder="Descreva o motivo do cancelamento..."></textarea>
+        </div>
         <div class="form-group full">
           <label>Observações</label>
           <textarea id="fObs" placeholder="Informações adicionais..."></textarea>
@@ -437,6 +656,7 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
       <button class="m-close" onclick="fecharModal('modalDetalhe')">✕</button>
     </div>
     <div class="detalhe-grid" id="detalheGrid"></div>
+    <div class="det-status-actions" id="detStatusActions"></div>
     <div id="detalheWppCliente"></div>
     <div class="det-divider" id="detDivider" style="display:none"></div>
     <div id="detalheWppInterno"></div>
@@ -444,20 +664,83 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:top}
   </div>
 </div>
 
+<!-- MODAL CANCELAR (motivo) -->
+<div class="modal-ov" id="modalCancelar" onclick="fecharOv(event,'modalCancelar')">
+  <div class="modal-box" style="width:440px">
+    <div class="modal-head" style="background:linear-gradient(130deg,#636366,#3a3a3c)">
+      <div><h3>Cancelar Pedido</h3><p>Informe o motivo do cancelamento</p></div>
+      <button class="m-close" onclick="fecharModal('modalCancelar')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group full">
+        <label style="color:var(--red)">⚠️ Motivo do Cancelamento *</label>
+        <textarea id="motivoCancelar" placeholder="Descreva o motivo..." style="min-height:90px"></textarea>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-cancelar" onclick="fecharModal('modalCancelar')">Voltar</button>
+      <button class="btn-salvar" style="background:#636366" onclick="confirmarCancelar()">❌ Confirmar Cancelamento</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════ ESTADO ════
-// IMPORTANTE: usar var (não let) para que window.pedidos e window._fbSalvar
-// sejam acessíveis pelo módulo Firebase (que roda em escopo isolado)
 var pedidos = [];
-var filtroStatusAtivo = 'todos';
+var filtroStatusAtivo = 'pendentes'; // padrão: mostra só pendentes
 var filtroVendedorAtivo = 'todos';
 var buscaAtiva = '';
 var editandoIdx = null;
-var _fbSalvar = null; // será injetado pelo módulo Firebase
+var periodoAtivo = 'mes'; // dia / semana / mes / ano / todos
+var idxPendenteCancelar = null;
+var _fbSalvar = null;
 
-// Armazena temporariamente as mensagens do detalhe aberto
 let _msgClienteTemp = '';
 let _msgInternoTemp = '';
+
+// ════ HELPERS DE DATA ════
+function hojeStr(){ return new Date().toISOString().slice(0,10); }
+function dataFormatada(){
+  const hoje = new Date();
+  return hoje.toLocaleDateString('pt-BR', {weekday:'long', day:'2-digit', month:'long'});
+}
+function dentroDoPeriodo(dataStr, periodo){
+  if(!dataStr) return false;
+  if(periodo==='todos') return true;
+  const d = new Date(dataStr+'T00:00:00');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  if(periodo==='dia'){
+    return d.toDateString() === hoje.toDateString();
+  }
+  if(periodo==='semana'){
+    const inicio = new Date(hoje); inicio.setDate(hoje.getDate() - hoje.getDay());
+    const fim = new Date(inicio); fim.setDate(inicio.getDate()+6); fim.setHours(23,59,59,999);
+    return d >= inicio && d <= fim;
+  }
+  if(periodo==='mes'){
+    return d.getFullYear()===hoje.getFullYear() && d.getMonth()===hoje.getMonth();
+  }
+  if(periodo==='ano'){
+    return d.getFullYear()===hoje.getFullYear();
+  }
+  return true;
+}
+function isPendente(p){ return p.status==='Agendado' || p.status==='Reservado'; }
+function isAtrasado(p){
+  if(!isPendente(p) || !p.data) return false;
+  const dt = new Date(p.data + 'T' + (p.hora||'23:59'));
+  return dt < new Date();
+}
+
+// ════ ORDENAÇÃO POR DATA E HORA ════
+function ordenarPedidos(arr){
+  return [...arr].sort((a,b)=>{
+    // Pendentes primeiro? Não, ordena estritamente por data+hora ascendente
+    const da = (a.data||'9999-12-31') + 'T' + (a.hora||'23:59');
+    const db = (b.data||'9999-12-31') + 'T' + (b.hora||'23:59');
+    return da.localeCompare(db);
+  });
+}
 
 // ════ TOAST COPIAR ════
 function showToast(msg){
@@ -480,15 +763,9 @@ function copiarMensagem(tipo, btnEl){
       setTimeout(()=>{ btnEl.innerHTML = orig; btnEl.classList.remove('copied'); }, 2200);
     }
   }).catch(()=>{
-    // Fallback: cria área de texto invisível
     const ta = document.createElement('textarea');
-    ta.value = texto;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
+    ta.value = texto; ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
     showToast('✅ Mensagem copiada! Cole no WhatsApp.');
   });
 }
@@ -499,20 +776,11 @@ function copiarPedidoIdx(idx, btnEl){
   const msg = `🔔 *VENDA CONFIRMADA — ${p.cod||''}*\n\n👤 *Cliente:* ${p.cliente||'—'}\n📞 *Telefone:* ${p.tel||'—'}\n📅 *Data:* ${dataFmt} às ${p.hora||'—'}h\n👨‍💼 *Vendedor:* ${p.vendedor||'—'}\n📱 *Produto:* ${p.produto||'—'}\n💰 *Valor:* ${p.valor||'—'}\n💳 *Pagamento:* ${p.pgto||'—'}${p.obs?'\n📝 *Obs:* '+p.obs:''}\n\n✅ Confirmado e registrado!`;
   navigator.clipboard.writeText(msg).then(()=>{
     showToast('✅ Pedido copiado! Cole no WhatsApp.');
-    if(btnEl){
-      const orig = btnEl.innerHTML;
-      btnEl.innerHTML = '✅';
-      setTimeout(()=>{ btnEl.innerHTML = orig; }, 2000);
-    }
+    if(btnEl){ const orig=btnEl.innerHTML; btnEl.innerHTML='✅'; setTimeout(()=>{btnEl.innerHTML=orig;},2000); }
   }).catch(()=>{
     const ta = document.createElement('textarea');
-    ta.value = msg;
-    ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
+    ta.value = msg; ta.style.position='fixed'; ta.style.left='-9999px';
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
     showToast('✅ Pedido copiado! Cole no WhatsApp.');
   });
 }
@@ -531,16 +799,32 @@ function showBanner(msg, tipo){
 
 // ════ RENDER ════
 function render(){
+  // Migra status antigos (Confirmado/Entregue) para os novos
+  pedidos.forEach(p=>{
+    if(p.status==='Confirmado') p.status='Reservado';
+    if(p.status==='Entregue') p.status='Concluido';
+  });
   atualizarBadges();
-  atualizarHero();
+  atualizarCardsPrincipais();
+  atualizarMetricas();
   atualizarStats();
   renderVendedores();
+  renderAgendaDoDia();
   renderTabela();
+}
+
+function scrollPendentes(){
+  const el = document.getElementById('tblWrap');
+  if(el) window.scrollTo({top: el.offsetTop - 20, behavior:'smooth'});
 }
 
 function filtrarPedidos(){
   return pedidos.filter(p=>{
-    const matchStatus = filtroStatusAtivo==='todos' || p.status===filtroStatusAtivo;
+    let matchStatus;
+    if(filtroStatusAtivo==='pendentes') matchStatus = isPendente(p);
+    else if(filtroStatusAtivo==='todos') matchStatus = true;
+    else matchStatus = p.status===filtroStatusAtivo;
+
     const matchVendedor = filtroVendedorAtivo==='todos' || p.vendedor===filtroVendedorAtivo;
     const q = buscaAtiva.toLowerCase();
     const matchBusca = !q ||
@@ -555,30 +839,104 @@ function filtrarPedidos(){
 
 function atualizarBadges(){
   const cnt = s => pedidos.filter(p=>p.status===s).length;
+  const pend = pedidos.filter(isPendente).length;
+  document.getElementById('badgePendentes').textContent = pend;
   document.getElementById('badgeTodos').textContent = pedidos.length;
   document.getElementById('badgeAgendado').textContent = cnt('Agendado');
-  document.getElementById('badgeConfirmado').textContent = cnt('Confirmado');
-  document.getElementById('badgeEntregue').textContent = cnt('Entregue');
+  document.getElementById('badgeReservado').textContent = cnt('Reservado');
+  document.getElementById('badgeConcluido').textContent = cnt('Concluido');
   document.getElementById('badgeCancelado').textContent = cnt('Cancelado');
 }
 
-function atualizarHero(){
-  const cnt = s => pedidos.filter(p=>p.status===s).length;
-  document.getElementById('heroTotal').textContent = pedidos.length;
-  document.getElementById('heroAgendado').textContent = cnt('Agendado');
-  document.getElementById('heroConfirmado').textContent = cnt('Confirmado');
-  document.getElementById('heroEntregue').textContent = cnt('Entregue');
+function atualizarCardsPrincipais(){
+  const hoje = hojeStr();
+  const hojePedidos = pedidos.filter(p=>p.data===hoje);
+  const hojePend = hojePedidos.filter(isPendente).length;
+  const hojeConc = hojePedidos.filter(p=>p.status==='Concluido').length;
+
+  document.getElementById('cardHoje').textContent = hojePedidos.length;
+  document.getElementById('cardHojeSub').innerHTML = hojePedidos.length>0
+    ? `${hojePend} pendente${hojePend!==1?'s':''} · ${hojeConc} concluído${hojeConc!==1?'s':''}`
+    : 'Nenhum agendamento hoje';
+
+  const pend = pedidos.filter(isPendente).length;
+  const atrasados = pedidos.filter(isAtrasado).length;
+  document.getElementById('cardPendentes').textContent = pend;
+  document.getElementById('cardPendentesSub').innerHTML = atrasados>0
+    ? `<span style="color:var(--red);font-weight:800">⚠️ ${atrasados} atrasado${atrasados!==1?'s':''}</span>`
+    : 'Tudo em dia ✓';
+
+  const reservados = pedidos.filter(p=>p.status==='Reservado').length;
+  document.getElementById('cardReservados').textContent = reservados;
+  document.getElementById('cardReservadosSub').textContent = reservados>0 ? 'aguardando retirada' : '—';
+
+  const conc = pedidos.filter(p=>p.status==='Concluido').length;
+  document.getElementById('cardConcluidos').textContent = conc;
+  document.getElementById('cardConcluidosSub').textContent = `${conc} no total`;
+
+  const canc = pedidos.filter(p=>p.status==='Cancelado').length;
+  document.getElementById('cardCancelados').textContent = canc;
+  document.getElementById('cardCanceladosSub').textContent = `${canc} no total`;
+}
+
+function atualizarMetricas(){
+  const filtrados = pedidos.filter(p=>dentroDoPeriodo(p.data, periodoAtivo));
+  const total = filtrados.length;
+  const cnt = s => filtrados.filter(p=>p.status===s).length;
+  const ag = cnt('Agendado'), res = cnt('Reservado'), conc = cnt('Concluido'), canc = cnt('Cancelado');
+  const taxaConc = total>0 ? Math.round((conc/total)*100) : 0;
+  const taxaCanc = total>0 ? Math.round((canc/total)*100) : 0;
+
+  const periodoLabel = {dia:'hoje', semana:'esta semana', mes:'este mês', ano:'este ano', todos:'no total'}[periodoAtivo];
+
+  document.getElementById('metricasGrid').innerHTML = `
+    <div class="metrica-item">
+      <div class="mi-l mi-roxo">📊 Total ${periodoLabel}</div>
+      <div class="mi-n">${total}</div>
+      <div class="mi-s">pedidos no período</div>
+    </div>
+    <div class="metrica-item">
+      <div class="mi-l mi-azul">🕐 Agendados</div>
+      <div class="mi-n mi-azul">${ag}</div>
+      <div class="mi-bar"><div style="width:${total?ag/total*100:0}%;background:var(--azul)"></div></div>
+    </div>
+    <div class="metrica-item">
+      <div class="mi-l mi-amarelo">🔖 Reservados</div>
+      <div class="mi-n mi-amarelo">${res}</div>
+      <div class="mi-bar"><div style="width:${total?res/total*100:0}%;background:var(--amarelo)"></div></div>
+    </div>
+    <div class="metrica-item">
+      <div class="mi-l mi-verde">✅ Concluídos</div>
+      <div class="mi-n mi-verde">${conc}</div>
+      <div class="mi-s">${taxaConc}% de conclusão</div>
+      <div class="mi-bar"><div style="width:${taxaConc}%;background:var(--verde)"></div></div>
+    </div>
+    <div class="metrica-item">
+      <div class="mi-l mi-cinza">❌ Cancelados</div>
+      <div class="mi-n mi-cinza">${canc}</div>
+      <div class="mi-s">${taxaCanc}% de cancelamento</div>
+      <div class="mi-bar"><div style="width:${taxaCanc}%;background:#8e8e93"></div></div>
+    </div>
+  `;
+}
+
+function setPeriodo(p, btn){
+  periodoAtivo = p;
+  document.querySelectorAll('.periodo-tab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  atualizarMetricas();
 }
 
 function atualizarStats(){
   const el = document.getElementById('sbStats');
   const total = pedidos.length;
-  const hoje = new Date().toISOString().slice(0,10);
-  const hojeQtd = pedidos.filter(p=>p.data===hoje).length;
+  const hoje = hojeStr();
+  const hojeQtd = pedidos.filter(p=>p.data===hoje && isPendente(p)).length;
+  const concHoje = pedidos.filter(p=>p.data===hoje && p.status==='Concluido').length;
   el.innerHTML = `
-    <div class="stat-row"><span class="stat-lbl">Total de pedidos</span><span class="stat-val">${total}</span></div>
-    <div class="stat-row"><span class="stat-lbl">Agendados hoje</span><span class="stat-val red">${hojeQtd}</span></div>
-    <div class="stat-row"><span class="stat-lbl">Entregues</span><span class="stat-val verde">${pedidos.filter(p=>p.status==='Entregue').length}</span></div>
+    <div class="stat-row"><span class="stat-lbl">Pendentes hoje</span><span class="stat-val red">${hojeQtd}</span></div>
+    <div class="stat-row"><span class="stat-lbl">Concluídos hoje</span><span class="stat-val verde">${concHoje}</span></div>
+    <div class="stat-row"><span class="stat-lbl">Total cadastrado</span><span class="stat-val">${total}</span></div>
   `;
 }
 
@@ -588,35 +946,88 @@ function renderVendedores(){
   let html = `<button class="nav-btn ${filtroVendedorAtivo==='todos'?'on':''}" onclick="filtrarVendedor('todos',this)"><span class="em">👥</span> Todos os vendedores</button>`;
   vends.forEach(v=>{
     const cnt = pedidos.filter(p=>p.vendedor===v).length;
-    html += `<button class="nav-btn ${filtroVendedorAtivo===v?'on':''}" onclick="filtrarVendedor('${v}',this)"><span class="em">👤</span> ${v}<span class="nav-badge" style="background:var(--txt2)">${cnt}</span></button>`;
+    html += `<button class="nav-btn ${filtroVendedorAtivo===v?'on':''}" onclick="filtrarVendedor('${v.replace(/'/g,"\\'")}',this)"><span class="em">👤</span> ${v}<span class="nav-badge" style="background:var(--txt2)">${cnt}</span></button>`;
   });
   nav.innerHTML = html;
 }
 
+function renderAgendaDoDia(){
+  const hoje = hojeStr();
+  const hojeData = new Date();
+  document.getElementById('hojeData').textContent = hojeData.toLocaleDateString('pt-BR',{weekday:'short', day:'2-digit', month:'short'}).toUpperCase();
+
+  const lista = ordenarPedidos(pedidos.filter(p=>p.data===hoje && isPendente(p)));
+  const el = document.getElementById('agendaList');
+  if(lista.length===0){
+    el.innerHTML = `<div class="agenda-empty">🌟 Nenhum agendamento pendente para hoje!</div>`;
+    return;
+  }
+  const agora = new Date();
+  el.innerHTML = lista.map(p=>{
+    const idx = pedidos.indexOf(p);
+    const horaCmp = p.hora ? new Date(`${p.data}T${p.hora}`) : null;
+    const atrasado = horaCmp && horaCmp < agora;
+    const cls = atrasado ? 'atrasado' : (p.status==='Reservado' ? 'reservado' : '');
+    const horaCls = atrasado ? 'atrasado' : (p.status==='Reservado' ? 'reservado' : '');
+    return `<div class="agenda-item ${cls}" onclick="verDetalhe(${idx})">
+      <div class="ai-top">
+        <div class="ai-hora ${horaCls}">${p.hora||'—'}h ${atrasado?'⚠️':''}</div>
+        <div class="ai-cod">${p.cod||'—'}</div>
+      </div>
+      <div class="ai-cliente">${p.cliente||'—'}</div>
+      <div class="ai-prod">${p.produto||'—'}</div>
+      <div class="ai-bot">
+        <div class="ai-vend">👤 ${p.vendedor||'—'} · ${badgeHTML(p.status)}</div>
+        <div class="ai-valor">${p.valor||''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 function renderTabela(){
-  const lista = filtrarPedidos();
+  const lista = ordenarPedidos(filtrarPedidos());
   const tbody = document.getElementById('tblBody');
   const empty = document.getElementById('emptyState');
+
+  // Atualiza título da tabela e empty state
+  const titulos = {
+    'pendentes':'⏳ Pedidos Pendentes',
+    'todos':'📋 Todos os Pedidos',
+    'Agendado':'🕐 Agendados',
+    'Reservado':'🔖 Reservados',
+    'Concluido':'✅ Concluídos',
+    'Cancelado':'❌ Cancelados',
+  };
+  document.getElementById('tblTitulo').textContent = titulos[filtroStatusAtivo]||'Pedidos';
   document.getElementById('tblCount').textContent = `${lista.length} pedido${lista.length!==1?'s':''}`;
 
   if(lista.length===0){
     tbody.innerHTML='';
     empty.style.display='block';
+    if(filtroStatusAtivo==='pendentes'){
+      empty.innerHTML = `<div class="es-ico">🎉</div><p>Nenhum pedido pendente!</p><span>Todos os agendamentos foram concluídos</span>`;
+    } else {
+      empty.innerHTML = `<div class="es-ico">📭</div><p>Nenhum pedido encontrado</p><span>Ajuste os filtros ou cadastre um novo</span>`;
+    }
     return;
   }
   empty.style.display='none';
 
+  const hoje = hojeStr();
   tbody.innerHTML = lista.map(p=>{
     const idx = pedidos.indexOf(p);
     const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
+    const flagHoje = p.data===hoje ? '<span class="data-flag">HOJE</span>' : '';
     const horaFmt = p.hora ? p.hora+'h' : '—';
     const tel = (p.tel||'').replace(/\D/g,'');
     const telLink = tel ? `<a href="https://wa.me/55${tel}" target="_blank">📱 ${p.tel}</a>` : p.tel||'—';
     const badge = badgeHTML(p.status);
-    return `<tr onclick="verDetalhe(${idx})" style="cursor:pointer">
+    const atrasado = isAtrasado(p);
+    const trCls = atrasado ? 'atrasado' : '';
+    return `<tr class="${trCls}" onclick="verDetalhe(${idx})" style="cursor:pointer">
       <td class="td-cod">${p.cod||'—'}</td>
-      <td class="td-data">${dataFmt}</td>
-      <td class="td-hora">${horaFmt}</td>
+      <td class="td-data">${dataFmt}${flagHoje}</td>
+      <td class="td-hora">${horaFmt}${atrasado?' ⚠️':''}</td>
       <td class="td-vendedor">${p.vendedor||'—'}</td>
       <td class="td-cliente">${p.cliente||'—'}</td>
       <td class="td-tel" onclick="event.stopPropagation()">${telLink}</td>
@@ -625,8 +1036,10 @@ function renderTabela(){
       <td class="td-pgto">${p.pgto||'—'}</td>
       <td>${badge}</td>
       <td class="td-acoes" onclick="event.stopPropagation()">
-        <button class="btn-edit" onclick="editarPedido(${idx})">✏️ Editar</button>
-        <button class="btn-copy-row" onclick="copiarPedidoIdx(${idx},this)" title="Copiar pedido para WhatsApp">📋</button>
+        ${isPendente(p) ? `<button class="btn-concluir" onclick="marcarConcluido(${idx})" title="Marcar como concluído">✅</button>` : ''}
+        <button class="btn-edit" onclick="editarPedido(${idx})">✏️</button>
+        <button class="btn-copy-row" onclick="copiarPedidoIdx(${idx},this)" title="Copiar para WhatsApp">📋</button>
+        ${p.status!=='Cancelado' ? `<button class="btn-cancelar-row" onclick="abrirCancelar(${idx})" title="Cancelar">❌</button>` : ''}
         <button class="btn-del" onclick="deletarPedido(${idx})">🗑</button>
       </td>
     </tr>`;
@@ -636,11 +1049,12 @@ function renderTabela(){
 function badgeHTML(status){
   const map = {
     'Agendado':  'badge-agendado',
-    'Confirmado':'badge-confirmado',
-    'Entregue':  'badge-entregue',
+    'Reservado': 'badge-reservado',
+    'Concluido': 'badge-concluido',
     'Cancelado': 'badge-cancelado',
   };
-  return `<span class="badge ${map[status]||'badge-agendado'}">${status||'Agendado'}</span>`;
+  const txt = status==='Concluido' ? 'Concluído' : (status||'Agendado');
+  return `<span class="badge ${map[status]||'badge-agendado'}">${txt}</span>`;
 }
 
 // ════ FILTROS ════
@@ -648,9 +1062,17 @@ function filtrarStatus(status, btn){
   filtroStatusAtivo = status;
   document.querySelectorAll('.nav-btn, .filtro-btn').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
+  // sincroniza outros botões com mesmo status
   document.querySelectorAll(`[data-status="${status}"]`).forEach(b=>b.classList.add('on'));
-  document.querySelectorAll('.nav-btn').forEach(b=>{
-    if(b.textContent.trim().includes(status==='todos'?'Todos os pedidos':status)) b.classList.add('on');
+  // sidebar nav
+  document.querySelectorAll('.sb-nav .nav-btn').forEach(b=>{
+    const txt = b.textContent.trim();
+    if(status==='pendentes' && txt.startsWith('Pendentes')) b.classList.add('on');
+    if(status==='todos' && txt.startsWith('Todos os pedidos')) b.classList.add('on');
+    if(status==='Agendado' && txt.startsWith('Agendados')) b.classList.add('on');
+    if(status==='Reservado' && txt.startsWith('Reservados')) b.classList.add('on');
+    if(status==='Concluido' && txt.startsWith('Concluídos')) b.classList.add('on');
+    if(status==='Cancelado' && txt.startsWith('Cancelados')) b.classList.add('on');
   });
   renderTabela();
 }
@@ -670,7 +1092,6 @@ function buscar(q){
 
 // ════ FIREBASE SAVE ════
 async function salvarFirebase(){
-  // Usa window._fbSalvar para garantir que pega a função injetada pelo módulo
   const fn = window._fbSalvar;
   if(!fn){
     showBanner('⚠️ Firebase ainda conectando... Tente em instantes.', 'err');
@@ -692,17 +1113,24 @@ function abrirModal(idx=null){
   document.getElementById('modalTitulo').textContent = idx!==null ? 'Editar Pedido' : 'Novo Pedido Agendado';
   const p = idx!==null ? pedidos[idx] : {};
   document.getElementById('fCod').value      = p.cod||autoCode();
-  document.getElementById('fStatus').value  = p.status||'Agendado';
-  document.getElementById('fData').value    = p.data||'';
-  document.getElementById('fHora').value    = p.hora||'';
-  document.getElementById('fVendedor').value= p.vendedor||'';
-  document.getElementById('fCliente').value = p.cliente||'';
-  document.getElementById('fTel').value     = p.tel||'';
-  document.getElementById('fValor').value   = p.valor||'';
-  document.getElementById('fProduto').value = p.produto||'';
-  document.getElementById('fPgto').value    = p.pgto||'';
-  document.getElementById('fObs').value     = p.obs||'';
+  document.getElementById('fStatus').value   = p.status||'Agendado';
+  document.getElementById('fData').value     = p.data||hojeStr();
+  document.getElementById('fHora').value     = p.hora||'';
+  document.getElementById('fVendedor').value = p.vendedor||'';
+  document.getElementById('fCliente').value  = p.cliente||'';
+  document.getElementById('fTel').value      = p.tel||'';
+  document.getElementById('fValor').value    = p.valor||'';
+  document.getElementById('fProduto').value  = p.produto||'';
+  document.getElementById('fPgto').value     = p.pgto||'';
+  document.getElementById('fMotivo').value   = p.motivoCancel||'';
+  document.getElementById('fObs').value      = p.obs||'';
+  onStatusChange();
   document.getElementById('modalAdd').classList.add('on');
+}
+
+function onStatusChange(){
+  const status = document.getElementById('fStatus').value;
+  document.getElementById('grpMotivo').style.display = (status==='Cancelado') ? 'flex' : 'none';
 }
 
 function editarPedido(idx){ abrirModal(idx); }
@@ -714,9 +1142,15 @@ function autoCode(){
 }
 
 function salvarPedido(){
+  const status = document.getElementById('fStatus').value;
+  const motivo = document.getElementById('fMotivo').value.trim();
+  if(status==='Cancelado' && !motivo){
+    alert('Informe o motivo do cancelamento.');
+    return;
+  }
   const p = {
     cod:      document.getElementById('fCod').value.trim().toUpperCase(),
-    status:   document.getElementById('fStatus').value,
+    status:   status,
     data:     document.getElementById('fData').value,
     hora:     document.getElementById('fHora').value,
     vendedor: document.getElementById('fVendedor').value.trim(),
@@ -725,6 +1159,7 @@ function salvarPedido(){
     valor:    document.getElementById('fValor').value.trim(),
     produto:  document.getElementById('fProduto').value.trim(),
     pgto:     document.getElementById('fPgto').value.trim(),
+    motivoCancel: status==='Cancelado' ? motivo : '',
     obs:      document.getElementById('fObs').value.trim(),
   };
   if(!p.cod || !p.cliente){
@@ -732,8 +1167,11 @@ function salvarPedido(){
     return;
   }
   if(editandoIdx !== null){
+    // Preserva data de criação se existia
+    p.criadoEm = pedidos[editandoIdx].criadoEm || new Date().toISOString();
     pedidos[editandoIdx] = p;
   } else {
+    p.criadoEm = new Date().toISOString();
     pedidos.unshift(p);
   }
   fecharModal('modalAdd');
@@ -749,6 +1187,58 @@ function deletarPedido(idx){
   salvarFirebase();
 }
 
+// ════ AÇÕES RÁPIDAS DE STATUS ════
+function marcarConcluido(idx){
+  if(!confirm(`Marcar pedido ${pedidos[idx].cod} como CONCLUÍDO?`)) return;
+  pedidos[idx].status = 'Concluido';
+  pedidos[idx].concluidoEm = new Date().toISOString();
+  fecharModal('modalDetalhe');
+  render();
+  salvarFirebase();
+  showToast('✅ Pedido concluído!');
+}
+
+function marcarReservado(idx){
+  pedidos[idx].status = 'Reservado';
+  fecharModal('modalDetalhe');
+  render();
+  salvarFirebase();
+  showToast('🔖 Pedido reservado!');
+}
+
+function reabrir(idx){
+  pedidos[idx].status = 'Agendado';
+  pedidos[idx].motivoCancel = '';
+  fecharModal('modalDetalhe');
+  render();
+  salvarFirebase();
+  showToast('🕐 Pedido reaberto como agendado!');
+}
+
+function abrirCancelar(idx){
+  idxPendenteCancelar = idx;
+  document.getElementById('motivoCancelar').value = pedidos[idx].motivoCancel || '';
+  document.getElementById('modalCancelar').classList.add('on');
+}
+
+function confirmarCancelar(){
+  const motivo = document.getElementById('motivoCancelar').value.trim();
+  if(!motivo){
+    alert('Informe o motivo do cancelamento.');
+    return;
+  }
+  if(idxPendenteCancelar===null) return;
+  pedidos[idxPendenteCancelar].status = 'Cancelado';
+  pedidos[idxPendenteCancelar].motivoCancel = motivo;
+  pedidos[idxPendenteCancelar].canceladoEm = new Date().toISOString();
+  fecharModal('modalCancelar');
+  fecharModal('modalDetalhe');
+  idxPendenteCancelar = null;
+  render();
+  salvarFirebase();
+  showToast('❌ Pedido cancelado.');
+}
+
 // ════ MODAL DETALHE ════
 function verDetalhe(idx){
   const p = pedidos[idx];
@@ -757,7 +1247,7 @@ function verDetalhe(idx){
   const dataFmt = p.data ? p.data.split('-').reverse().join('/') : '—';
   const tel = (p.tel||'').replace(/\D/g,'');
 
-  // Mensagens sem encode (para copiar)
+  // Mensagens
   _msgClienteTemp =
 `Olá ${p.cliente}! 😊
 
@@ -784,11 +1274,10 @@ Te esperamos! Qualquer dúvida, é só chamar. ✅`;
 
 ✅ Confirmado e registrado!`;
 
-  // Encode para links wa.me
   const msgClienteEnc = encodeURIComponent(_msgClienteTemp);
   const msgInternoEnc = encodeURIComponent(_msgInternoTemp);
 
-  document.getElementById('detalheGrid').innerHTML = `
+  let gridHTML = `
     <div class="dg-item"><div class="dg-lbl">Código</div><div class="dg-val">${p.cod||'—'}</div></div>
     <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val">${badgeHTML(p.status)}</div></div>
     <div class="dg-item"><div class="dg-lbl">Data</div><div class="dg-val">${dataFmt}</div></div>
@@ -800,7 +1289,23 @@ Te esperamos! Qualquer dúvida, é só chamar. ✅`;
     <div class="dg-item"><div class="dg-lbl">Valor</div><div class="dg-val red">${p.valor||'—'}</div></div>
     <div class="dg-item full"><div class="dg-lbl">Forma de Pagamento</div><div class="dg-val">${p.pgto||'—'}</div></div>
     ${p.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${p.obs}</div></div>`:''}
+    ${p.status==='Cancelado' && p.motivoCancel?`<div class="dg-item full cancelado"><div class="dg-lbl">⚠️ Motivo do Cancelamento</div><div class="dg-val">${p.motivoCancel}</div></div>`:''}
   `;
+  document.getElementById('detalheGrid').innerHTML = gridHTML;
+
+  // AÇÕES DE STATUS (mudar status rapidamente)
+  let actHTML = '';
+  if(p.status==='Agendado'){
+    actHTML += `<button class="det-btn det-btn-reservar" onclick="marcarReservado(${idx})">🔖 Reservar</button>`;
+    actHTML += `<button class="det-btn det-btn-concluir" onclick="marcarConcluido(${idx})">✅ Concluir</button>`;
+    actHTML += `<button class="det-btn det-btn-cancelar" onclick="abrirCancelar(${idx})">❌ Cancelar</button>`;
+  } else if(p.status==='Reservado'){
+    actHTML += `<button class="det-btn det-btn-concluir" onclick="marcarConcluido(${idx})">✅ Concluir</button>`;
+    actHTML += `<button class="det-btn det-btn-cancelar" onclick="abrirCancelar(${idx})">❌ Cancelar</button>`;
+  } else if(p.status==='Concluido' || p.status==='Cancelado'){
+    actHTML += `<button class="det-btn det-btn-reabrir" onclick="reabrir(${idx})">🔄 Reabrir</button>`;
+  }
+  document.getElementById('detStatusActions').innerHTML = actHTML;
 
   // Seção cliente
   document.getElementById('detalheWppCliente').innerHTML = `
@@ -822,7 +1327,6 @@ Te esperamos! Qualquer dúvida, é só chamar. ✅`;
 
   document.getElementById('detDivider').style.display = 'block';
 
-  // Seção grupo interno — usa web.whatsapp.com em vez de api.whatsapp.com
   document.getElementById('detalheWppInterno').innerHTML = `
     <div class="det-wpp-section" style="padding-bottom:12px">
       <div class="det-wpp-label">🏪 Enviar ao grupo interno — Vendas Confirmadas</div>
@@ -856,7 +1360,6 @@ function fecharOv(e, id){ if(e.target===document.getElementById(id)) fecharModal
 window.addEventListener('load',()=>{
   showBanner('Conectando ao Firebase...', 'loading');
   setTimeout(()=>{ document.getElementById('loading').classList.add('gone'); },600);
-  // Se em 8 segundos ainda não conectou, avisa
   setTimeout(()=>{
     if(!window._fbSalvar){
       showBanner('⚠️ Verifique as regras do Firebase Realtime Database (read/write)', 'err');
@@ -883,19 +1386,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 
-// Expõe função de salvar para o código global
 window._fbSalvar = async (dados) => {
   await set(ref(db, 'pedidos_agendados'), dados);
 };
 
-// Listener em tempo real
-// IMPORTANTE: usar window.pedidos (não pedidos) pois módulos rodam em strict mode
 onValue(ref(db, 'pedidos_agendados'), snap => {
   const val = snap.val();
   if(Array.isArray(val)){
     window.pedidos = val;
   } else if(val && typeof val === 'object'){
-    // caso venha como objeto Firebase (chaves numéricas ou string)
     window.pedidos = Object.values(val).filter(v => v && typeof v === 'object');
   } else {
     window.pedidos = [];
