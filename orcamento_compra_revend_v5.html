@@ -541,7 +541,7 @@ async function gerarPDF(){
   const s=getState();
   const {jsPDF}=window.jspdf;
   const doc=new jsPDF({unit:"mm",format:"a4"});
-  const W=210,M=14;let y=0;
+  const W=210,M=14,pageH=297;let y=0;
 
   function header(){
     doc.setFillColor(25,25,25);doc.rect(0,0,W,24,"F");
@@ -710,6 +710,63 @@ async function gerarPDF(){
   doc.text(boxLabel,W/2,y+9,{align:"center"});
   doc.setTextColor(0,0,0);y+=18;
 
+  // ── Determina se há anexo RG ──
+  const temRgAnexo=rgData.frente||rgData.verso;
+
+  // ── Função auxiliar para desenhar bloco de assinaturas ──
+  function drawAssinaturas(){
+    if(y+50>pageH-10){doc.addPage();y=0;header();}
+    secHdr("ASSINATURAS");
+    y+=8;
+    const sigColW=(W-2*M)/3;
+    const sigPad=8;
+    const sigLineW=sigColW-sigPad*2;
+
+    const sigDataCols=s.modalidade==="parte"
+      ?[
+        { titulo:"CLIENTE", nome: s.nome||"", role:"Assinatura do Cliente" },
+        { titulo:"COLABORADOR RESPONSAVEL", nome: s.responsavel||"", role:"Colaborador responsavel pelo recebimento" },
+        { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
+      ]
+      :[
+        { titulo:"CLIENTE (VENDEDOR)", nome: s.nome||"", role:"Assinatura do Cliente / Vendedor" },
+        { titulo:"COLABORADOR RESPONSAVEL PELOS TESTES", nome: s.responsavel||"", role:"Colaborador responsavel pelos testes" },
+        { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
+      ];
+
+    const sigImgs={
+      cliente: getSigDataURL("cliente"),
+      colaborador: getSigDataURL("colaborador"),
+      supervisao: getSigDataURL("supervisao")
+    };
+    const sigKeys=["cliente","colaborador","supervisao"];
+
+    sigDataCols.forEach((col,i)=>{
+      const x=M+sigColW*i+sigPad;
+      doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(80,80,80);
+      doc.text(col.titulo,x,y-1);
+      const boxH=24;
+      doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);
+      doc.rect(x,y+1,sigLineW,boxH);
+      const sigImg=sigImgs[sigKeys[i]];
+      if(sigImg){
+        try{doc.addImage(sigImg,"PNG",x+1,y+1,sigLineW-2,boxH-2);}catch(e){}
+      }
+      doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(20,20,20);
+      const nomeDisplay=col.nome||"";
+      doc.text(doc.splitTextToSize(nomeDisplay,sigLineW)[0],x,y+boxH+6);
+      doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
+      doc.text(col.role,x,y+boxH+11);
+    });
+    doc.setTextColor(0,0,0);
+    y+=50;
+  }
+
+  // ── Se NÃO há anexo: assinaturas na página 1 ──
+  if(!temRgAnexo){
+    drawAssinaturas();
+  }
+
   // PAGE 2 — CONTRATO / REGISTRO
   doc.addPage();y=0;header();
   doc.setFontSize(s.modalidade==="parte"?11:13);doc.setFont("helvetica","bold");doc.setTextColor(0,0,0);
@@ -789,7 +846,6 @@ async function gerarPDF(){
     doc.setFont("helvetica","normal");
   }
 
-  const pageH=297;
   if(y+60>pageH-10){doc.addPage();y=0;header();}
   secHdr("CONDICOES GERAIS");y+=4;
   const conds=s.modalidade==="parte"
@@ -807,69 +863,13 @@ async function gerarPDF(){
   const foroLines=doc.splitTextToSize(foroTxt,W-2*M);
   doc.text(foroLines,M,y);y+=foroLines.length*4.5+10;
 
-  // ASSINATURAS — 3 campos
-  if(y+50>pageH-10){doc.addPage();y=0;header();}
-  secHdr("ASSINATURAS");
-  y+=8;
-  const sigColW=(W-2*M)/3;
-  const sigPad=8;
-  const sigLineW=sigColW-sigPad*2;
-
-  // Dados de cada coluna adaptados por modalidade
-  const sigData=s.modalidade==="parte"
-    ?[
-      { titulo:"CLIENTE", nome: s.nome||"", role:"Assinatura do Cliente" },
-      { titulo:"COLABORADOR RESPONSAVEL", nome: s.responsavel||"", role:"Colaborador responsavel pelo recebimento" },
-      { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
-    ]
-    :[
-      { titulo:"CLIENTE (VENDEDOR)", nome: s.nome||"", role:"Assinatura do Cliente / Vendedor" },
-      { titulo:"COLABORADOR RESPONSAVEL PELOS TESTES", nome: s.responsavel||"", role:"Colaborador responsavel pelos testes" },
-      { titulo:"SUPERVISAO", nome:"Supervisao", role:"Assinatura da Supervisao" }
-    ];
-
-  // Coleta as assinaturas digitais dos canvas
-  const sigImgs={
-    cliente: getSigDataURL("cliente"),
-    colaborador: getSigDataURL("colaborador"),
-    supervisao: getSigDataURL("supervisao")
-  };
-  const sigKeys=["cliente","colaborador","supervisao"];
-
-  sigData.forEach((col,i)=>{
-    const x=M+sigColW*i+sigPad;
-
-    // Título da coluna
-    doc.setFontSize(7.5);doc.setFont("helvetica","bold");doc.setTextColor(80,80,80);
-    doc.text(col.titulo,x,y-1);
-
-    // Caixa de assinatura
-    const boxH=24;
-    doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);
-    doc.rect(x,y+1,sigLineW,boxH);
-
-    // Imagem da assinatura digital (se houver)
-    const sigImg=sigImgs[sigKeys[i]];
-    if(sigImg){
-      try{doc.addImage(sigImg,"PNG",x+1,y+1,sigLineW-2,boxH-2);}catch(e){}
-    }
-
-    // Linha abaixo da caixa
-    doc.setFontSize(8);doc.setFont("helvetica","bold");doc.setTextColor(20,20,20);
-    const nomeDisplay=col.nome||"";
-    doc.text(doc.splitTextToSize(nomeDisplay,sigLineW)[0],x,y+boxH+6);
-
-    // Role / legenda
-    doc.setFontSize(7);doc.setFont("helvetica","normal");doc.setTextColor(100,100,100);
-    doc.text(col.role,x,y+boxH+11);
-  });
-
-  doc.setTextColor(0,0,0);
-  y+=50;
+  // ── Se HÁ anexo: assinaturas na página 2 (antes do RG) ──
+  if(temRgAnexo){
+    drawAssinaturas();
+  }
 
   // ── ANEXO: DOCUMENTO RG ─────────────────────────────
-  const temRg=rgData.frente||rgData.verso;
-  if(temRg){
+  if(temRgAnexo){
     if(y+10>pageH-10){doc.addPage();y=0;header();}
     secHdr("ANEXO — DOCUMENTO DE IDENTIFICACAO (RG)");
     y+=6;
