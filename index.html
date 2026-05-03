@@ -99,7 +99,7 @@ body{background:var(--bg);display:flex;flex-direction:column;height:100vh;overfl
 .tc-badge.cinza{background:#f1f1f1;color:#555}
 .tc-badge.wpp{background:#e8faf0;color:var(--wpp)}
 
-/* CARD DESTAQUE */
+/* CARD DESTAQUE (novo) */
 .tool-card.destaque{border-color:var(--brd);background:linear-gradient(135deg,#fff 60%,rgba(200,16,46,.03))}
 .tool-card.destaque:hover{border-color:#f5aab8}
 
@@ -128,7 +128,22 @@ iframe{width:100%;height:100%;border:none;display:block}
 .no-file h3{font-size:15px;font-weight:700;color:var(--txt2)}
 .no-file p{font-size:12px;color:var(--txt2);max-width:300px;line-height:1.5;font-weight:500}
 
-/* ══ MODAL SENHA ADM ══ */
+/* ── MOBILE ── */
+@media(max-width:768px){
+  .sidebar,.topbar{display:none}
+  .main-area{flex:1}
+  .home-screen{padding:12px 12px 60px}
+  .hero{flex-direction:column;gap:12px}
+  .hero-right{width:100%;justify-content:space-between}
+  .hero-stat{flex:1}
+  .mob-header{display:flex!important;align-items:center;justify-content:space-between;background:#fff;padding:13px 16px;position:sticky;top:0;z-index:200;border-bottom:1px solid var(--brd);box-shadow:0 1px 8px rgba(0,0,0,.06)}
+  .mob-logo{font-size:21px;font-weight:900;color:var(--red);letter-spacing:-.8px}
+  .mob-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--verde)}
+  .cards-grid{grid-template-columns:1fr 1fr}
+}
+@media(min-width:769px){.mob-header{display:none}}
+
+/* ══ MODAL SENHA RESTRITO ══ */
 .adm-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
 .adm-ov.on{display:flex;animation:ov-in .2s}
 @keyframes ov-in{from{opacity:0}to{opacity:1}}
@@ -154,21 +169,6 @@ iframe{width:100%;height:100%;border:none;display:block}
 .adm-foot{padding:12px 24px 20px;text-align:center}
 .adm-cancel{font-size:11px;font-weight:700;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;text-decoration:underline;transition:color .15s}
 .adm-cancel:hover{color:var(--preto)}
-
-/* ── MOBILE ── */
-@media(max-width:768px){
-  .sidebar,.topbar{display:none}
-  .main-area{flex:1}
-  .home-screen{padding:12px 12px 60px}
-  .hero{flex-direction:column;gap:12px}
-  .hero-right{width:100%;justify-content:space-between}
-  .hero-stat{flex:1}
-  .mob-header{display:flex!important;align-items:center;justify-content:space-between;background:#fff;padding:13px 16px;position:sticky;top:0;z-index:200;border-bottom:1px solid var(--brd);box-shadow:0 1px 8px rgba(0,0,0,.06)}
-  .mob-logo{font-size:21px;font-weight:900;color:var(--red);letter-spacing:-.8px}
-  .mob-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--verde)}
-  .cards-grid{grid-template-columns:1fr 1fr}
-}
-@media(min-width:769px){.mob-header{display:none}}
 </style>
 </head>
 <body>
@@ -180,13 +180,14 @@ iframe{width:100%;height:100%;border:none;display:block}
   <div class="ld-txt">Carregando central de ferramentas...</div>
 </div>
 
-<!-- MODAL SENHA ADMIN -->
+
+<!-- MODAL SENHA RESTRITO -->
 <div class="adm-ov" id="admOv">
   <div class="adm-box">
     <div class="adm-head">
       <div class="adm-head-icon">🔐</div>
       <h2>Área Restrita</h2>
-      <p>Insira a senha de administrador para continuar</p>
+      <p id="admHeadDesc">Insira a senha de administrador para continuar</p>
     </div>
     <div class="adm-body">
       <div class="adm-inp-row">
@@ -195,7 +196,7 @@ iframe{width:100%;height:100%;border:none;display:block}
         <button class="adm-eye" id="admEye" onclick="admToggle()">👁</button>
       </div>
       <div class="adm-err-msg hide" id="admErr">Senha incorreta. Tente novamente.</div>
-      <button class="adm-btn" onclick="admEntrar()">🔓 Entrar no Painel Admin</button>
+      <button class="adm-btn" onclick="admEntrar()">🔓 Entrar</button>
     </div>
     <div class="adm-foot">
       <button class="adm-cancel" onclick="admCancelar()">Cancelar</button>
@@ -267,7 +268,11 @@ iframe{width:100%;height:100%;border:none;display:block}
       </button>
 
       <div class="sb-sep"></div>
-      <div class="nav-label">Administração</div>
+      <div class="nav-label">CRM & Administração</div>
+      <button class="nav-btn" data-key="kommo" onclick="openTool('kommo')">
+        <span class="em">📊</span> Métricas Kommo
+        <span class="nav-tag azul">CRM</span>
+      </button>
       <button class="nav-btn" data-key="admin" onclick="openTool('admin')">
         <span class="em">⚙️</span> Painel Admin
         <span class="nav-tag red">ADM</span>
@@ -312,7 +317,7 @@ iframe{width:100%;height:100%;border:none;display:block}
         </div>
         <div class="hero-right">
           <div class="hero-stat">
-            <div class="hs-n">8</div>
+            <div class="hs-n">9</div>
             <div class="hs-l">Ferramentas</div>
           </div>
           <div class="hero-stat">
@@ -385,6 +390,13 @@ iframe{width:100%;height:100%;border:none;display:block}
           <div class="tc-badge verde">Tabela</div>
         </div>
 
+        <div class="tool-card" style="--accent:var(--azul)" onclick="openTool('kommo')">
+          <div class="tc-icon-wrap" style="--ic-bg:#e3f0ff">📊</div>
+          <div class="tc-name">Métricas Kommo</div>
+          <div class="tc-desc">Acompanhe vendas fechadas, clientes no funil, performance por vendedor e tempo de atendimento.</div>
+          <div class="tc-badge azul">🔐 CRM</div>
+        </div>
+
         <div class="tool-card" style="--accent:var(--red)" onclick="openTool('admin')">
           <div class="tc-icon-wrap" style="--ic-bg:var(--red-dim)">⚙️</div>
           <div class="tc-name">Painel Admin</div>
@@ -429,78 +441,69 @@ iframe{width:100%;height:100%;border:none;display:block}
 </div>
 
 <script>
-/* ══ FERRAMENTAS ══ */
 const TOOLS = {
-  pedidos:         { name: 'Pedidos Agendados',     icon: '🗓',  file: 'pedidos_agendados.html',               sub: 'Agendamentos dos vendedores' },
-  garantia:        { name: 'Termos de Garantia',    icon: '🛡️', file: 'termos_garantia_revend.html',           sub: 'Geração de termos em PDF' },
-  orcamento_compra:{ name: 'Orçamento Compra',      icon: '📋', file: 'orcamento_compra_revend_v5.html',        sub: 'PDF + Contrato' },
-  estoque:         { name: 'Estoque Acessórios',    icon: '📦', file: 'REVEND_ESTOQUE_ACESS_ON.html',           sub: 'Controle por modelos' },
-  reposicao:       { name: 'Reposição de Materiais',icon: '🛒', file: 'REPOSIC_A_O_MATERIAIS_LOJA.html',        sub: 'Planilha de pedidos' },
-  script:          { name: 'Script de Atendimento', icon: '💬', file: 'script_atendimento_revend_v3.html',      sub: 'Guia de atendimento' },
-  tabela:          { name: 'Tabela de Valores',     icon: '💰', file: 'tabela_proposta.html',                   sub: 'Preços e propostas' },
-  admin:           { name: 'Painel Admin',           icon: '⚙️', file: 'admin_revend.html',                     sub: 'Administração · Revend Eletro', restrito: true },
+  pedidos: {
+    name: 'Pedidos Agendados',
+    icon: '🗓',
+    file: 'pedidos_agendados.html',
+    sub: 'Agendamentos dos vendedores',
+  },
+  garantia: {
+    name: 'Termos de Garantia',
+    icon: '🛡️',
+    file: 'termos_garantia_revend.html',
+    sub: 'Geração de termos em PDF',
+  },
+  orcamento_compra: {
+    name: 'Orçamento Compra',
+    icon: '📋',
+    file: 'orcamento_compra_revend_v5.html',
+    sub: 'PDF + Contrato',
+  },
+  estoque: {
+    name: 'Estoque Acessórios',
+    icon: '📦',
+    file: 'REVEND_ESTOQUE_ACESS_ON.html',
+    sub: 'Controle por modelos',
+  },
+  reposicao: {
+    name: 'Reposição de Materiais',
+    icon: '🛒',
+    file: 'REPOSIC_A_O_MATERIAIS_LOJA.html',
+    sub: 'Planilha de pedidos',
+  },
+  script: {
+    name: 'Script de Atendimento',
+    icon: '💬',
+    file: 'script_atendimento_revend_v3.html',
+    sub: 'Guia de atendimento',
+  },
+  tabela: {
+    name: 'Tabela de Valores',
+    icon: '💰',
+    file: 'tabela_proposta.html',
+    sub: 'Preços e propostas',
+  },
+  kommo: {
+    name: 'Métricas Kommo',
+    icon: '📊',
+    file: 'kommo_metricas.html',
+    sub: 'CRM · Funil · Vendas',
+    restrito: true,
+  },
+  admin: {
+    name: 'Painel Admin',
+    icon: '⚙️',
+    file: 'admin_revend.html',
+    sub: 'Administração · Revend Eletro',
+    restrito: true,
+  },
 };
 
 let current = 'home';
 
-/* ══ MODAL SENHA ══ */
-const ADM_SENHA = 'Revend@2026';
-let pendingKey = null;
-
-function abrirModalSenha(key) {
-  pendingKey = key;
-  const ov = document.getElementById('admOv');
-  const inp = document.getElementById('admInp');
-  const err = document.getElementById('admErr');
-  inp.value = '';
-  inp.type = 'password';
-  document.getElementById('admEye').textContent = '👁';
-  err.classList.add('hide');
-  ov.classList.add('on');
-  setTimeout(() => inp.focus(), 120);
-}
-
-function admCancelar() {
-  document.getElementById('admOv').classList.remove('on');
-  pendingKey = null;
-  // desmarca o botão que ficou "on" na sidebar
-  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
-    el.classList.toggle('on', el.dataset.key === current);
-  });
-}
-
-function admToggle() {
-  const inp = document.getElementById('admInp');
-  const eye = document.getElementById('admEye');
-  if (inp.type === 'password') { inp.type = 'text';     eye.textContent = '🙈'; }
-  else                         { inp.type = 'password'; eye.textContent = '👁'; }
-}
-
-function admEntrar() {
-  const inp = document.getElementById('admInp');
-  const err = document.getElementById('admErr');
-  if (inp.value === ADM_SENHA) {
-    document.getElementById('admOv').classList.remove('on');
-    carregarFerramenta(pendingKey);
-    pendingKey = null;
-  } else {
-    err.classList.remove('hide');
-    inp.classList.remove('err');
-    void inp.offsetWidth;           // reflow para reiniciar animação
-    inp.classList.add('err');
-    inp.value = '';
-    inp.focus();
-    setTimeout(() => inp.classList.remove('err'), 350);
-  }
-}
-
-// Fecha modal ao clicar no overlay
-document.getElementById('admOv').addEventListener('click', function(e) {
-  if (e.target === this) admCancelar();
-});
-
-/* ══ NAVEGAÇÃO ══ */
 function openTool(key) {
+  // atualiza sidebar
   document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
     el.classList.toggle('on', el.dataset.key === key);
   });
@@ -510,25 +513,12 @@ function openTool(key) {
   const tool = TOOLS[key];
   if (!tool) { showNoFile(); return; }
 
-  // Se for restrito, pede senha antes de carregar
-  if (tool.restrito) {
-    abrirModalSenha(key);
-    return;
-  }
-
-  carregarFerramenta(key);
-}
-
-function carregarFerramenta(key) {
-  const tool = TOOLS[key];
-  if (!tool) { showNoFile(); return; }
-
   current = key;
-  document.getElementById('activeLabel').textContent = tool.name;
-  document.getElementById('iframeIcon').textContent  = tool.icon;
-  document.getElementById('iframeTitle').textContent = tool.name;
-  document.getElementById('topbarTitle').textContent = tool.name;
-  document.getElementById('topbarSub').textContent   = tool.sub || 'Revend · Ferramenta interna';
+  document.getElementById('activeLabel').textContent  = tool.name;
+  document.getElementById('iframeIcon').textContent   = tool.icon;
+  document.getElementById('iframeTitle').textContent  = tool.name;
+  document.getElementById('topbarTitle').textContent  = tool.name;
+  document.getElementById('topbarSub').textContent    = tool.sub || 'Revend · Ferramenta interna';
 
   document.getElementById('homeScreen').classList.add('hidden');
   document.getElementById('noFileScreen').classList.remove('show');
@@ -536,11 +526,6 @@ function carregarFerramenta(key) {
   document.getElementById('iframeLoading').classList.remove('hidden');
 
   document.getElementById('mainFrame').src = tool.file;
-
-  // Garante highlight correto na sidebar após senha
-  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
-    el.classList.toggle('on', el.dataset.key === key);
-  });
 }
 
 function goHome() {
@@ -581,6 +566,61 @@ function openInNewTab() {
 window.addEventListener('load', () => {
   setTimeout(() => { document.getElementById('loading').classList.add('gone'); }, 500);
 });
+
+/* ══ MODAL SENHA RESTRITO ══ */
+const ADM_SENHA = 'Revend@2026';
+let pendingKey = null;
+
+function abrirModalSenha(key) {
+  pendingKey = key;
+  const tool = TOOLS[key];
+  document.getElementById('admHeadDesc').textContent =
+    tool && tool.name ? 'Insira a senha para acessar: ' + tool.name : 'Insira a senha de administrador';
+  const inp = document.getElementById('admInp');
+  const err = document.getElementById('admErr');
+  inp.value = ''; inp.type = 'password';
+  document.getElementById('admEye').textContent = '👁';
+  err.classList.add('hide');
+  document.getElementById('admOv').classList.add('on');
+  setTimeout(() => inp.focus(), 120);
+}
+
+function admCancelar() {
+  document.getElementById('admOv').classList.remove('on');
+  pendingKey = null;
+  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
+    el.classList.toggle('on', el.dataset.key === current);
+  });
+}
+
+function admToggle() {
+  const inp = document.getElementById('admInp');
+  const eye = document.getElementById('admEye');
+  if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+  else { inp.type = 'password'; eye.textContent = '👁'; }
+}
+
+function admEntrar() {
+  const inp = document.getElementById('admInp');
+  const err = document.getElementById('admErr');
+  if (inp.value === ADM_SENHA) {
+    document.getElementById('admOv').classList.remove('on');
+    carregarFerramenta(pendingKey);
+    pendingKey = null;
+  } else {
+    err.classList.remove('hide');
+    inp.classList.remove('err');
+    void inp.offsetWidth;
+    inp.classList.add('err');
+    inp.value = ''; inp.focus();
+    setTimeout(() => inp.classList.remove('err'), 350);
+  }
+}
+
+document.getElementById('admOv').addEventListener('click', function(e) {
+  if (e.target === this) admCancelar();
+});
+
 </script>
 </body>
 </html>
