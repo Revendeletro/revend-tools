@@ -26,7 +26,7 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 /* ══ CONFIG SCREEN ══ */
 #configScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
 #configScreen.hidden{display:none}
-.cfg-box{background:#fff;border-radius:var(--radius);border:1.5px solid var(--brd);padding:32px;width:100%;max-width:480px;box-shadow:var(--shadow-md)}
+.cfg-box{background:#fff;border-radius:var(--radius);border:1.5px solid var(--brd);padding:32px;width:100%;max-width:500px;box-shadow:var(--shadow-md)}
 .cfg-logo{font-size:24px;font-weight:900;color:var(--red);letter-spacing:-1px;margin-bottom:4px}
 .cfg-sub{font-size:11px;color:var(--txt2);font-weight:600;margin-bottom:24px}
 .cfg-title{font-size:15px;font-weight:800;margin-bottom:6px}
@@ -41,6 +41,9 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .cfg-steps{margin:0 0 20px;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
 .cfg-steps li{display:flex;gap:10px;align-items:flex-start;font-size:11px;color:var(--txt2);font-weight:600;line-height:1.5}
 .cfg-steps li span.num{background:var(--red-dim);color:var(--red);border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;margin-top:1px}
+.cfg-divider{border:none;border-top:1.5px solid var(--brd);margin:20px 0}
+.cfg-proxy-note{background:#f0f7ff;border:1.5px solid #c0dcff;border-radius:10px;padding:12px 14px;font-size:10px;color:#005aaa;font-weight:600;line-height:1.7;margin-bottom:14px}
+.cfg-proxy-note strong{font-weight:800}
 
 /* ══ DEMO BANNER ══ */
 #demoBanner{background:linear-gradient(130deg,var(--amarelo),#e8850a);color:#fff;padding:10px 20px;text-align:center;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center;gap:10px}
@@ -165,21 +168,34 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
     <div class="cfg-sub">Métricas Kommo · Configuração</div>
 
     <div class="cfg-title">Conectar ao seu Kommo CRM</div>
-    <div class="cfg-desc">Para exibir seus dados reais, você precisa informar o token de acesso da API do Kommo. Seus dados ficam salvos apenas neste navegador.</div>
+    <div class="cfg-desc">Preencha os dados abaixo para exibir seus dados reais. Tudo fica salvo apenas neste navegador.</div>
 
     <div class="cfg-steps">
       <div class="section-label" style="margin-bottom:8px">Como obter o token</div>
-      <li><span class="num">1</span><span>Acesse seu Kommo → <strong>Configurações → Integrações → API</strong></span></li>
-      <li><span class="num">2</span><span>Clique em <strong>"Mostrar chave API"</strong> ou crie uma integração OAuth</span></li>
-      <li><span class="num">3</span><span>Copie o <strong>Long-term access token</strong> e cole abaixo</span></li>
-      <li><span class="num">4</span><span>Informe também o subdomínio da sua conta (ex: <strong>revend</strong> se a URL for revend.kommo.com)</span></li>
+      <li><span class="num">1</span><span>Acesse seu Kommo → <strong>Configurações → Integrações → Criar integração</strong></span></li>
+      <li><span class="num">2</span><span>Dê um nome qualquer (ex: Dashboard) e salve</span></li>
+      <li><span class="num">3</span><span>Vá na aba <strong>"Chaves e escopos"</strong> e copie o <strong>Long-term access token</strong></span></li>
+      <li><span class="num">4</span><span>Informe o subdomínio (ex: <strong>revendeletro</strong> se a URL for revendeletro.kommo.com)</span></li>
     </div>
 
     <label class="cfg-label">Subdomínio da conta</label>
-    <input class="cfg-inp" id="cfgDomain" placeholder="ex: revend (de revend.kommo.com)" />
+    <input class="cfg-inp" id="cfgDomain" placeholder="ex: revendeletro" />
 
     <label class="cfg-label">Token de acesso da API</label>
     <input class="cfg-inp" id="cfgToken" type="password" placeholder="Cole aqui o token longo..." />
+
+    <hr class="cfg-divider">
+
+    <div class="cfg-proxy-note">
+      <strong>⚡ URL do Proxy (obrigatório para funcionar)</strong><br>
+      Para contornar o bloqueio CORS do navegador, é necessário um proxy.<br>
+      Crie o seu gratuitamente em <strong>workers.cloudflare.com</strong> usando o arquivo<br>
+      <strong>cloudflare-worker-proxy.js</strong> que acompanha este dashboard.<br>
+      Depois cole a URL do Worker abaixo (ex: https://meu-proxy.USUARIO.workers.dev)
+    </div>
+
+    <label class="cfg-label">URL do Proxy (Cloudflare Worker)</label>
+    <input class="cfg-inp" id="cfgProxy" placeholder="https://meu-proxy.usuario.workers.dev" />
 
     <button class="cfg-btn" onclick="salvarConfig()">🔗 Conectar ao Kommo</button>
 
@@ -219,9 +235,7 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
 
   <!-- KPIs -->
   <div class="section-label">Visão geral</div>
-  <div class="kpi-grid" id="kpiGrid">
-    <!-- preenchido via JS -->
-  </div>
+  <div class="kpi-grid" id="kpiGrid"></div>
 
   <!-- FUNIL -->
   <div class="section-label">Clientes por etapa do funil</div>
@@ -287,19 +301,20 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
 
 <script>
 /* ══ ESTADO ══ */
-let domain = '', token = '', isDemo = false, currentDays = 7;
-const DEMO_KEY = 'revend_kommo_cfg';
+let domain = '', token = '', proxyUrl = '', isDemo = false, currentDays = 7;
+const STORAGE_KEY = 'revend_kommo_cfg';
 
 /* ══ INIT ══ */
 window.addEventListener('load', () => {
   setTimeout(() => document.getElementById('loading').classList.add('gone'), 600);
-  const saved = localStorage.getItem(DEMO_KEY);
+  const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
       const cfg = JSON.parse(saved);
-      domain = cfg.domain || '';
-      token  = cfg.token  || '';
-      if (domain && token) { iniciarPainel(false); return; }
+      domain   = cfg.domain   || '';
+      token    = cfg.token    || '';
+      proxyUrl = cfg.proxyUrl || '';
+      if (domain && token && proxyUrl) { iniciarPainel(false); return; }
     } catch(e){}
   }
   document.getElementById('configScreen').classList.remove('hidden');
@@ -307,15 +322,24 @@ window.addEventListener('load', () => {
 
 /* ══ CONFIG ══ */
 function salvarConfig() {
-  const d = document.getElementById('cfgDomain').value.trim().replace('https://','').replace('.kommo.com','').replace('/','');
+  const d = document.getElementById('cfgDomain').value.trim()
+    .replace('https://','').replace('.kommo.com','').replace('/','');
   const t = document.getElementById('cfgToken').value.trim();
+  const p = document.getElementById('cfgProxy').value.trim().replace(/\/$/, '');
+
   if (!d || !t) { toast('⚠️ Preencha o subdomínio e o token'); return; }
-  domain = d; token = t;
-  localStorage.setItem(DEMO_KEY, JSON.stringify({ domain, token }));
+  if (!p) { toast('⚠️ Preencha a URL do proxy Cloudflare'); return; }
+
+  domain = d; token = t; proxyUrl = p;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({ domain, token, proxyUrl }));
   iniciarPainel(false);
 }
 
 function showConfig() {
+  // Preenche campos com valores já salvos
+  if (domain)   document.getElementById('cfgDomain').value = domain;
+  if (proxyUrl) document.getElementById('cfgProxy').value  = proxyUrl;
+
   document.getElementById('configScreen').classList.remove('hidden');
   document.getElementById('topbar').style.display = 'none';
   document.getElementById('mainContent').classList.remove('show');
@@ -323,14 +347,17 @@ function showConfig() {
 }
 
 function limparConfig() {
-  localStorage.removeItem(DEMO_KEY);
-  domain = ''; token = ''; isDemo = false;
+  localStorage.removeItem(STORAGE_KEY);
+  domain = ''; token = ''; proxyUrl = ''; isDemo = false;
+  document.getElementById('cfgDomain').value = '';
+  document.getElementById('cfgToken').value  = '';
+  document.getElementById('cfgProxy').value  = '';
   showConfig();
 }
 
 function carregarDemo() {
   isDemo = true;
-  domain = 'demo'; token = 'demo';
+  domain = 'demo'; token = 'demo'; proxyUrl = 'demo';
   iniciarPainel(true);
 }
 
@@ -370,14 +397,18 @@ function setStatus(s) {
   else if (s === 'error') { tag.classList.add('error'); txt.textContent = 'Erro na API'; }
 }
 
-/* ══ API KOMMO ══ */
+/* ══ API KOMMO VIA PROXY ══ */
 async function kommoGet(path) {
-  // CORS: chamadas diretas ao Kommo de um arquivo local podem ser bloqueadas.
-  // Em produção, use um proxy/backend simples. Aqui tentamos diretamente.
-  const url = `https://${domain}.kommo.com/api/v4/${path}`;
-  const r = await fetch(url, {
-    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
+  const targetUrl = `https://${domain}.kommo.com/api/v4/${path}`;
+  const proxyEndpoint = `${proxyUrl}?url=${encodeURIComponent(targetUrl)}`;
+
+  const r = await fetch(proxyEndpoint, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
   });
+
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
@@ -399,7 +430,6 @@ async function carregarTudo() {
   }
   try {
     const from = dateFrom(currentDays);
-    // Busca em paralelo: pipelines, leads fechados, usuários
     const [pipelines, leadsGanhos, leadsTotal, usuarios] = await Promise.all([
       kommoGet('leads/pipelines'),
       kommoGet(`leads?filter[closed_at][from]=${from}&filter[statuses][0][status_id]=142&with=contacts,users&limit=50`),
@@ -411,7 +441,7 @@ async function carregarTudo() {
   } catch(e) {
     console.error(e);
     setStatus('error');
-    toast('❌ Erro ao carregar dados. Verifique o token e o subdomínio.');
+    toast('❌ Erro ao carregar dados. Verifique o token, subdomínio e URL do proxy.');
     renderErro();
   }
 }
@@ -423,13 +453,11 @@ function renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios }) {
   const pipes  = pipelines?._embedded?.pipelines || [];
   const users  = usuarios?._embedded?.users || [];
 
-  // ── KPIs ──
   const totalGanho = ganhos.reduce((s, l) => s + (l.sale || 0), 0);
   const perdidos = todos.filter(l => l.status_id === 143).length;
   const abertos  = todos.filter(l => l.status_id !== 142 && l.status_id !== 143).length;
   const taxa = todos.length > 0 ? Math.round((ganhos.length / todos.length) * 100) : 0;
 
-  // Tempo médio (diferença entre criação e fechamento)
   let tempoMed = 0;
   if (ganhos.length > 0) {
     const soma = ganhos.reduce((s, l) => {
@@ -442,7 +470,6 @@ function renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios }) {
   renderKPIs(ganhos.length, fmtMoeda(totalGanho), abertos, taxa, perdidos);
   renderTempo(tempoMed, ganhos.length);
 
-  // ── FUNIL ──
   if (pipes.length > 0) {
     const pipe = pipes[0];
     const stages = pipe._embedded?.statuses || [];
@@ -458,7 +485,6 @@ function renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios }) {
     renderFunnel(stagesData);
   }
 
-  // ── VENDEDORES ──
   const byUser = {};
   users.forEach(u => { byUser[u.id] = { name: u.name, ganhos: 0, abertos: 0 }; });
   ganhos.forEach(l => {
@@ -477,7 +503,6 @@ function renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios }) {
     .slice(0, 8);
   renderVendedores(vendedores);
 
-  // ── ÚLTIMOS NEGÓCIOS ──
   const ultimos = [...ganhos]
     .sort((a,b) => (b.closed_at||0) - (a.closed_at||0))
     .slice(0, 8)
@@ -494,11 +519,11 @@ function renderDemo() {
   renderKPIs(23, 'R$ 48.700', 17, 64, 5);
   renderTempo(4, 23);
   renderFunnel([
-    { name: 'Novo contato',    count: 34, color: '#007AFF' },
-    { name: 'Interesse',       count: 22, color: '#AF52DE' },
-    { name: 'Proposta enviada',count: 15, color: '#FF9500' },
-    { name: 'Negociação',      count:  9, color: '#c8102e' },
-    { name: 'Fechamento',      count:  4, color: '#34C759' },
+    { name: 'Novo contato',     count: 34, color: '#007AFF' },
+    { name: 'Interesse',        count: 22, color: '#AF52DE' },
+    { name: 'Proposta enviada', count: 15, color: '#FF9500' },
+    { name: 'Negociação',       count:  9, color: '#c8102e' },
+    { name: 'Fechamento',       count:  4, color: '#34C759' },
   ]);
   renderVendedores([
     { name: 'João Silva',  ganhos: 9, abertos: 7 },
@@ -506,11 +531,11 @@ function renderDemo() {
     { name: 'Pedro Lima',  ganhos: 6, abertos: 5 },
   ]);
   renderNegocios([
-    { nome: 'iPhone 16 Pro Max — Carlos M.', valor: 'R$ 9.500',  data: hoje(-1) },
-    { nome: 'iPhone 15 — Ana Paula',          valor: 'R$ 6.200',  data: hoje(-2) },
-    { nome: 'iPhone 16 Plus — Roberto F.',    valor: 'R$ 7.800',  data: hoje(-3) },
-    { nome: 'iPhone 14 Pro — Fernanda L.',    valor: 'R$ 4.900',  data: hoje(-4) },
-    { nome: 'iPhone 15 Pro Max — Lucas T.',   valor: 'R$ 8.100',  data: hoje(-5) },
+    { nome: 'iPhone 16 Pro Max — Carlos M.', valor: 'R$ 9.500', data: hoje(-1) },
+    { nome: 'iPhone 15 — Ana Paula',          valor: 'R$ 6.200', data: hoje(-2) },
+    { nome: 'iPhone 16 Plus — Roberto F.',    valor: 'R$ 7.800', data: hoje(-3) },
+    { nome: 'iPhone 14 Pro — Fernanda L.',    valor: 'R$ 4.900', data: hoje(-4) },
+    { nome: 'iPhone 15 Pro Max — Lucas T.',   valor: 'R$ 8.100', data: hoje(-5) },
   ]);
 }
 
