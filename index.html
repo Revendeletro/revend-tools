@@ -121,45 +121,39 @@ body{background:var(--bg);display:flex;flex-direction:column;height:100vh;overfl
 .iframe-loading .spin{width:32px;height:32px;border:3px solid #eee;border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite}
 iframe{width:100%;height:100%;border:none;display:block}
 
-/* ── ADMIN EMBED VIEW ── */
-.admin-view{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.admin-view.hidden{display:none}
-.admin-embed-wrap{flex:1;overflow-y:auto;position:relative}
-.admin-embed-wrap::-webkit-scrollbar{width:5px}.admin-embed-wrap::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
-
-/* ── MODAL SENHA ADM ── */
-.adm-modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:5000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
-.adm-modal-ov.on{display:flex;animation:fadein-adm .2s}
-@keyframes fadein-adm{from{opacity:0}to{opacity:1}}
-.adm-modal-box{background:#fff;border-radius:24px;width:380px;max-width:calc(100vw - 32px);box-shadow:0 32px 80px rgba(0,0,0,.28);animation:slideup-adm .24s ease;overflow:hidden}
-@keyframes slideup-adm{from{transform:translateY(30px);opacity:0}to{transform:none;opacity:1}}
-.adm-modal-head{background:linear-gradient(130deg,var(--red),var(--red-dark));padding:22px 24px 18px;text-align:center;color:#fff}
-.adm-modal-head .adm-lock-icon{font-size:38px;margin-bottom:8px}
-.adm-modal-head h2{font-size:17px;font-weight:900;letter-spacing:-.3px}
-.adm-modal-head p{font-size:11px;opacity:.8;margin-top:4px;font-weight:600}
-.adm-modal-body{padding:24px}
-.adm-inp-wrap{position:relative;margin-bottom:14px}
-.adm-inp{width:100%;padding:13px 44px 13px 16px;border:2px solid var(--brd);border-radius:12px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;outline:none;background:#fafafa;transition:border .15s;color:var(--preto);letter-spacing:2px}
-.adm-inp:focus{border-color:var(--red);background:#fff}
-.adm-toggle-vis{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;opacity:.5;transition:opacity .15s}
-.adm-toggle-vis:hover{opacity:.9}
-.adm-error{font-size:11px;font-weight:700;color:var(--red);text-align:center;min-height:16px;margin-bottom:10px;transition:opacity .2s}
-.adm-error.hidden{opacity:0}
-.adm-btn-entrar{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:background .15s,transform .1s;display:flex;align-items:center;justify-content:center;gap:7px}
-.adm-btn-entrar:hover{background:var(--red-dark);transform:scale(1.01)}
-.adm-btn-entrar:active{transform:scale(.98)}
-.adm-modal-foot{padding:0 24px 20px;text-align:center}
-.adm-cancelar{font-size:11px;font-weight:700;color:var(--txt2);background:none;border:none;cursor:pointer;padding:6px;text-decoration:underline;font-family:'Montserrat',sans-serif;transition:color .15s}
-.adm-cancelar:hover{color:var(--preto)}
-.adm-inp.shake{animation:shake .35s ease}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-
 /* ── NO FILE ── */
 .no-file{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:40px}
 .no-file.show{display:flex}
 .no-file .nf-icon{font-size:44px;opacity:.25}
 .no-file h3{font-size:15px;font-weight:700;color:var(--txt2)}
 .no-file p{font-size:12px;color:var(--txt2);max-width:300px;line-height:1.5;font-weight:500}
+
+/* ══ MODAL SENHA ADM ══ */
+.adm-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:8000;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.adm-ov.on{display:flex;animation:ov-in .2s}
+@keyframes ov-in{from{opacity:0}to{opacity:1}}
+.adm-box{background:#fff;border-radius:24px;width:370px;max-width:calc(100vw - 32px);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.3);animation:box-up .22s ease}
+@keyframes box-up{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.adm-head{background:linear-gradient(130deg,var(--red),var(--red-dark));padding:26px 24px 20px;text-align:center;color:#fff}
+.adm-head-icon{font-size:40px;margin-bottom:8px}
+.adm-head h2{font-size:17px;font-weight:900;letter-spacing:-.3px}
+.adm-head p{font-size:11px;opacity:.75;margin-top:4px;font-weight:600}
+.adm-body{padding:22px 24px 8px}
+.adm-inp-row{position:relative;margin-bottom:10px}
+.adm-inp{width:100%;padding:13px 46px 13px 16px;border:2px solid var(--brd);border-radius:12px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;outline:none;background:#fafafa;color:var(--preto);letter-spacing:1px;transition:border .15s}
+.adm-inp:focus{border-color:var(--red);background:#fff}
+.adm-inp.err{border-color:var(--red);animation:shake .32s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-7px)}50%{transform:translateX(7px)}}
+.adm-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;opacity:.45;transition:opacity .15s;line-height:1}
+.adm-eye:hover{opacity:.9}
+.adm-err-msg{font-size:11px;font-weight:700;color:var(--red);text-align:center;height:16px;margin-bottom:12px;transition:opacity .2s}
+.adm-err-msg.hide{opacity:0}
+.adm-btn{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,transform .1s;margin-bottom:4px}
+.adm-btn:hover{background:var(--red-dark)}
+.adm-btn:active{transform:scale(.98)}
+.adm-foot{padding:12px 24px 20px;text-align:center}
+.adm-cancel{font-size:11px;font-weight:700;color:var(--txt2);background:none;border:none;cursor:pointer;font-family:'Montserrat',sans-serif;text-decoration:underline;transition:color .15s}
+.adm-cancel:hover{color:var(--preto)}
 
 /* ── MOBILE ── */
 @media(max-width:768px){
@@ -175,207 +169,6 @@ iframe{width:100%;height:100%;border:none;display:block}
   .cards-grid{grid-template-columns:1fr 1fr}
 }
 @media(min-width:769px){.mob-header{display:none}}
-
-
-/* ══════════════════════════════════════════
-   ADMIN PANEL — ESTILOS (escopo .admin-embed-wrap)
-   ══════════════════════════════════════════ */
-.admin-embed-wrap .admin-content-pad{--content-pad:28px}
-
-/* admin layout internal */
-.admin-embed-wrap .adm-layout{display:flex;min-height:100%}
-.admin-embed-wrap .adm-sidebar{width:var(--sidebar);background:#fff;border-right:1px solid var(--brd);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;flex-shrink:0}
-.admin-embed-wrap .adm-sidebar::-webkit-scrollbar{width:4px}.admin-embed-wrap .adm-sidebar::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
-.admin-embed-wrap .adm-sb-logo{padding:20px 20px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
-.admin-embed-wrap .adm-sb-logo-txt{font-size:22px;font-weight:900;color:var(--red);letter-spacing:-1px}
-.admin-embed-wrap .adm-sb-search{padding:10px 14px;border-bottom:1px solid var(--brd)}
-.admin-embed-wrap .adm-inp-search{width:100%;padding:8px 14px;border:1.5px solid var(--brd);border-radius:20px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:500;outline:none;background:#fafafa;transition:border .15s}
-.admin-embed-wrap .adm-inp-search:focus{border-color:var(--red);background:#fff}
-.admin-embed-wrap .adm-sb-nav{padding:10px 10px 20px}
-.admin-embed-wrap .adm-nav-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px}
-.admin-embed-wrap .adm-nav-btn{display:flex;align-items:center;gap:9px;width:100%;padding:9px 12px;border:none;border-radius:10px;background:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:#555;text-align:left;transition:all .15s;margin-bottom:2px}
-.admin-embed-wrap .adm-nav-btn:hover{background:var(--bg);color:var(--preto)}
-.admin-embed-wrap .adm-nav-btn.on{background:var(--red-dim);color:var(--red)}
-.admin-embed-wrap .adm-nav-btn .em{font-size:16px;flex-shrink:0}
-.admin-embed-wrap .adm-nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;min-width:18px;text-align:center}
-.admin-embed-wrap .adm-nav-badge.verde{background:var(--verde)}
-.admin-embed-wrap .adm-nav-badge.amarelo{background:var(--amarelo)}
-.admin-embed-wrap .adm-nav-badge.azul{background:var(--azul)}
-.admin-embed-wrap .adm-nav-badge.cinza{background:#8e8e93}
-.admin-embed-wrap .adm-sb-stats{padding:12px 14px;border-top:1px solid var(--brd);border-bottom:1px solid var(--brd)}
-.admin-embed-wrap .adm-stat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.admin-embed-wrap .adm-stat-row:last-child{margin-bottom:0}
-.admin-embed-wrap .adm-stat-lbl{font-size:10px;font-weight:700;color:var(--txt2)}
-.admin-embed-wrap .adm-stat-val{font-size:14px;font-weight:900;color:var(--preto)}
-.admin-embed-wrap .adm-stat-val.red{color:var(--red)}
-.admin-embed-wrap .adm-stat-val.verde{color:var(--verde)}
-.admin-embed-wrap .adm-sb-foot{padding:14px;background:#fff;margin-top:auto}
-.admin-embed-wrap .adm-add-btn-sb{width:100%;padding:12px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background .15s,transform .1s;margin-bottom:8px}
-.admin-embed-wrap .adm-add-btn-sb:hover{background:var(--red-dark);transform:scale(1.01)}
-/* main */
-.admin-embed-wrap .adm-main{flex:1;display:flex;flex-direction:column}
-.admin-embed-wrap .adm-topbar{background:#fff;border-bottom:1px solid var(--brd);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:90}
-.admin-embed-wrap .adm-topbar-info h1{font-size:18px;font-weight:900;letter-spacing:-.4px}
-.admin-embed-wrap .adm-topbar-info p{font-size:11px;color:var(--txt2);font-weight:600;margin-top:1px}
-.admin-embed-wrap .adm-topbar-actions{margin-left:auto;display:flex;align-items:center;gap:10px}
-.admin-embed-wrap .adm-tb-add-btn{padding:9px 18px;background:var(--red);color:#fff;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .15s}
-.admin-embed-wrap .adm-tb-add-btn:hover{background:var(--red-dark)}
-.admin-embed-wrap .adm-content{padding:24px 28px 70px;flex:1;max-width:100%}
-/* cards */
-.admin-embed-wrap .adm-cards-principais{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:22px}
-.admin-embed-wrap .adm-card-stat{background:#fff;border-radius:var(--radius);padding:18px 20px;border:1.5px solid var(--brd);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s;cursor:pointer}
-.admin-embed-wrap .adm-card-stat:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.admin-embed-wrap .adm-card-stat .cs-ico{font-size:22px;width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
-.admin-embed-wrap .adm-card-stat .cs-n{font-size:32px;font-weight:900;line-height:1;letter-spacing:-1px;color:var(--preto)}
-.admin-embed-wrap .adm-card-stat .cs-l{font-size:11px;color:var(--txt2);font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
-.admin-embed-wrap .adm-card-stat .cs-sub{font-size:10px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:4px}
-.admin-embed-wrap .adm-card-hero{background:linear-gradient(135deg,var(--red) 0%,var(--red-dark) 100%);color:#fff;border-color:var(--red-dark)}
-.admin-embed-wrap .adm-card-hero .cs-ico{background:rgba(255,255,255,.2)}
-.admin-embed-wrap .adm-card-hero .cs-n{color:#fff}
-.admin-embed-wrap .adm-card-hero .cs-l{color:rgba(255,255,255,.8)}
-.admin-embed-wrap .adm-card-azul .cs-ico{background:rgba(0,122,255,.12);color:var(--azul)}
-.admin-embed-wrap .adm-card-amarelo .cs-ico{background:rgba(255,149,0,.12);color:var(--amarelo)}
-.admin-embed-wrap .adm-card-verde .cs-ico{background:rgba(52,199,89,.12);color:var(--verde)}
-.admin-embed-wrap .adm-card-cinza .cs-ico{background:rgba(142,142,147,.12);color:#636366}
-.admin-embed-wrap .adm-card-roxo .cs-ico{background:rgba(175,82,222,.12);color:var(--roxo)}
-.admin-embed-wrap .adm-card-wpp .cs-ico{background:rgba(37,211,102,.12);color:var(--wpp)}
-/* filtros */
-.admin-embed-wrap .adm-filtros{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
-.admin-embed-wrap .adm-filtro-btn{padding:7px 16px;border-radius:20px;border:1.5px solid var(--brd);background:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#555;cursor:pointer;transition:all .15s;white-space:nowrap}
-.admin-embed-wrap .adm-filtro-btn:hover{border-color:#bbb;background:#f5f5f5}
-.admin-embed-wrap .adm-filtro-btn.on{background:var(--red);color:#fff;border-color:var(--red)}
-.admin-embed-wrap .adm-filtro-btn.azul.on{background:var(--azul);border-color:var(--azul)}
-.admin-embed-wrap .adm-filtro-btn.amarelo.on{background:var(--amarelo);border-color:var(--amarelo)}
-.admin-embed-wrap .adm-filtro-btn.verde.on{background:var(--verde);border-color:var(--verde)}
-.admin-embed-wrap .adm-filtro-btn.cinza.on{background:#8e8e93;border-color:#8e8e93}
-.admin-embed-wrap .adm-filtro-btn.wpp.on{background:var(--wpp);border-color:var(--wpp)}
-/* tabela */
-.admin-embed-wrap .adm-tbl-wrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1.5px solid var(--brd)}
-.admin-embed-wrap .adm-tbl-head-bar{padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.admin-embed-wrap .adm-tbl-head-bar h3{font-size:13px;font-weight:800}
-.admin-embed-wrap .adm-tbl-count{font-size:11px;color:var(--txt2);font-weight:600}
-.admin-embed-wrap .adm-tbl-scroll{overflow-x:auto}
-.admin-embed-wrap .adm-tbl-scroll::-webkit-scrollbar{height:4px}.admin-embed-wrap .adm-tbl-scroll::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
-.admin-embed-wrap table{width:100%;border-collapse:collapse;min-width:900px}
-.admin-embed-wrap thead{background:#f5f5f7}
-.admin-embed-wrap thead th{padding:10px 14px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);border-bottom:1.5px solid var(--brd);white-space:nowrap}
-.admin-embed-wrap tbody tr{transition:background .12s;border-bottom:1px solid #f0f0f0;cursor:pointer}
-.admin-embed-wrap tbody tr:hover{background:#fff5f6}
-.admin-embed-wrap tbody tr:last-child{border-bottom:none}
-.admin-embed-wrap td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:middle}
-.admin-embed-wrap .td-bold{font-weight:800;color:var(--preto)}
-.admin-embed-wrap .td-red{font-weight:800;color:var(--red);white-space:nowrap}
-.admin-embed-wrap .td-mono{font-family:'SF Mono',Menlo,monospace;font-size:11px;color:#555}
-.admin-embed-wrap .td-acoes{white-space:nowrap;text-align:right}
-.admin-embed-wrap .td-acoes button{padding:5px 10px;border-radius:7px;border:none;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;cursor:pointer;transition:all .15s;margin-left:4px}
-.admin-embed-wrap .btn-edit{background:var(--red-dim);color:var(--red)}.admin-embed-wrap .btn-edit:hover{background:var(--red);color:#fff}
-.admin-embed-wrap .btn-del{background:#f5f5f7;color:#8e8e93}.admin-embed-wrap .btn-del:hover{background:#fde8ec;color:var(--red)}
-.admin-embed-wrap .btn-wpp-row{background:#e8faf0;color:var(--wpp)}.admin-embed-wrap .btn-wpp-row:hover{background:var(--wpp);color:#fff}
-/* badges */
-.admin-embed-wrap .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
-.admin-embed-wrap .badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.admin-embed-wrap .badge-azul{background:rgba(0,122,255,.12);color:var(--azul)}.admin-embed-wrap .badge-azul::before{background:var(--azul)}
-.admin-embed-wrap .badge-amarelo{background:rgba(255,149,0,.12);color:var(--amarelo)}.admin-embed-wrap .badge-amarelo::before{background:var(--amarelo)}
-.admin-embed-wrap .badge-verde{background:rgba(52,199,89,.12);color:var(--verde)}.admin-embed-wrap .badge-verde::before{background:var(--verde)}
-.admin-embed-wrap .badge-cinza{background:rgba(142,142,147,.12);color:#636366}.admin-embed-wrap .badge-cinza::before{background:#8e8e93}
-.admin-embed-wrap .badge-vermelho{background:rgba(200,16,46,.12);color:var(--red)}.admin-embed-wrap .badge-vermelho::before{background:var(--red)}
-.admin-embed-wrap .badge-roxo{background:rgba(175,82,222,.12);color:var(--roxo)}.admin-embed-wrap .badge-roxo::before{background:var(--roxo)}
-.admin-embed-wrap .badge-wpp{background:rgba(37,211,102,.12);color:var(--wpp)}.admin-embed-wrap .badge-wpp::before{background:var(--wpp)}
-/* empty */
-.admin-embed-wrap .empty-state{padding:60px 20px;text-align:center;color:var(--txt2)}
-.admin-embed-wrap .empty-state .es-ico{font-size:48px;margin-bottom:12px}
-.admin-embed-wrap .empty-state p{font-size:14px;font-weight:600}
-.admin-embed-wrap .empty-state span{font-size:12px;display:block;margin-top:4px}
-/* modals */
-.admin-embed-wrap .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
-.admin-embed-wrap .modal-ov.on{display:flex;animation:fadein .2s}
-.admin-embed-wrap .modal-box{background:#fff;border-radius:22px;width:620px;max-width:calc(100vw - 24px);max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 28px 70px rgba(0,0,0,.25);animation:slideup .22s ease}
-@keyframes slideup{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
-.admin-embed-wrap .modal-head{background:linear-gradient(130deg,var(--red),var(--red-dark));color:#fff;padding:18px 20px;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
-.admin-embed-wrap .modal-head h3{font-size:15px;font-weight:900}.admin-embed-wrap .modal-head p{font-size:11px;opacity:.8;margin-top:2px}
-.admin-embed-wrap .m-close{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
-.admin-embed-wrap .m-close:hover{background:rgba(255,255,255,.35)}
-.admin-embed-wrap .modal-body{overflow-y:auto;flex:1;padding:20px}
-.admin-embed-wrap .modal-body::-webkit-scrollbar{width:4px}.admin-embed-wrap .modal-body::-webkit-scrollbar-thumb{background:#ddd;border-radius:4px}
-.admin-embed-wrap .form-section{margin-bottom:14px}
-.admin-embed-wrap .form-section-title{font-size:10px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-bottom:6px;border-bottom:1px dashed var(--brd)}
-.admin-embed-wrap .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.admin-embed-wrap .form-group{display:flex;flex-direction:column;gap:5px}
-.admin-embed-wrap .form-group.full{grid-column:1/-1}
-.admin-embed-wrap .form-group label{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px}
-.admin-embed-wrap .form-group input,.admin-embed-wrap .form-group select,.admin-embed-wrap .form-group textarea{width:100%;padding:10px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;outline:none;background:#fafafa;transition:border .15s;color:var(--preto)}
-.admin-embed-wrap .form-group input:focus,.admin-embed-wrap .form-group select:focus,.admin-embed-wrap .form-group textarea:focus{border-color:var(--red);background:#fff}
-.admin-embed-wrap .form-group textarea{resize:vertical;min-height:60px}
-.admin-embed-wrap .modal-foot{padding:14px 20px;border-top:1px solid var(--brd);display:flex;gap:10px;flex-shrink:0}
-.admin-embed-wrap .btn-salvar{flex:1;padding:13px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:background .15s}
-.admin-embed-wrap .btn-salvar:hover{background:var(--red-dark)}
-.admin-embed-wrap .btn-cancelar{padding:13px 20px;background:var(--bg);color:#555;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s}
-.admin-embed-wrap .btn-cancelar:hover{background:#e5e5ea}
-/* detalhe */
-.admin-embed-wrap .detalhe-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:20px}
-.admin-embed-wrap .dg-item{background:var(--bg);border-radius:10px;padding:10px 14px}
-.admin-embed-wrap .dg-item.full{grid-column:1/-1}
-.admin-embed-wrap .dg-lbl{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
-.admin-embed-wrap .dg-val{font-size:13px;font-weight:700;color:var(--preto);line-height:1.4;word-break:break-word}
-.admin-embed-wrap .dg-val.red{color:var(--red);font-size:18px;font-weight:900}
-.admin-embed-wrap .dg-val.verde{color:var(--verde)}
-.admin-embed-wrap .detalhe-actions{padding:0 20px 20px;display:flex;gap:8px;flex-wrap:wrap}
-.admin-embed-wrap .det-btn{flex:1;padding:11px;border-radius:10px;border:none;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px;min-width:100px}
-.admin-embed-wrap .det-btn-edit{background:var(--red-dim);color:var(--red)}.admin-embed-wrap .det-btn-edit:hover{background:var(--red);color:#fff}
-.admin-embed-wrap .det-btn-del{background:#f5f5f7;color:#8e8e93}.admin-embed-wrap .det-btn-del:hover{background:#fde8ec;color:var(--red)}
-.admin-embed-wrap .det-btn-wpp{background:#e8faf0;color:var(--wpp)}.admin-embed-wrap .det-btn-wpp:hover{background:var(--wpp);color:#fff}
-.admin-embed-wrap .linked-list{display:flex;flex-direction:column;gap:6px;margin-top:6px}
-.admin-embed-wrap .linked-item{background:#fff;border:1px solid var(--brd);border-radius:8px;padding:8px 12px;font-size:11px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.admin-embed-wrap .linked-item .li-tipo{color:var(--azul);font-weight:800;font-size:10px;text-transform:uppercase}
-.admin-embed-wrap .linked-item .li-nome{flex:1;color:var(--preto)}
-.admin-embed-wrap .linked-empty{font-size:11px;color:var(--txt2);font-weight:600;font-style:italic}
-/* subtabs */
-.admin-embed-wrap .subtabs{display:flex;gap:6px;background:#fff;padding:5px;border-radius:14px;border:1.5px solid var(--brd);margin-bottom:18px;overflow-x:auto;box-shadow:var(--shadow)}
-.admin-embed-wrap .subtabs::-webkit-scrollbar{display:none}
-.admin-embed-wrap .subtab{padding:9px 18px;border:none;background:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;color:#555;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:6px}
-.admin-embed-wrap .subtab:hover{background:var(--bg);color:var(--preto)}
-.admin-embed-wrap .subtab.on{background:var(--red);color:#fff;box-shadow:0 2px 8px rgba(200,16,46,.25)}
-/* comissões */
-.admin-embed-wrap .cmsn-grupos{display:flex;flex-direction:column;gap:20px}
-.admin-embed-wrap .cmsn-grupo{background:#fff;border-radius:var(--radius);border:1.5px solid var(--brd);box-shadow:var(--shadow);overflow:hidden}
-.admin-embed-wrap .cmsn-grupo-head{padding:14px 20px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;position:relative}
-.admin-embed-wrap .cmsn-grupo-head::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--cor-grupo,var(--red))}
-.admin-embed-wrap .cmsn-grupo-titulo{font-size:14px;font-weight:900;display:flex;align-items:center;gap:9px;letter-spacing:-.3px}
-.admin-embed-wrap .cmsn-grupo-titulo .ico{font-size:20px}
-.admin-embed-wrap .cmsn-grupo-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.admin-embed-wrap .cmsn-grupo-soma{font-size:11px;font-weight:800;color:var(--verde);background:rgba(52,199,89,.12);padding:4px 11px;border-radius:20px;white-space:nowrap}
-.admin-embed-wrap .cmsn-grupo-count{font-size:10px;color:var(--txt2);font-weight:700;background:var(--bg);padding:4px 11px;border-radius:20px;white-space:nowrap}
-.admin-embed-wrap .cmsn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;padding:16px}
-.admin-embed-wrap .cmsn-card{background:#fff;border-radius:14px;padding:14px 16px;border:1.5px solid var(--brd);transition:all .2s;cursor:pointer;display:flex;flex-direction:column;gap:9px;position:relative;overflow:hidden}
-.admin-embed-wrap .cmsn-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cor-card,transparent);transition:width .2s}
-.admin-embed-wrap .cmsn-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--cor-card,var(--red))}
-.admin-embed-wrap .cmsn-card:hover::before{width:5px}
-.admin-embed-wrap .cmsn-card.inativa{opacity:.45;background:#f7f7f9}
-.admin-embed-wrap .cm-valor-bg{align-self:flex-start;padding:8px 14px;border-radius:10px;font-size:15px;font-weight:900;letter-spacing:-.3px;line-height:1.2;background:rgba(200,16,46,.1);color:var(--red);white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.admin-embed-wrap .cm-valor-bg.fixo{background:rgba(200,16,46,.1);color:var(--red)}
-.admin-embed-wrap .cm-valor-bg.percent{background:rgba(0,122,255,.1);color:var(--azul)}
-.admin-embed-wrap .cm-valor-bg.tabela{background:rgba(175,82,222,.1);color:var(--roxo);font-size:12px;font-weight:800}
-.admin-embed-wrap .cm-valor-bg.bonus{background:rgba(255,149,0,.12);color:#cc7700;font-size:13px}
-.admin-embed-wrap .cm-valor-bg.texto{background:#f0f0f5;color:#666;font-size:11px;font-weight:800}
-.admin-embed-wrap .cm-titulo{font-size:13px;font-weight:800;color:var(--preto);line-height:1.3;letter-spacing:-.2px}
-.admin-embed-wrap .cm-desc{font-size:11px;color:#555;font-weight:600;line-height:1.5;white-space:pre-line}
-.admin-embed-wrap .cm-tipo-tag{display:inline-flex;font-size:9px;font-weight:800;color:var(--txt2);background:var(--bg);padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;align-self:flex-start;margin-top:auto}
-.admin-embed-wrap .cmsn-grupo-empty{padding:30px;text-align:center;color:var(--txt2);font-weight:600;font-size:12px}
-/* escalonamento */
-.admin-embed-wrap .esc-info{background:#fff7e6;border:1.5px solid #ffe0a0;border-radius:12px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#664400;font-weight:600;line-height:1.5;display:flex;align-items:flex-start;gap:10px}
-.admin-embed-wrap .esc-info .ei-ico{font-size:18px;flex-shrink:0}
-/* toast admin */
-.admin-embed-wrap #copyToast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:10px 22px;border-radius:30px;font-size:12px;font-weight:700;font-family:'Montserrat',sans-serif;opacity:0;pointer-events:none;transition:all .3s;z-index:99999;white-space:nowrap}
-.admin-embed-wrap #copyToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* responsive admin embed */
-@media(max-width:900px){
-  .admin-embed-wrap .adm-sidebar{display:none}
-  .admin-embed-wrap .adm-main{margin-left:0}
-  .admin-embed-wrap .adm-content{padding:16px 16px 70px}
-  .admin-embed-wrap .adm-cards-principais{grid-template-columns:repeat(2,1fr)}
-  .admin-embed-wrap table{min-width:780px}
-}
-
 </style>
 </head>
 <body>
@@ -388,26 +181,24 @@ iframe{width:100%;height:100%;border:none;display:block}
 </div>
 
 <!-- MODAL SENHA ADMIN -->
-<div class="adm-modal-ov" id="admModalSenha">
-  <div class="adm-modal-box">
-    <div class="adm-modal-head">
-      <div class="adm-lock-icon">🔐</div>
+<div class="adm-ov" id="admOv">
+  <div class="adm-box">
+    <div class="adm-head">
+      <div class="adm-head-icon">🔐</div>
       <h2>Área Restrita</h2>
       <p>Insira a senha de administrador para continuar</p>
     </div>
-    <div class="adm-modal-body">
-      <div class="adm-inp-wrap">
-        <input class="adm-inp" type="password" id="admSenhaInput" placeholder="••••••••••••"
-          onkeydown="if(event.key==='Enter')verificarSenha()">
-        <button class="adm-toggle-vis" id="admToggleVis" onclick="toggleSenhaVis()" title="Mostrar/ocultar senha">👁</button>
+    <div class="adm-body">
+      <div class="adm-inp-row">
+        <input class="adm-inp" type="password" id="admInp" placeholder="••••••••••••"
+          onkeydown="if(event.key==='Enter')admEntrar()">
+        <button class="adm-eye" id="admEye" onclick="admToggle()">👁</button>
       </div>
-      <div class="adm-error hidden" id="admError">Senha incorreta. Tente novamente.</div>
-      <button class="adm-btn-entrar" onclick="verificarSenha()">
-        🔓 Entrar no Painel Admin
-      </button>
+      <div class="adm-err-msg hide" id="admErr">Senha incorreta. Tente novamente.</div>
+      <button class="adm-btn" onclick="admEntrar()">🔓 Entrar no Painel Admin</button>
     </div>
-    <div class="adm-modal-foot">
-      <button class="adm-cancelar" onclick="fecharModalSenha()">Cancelar</button>
+    <div class="adm-foot">
+      <button class="adm-cancel" onclick="admCancelar()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -512,6 +303,8 @@ iframe{width:100%;height:100%;border:none;display:block}
 
     <!-- HOME -->
     <div class="home-screen" id="homeScreen">
+
+      <!-- HERO -->
       <div class="hero">
         <div class="hero-left">
           <h2>Central de Ferramentas</h2>
@@ -533,60 +326,72 @@ iframe{width:100%;height:100%;border:none;display:block}
         </div>
       </div>
 
+      <!-- DESTAQUES -->
       <div class="section-label">🆕 Novidades</div>
       <div class="cards-grid" style="margin-bottom:28px">
+
         <div class="tool-card destaque" style="--accent:var(--azul)" onclick="openTool('pedidos')">
           <div class="tc-icon-wrap" style="--ic-bg:#e3f0ff">🗓</div>
           <div class="tc-name">Pedidos Agendados</div>
           <div class="tc-desc">Gerencie todos os agendamentos dos vendedores com status, filtros por vendedor e envio direto pelo WhatsApp.</div>
           <div class="tc-badge azul">Live · Agendamentos</div>
         </div>
+
         <div class="tool-card destaque" style="--accent:var(--verde)" onclick="openTool('garantia')">
           <div class="tc-icon-wrap" style="--ic-bg:#e8fdf0">🛡️</div>
           <div class="tc-name">Termos de Garantia</div>
           <div class="tc-desc">Gere e imprima termos de garantia personalizados para cada cliente com dados do aparelho, condições e assinatura.</div>
           <div class="tc-badge verde">Gera PDF</div>
         </div>
+
       </div>
 
+      <!-- TODAS AS FERRAMENTAS -->
       <div class="section-label">Todas as ferramentas</div>
       <div class="cards-grid">
+
         <div class="tool-card" style="--accent:var(--laranja)" onclick="openTool('orcamento_compra')">
           <div class="tc-icon-wrap" style="--ic-bg:#fff3e0">📋</div>
           <div class="tc-name">Orçamento Compra</div>
           <div class="tc-desc">Gera orçamento e contrato de compra em PDF com campos automáticos, descontos e assinaturas.</div>
           <div class="tc-badge laranja">Gera PDF</div>
         </div>
+
         <div class="tool-card" style="--accent:var(--verde)" onclick="openTool('estoque')">
           <div class="tc-icon-wrap" style="--ic-bg:#e8fdf0">📦</div>
           <div class="tc-name">Estoque de Acessórios</div>
           <div class="tc-desc">Controle de estoque em tempo real via Firebase. Pedidos organizados por modelo de iPhone.</div>
           <div class="tc-badge verde">Firebase Live</div>
         </div>
+
         <div class="tool-card" style="--accent:var(--roxo)" onclick="openTool('reposicao')">
           <div class="tc-icon-wrap" style="--ic-bg:#f5ecff">🛒</div>
           <div class="tc-name">Reposição de Materiais</div>
           <div class="tc-desc">Planilha de pedidos de reposição de materiais e insumos da loja.</div>
           <div class="tc-badge cinza">Planilha</div>
         </div>
+
         <div class="tool-card" style="--accent:var(--red)" onclick="openTool('script')">
           <div class="tc-icon-wrap" style="--ic-bg:var(--red-dim)">💬</div>
           <div class="tc-name">Script de Atendimento</div>
           <div class="tc-desc">Guia completo de atendimento ao cliente para toda a equipe Revend.</div>
           <div class="tc-badge red">Atendimento</div>
         </div>
+
         <div class="tool-card" style="--accent:var(--verde)" onclick="openTool('tabela')">
           <div class="tc-icon-wrap" style="--ic-bg:#e8fdf0">💰</div>
           <div class="tc-name">Tabela de Valores</div>
           <div class="tc-desc">Tabela de preços e propostas para consulta rápida durante o atendimento.</div>
           <div class="tc-badge verde">Tabela</div>
         </div>
+
         <div class="tool-card" style="--accent:var(--red)" onclick="openTool('admin')">
           <div class="tc-icon-wrap" style="--ic-bg:var(--red-dim)">⚙️</div>
           <div class="tc-name">Painel Admin</div>
-          <div class="tc-desc">Gestão de funcionários, inventário, WhatsApps e comissões. Acesso restrito a administradores.</div>
+          <div class="tc-desc">Gerencie funcionários, inventário, WhatsApps e comissões. Acesso restrito a administradores.</div>
           <div class="tc-badge red">🔐 Restrito</div>
         </div>
+
       </div>
     </div>
 
@@ -613,22 +418,6 @@ iframe{width:100%;height:100%;border:none;display:block}
       </div>
     </div>
 
-    <!-- ADMIN EMBED VIEW -->
-    <div class="admin-view hidden" id="adminView">
-      <div class="iframe-bar">
-        <div class="iframe-bar-title">
-          <span>⚙️</span>
-          <span>Painel Admin · Revend</span>
-        </div>
-        <div class="iframe-bar-actions">
-          <button class="bar-btn danger" onclick="fecharAdmin()">✕ Fechar</button>
-        </div>
-      </div>
-      <div class="admin-embed-wrap" id="adminEmbedWrap">
-        <!-- Admin content injected here -->
-      </div>
-    </div>
-
     <!-- NO FILE -->
     <div class="no-file" id="noFileScreen">
       <div class="nf-icon">🔗</div>
@@ -640,127 +429,77 @@ iframe{width:100%;height:100%;border:none;display:block}
 </div>
 
 <script>
-/* ══════════════════════════════════════
-   SENHA ADM
-   ══════════════════════════════════════ */
-const ADM_HASH = 'b5c4bdfb7c0daf3b6c90c4c3e30e5e2b4f7a8d1e9c2b6f4a3d7e0c1b2f5a6d8'; // SHA-256 placeholder
-const ADM_SENHA = 'Revend@2026';
-let admAutorizado = false;
-
-function abrirModalSenha() {
-  const modal = document.getElementById('admModalSenha');
-  modal.classList.add('on');
-  setTimeout(() => {
-    const inp = document.getElementById('admSenhaInput');
-    inp.value = '';
-    inp.focus();
-    document.getElementById('admError').classList.add('hidden');
-  }, 50);
-}
-
-function fecharModalSenha() {
-  document.getElementById('admModalSenha').classList.remove('on');
-  document.getElementById('admSenhaInput').value = '';
-  document.getElementById('admError').classList.add('hidden');
-  // volta ao home se estava tentando abrir admin
-  if (current === 'admin' && !admAutorizado) {
-    openTool('home');
-  }
-}
-
-function toggleSenhaVis() {
-  const inp = document.getElementById('admSenhaInput');
-  const btn = document.getElementById('admToggleVis');
-  if (inp.type === 'password') {
-    inp.type = 'text';
-    btn.textContent = '🙈';
-  } else {
-    inp.type = 'password';
-    btn.textContent = '👁';
-  }
-}
-
-function verificarSenha() {
-  const inp = document.getElementById('admSenhaInput');
-  const errEl = document.getElementById('admError');
-  const val = inp.value;
-
-  if (val === ADM_SENHA) {
-    admAutorizado = true;
-    document.getElementById('admModalSenha').classList.remove('on');
-    inp.value = '';
-    errEl.classList.add('hidden');
-    abrirAdminPanel();
-  } else {
-    errEl.classList.remove('hidden');
-    inp.classList.remove('shake');
-    void inp.offsetWidth; // reflow
-    inp.classList.add('shake');
-    inp.value = '';
-    inp.focus();
-    setTimeout(() => inp.classList.remove('shake'), 400);
-  }
-}
-
-/* fechar modal clicando fora */
-document.getElementById('admModalSenha').addEventListener('click', function(e) {
-  if (e.target === this) fecharModalSenha();
-});
-
-/* ══════════════════════════════════════
-   ADMIN PANEL — INJECT
-   ══════════════════════════════════════ */
-function abrirAdminPanel() {
-  current = 'admin';
-  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
-    el.classList.toggle('on', el.dataset.key === 'admin');
-  });
-
-  document.getElementById('topbarTitle').textContent = 'Painel Admin';
-  document.getElementById('topbarSub').textContent   = 'Administração · Revend Eletro';
-  document.getElementById('activeLabel').textContent  = 'Admin';
-
-  document.getElementById('homeScreen').classList.add('hidden');
-  document.getElementById('iframeView').classList.add('hidden');
-  document.getElementById('noFileScreen').classList.remove('show');
-  document.getElementById('adminView').classList.remove('hidden');
-
-  /* Inject admin HTML if not yet loaded */
-  const wrap = document.getElementById('adminEmbedWrap');
-  if (!wrap.dataset.loaded) {
-    wrap.dataset.loaded = '1';
-    wrap.innerHTML = getAdminHTML();
-    /* The admin script is already in the page as #adminScriptBlock,
-       so just call initAdmin() to initialize the panel */
-    if (typeof initAdmin === 'function') {
-      initAdmin();
-    }
-  }
-}
-
-function fecharAdmin() {
-  admAutorizado = false;
-  const wrap = document.getElementById('adminEmbedWrap');
-  wrap.innerHTML = '';
-  wrap.removeAttribute('data-loaded');
-  openTool('home');
-}
-
-/* ══════════════════════════════════════
-   TOOLS NAVIGATION
-   ══════════════════════════════════════ */
+/* ══ FERRAMENTAS ══ */
 const TOOLS = {
-  pedidos:        { name: 'Pedidos Agendados',    icon: '🗓',  file: 'pedidos_agendados.html',                sub: 'Agendamentos dos vendedores' },
-  garantia:       { name: 'Termos de Garantia',   icon: '🛡️', file: 'termos_garantia_revend.html',           sub: 'Geração de termos em PDF' },
-  orcamento_compra:{ name: 'Orçamento Compra',    icon: '📋', file: 'orcamento_compra_revend_v5.html',        sub: 'PDF + Contrato' },
-  estoque:        { name: 'Estoque Acessórios',   icon: '📦', file: 'REVEND_ESTOQUE_ACESS_ON.html',           sub: 'Controle por modelos' },
-  reposicao:      { name: 'Reposição de Materiais',icon: '🛒', file: 'REPOSIC_A_O_MATERIAIS_LOJA.html',       sub: 'Planilha de pedidos' },
-  script:         { name: 'Script de Atendimento', icon: '💬', file: 'script_atendimento_revend_v3.html',     sub: 'Guia de atendimento' },
-  tabela:         { name: 'Tabela de Valores',    icon: '💰', file: 'tabela_proposta.html',                   sub: 'Preços e propostas' },
+  pedidos:         { name: 'Pedidos Agendados',     icon: '🗓',  file: 'pedidos_agendados.html',               sub: 'Agendamentos dos vendedores' },
+  garantia:        { name: 'Termos de Garantia',    icon: '🛡️', file: 'termos_garantia_revend.html',           sub: 'Geração de termos em PDF' },
+  orcamento_compra:{ name: 'Orçamento Compra',      icon: '📋', file: 'orcamento_compra_revend_v5.html',        sub: 'PDF + Contrato' },
+  estoque:         { name: 'Estoque Acessórios',    icon: '📦', file: 'REVEND_ESTOQUE_ACESS_ON.html',           sub: 'Controle por modelos' },
+  reposicao:       { name: 'Reposição de Materiais',icon: '🛒', file: 'REPOSIC_A_O_MATERIAIS_LOJA.html',        sub: 'Planilha de pedidos' },
+  script:          { name: 'Script de Atendimento', icon: '💬', file: 'script_atendimento_revend_v3.html',      sub: 'Guia de atendimento' },
+  tabela:          { name: 'Tabela de Valores',     icon: '💰', file: 'tabela_proposta.html',                   sub: 'Preços e propostas' },
+  admin:           { name: 'Painel Admin',           icon: '⚙️', file: 'admin_revend.html',                     sub: 'Administração · Revend Eletro', restrito: true },
 };
 
 let current = 'home';
 
+/* ══ MODAL SENHA ══ */
+const ADM_SENHA = 'Revend@2026';
+let pendingKey = null;
+
+function abrirModalSenha(key) {
+  pendingKey = key;
+  const ov = document.getElementById('admOv');
+  const inp = document.getElementById('admInp');
+  const err = document.getElementById('admErr');
+  inp.value = '';
+  inp.type = 'password';
+  document.getElementById('admEye').textContent = '👁';
+  err.classList.add('hide');
+  ov.classList.add('on');
+  setTimeout(() => inp.focus(), 120);
+}
+
+function admCancelar() {
+  document.getElementById('admOv').classList.remove('on');
+  pendingKey = null;
+  // desmarca o botão que ficou "on" na sidebar
+  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
+    el.classList.toggle('on', el.dataset.key === current);
+  });
+}
+
+function admToggle() {
+  const inp = document.getElementById('admInp');
+  const eye = document.getElementById('admEye');
+  if (inp.type === 'password') { inp.type = 'text';     eye.textContent = '🙈'; }
+  else                         { inp.type = 'password'; eye.textContent = '👁'; }
+}
+
+function admEntrar() {
+  const inp = document.getElementById('admInp');
+  const err = document.getElementById('admErr');
+  if (inp.value === ADM_SENHA) {
+    document.getElementById('admOv').classList.remove('on');
+    carregarFerramenta(pendingKey);
+    pendingKey = null;
+  } else {
+    err.classList.remove('hide');
+    inp.classList.remove('err');
+    void inp.offsetWidth;           // reflow para reiniciar animação
+    inp.classList.add('err');
+    inp.value = '';
+    inp.focus();
+    setTimeout(() => inp.classList.remove('err'), 350);
+  }
+}
+
+// Fecha modal ao clicar no overlay
+document.getElementById('admOv').addEventListener('click', function(e) {
+  if (e.target === this) admCancelar();
+});
+
+/* ══ NAVEGAÇÃO ══ */
 function openTool(key) {
   document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
     el.classList.toggle('on', el.dataset.key === key);
@@ -768,44 +507,49 @@ function openTool(key) {
 
   if (key === 'home') { goHome(); return; }
 
-  if (key === 'admin') {
-    current = 'admin';
-    if (!admAutorizado) {
-      abrirModalSenha();
-      return;
-    }
-    abrirAdminPanel();
+  const tool = TOOLS[key];
+  if (!tool) { showNoFile(); return; }
+
+  // Se for restrito, pede senha antes de carregar
+  if (tool.restrito) {
+    abrirModalSenha(key);
     return;
   }
 
+  carregarFerramenta(key);
+}
+
+function carregarFerramenta(key) {
   const tool = TOOLS[key];
   if (!tool) { showNoFile(); return; }
 
   current = key;
-  document.getElementById('activeLabel').textContent  = tool.name;
-  document.getElementById('iframeIcon').textContent   = tool.icon;
-  document.getElementById('iframeTitle').textContent  = tool.name;
-  document.getElementById('topbarTitle').textContent  = tool.name;
-  document.getElementById('topbarSub').textContent    = tool.sub || 'Revend · Ferramenta interna';
+  document.getElementById('activeLabel').textContent = tool.name;
+  document.getElementById('iframeIcon').textContent  = tool.icon;
+  document.getElementById('iframeTitle').textContent = tool.name;
+  document.getElementById('topbarTitle').textContent = tool.name;
+  document.getElementById('topbarSub').textContent   = tool.sub || 'Revend · Ferramenta interna';
 
   document.getElementById('homeScreen').classList.add('hidden');
-  document.getElementById('adminView').classList.add('hidden');
   document.getElementById('noFileScreen').classList.remove('show');
   document.getElementById('iframeView').classList.remove('hidden');
   document.getElementById('iframeLoading').classList.remove('hidden');
 
   document.getElementById('mainFrame').src = tool.file;
+
+  // Garante highlight correto na sidebar após senha
+  document.querySelectorAll('.nav-btn[data-key]').forEach(el => {
+    el.classList.toggle('on', el.dataset.key === key);
+  });
 }
 
 function goHome() {
   current = 'home';
-  admAutorizado = false;
   document.getElementById('activeLabel').textContent = 'Início';
   document.getElementById('topbarTitle').textContent = 'Central de Ferramentas';
   document.getElementById('topbarSub').textContent   = 'Painel interno · Revend Eletro';
   document.getElementById('homeScreen').classList.remove('hidden');
   document.getElementById('iframeView').classList.add('hidden');
-  document.getElementById('adminView').classList.add('hidden');
   document.getElementById('noFileScreen').classList.remove('show');
   document.getElementById('mainFrame').src = 'about:blank';
 }
@@ -813,7 +557,6 @@ function goHome() {
 function showNoFile() {
   document.getElementById('homeScreen').classList.add('hidden');
   document.getElementById('iframeView').classList.add('hidden');
-  document.getElementById('adminView').classList.add('hidden');
   document.getElementById('noFileScreen').classList.add('show');
 }
 
@@ -822,7 +565,7 @@ function onFrameLoad() {
 }
 
 function reloadCurrent() {
-  if (current === 'home' || current === 'admin') return;
+  if (current === 'home') return;
   const tool = TOOLS[current];
   if (!tool) return;
   document.getElementById('iframeLoading').classList.remove('hidden');
@@ -830,7 +573,7 @@ function reloadCurrent() {
 }
 
 function openInNewTab() {
-  if (current === 'home' || current === 'admin') return;
+  if (current === 'home') return;
   const tool = TOOLS[current];
   if (tool) window.open(tool.file, '_blank');
 }
@@ -838,1276 +581,6 @@ function openInNewTab() {
 window.addEventListener('load', () => {
   setTimeout(() => { document.getElementById('loading').classList.add('gone'); }, 500);
 });
-
-/* ══════════════════════════════════════
-   ADMIN HTML TEMPLATE (inline)
-   ══════════════════════════════════════ */
-function getAdminHTML() {
-  return "<style>.admin-embed-wrap #admLoadingInner{display:none!important}.admin-embed-wrap .mob-header,.admin-embed-wrap .mob-tabs,.admin-embed-wrap .mob-search{display:none!important}</style>\n\n<!-- TOAST -->\n<div id=\"admCopyToast\">\u2705 Copiado!</div>\n\n<!-- LOADING -->\n<div id=\"admLoadingInner\">\n  <div class=\"ld-logo\">revend</div>\n  <div class=\"ld-spin\"></div>\n  <div class=\"ld-txt\">Carregando administra\u00e7\u00e3o...</div>\n</div>\n\n<!-- MOBILE HEADER -->\n<div class=\"mob-header\">\n  <div class=\"mob-logo\">revend</div>\n  <div class=\"live-pill\"><div class=\"live-dot\"></div><span>admin</span></div>\n</div>\n<div class=\"mob-tabs\">\n  <button class=\"mob-tab on\" data-modulo=\"funcionarios\" onclick=\"trocarModulo('funcionarios')\">\ud83d\udc65 Funcion\u00e1rios</button>\n  <button class=\"mob-tab\" data-modulo=\"inventario\" onclick=\"trocarModulo('inventario')\">\ud83d\udce6 Invent\u00e1rio</button>\n  <button class=\"mob-tab\" data-modulo=\"whatsapp\" onclick=\"trocarModulo('whatsapp')\">\ud83d\udcac WhatsApp</button>\n  <button class=\"mob-tab\" data-modulo=\"comissoes\" onclick=\"trocarModulo('comissoes')\">\ud83d\udcbc Comiss\u00f5es</button>\n</div>\n<div class=\"mob-search\">\n  <input class=\"inp-search\" type=\"search\" id=\"mobSearch\" placeholder=\"\ud83d\udd0d Buscar...\" oninput=\"buscar(this.value)\">\n</div>\n\n<!-- LAYOUT -->\n<div class=\"layout\">\n  <!-- SIDEBAR -->\n  <aside class=\"sidebar\">\n    <div class=\"sb-logo\">\n      <div class=\"sb-logo-txt\">revend</div>\n      <div class=\"live-pill\"><div class=\"live-dot\"></div><span>admin</span></div>\n    </div>\n    <div class=\"sb-search\">\n      <input class=\"inp-search\" type=\"search\" id=\"deskSearch\" placeholder=\"\ud83d\udd0d Buscar...\" oninput=\"buscar(this.value)\">\n    </div>\n    <nav class=\"sb-nav\">\n      <div class=\"nav-label\">M\u00f3dulos</div>\n      <button class=\"nav-btn on\" data-modulo=\"funcionarios\" onclick=\"trocarModulo('funcionarios')\">\n        <span class=\"em\">\ud83d\udc65</span> Funcion\u00e1rios\n        <span class=\"nav-badge azul\" id=\"badgeFuncionarios\">0</span>\n      </button>\n      <button class=\"nav-btn\" data-modulo=\"inventario\" onclick=\"trocarModulo('inventario')\">\n        <span class=\"em\">\ud83d\udce6</span> Invent\u00e1rio\n        <span class=\"nav-badge amarelo\" id=\"badgeInventario\">0</span>\n      </button>\n      <button class=\"nav-btn\" data-modulo=\"whatsapp\" onclick=\"trocarModulo('whatsapp')\">\n        <span class=\"em\">\ud83d\udcac</span> WhatsApp\n        <span class=\"nav-badge\" style=\"background:var(--wpp)\" id=\"badgeWhatsapp\">0</span>\n      </button>\n      <button class=\"nav-btn\" data-modulo=\"comissoes\" onclick=\"trocarModulo('comissoes')\">\n        <span class=\"em\">\ud83d\udcbc</span> Comiss\u00f5es\n        <span class=\"nav-badge\" style=\"background:var(--roxo)\" id=\"badgeComissoes\">0</span>\n      </button>\n\n      <!-- FILTROS DIN\u00c2MICOS -->\n      <div id=\"filtrosSidebar\"></div>\n    </nav>\n    <div class=\"sb-stats\" id=\"sbStats\"></div>\n    <div class=\"sb-foot\">\n      <button class=\"add-btn-sb\" onclick=\"abrirModalAtual()\">\uff0b <span id=\"addBtnLbl\">Novo</span></button>\n    </div>\n  </aside>\n\n  <main class=\"main\">\n    <div class=\"topbar\">\n      <div class=\"topbar-info\">\n        <h1 id=\"topTitulo\">Funcion\u00e1rios</h1>\n        <p id=\"topSub\">Gerencie funcion\u00e1rios, sal\u00e1rios e comiss\u00f5es</p>\n      </div>\n      <div class=\"topbar-actions\">\n        <button class=\"tb-add-btn\" onclick=\"abrirModalAtual()\">\uff0b <span id=\"topAddLbl\">Novo Funcion\u00e1rio</span></button>\n      </div>\n    </div>\n\n    <div class=\"content\">\n\n      <!-- \u2500\u2500\u2500 VIEW PADR\u00c3O (Funcion\u00e1rios / Invent\u00e1rio / WhatsApp) \u2500\u2500\u2500 -->\n      <div id=\"viewPadrao\">\n        <!-- CARDS PRINCIPAIS -->\n        <div class=\"cards-principais\" id=\"cardsPrincipais\"></div>\n\n        <!-- FILTROS -->\n        <div class=\"filtros\" id=\"filtros\"></div>\n\n        <!-- TABELA -->\n        <div class=\"tbl-wrap\">\n          <div class=\"tbl-head-bar\">\n            <h3 id=\"tblTitulo\">Funcion\u00e1rios</h3>\n            <span class=\"tbl-count\" id=\"tblCount\">0 itens</span>\n          </div>\n          <div class=\"tbl-scroll\">\n            <table id=\"tabela\">\n              <thead id=\"tblHead\"></thead>\n              <tbody id=\"tblBody\"></tbody>\n            </table>\n            <div class=\"empty-state\" id=\"emptyState\" style=\"display:none\">\n              <div class=\"es-ico\">\ud83d\udced</div>\n              <p>Nada cadastrado ainda</p>\n              <span>Clique em \"Novo\" para come\u00e7ar</span>\n            </div>\n          </div>\n        </div>\n      </div>\n\n      <!-- \u2500\u2500\u2500 VIEW COMISS\u00d5ES \u2500\u2500\u2500 -->\n      <div id=\"viewComissoes\" style=\"display:none\">\n        <!-- Sub-tabs -->\n        <div class=\"subtabs\" id=\"cmsnSubtabs\">\n          <button class=\"subtab on\" data-aba=\"regras\" onclick=\"trocarAbaCmsn('regras')\">\ud83d\udccb Regras de Comiss\u00e3o</button>\n          <button class=\"subtab\" data-aba=\"vendas\" onclick=\"trocarAbaCmsn('vendas')\">\ud83d\udcc8 Escalonamento \u2014 Vendas</button>\n          <button class=\"subtab\" data-aba=\"acessorios\" onclick=\"trocarAbaCmsn('acessorios')\">\ud83c\udf92 Escalonamento \u2014 Acess\u00f3rios</button>\n        </div>\n\n        <!-- Aba: Regras -->\n        <div id=\"abaRegras\">\n          <div id=\"cmsnGrupos\" class=\"cmsn-grupos\"></div>\n        </div>\n\n        <!-- Aba: Escalonamento Vendas -->\n        <div id=\"abaVendas\" style=\"display:none\">\n          <div class=\"esc-info\">\n            <span class=\"ei-ico\">\ud83d\udcc8</span>\n            <div>Defina as faixas de comiss\u00e3o por <b>quantidade de vendas no m\u00eas</b>. Ex.: 1\u20139 vendas \u2192 R$ 30 por venda; 10\u201319 \u2192 R$ 40; 20+ \u2192 R$ 50.</div>\n          </div>\n          <div class=\"tbl-wrap\">\n            <div class=\"tbl-head-bar\">\n              <h3>Escalonamento \u2014 Vendas por C\u00f3digo</h3>\n              <span class=\"tbl-count\" id=\"escVendasCount\">0 faixas</span>\n            </div>\n            <div class=\"tbl-scroll\">\n              <table>\n                <thead>\n                  <tr><th>Faixa (qtd)</th><th>Valor / Comiss\u00e3o</th><th>Aplica-se a</th><th>Observa\u00e7\u00f5es</th><th></th></tr>\n                </thead>\n                <tbody id=\"escVendasBody\"></tbody>\n              </table>\n              <div class=\"empty-state\" id=\"escVendasEmpty\" style=\"display:none\">\n                <div class=\"es-ico\">\ud83d\udcc8</div>\n                <p>Nenhuma faixa cadastrada</p>\n                <span>Clique em \"Nova Faixa\" para come\u00e7ar</span>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <!-- Aba: Escalonamento Acess\u00f3rios -->\n        <div id=\"abaAcessorios\" style=\"display:none\">\n          <div class=\"esc-info\" style=\"background:#e6f4ff;border-color:#a0d0ff;color:#0a4380\">\n            <span class=\"ei-ico\">\ud83c\udf92</span>\n            <div>Defina as faixas de comiss\u00e3o por <b>volume de acess\u00f3rios vendidos</b> (em quantidade ou valor). Ex.: at\u00e9 R$ 500 \u2192 5%; R$ 500\u20131.000 \u2192 7%; acima \u2192 10%.</div>\n          </div>\n          <div class=\"tbl-wrap\">\n            <div class=\"tbl-head-bar\">\n              <h3>Escalonamento \u2014 Acess\u00f3rios</h3>\n              <span class=\"tbl-count\" id=\"escAcessCount\">0 faixas</span>\n            </div>\n            <div class=\"tbl-scroll\">\n              <table>\n                <thead>\n                  <tr><th>Faixa</th><th>Valor / %</th><th>Aplica-se a</th><th>Observa\u00e7\u00f5es</th><th></th></tr>\n                </thead>\n                <tbody id=\"escAcessBody\"></tbody>\n              </table>\n              <div class=\"empty-state\" id=\"escAcessEmpty\" style=\"display:none\">\n                <div class=\"es-ico\">\ud83c\udf92</div>\n                <p>Nenhuma faixa cadastrada</p>\n                <span>Clique em \"Nova Faixa\" para come\u00e7ar</span>\n              </div>\n            </div>\n          </div>\n        </div>\n      </div>\n\n    </div>\n  </main>\n</div>\n\n<!-- ADD FLOAT MOBILE -->\n<button class=\"add-float\" onclick=\"abrirModalAtual()\">\uff0b Novo</button>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL FUNCION\u00c1RIO \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalFunc\" onclick=\"fecharOv(event,'modalFunc')\">\n  <div class=\"modal-box\">\n    <div class=\"modal-head\">\n      <div><h3 id=\"funcModalTitulo\">Novo Funcion\u00e1rio</h3><p>Preencha os dados do funcion\u00e1rio</p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalFunc')\">\u2715</button>\n    </div>\n    <div class=\"modal-body\">\n      <div class=\"form-section\">\n        <div class=\"form-section-title\">\ud83d\udccb Dados b\u00e1sicos</div>\n        <div class=\"form-grid\">\n          <div class=\"form-group full\">\n            <label>Nome completo *</label>\n            <input type=\"text\" id=\"fNome\" placeholder=\"Nome do funcion\u00e1rio\">\n          </div>\n          <div class=\"form-group\">\n            <label>Cargo *</label>\n            <input type=\"text\" id=\"fCargo\" placeholder=\"Ex: Vendedor, Gerente, Suporte\">\n          </div>\n          <div class=\"form-group\">\n            <label>Status</label>\n            <select id=\"fStatus\">\n              <option value=\"Ativo\">\u2705 Ativo</option>\n              <option value=\"Inativo\">\u274c Inativo</option>\n              <option value=\"F\u00e9rias\">\ud83c\udf34 F\u00e9rias</option>\n              <option value=\"Afastado\">\u23f8\ufe0f Afastado</option>\n            </select>\n          </div>\n          <div class=\"form-group\">\n            <label>Telefone</label>\n            <input type=\"text\" id=\"fTel\" placeholder=\"11 99999-9999\">\n          </div>\n          <div class=\"form-group\">\n            <label>E-mail</label>\n            <input type=\"email\" id=\"fEmail\" placeholder=\"email@revendapple.com.br\">\n          </div>\n          <div class=\"form-group\">\n            <label>Data de admiss\u00e3o</label>\n            <input type=\"date\" id=\"fAdmissao\">\n          </div>\n        </div>\n      </div>\n\n      <div class=\"form-section\">\n        <div class=\"form-section-title\">\ud83d\udcb0 Remunera\u00e7\u00e3o</div>\n        <div class=\"form-grid\">\n          <div class=\"form-group\">\n            <label>Sal\u00e1rio fixo (R$)</label>\n            <input type=\"text\" id=\"fSalario\" placeholder=\"Ex: 2500,00\">\n          </div>\n          <div class=\"form-group\">\n            <label>Comiss\u00e3o (%)</label>\n            <input type=\"text\" id=\"fComissao\" placeholder=\"Ex: 1.5\">\n          </div>\n        </div>\n      </div>\n\n      <div class=\"form-section\">\n        <div class=\"form-section-title\">\ud83e\udeaa Documentos</div>\n        <div class=\"form-grid\">\n          <div class=\"form-group\">\n            <label>CPF</label>\n            <input type=\"text\" id=\"fCpf\" placeholder=\"000.000.000-00\">\n          </div>\n          <div class=\"form-group\">\n            <label>RG</label>\n            <input type=\"text\" id=\"fRg\" placeholder=\"00.000.000-0\">\n          </div>\n          <div class=\"form-group full\">\n            <label>Endere\u00e7o completo</label>\n            <textarea id=\"fEndereco\" placeholder=\"Rua, n\u00famero, bairro, cidade \u2014 CEP\"></textarea>\n          </div>\n          <div class=\"form-group full\">\n            <label>Observa\u00e7\u00f5es</label>\n            <textarea id=\"fObs\" placeholder=\"Informa\u00e7\u00f5es adicionais...\"></textarea>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"modal-foot\">\n      <button class=\"btn-cancelar\" onclick=\"fecharModal('modalFunc')\">Cancelar</button>\n      <button class=\"btn-salvar\" onclick=\"salvarFuncionario()\">\ud83d\udcbe Salvar</button>\n    </div>\n  </div>\n</div>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL INVENT\u00c1RIO \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalInv\" onclick=\"fecharOv(event,'modalInv')\">\n  <div class=\"modal-box\">\n    <div class=\"modal-head\">\n      <div><h3 id=\"invModalTitulo\">Novo Item de Invent\u00e1rio</h3><p>Cadastre um equipamento da loja</p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalInv')\">\u2715</button>\n    </div>\n    <div class=\"modal-body\">\n      <div class=\"form-grid\">\n        <div class=\"form-group\">\n          <label>Tipo *</label>\n          <select id=\"iTipo\">\n            <option value=\"iPhone\">\ud83d\udcf1 iPhone</option>\n            <option value=\"iPad\">\ud83d\udcf2 iPad</option>\n            <option value=\"MacBook\">\ud83d\udcbb MacBook</option>\n            <option value=\"iMac\">\ud83d\udda5\ufe0f iMac</option>\n            <option value=\"Mac mini\">\ud83d\udda5\ufe0f Mac mini</option>\n            <option value=\"Computador\">\ud83d\udcbb Computador (PC)</option>\n            <option value=\"Monitor\">\ud83d\udda5\ufe0f Monitor</option>\n            <option value=\"TV\">\ud83d\udcfa TV</option>\n            <option value=\"Apple Watch\">\u231a Apple Watch</option>\n            <option value=\"AirPods\">\ud83c\udfa7 AirPods</option>\n            <option value=\"Acess\u00f3rio\">\ud83d\udd0c Acess\u00f3rio</option>\n            <option value=\"Outro\">\ud83d\udce6 Outro</option>\n          </select>\n        </div>\n        <div class=\"form-group\">\n          <label>Status *</label>\n          <select id=\"iStatus\" onchange=\"onInvStatusChange()\">\n            <option value=\"Em uso\">\ud83d\udfe2 Em uso</option>\n            <option value=\"Guardado\">\ud83d\udce6 Guardado</option>\n            <option value=\"Manuten\u00e7\u00e3o\">\ud83d\udd27 Em manuten\u00e7\u00e3o</option>\n            <option value=\"Vendido\">\ud83d\udcb0 Vendido</option>\n            <option value=\"Descartado\">\ud83d\uddd1\ufe0f Descartado</option>\n          </select>\n        </div>\n        <div class=\"form-group full\">\n          <label>Modelo / descri\u00e7\u00e3o *</label>\n          <input type=\"text\" id=\"iModelo\" placeholder=\"Ex: iPad Pro 12.9 M2 256GB Space Gray\">\n        </div>\n        <div class=\"form-group\">\n          <label>N\u00famero de s\u00e9rie</label>\n          <input type=\"text\" id=\"iSerie\" placeholder=\"Ex: F2LX7Y3HJK\">\n        </div>\n        <div class=\"form-group\">\n          <label>Local f\u00edsico</label>\n          <input type=\"text\" id=\"iLocal\" placeholder=\"Ex: Loja, Estoque, Sala admin\">\n        </div>\n        <div class=\"form-group full\" id=\"grpResp\">\n          <label>Respons\u00e1vel atual</label>\n          <select id=\"iResp\">\n            <option value=\"\">\u2014 Sem respons\u00e1vel \u2014</option>\n          </select>\n        </div>\n        <div class=\"form-group full\">\n          <label>Observa\u00e7\u00f5es</label>\n          <textarea id=\"iObs\" placeholder=\"Detalhes, danos, acess\u00f3rios inclusos...\"></textarea>\n        </div>\n      </div>\n    </div>\n    <div class=\"modal-foot\">\n      <button class=\"btn-cancelar\" onclick=\"fecharModal('modalInv')\">Cancelar</button>\n      <button class=\"btn-salvar\" onclick=\"salvarInventario()\">\ud83d\udcbe Salvar</button>\n    </div>\n  </div>\n</div>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL WHATSAPP \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalWpp\" onclick=\"fecharOv(event,'modalWpp')\">\n  <div class=\"modal-box\">\n    <div class=\"modal-head\" style=\"background:linear-gradient(130deg,var(--wpp),#1ea954)\">\n      <div><h3 id=\"wppModalTitulo\">Novo N\u00famero WhatsApp</h3><p>Cadastre uma linha da loja</p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalWpp')\">\u2715</button>\n    </div>\n    <div class=\"modal-body\">\n      <div class=\"form-section\">\n        <div class=\"form-section-title\" style=\"color:var(--wpp)\">\ud83d\udcac Identifica\u00e7\u00e3o</div>\n        <div class=\"form-grid\">\n          <div class=\"form-group\">\n            <label>Apelido / Identifica\u00e7\u00e3o *</label>\n            <input type=\"text\" id=\"wApelido\" placeholder=\"Ex: WhatsApp Vendas 01\">\n          </div>\n          <div class=\"form-group\">\n            <label>N\u00famero *</label>\n            <input type=\"text\" id=\"wNumero\" placeholder=\"11 99999-9999\">\n          </div>\n          <div class=\"form-group\">\n            <label>Tipo de uso</label>\n            <select id=\"wTipo\" onchange=\"onWppTipoChange()\">\n              <option value=\"Vendedor\">\ud83d\udc64 Com vendedor</option>\n              <option value=\"CRM\">\ud83e\udd16 No CRM</option>\n              <option value=\"Setor\">\ud83c\udfe2 Setor espec\u00edfico</option>\n              <option value=\"Dispon\u00edvel\">\ud83d\udce6 Dispon\u00edvel / em estoque</option>\n            </select>\n          </div>\n          <div class=\"form-group\">\n            <label>Status da linha</label>\n            <select id=\"wStatus\">\n              <option value=\"Ativo\">\u2705 Ativo</option>\n              <option value=\"Suspenso\">\u23f8\ufe0f Suspenso</option>\n              <option value=\"Cancelado\">\u274c Cancelado</option>\n            </select>\n          </div>\n          <div class=\"form-group full\" id=\"grpWppResp\">\n            <label id=\"lblWppResp\">Vendedor respons\u00e1vel</label>\n            <select id=\"wResp\">\n              <option value=\"\">\u2014 Selecione \u2014</option>\n            </select>\n          </div>\n          <div class=\"form-group full\" id=\"grpWppSetor\" style=\"display:none\">\n            <label>Nome do setor</label>\n            <input type=\"text\" id=\"wSetor\" placeholder=\"Ex: Suporte, Financeiro, Marketing, P\u00f3s-venda\">\n          </div>\n        </div>\n      </div>\n\n      <div class=\"form-section\">\n        <div class=\"form-section-title\" style=\"color:var(--wpp)\">\ud83d\udce1 Plano</div>\n        <div class=\"form-grid\">\n          <div class=\"form-group\">\n            <label>Operadora</label>\n            <select id=\"wOperadora\">\n              <option value=\"\">\u2014 Selecione \u2014</option>\n              <option value=\"Vivo\">Vivo</option>\n              <option value=\"Claro\">Claro</option>\n              <option value=\"TIM\">TIM</option>\n              <option value=\"Oi\">Oi</option>\n              <option value=\"Algar\">Algar</option>\n              <option value=\"Outra\">Outra</option>\n            </select>\n          </div>\n          <div class=\"form-group\">\n            <label>Plano</label>\n            <input type=\"text\" id=\"wPlano\" placeholder=\"Ex: Controle 15GB\">\n          </div>\n          <div class=\"form-group\">\n            <label>Valor mensal (R$)</label>\n            <input type=\"text\" id=\"wValor\" placeholder=\"Ex: 89,90\">\n          </div>\n          <div class=\"form-group\">\n            <label>Vencimento (dia)</label>\n            <input type=\"number\" id=\"wVenc\" placeholder=\"Ex: 10\" min=\"1\" max=\"31\">\n          </div>\n          <div class=\"form-group full\">\n            <label>Observa\u00e7\u00f5es</label>\n            <textarea id=\"wObs\" placeholder=\"Informa\u00e7\u00f5es adicionais...\"></textarea>\n          </div>\n        </div>\n      </div>\n    </div>\n    <div class=\"modal-foot\">\n      <button class=\"btn-cancelar\" onclick=\"fecharModal('modalWpp')\">Cancelar</button>\n      <button class=\"btn-salvar\" style=\"background:var(--wpp)\" onclick=\"salvarWhatsapp()\">\ud83d\udcbe Salvar</button>\n    </div>\n  </div>\n</div>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL REGRA DE COMISS\u00c3O \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalCmsn\" onclick=\"fecharOv(event,'modalCmsn')\">\n  <div class=\"modal-box\">\n    <div class=\"modal-head\" style=\"background:linear-gradient(130deg,var(--roxo),#7e2fb3)\">\n      <div><h3 id=\"cmsnModalTitulo\">Nova Regra de Comiss\u00e3o</h3><p>Cadastre uma regra da pol\u00edtica de comiss\u00f5es</p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalCmsn')\">\u2715</button>\n    </div>\n    <div class=\"modal-body\">\n      <div class=\"form-grid\">\n        <div class=\"form-group\">\n          <label>Categoria *</label>\n          <select id=\"cCat\">\n            <option value=\"Atendimento\">\ud83d\udcde Time de Atendimento</option>\n            <option value=\"Vendas\">\ud83d\udcbc Equipe de Vendas</option>\n            <option value=\"Geral\">\ud83c\udfea Comiss\u00f5es Gerais da Loja</option>\n          </select>\n        </div>\n        <div class=\"form-group\">\n          <label>Tipo de valor</label>\n          <select id=\"cTipoValor\">\n            <option value=\"Fixo\">\ud83d\udcb0 Valor fixo (R$)</option>\n            <option value=\"Percentual\">\ud83d\udcca Percentual (%)</option>\n            <option value=\"Tabela\">\ud83d\udcc8 Conforme tabela escalonamento</option>\n            <option value=\"Bonus\">\ud83c\udf81 B\u00f4nus / extra</option>\n            <option value=\"Texto\">\ud83d\udcdd Regra textual (sem valor)</option>\n          </select>\n        </div>\n        <div class=\"form-group full\">\n          <label>T\u00edtulo da regra *</label>\n          <input type=\"text\" id=\"cTitulo\" placeholder=\"Ex: Atendimento conclu\u00eddo\">\n        </div>\n        <div class=\"form-group full\">\n          <label>Valor</label>\n          <input type=\"text\" id=\"cValor\" placeholder=\"Ex: R$ 3,00 por atendimento  \u00b7  R$ 25,00 por garantia  \u00b7  2% sobre acess\u00f3rios\">\n        </div>\n        <div class=\"form-group full\">\n          <label>Descri\u00e7\u00e3o / detalhes</label>\n          <textarea id=\"cDesc\" placeholder=\"Detalhes da regra: condi\u00e7\u00f5es, exce\u00e7\u00f5es, valores espec\u00edficos por modelo, etc.\" style=\"min-height:90px\"></textarea>\n        </div>\n        <div class=\"form-group full\">\n          <label style=\"display:flex;align-items:center;gap:8px;cursor:pointer\">\n            <input type=\"checkbox\" id=\"cAtivo\" checked style=\"width:auto;margin:0\">\n            <span style=\"text-transform:none;letter-spacing:0;color:var(--preto);font-size:12px\">Regra ativa (em vigor)</span>\n          </label>\n        </div>\n      </div>\n    </div>\n    <div class=\"modal-foot\">\n      <button class=\"btn-cancelar\" onclick=\"fecharModal('modalCmsn')\">Cancelar</button>\n      <button class=\"btn-salvar\" style=\"background:var(--roxo)\" onclick=\"salvarComissao()\">\ud83d\udcbe Salvar</button>\n    </div>\n  </div>\n</div>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL FAIXA DE ESCALONAMENTO \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalEsc\" onclick=\"fecharOv(event,'modalEsc')\">\n  <div class=\"modal-box\" style=\"width:480px\">\n    <div class=\"modal-head\" style=\"background:linear-gradient(130deg,var(--azul),#0055cc)\">\n      <div><h3 id=\"escModalTitulo\">Nova Faixa</h3><p id=\"escModalSub\">Faixa de escalonamento</p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalEsc')\">\u2715</button>\n    </div>\n    <div class=\"modal-body\">\n      <div class=\"form-grid\">\n        <div class=\"form-group\">\n          <label>De (m\u00edn)</label>\n          <input type=\"text\" id=\"eMin\" placeholder=\"Ex: 1 ou 0,00\">\n        </div>\n        <div class=\"form-group\">\n          <label>At\u00e9 (m\u00e1x)</label>\n          <input type=\"text\" id=\"eMax\" placeholder=\"Ex: 9 ou 500,00 (vazio = sem limite)\">\n        </div>\n        <div class=\"form-group full\">\n          <label>Valor / comiss\u00e3o *</label>\n          <input type=\"text\" id=\"eValor\" placeholder=\"Ex: R$ 30,00 por venda  \u00b7  5%  \u00b7  R$ 50 + 2%\">\n        </div>\n        <div class=\"form-group full\">\n          <label>Aplica-se a</label>\n          <input type=\"text\" id=\"eAplica\" placeholder=\"Ex: Todos vendedores  \u00b7  Equipe atendimento  \u00b7  iPhone novo\">\n        </div>\n        <div class=\"form-group full\">\n          <label>Observa\u00e7\u00f5es</label>\n          <textarea id=\"eObs\" placeholder=\"Detalhes, regras especiais...\"></textarea>\n        </div>\n      </div>\n    </div>\n    <div class=\"modal-foot\">\n      <button class=\"btn-cancelar\" onclick=\"fecharModal('modalEsc')\">Cancelar</button>\n      <button class=\"btn-salvar\" style=\"background:var(--azul)\" onclick=\"salvarEscalonamento()\">\ud83d\udcbe Salvar Faixa</button>\n    </div>\n  </div>\n</div>\n\n<!-- \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 MODAL DETALHE \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550 -->\n<div class=\"modal-ov\" id=\"modalDetalhe\" onclick=\"fecharOv(event,'modalDetalhe')\">\n  <div class=\"modal-box\">\n    <div class=\"modal-head\" id=\"dHead\">\n      <div><h3 id=\"dTitulo\">Detalhes</h3><p id=\"dSub\"></p></div>\n      <button class=\"m-close\" onclick=\"fecharModal('modalDetalhe')\">\u2715</button>\n    </div>\n    <div class=\"detalhe-grid\" id=\"detalheGrid\"></div>\n    <div class=\"detalhe-actions\" id=\"detalheActions\"></div>\n  </div>\n</div>\n\n";
-}
-
-</script>
-
-<!-- ADMIN SCRIPT (runs in global scope when panel is opened) -->
-<script id="adminScriptBlock">
-/* ════════════════════════════════════════════════
-   ESTADO E STORAGE
-   ════════════════════════════════════════════════ */
-var moduloAtual = 'funcionarios'; // funcionarios | inventario | whatsapp | comissoes
-var abaCmsn = 'regras'; // regras | vendas | acessorios
-var funcionarios = [];
-var inventario = [];
-var whatsapps = [];
-var comissoes = [];
-var escVendas = [];
-var escAcess = [];
-var filtroAtivo = 'todos';
-var buscaAtiva = '';
-var editandoIdx = null;
-var editandoTipoEsc = null; // 'vendas' | 'acessorios'
-
-const KEYS = {
-  funcionarios: 'revend_funcionarios',
-  inventario:   'revend_inventario',
-  whatsapps:    'revend_whatsapps',
-  comissoes:    'revend_comissoes',
-  escVendas:    'revend_esc_vendas',
-  escAcess:     'revend_esc_acess',
-};
-
-function carregarStorage(){
-  try{ funcionarios = JSON.parse(localStorage.getItem(KEYS.funcionarios)||'[]'); }catch(e){ funcionarios=[]; }
-  try{ inventario   = JSON.parse(localStorage.getItem(KEYS.inventario)  ||'[]'); }catch(e){ inventario=[]; }
-  try{ whatsapps    = JSON.parse(localStorage.getItem(KEYS.whatsapps)   ||'[]'); }catch(e){ whatsapps=[]; }
-  try{ comissoes    = JSON.parse(localStorage.getItem(KEYS.comissoes)   ||'[]'); }catch(e){ comissoes=[]; }
-  try{ escVendas    = JSON.parse(localStorage.getItem(KEYS.escVendas)   ||'[]'); }catch(e){ escVendas=[]; }
-  try{ escAcess     = JSON.parse(localStorage.getItem(KEYS.escAcess)    ||'[]'); }catch(e){ escAcess=[]; }
-}
-
-function salvarStorage(){
-  localStorage.setItem(KEYS.funcionarios, JSON.stringify(funcionarios));
-  localStorage.setItem(KEYS.inventario,   JSON.stringify(inventario));
-  localStorage.setItem(KEYS.whatsapps,    JSON.stringify(whatsapps));
-  localStorage.setItem(KEYS.comissoes,    JSON.stringify(comissoes));
-  localStorage.setItem(KEYS.escVendas,    JSON.stringify(escVendas));
-  localStorage.setItem(KEYS.escAcess,     JSON.stringify(escAcess));
-}
-
-/* ════════════════════════════════════════════════
-   HELPERS
-   ════════════════════════════════════════════════ */
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-function moeda(v){
-  if(v===null || v===undefined || v==='') return '—';
-  const s = String(v).replace(/[^\d,.-]/g,'').replace(',','.');
-  const n = parseFloat(s);
-  if(isNaN(n)) return v;
-  return n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-}
-function fmtData(d){
-  if(!d) return '—';
-  return d.split('-').reverse().join('/');
-}
-function fmtTel(t){
-  if(!t) return '';
-  return t.replace(/\D/g,'').replace(/(\d{2})(\d{4,5})(\d{4})/,'($1) $2-$3');
-}
-function showToast(msg){
-  const t = document.getElementById('admCopyToast');
-  t.textContent = msg || '✅ Salvo!';
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2200);
-}
-function nomeFuncPorId(id){
-  const f = funcionarios.find(x=>x.id===id);
-  return f ? f.nome : null;
-}
-
-/* ════════════════════════════════════════════════
-   TROCAR MÓDULO
-   ════════════════════════════════════════════════ */
-const MODULOS = {
-  funcionarios: {
-    titulo: 'Funcionários',
-    sub: 'Gerencie funcionários, salários e comissões',
-    addLbl: 'Novo Funcionário',
-    addLblShort: 'Novo Funcionário',
-  },
-  inventario: {
-    titulo: 'Inventário da Loja',
-    sub: 'iPads, MacBooks, monitores, TVs e equipamentos internos',
-    addLbl: 'Novo Item',
-    addLblShort: 'Novo Item',
-  },
-  whatsapp: {
-    titulo: 'Números de WhatsApp',
-    sub: 'Linhas com vendedores, no CRM e setores específicos',
-    addLbl: 'Novo Número',
-    addLblShort: 'Novo Número',
-  },
-  comissoes: {
-    titulo: 'Política de Comissões',
-    sub: 'Regras de comissão, escalonamento de vendas e acessórios',
-    addLbl: 'Nova Regra',
-    addLblShort: 'Nova Regra',
-  },
-};
-
-function trocarModulo(m){
-  moduloAtual = m;
-  filtroAtivo = 'todos';
-  buscaAtiva = '';
-  document.getElementById('deskSearch').value='';
-  document.getElementById('mobSearch').value='';
-  // Atualiza nav buttons
-  document.querySelectorAll('.nav-btn[data-modulo],.mob-tab[data-modulo]').forEach(b=>{
-    b.classList.toggle('on', b.dataset.modulo===m);
-  });
-  // Alterna views
-  const isCmsn = m==='comissoes';
-  document.getElementById('viewPadrao').style.display     = isCmsn ? 'none' : '';
-  document.getElementById('viewComissoes').style.display  = isCmsn ? '' : 'none';
-  // Atualiza topbar
-  document.getElementById('topTitulo').textContent = MODULOS[m].titulo;
-  document.getElementById('topSub').textContent = MODULOS[m].sub;
-  document.getElementById('topAddLbl').textContent = MODULOS[m].addLbl;
-  document.getElementById('addBtnLbl').textContent = MODULOS[m].addLblShort;
-  document.getElementById('tblTitulo').textContent = MODULOS[m].titulo;
-  render();
-}
-
-function abrirModalAtual(){
-  if(moduloAtual==='funcionarios') abrirModalFunc();
-  else if(moduloAtual==='inventario') abrirModalInv();
-  else if(moduloAtual==='whatsapp') abrirModalWpp();
-  else if(moduloAtual==='comissoes'){
-    if(abaCmsn==='regras') abrirModalCmsn();
-    else if(abaCmsn==='vendas') abrirModalEsc('vendas');
-    else if(abaCmsn==='acessorios') abrirModalEsc('acessorios');
-  }
-}
-
-function trocarAbaCmsn(aba){
-  abaCmsn = aba;
-  document.querySelectorAll('.subtab').forEach(b=>{
-    b.classList.toggle('on', b.dataset.aba===aba);
-  });
-  document.getElementById('abaRegras').style.display     = aba==='regras' ? '' : 'none';
-  document.getElementById('abaVendas').style.display     = aba==='vendas' ? '' : 'none';
-  document.getElementById('abaAcessorios').style.display = aba==='acessorios' ? '' : 'none';
-  // Atualiza label do botão "Novo"
-  const lbl = aba==='regras' ? 'Nova Regra' : 'Nova Faixa';
-  document.getElementById('topAddLbl').textContent = lbl;
-  document.getElementById('addBtnLbl').textContent = lbl;
-  renderComissoes();
-}
-
-/* ════════════════════════════════════════════════
-   BUSCA
-   ════════════════════════════════════════════════ */
-function buscar(v){
-  buscaAtiva = (v||'').toLowerCase().trim();
-  // sincroniza ambos campos
-  const d = document.getElementById('deskSearch'), m = document.getElementById('mobSearch');
-  if(d && d.value!==v) d.value = v;
-  if(m && m.value!==v) m.value = v;
-  render();
-}
-
-/* ════════════════════════════════════════════════
-   FILTRO
-   ════════════════════════════════════════════════ */
-function setFiltro(f){
-  filtroAtivo = f;
-  render();
-}
-
-/* ════════════════════════════════════════════════
-   RENDER PRINCIPAL
-   ════════════════════════════════════════════════ */
-function render(){
-  atualizarBadgesGerais();
-  atualizarStatsSidebar();
-  if(moduloAtual==='funcionarios') renderFuncionarios();
-  else if(moduloAtual==='inventario') renderInventario();
-  else if(moduloAtual==='whatsapp') renderWhatsapps();
-  else if(moduloAtual==='comissoes') renderComissoes();
-}
-
-function atualizarBadgesGerais(){
-  document.getElementById('badgeFuncionarios').textContent = funcionarios.length;
-  document.getElementById('badgeInventario').textContent = inventario.length;
-  document.getElementById('badgeWhatsapp').textContent = whatsapps.length;
-  const totalCmsn = comissoes.length + escVendas.length + escAcess.length;
-  const elBadge = document.getElementById('badgeComissoes');
-  if(elBadge) elBadge.textContent = totalCmsn;
-}
-
-function atualizarStatsSidebar(){
-  const ativos = funcionarios.filter(f=>f.status==='Ativo').length;
-  const emUso = inventario.filter(i=>i.status==='Em uso').length;
-  const guardados = inventario.filter(i=>i.status==='Guardado').length;
-  const wppAtivos = whatsapps.filter(w=>w.status==='Ativo').length;
-  const valorMensal = whatsapps.reduce((acc,w)=>{
-    const v = parseFloat(String(w.valor||'0').replace(/[^\d,.-]/g,'').replace(',','.'));
-    return acc + (isNaN(v)?0:v);
-  },0);
-
-  document.getElementById('sbStats').innerHTML = `
-    <div class="stat-row"><span class="stat-lbl">👥 Funcionários ativos</span><span class="stat-val verde">${ativos}</span></div>
-    <div class="stat-row"><span class="stat-lbl">📦 Itens em uso</span><span class="stat-val">${emUso}</span></div>
-    <div class="stat-row"><span class="stat-lbl">📥 Itens guardados</span><span class="stat-val">${guardados}</span></div>
-    <div class="stat-row"><span class="stat-lbl">💬 Linhas ativas</span><span class="stat-val verde">${wppAtivos}</span></div>
-    <div class="stat-row"><span class="stat-lbl">💰 Custo mensal WPP</span><span class="stat-val red">${moeda(valorMensal)}</span></div>
-  `;
-}
-
-/* ════════════════════════════════════════════════
-   ═══════════ MÓDULO FUNCIONÁRIOS ═══════════
-   ════════════════════════════════════════════════ */
-function renderFuncionarios(){
-  // CARDS
-  const total = funcionarios.length;
-  const ativos = funcionarios.filter(f=>f.status==='Ativo').length;
-  const inativos = funcionarios.filter(f=>f.status==='Inativo').length;
-  const ferias = funcionarios.filter(f=>f.status==='Férias').length;
-  const totalSalario = funcionarios
-    .filter(f=>f.status==='Ativo')
-    .reduce((acc,f)=>{
-      const v = parseFloat(String(f.salario||'0').replace(/[^\d,.-]/g,'').replace(',','.'));
-      return acc + (isNaN(v)?0:v);
-    },0);
-
-  document.getElementById('cardsPrincipais').innerHTML = `
-    <div class="card-stat card-hero">
-      <div class="cs-ico">👥</div>
-      <div class="cs-n">${total}</div>
-      <div class="cs-l">Total cadastrado</div>
-      <div class="cs-sub" style="color:rgba(255,255,255,.85)">${ativos} ativo${ativos!==1?'s':''}</div>
-    </div>
-    <div class="card-stat card-verde">
-      <div class="cs-ico">✅</div>
-      <div class="cs-n">${ativos}</div>
-      <div class="cs-l">Ativos</div>
-      <div class="cs-sub" style="color:var(--verde)">trabalhando agora</div>
-    </div>
-    <div class="card-stat card-amarelo">
-      <div class="cs-ico">🌴</div>
-      <div class="cs-n">${ferias}</div>
-      <div class="cs-l">Em férias</div>
-      <div class="cs-sub" style="color:var(--amarelo)">${ferias>0?'aproveitando':'—'}</div>
-    </div>
-    <div class="card-stat card-cinza">
-      <div class="cs-ico">⏸️</div>
-      <div class="cs-n">${inativos}</div>
-      <div class="cs-l">Inativos</div>
-      <div class="cs-sub" style="color:#636366">desligados</div>
-    </div>
-    <div class="card-stat card-azul">
-      <div class="cs-ico">💰</div>
-      <div class="cs-n" style="font-size:22px">${moeda(totalSalario)}</div>
-      <div class="cs-l">Folha (ativos)</div>
-      <div class="cs-sub" style="color:var(--azul)">salários fixos</div>
-    </div>
-  `;
-
-  // FILTROS
-  const cnt = s => funcionarios.filter(f=>f.status===s).length;
-  document.getElementById('filtros').innerHTML = `
-    <button class="filtro-btn ${filtroAtivo==='todos'?'on':''}" onclick="setFiltro('todos')">📋 Todos (${total})</button>
-    <button class="filtro-btn verde ${filtroAtivo==='Ativo'?'on':''}" onclick="setFiltro('Ativo')">✅ Ativos (${ativos})</button>
-    <button class="filtro-btn amarelo ${filtroAtivo==='Férias'?'on':''}" onclick="setFiltro('Férias')">🌴 Férias (${ferias})</button>
-    <button class="filtro-btn ${filtroAtivo==='Afastado'?'on':''}" onclick="setFiltro('Afastado')">⏸️ Afastados (${cnt('Afastado')})</button>
-    <button class="filtro-btn cinza ${filtroAtivo==='Inativo'?'on':''}" onclick="setFiltro('Inativo')">❌ Inativos (${inativos})</button>
-  `;
-
-  // TABELA
-  document.getElementById('tblHead').innerHTML = `
-    <tr>
-      <th>Nome</th>
-      <th>Cargo</th>
-      <th>Telefone</th>
-      <th>Salário</th>
-      <th>Comissão</th>
-      <th>Admissão</th>
-      <th>Itens</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  `;
-
-  let lista = funcionarios.filter(f=>{
-    const ms = filtroAtivo==='todos' || f.status===filtroAtivo;
-    const q = buscaAtiva;
-    const mb = !q ||
-      (f.nome||'').toLowerCase().includes(q) ||
-      (f.cargo||'').toLowerCase().includes(q) ||
-      (f.tel||'').toLowerCase().includes(q) ||
-      (f.email||'').toLowerCase().includes(q) ||
-      (f.cpf||'').toLowerCase().includes(q);
-    return ms && mb;
-  });
-
-  document.getElementById('tblCount').textContent = `${lista.length} ${lista.length===1?'funcionário':'funcionários'}`;
-
-  if(lista.length===0){
-    document.getElementById('tabela').style.display='none';
-    document.getElementById('emptyState').style.display='block';
-    return;
-  }
-  document.getElementById('tabela').style.display='';
-  document.getElementById('emptyState').style.display='none';
-
-  document.getElementById('tblBody').innerHTML = lista.map(f=>{
-    const idx = funcionarios.indexOf(f);
-    const itens = inventario.filter(i=>i.responsavelId===f.id).length;
-    return `
-    <tr onclick="verDetalheFunc(${idx})">
-      <td class="td-bold">${f.nome||'—'}</td>
-      <td>${f.cargo||'—'}</td>
-      <td>${fmtTel(f.tel)||'—'}</td>
-      <td class="td-red">${moeda(f.salario)}</td>
-      <td>${f.comissao? f.comissao+'%':'—'}</td>
-      <td>${fmtData(f.admissao)}</td>
-      <td>${itens>0?`<span class="badge badge-azul">${itens} item${itens>1?'s':''}</span>`:'<span style="color:var(--txt2)">—</span>'}</td>
-      <td>${badgeStatusFunc(f.status)}</td>
-      <td class="td-acoes" onclick="event.stopPropagation()">
-        <button class="btn-edit" onclick="abrirModalFunc(${idx})">✏️</button>
-        <button class="btn-del" onclick="excluirFuncionario(${idx})">🗑</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function badgeStatusFunc(s){
-  const mp = {
-    'Ativo':'badge-verde',
-    'Inativo':'badge-cinza',
-    'Férias':'badge-amarelo',
-    'Afastado':'badge-azul',
-  };
-  return `<span class="badge ${mp[s]||'badge-cinza'}">${s||'—'}</span>`;
-}
-
-function abrirModalFunc(idx=null){
-  editandoIdx = idx;
-  document.getElementById('funcModalTitulo').textContent = idx!==null ? 'Editar Funcionário' : 'Novo Funcionário';
-  const f = idx!==null ? funcionarios[idx] : {};
-  document.getElementById('fNome').value     = f.nome||'';
-  document.getElementById('fCargo').value    = f.cargo||'';
-  document.getElementById('fStatus').value   = f.status||'Ativo';
-  document.getElementById('fTel').value      = f.tel||'';
-  document.getElementById('fEmail').value    = f.email||'';
-  document.getElementById('fAdmissao').value = f.admissao||'';
-  document.getElementById('fSalario').value  = f.salario||'';
-  document.getElementById('fComissao').value = f.comissao||'';
-  document.getElementById('fCpf').value      = f.cpf||'';
-  document.getElementById('fRg').value       = f.rg||'';
-  document.getElementById('fEndereco').value = f.endereco||'';
-  document.getElementById('fObs').value      = f.obs||'';
-  document.getElementById('modalFunc').classList.add('on');
-}
-
-function salvarFuncionario(){
-  const nome = document.getElementById('fNome').value.trim();
-  const cargo = document.getElementById('fCargo').value.trim();
-  if(!nome || !cargo){
-    alert('Preencha pelo menos o nome e o cargo.');
-    return;
-  }
-  const obj = {
-    id:        editandoIdx!==null ? funcionarios[editandoIdx].id : uid(),
-    nome,
-    cargo,
-    status:    document.getElementById('fStatus').value,
-    tel:       document.getElementById('fTel').value.trim(),
-    email:     document.getElementById('fEmail').value.trim(),
-    admissao:  document.getElementById('fAdmissao').value,
-    salario:   document.getElementById('fSalario').value.trim(),
-    comissao:  document.getElementById('fComissao').value.trim(),
-    cpf:       document.getElementById('fCpf').value.trim(),
-    rg:        document.getElementById('fRg').value.trim(),
-    endereco:  document.getElementById('fEndereco').value.trim(),
-    obs:       document.getElementById('fObs').value.trim(),
-  };
-  if(editandoIdx!==null){
-    obj.criadoEm = funcionarios[editandoIdx].criadoEm;
-    funcionarios[editandoIdx] = obj;
-  } else {
-    obj.criadoEm = new Date().toISOString();
-    funcionarios.unshift(obj);
-  }
-  fecharModal('modalFunc');
-  salvarStorage();
-  render();
-  showToast('✅ Funcionário salvo!');
-}
-
-function excluirFuncionario(idx){
-  const f = funcionarios[idx];
-  if(!confirm(`Excluir o funcionário ${f.nome}?\n\nOs itens vinculados ficarão sem responsável.`)) return;
-  // Desvincula itens do inventário
-  inventario.forEach(i=>{
-    if(i.responsavelId===f.id){ i.responsavelId=''; }
-  });
-  funcionarios.splice(idx,1);
-  fecharModal('modalDetalhe');
-  salvarStorage();
-  render();
-  showToast('🗑 Funcionário removido');
-}
-
-function verDetalheFunc(idx){
-  const f = funcionarios[idx];
-  document.getElementById('dHead').style.background = 'linear-gradient(130deg,var(--red),var(--red-dark))';
-  document.getElementById('dTitulo').textContent = f.nome||'Funcionário';
-  document.getElementById('dSub').textContent = `${f.cargo||'—'} · ${f.status||'—'}`;
-
-  const itensVinc = inventario.filter(i=>i.responsavelId===f.id);
-  const wppsVinc = whatsapps.filter(w=>w.respId===f.id);
-
-  document.getElementById('detalheGrid').innerHTML = `
-    <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val">${badgeStatusFunc(f.status)}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Cargo</div><div class="dg-val">${f.cargo||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Telefone</div><div class="dg-val">${fmtTel(f.tel)||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">E-mail</div><div class="dg-val">${f.email||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Admissão</div><div class="dg-val">${fmtData(f.admissao)}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Salário fixo</div><div class="dg-val red">${moeda(f.salario)}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Comissão</div><div class="dg-val">${f.comissao? f.comissao+'%':'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">CPF</div><div class="dg-val">${f.cpf||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">RG</div><div class="dg-val">${f.rg||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Endereço</div><div class="dg-val">${f.endereco||'—'}</div></div>
-    <div class="dg-item full">
-      <div class="dg-lbl">📦 Itens do inventário (${itensVinc.length})</div>
-      <div class="linked-list">
-        ${itensVinc.length>0
-          ? itensVinc.map(i=>`<div class="linked-item"><span class="li-tipo">${i.tipo}</span><span class="li-nome">${i.modelo||'—'}</span>${badgeStatusInv(i.status)}</div>`).join('')
-          : '<span class="linked-empty">Nenhum item vinculado</span>'}
-      </div>
-    </div>
-    <div class="dg-item full">
-      <div class="dg-lbl">💬 Linhas WhatsApp (${wppsVinc.length})</div>
-      <div class="linked-list">
-        ${wppsVinc.length>0
-          ? wppsVinc.map(w=>`<div class="linked-item"><span class="li-tipo" style="color:var(--wpp)">${w.apelido||'—'}</span><span class="li-nome">${fmtTel(w.numero)}</span></div>`).join('')
-          : '<span class="linked-empty">Nenhuma linha vinculada</span>'}
-      </div>
-    </div>
-    ${f.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${f.obs}</div></div>`:''}
-  `;
-
-  const tel = (f.tel||'').replace(/\D/g,'');
-  document.getElementById('detalheActions').innerHTML = `
-    ${tel?`<a href="https://wa.me/55${tel}" target="_blank" style="flex:1;text-decoration:none"><button class="det-btn det-btn-wpp" style="width:100%">💬 WhatsApp</button></a>`:''}
-    <button class="det-btn det-btn-edit" onclick="fecharModal('modalDetalhe');abrirModalFunc(${idx})">✏️ Editar</button>
-    <button class="det-btn det-btn-del" onclick="excluirFuncionario(${idx})">🗑 Excluir</button>
-  `;
-
-  document.getElementById('modalDetalhe').classList.add('on');
-}
-
-/* ════════════════════════════════════════════════
-   ═══════════ MÓDULO INVENTÁRIO ═══════════
-   ════════════════════════════════════════════════ */
-function renderInventario(){
-  const total = inventario.length;
-  const emUso = inventario.filter(i=>i.status==='Em uso').length;
-  const guardados = inventario.filter(i=>i.status==='Guardado').length;
-  const manut = inventario.filter(i=>i.status==='Manutenção').length;
-  const vendidos = inventario.filter(i=>i.status==='Vendido').length;
-
-  document.getElementById('cardsPrincipais').innerHTML = `
-    <div class="card-stat card-hero">
-      <div class="cs-ico">📦</div>
-      <div class="cs-n">${total}</div>
-      <div class="cs-l">Total no inventário</div>
-      <div class="cs-sub" style="color:rgba(255,255,255,.85)">${emUso} em uso · ${guardados} guardados</div>
-    </div>
-    <div class="card-stat card-verde">
-      <div class="cs-ico">🟢</div>
-      <div class="cs-n">${emUso}</div>
-      <div class="cs-l">Em uso</div>
-      <div class="cs-sub" style="color:var(--verde)">com funcionários</div>
-    </div>
-    <div class="card-stat card-azul">
-      <div class="cs-ico">📥</div>
-      <div class="cs-n">${guardados}</div>
-      <div class="cs-l">Guardados</div>
-      <div class="cs-sub" style="color:var(--azul)">no estoque</div>
-    </div>
-    <div class="card-stat card-amarelo">
-      <div class="cs-ico">🔧</div>
-      <div class="cs-n">${manut}</div>
-      <div class="cs-l">Em manutenção</div>
-      <div class="cs-sub" style="color:var(--amarelo)">${manut>0?'em conserto':'—'}</div>
-    </div>
-    <div class="card-stat card-cinza">
-      <div class="cs-ico">💰</div>
-      <div class="cs-n">${vendidos}</div>
-      <div class="cs-l">Vendidos</div>
-      <div class="cs-sub" style="color:#636366">saídas</div>
-    </div>
-  `;
-
-  document.getElementById('filtros').innerHTML = `
-    <button class="filtro-btn ${filtroAtivo==='todos'?'on':''}" onclick="setFiltro('todos')">📋 Todos (${total})</button>
-    <button class="filtro-btn verde ${filtroAtivo==='Em uso'?'on':''}" onclick="setFiltro('Em uso')">🟢 Em uso (${emUso})</button>
-    <button class="filtro-btn azul ${filtroAtivo==='Guardado'?'on':''}" onclick="setFiltro('Guardado')">📥 Guardados (${guardados})</button>
-    <button class="filtro-btn amarelo ${filtroAtivo==='Manutenção'?'on':''}" onclick="setFiltro('Manutenção')">🔧 Manutenção (${manut})</button>
-    <button class="filtro-btn cinza ${filtroAtivo==='Vendido'?'on':''}" onclick="setFiltro('Vendido')">💰 Vendidos (${vendidos})</button>
-  `;
-
-  document.getElementById('tblHead').innerHTML = `
-    <tr>
-      <th>Tipo</th>
-      <th>Modelo</th>
-      <th>Nº de Série</th>
-      <th>Local</th>
-      <th>Responsável</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  `;
-
-  let lista = inventario.filter(i=>{
-    const ms = filtroAtivo==='todos' || i.status===filtroAtivo;
-    const q = buscaAtiva;
-    const respNome = i.responsavelId ? (nomeFuncPorId(i.responsavelId)||'').toLowerCase() : '';
-    const mb = !q ||
-      (i.tipo||'').toLowerCase().includes(q) ||
-      (i.modelo||'').toLowerCase().includes(q) ||
-      (i.serie||'').toLowerCase().includes(q) ||
-      (i.local||'').toLowerCase().includes(q) ||
-      respNome.includes(q);
-    return ms && mb;
-  });
-
-  document.getElementById('tblCount').textContent = `${lista.length} ${lista.length===1?'item':'itens'}`;
-
-  if(lista.length===0){
-    document.getElementById('tabela').style.display='none';
-    document.getElementById('emptyState').style.display='block';
-    return;
-  }
-  document.getElementById('tabela').style.display='';
-  document.getElementById('emptyState').style.display='none';
-
-  document.getElementById('tblBody').innerHTML = lista.map(i=>{
-    const idx = inventario.indexOf(i);
-    const respNome = i.responsavelId ? (nomeFuncPorId(i.responsavelId)||'(removido)') : '—';
-    return `
-    <tr onclick="verDetalheInv(${idx})">
-      <td><span class="badge badge-roxo">${i.tipo||'—'}</span></td>
-      <td class="td-bold">${i.modelo||'—'}</td>
-      <td class="td-mono">${i.serie||'—'}</td>
-      <td>${i.local||'—'}</td>
-      <td>${respNome}</td>
-      <td>${badgeStatusInv(i.status)}</td>
-      <td class="td-acoes" onclick="event.stopPropagation()">
-        <button class="btn-edit" onclick="abrirModalInv(${idx})">✏️</button>
-        <button class="btn-del" onclick="excluirInventario(${idx})">🗑</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function badgeStatusInv(s){
-  const mp = {
-    'Em uso':'badge-verde',
-    'Guardado':'badge-azul',
-    'Manutenção':'badge-amarelo',
-    'Vendido':'badge-cinza',
-    'Descartado':'badge-vermelho',
-  };
-  return `<span class="badge ${mp[s]||'badge-cinza'}">${s||'—'}</span>`;
-}
-
-function abrirModalInv(idx=null){
-  editandoIdx = idx;
-  document.getElementById('invModalTitulo').textContent = idx!==null ? 'Editar Item' : 'Novo Item de Inventário';
-  // Popula select de responsáveis
-  const respSel = document.getElementById('iResp');
-  respSel.innerHTML = '<option value="">— Sem responsável —</option>' +
-    funcionarios.filter(f=>f.status==='Ativo')
-      .map(f=>`<option value="${f.id}">${f.nome} (${f.cargo})</option>`).join('');
-
-  const i = idx!==null ? inventario[idx] : {};
-  document.getElementById('iTipo').value    = i.tipo||'iPad';
-  document.getElementById('iStatus').value  = i.status||'Em uso';
-  document.getElementById('iModelo').value  = i.modelo||'';
-  document.getElementById('iSerie').value   = i.serie||'';
-  document.getElementById('iLocal').value   = i.local||'';
-  document.getElementById('iResp').value    = i.responsavelId||'';
-  document.getElementById('iObs').value     = i.obs||'';
-  onInvStatusChange();
-  document.getElementById('modalInv').classList.add('on');
-}
-
-function onInvStatusChange(){
-  const s = document.getElementById('iStatus').value;
-  const grp = document.getElementById('grpResp');
-  // Mantém visível sempre, mas pode zerar quando não está em uso
-  if(s!=='Em uso'){
-    grp.style.opacity='0.65';
-  } else {
-    grp.style.opacity='1';
-  }
-}
-
-function salvarInventario(){
-  const modelo = document.getElementById('iModelo').value.trim();
-  if(!modelo){
-    alert('Preencha pelo menos o modelo / descrição.');
-    return;
-  }
-  const obj = {
-    id:             editandoIdx!==null ? inventario[editandoIdx].id : uid(),
-    tipo:           document.getElementById('iTipo').value,
-    status:         document.getElementById('iStatus').value,
-    modelo,
-    serie:          document.getElementById('iSerie').value.trim(),
-    local:          document.getElementById('iLocal').value.trim(),
-    responsavelId:  document.getElementById('iResp').value,
-    obs:            document.getElementById('iObs').value.trim(),
-  };
-  if(editandoIdx!==null){
-    obj.criadoEm = inventario[editandoIdx].criadoEm;
-    inventario[editandoIdx] = obj;
-  } else {
-    obj.criadoEm = new Date().toISOString();
-    inventario.unshift(obj);
-  }
-  fecharModal('modalInv');
-  salvarStorage();
-  render();
-  showToast('✅ Item salvo!');
-}
-
-function excluirInventario(idx){
-  const i = inventario[idx];
-  if(!confirm(`Excluir o item ${i.modelo}?`)) return;
-  inventario.splice(idx,1);
-  fecharModal('modalDetalhe');
-  salvarStorage();
-  render();
-  showToast('🗑 Item removido');
-}
-
-function verDetalheInv(idx){
-  const i = inventario[idx];
-  document.getElementById('dHead').style.background = 'linear-gradient(130deg,var(--red),var(--red-dark))';
-  document.getElementById('dTitulo').textContent = i.modelo||'Item';
-  document.getElementById('dSub').textContent = `${i.tipo||'—'} · ${i.status||'—'}`;
-  const respNome = i.responsavelId ? (nomeFuncPorId(i.responsavelId)||'(removido)') : '—';
-
-  document.getElementById('detalheGrid').innerHTML = `
-    <div class="dg-item"><div class="dg-lbl">Tipo</div><div class="dg-val"><span class="badge badge-roxo">${i.tipo||'—'}</span></div></div>
-    <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val">${badgeStatusInv(i.status)}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Modelo / Descrição</div><div class="dg-val">${i.modelo||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Número de série</div><div class="dg-val" style="font-family:'SF Mono',monospace">${i.serie||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Local físico</div><div class="dg-val">${i.local||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Responsável atual</div><div class="dg-val ${i.responsavelId?'verde':''}">${respNome}</div></div>
-    ${i.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${i.obs}</div></div>`:''}
-  `;
-
-  document.getElementById('detalheActions').innerHTML = `
-    <button class="det-btn det-btn-edit" onclick="fecharModal('modalDetalhe');abrirModalInv(${idx})">✏️ Editar</button>
-    <button class="det-btn det-btn-del" onclick="excluirInventario(${idx})">🗑 Excluir</button>
-  `;
-
-  document.getElementById('modalDetalhe').classList.add('on');
-}
-
-/* ════════════════════════════════════════════════
-   ═══════════ MÓDULO WHATSAPP ═══════════
-   ════════════════════════════════════════════════ */
-function renderWhatsapps(){
-  const total = whatsapps.length;
-  const comVend = whatsapps.filter(w=>w.tipo==='Vendedor').length;
-  const noCrm = whatsapps.filter(w=>w.tipo==='CRM').length;
-  const setor = whatsapps.filter(w=>w.tipo==='Setor').length;
-  const disp = whatsapps.filter(w=>w.tipo==='Disponível').length;
-  const valorMensal = whatsapps.reduce((acc,w)=>{
-    if(w.status==='Cancelado') return acc;
-    const v = parseFloat(String(w.valor||'0').replace(/[^\d,.-]/g,'').replace(',','.'));
-    return acc + (isNaN(v)?0:v);
-  },0);
-
-  document.getElementById('cardsPrincipais').innerHTML = `
-    <div class="card-stat card-hero" style="background:linear-gradient(135deg,var(--wpp),#1ea954);border-color:#1ea954">
-      <div class="cs-ico">💬</div>
-      <div class="cs-n">${total}</div>
-      <div class="cs-l">Total de linhas</div>
-      <div class="cs-sub" style="color:rgba(255,255,255,.85)">${comVend} com vendedor · ${noCrm} no CRM</div>
-    </div>
-    <div class="card-stat card-azul">
-      <div class="cs-ico">👤</div>
-      <div class="cs-n">${comVend}</div>
-      <div class="cs-l">Com vendedor</div>
-      <div class="cs-sub" style="color:var(--azul)">em campo</div>
-    </div>
-    <div class="card-stat card-roxo">
-      <div class="cs-ico">🤖</div>
-      <div class="cs-n">${noCrm}</div>
-      <div class="cs-l">No CRM</div>
-      <div class="cs-sub" style="color:var(--roxo)">automatizado</div>
-    </div>
-    <div class="card-stat card-amarelo">
-      <div class="cs-ico">🏢</div>
-      <div class="cs-n">${setor}</div>
-      <div class="cs-l">Setores</div>
-      <div class="cs-sub" style="color:var(--amarelo)">internos</div>
-    </div>
-    <div class="card-stat card-verde">
-      <div class="cs-ico">💰</div>
-      <div class="cs-n" style="font-size:22px">${moeda(valorMensal)}</div>
-      <div class="cs-l">Custo mensal</div>
-      <div class="cs-sub" style="color:var(--verde)">soma das ativas</div>
-    </div>
-  `;
-
-  document.getElementById('filtros').innerHTML = `
-    <button class="filtro-btn ${filtroAtivo==='todos'?'on':''}" onclick="setFiltro('todos')">📋 Todas (${total})</button>
-    <button class="filtro-btn azul ${filtroAtivo==='Vendedor'?'on':''}" onclick="setFiltro('Vendedor')">👤 Vendedor (${comVend})</button>
-    <button class="filtro-btn ${filtroAtivo==='CRM'?'on':''}" style="${filtroAtivo==='CRM'?'background:var(--roxo);border-color:var(--roxo);color:#fff':''}" onclick="setFiltro('CRM')">🤖 CRM (${noCrm})</button>
-    <button class="filtro-btn amarelo ${filtroAtivo==='Setor'?'on':''}" onclick="setFiltro('Setor')">🏢 Setor (${setor})</button>
-    <button class="filtro-btn ${filtroAtivo==='Disponível'?'on':''}" onclick="setFiltro('Disponível')">📦 Disponíveis (${disp})</button>
-  `;
-
-  document.getElementById('tblHead').innerHTML = `
-    <tr>
-      <th>Apelido</th>
-      <th>Número</th>
-      <th>Tipo de uso</th>
-      <th>Responsável / Setor</th>
-      <th>Operadora</th>
-      <th>Plano</th>
-      <th>Valor</th>
-      <th>Status</th>
-      <th></th>
-    </tr>
-  `;
-
-  let lista = whatsapps.filter(w=>{
-    const ms = filtroAtivo==='todos' || w.tipo===filtroAtivo;
-    const q = buscaAtiva;
-    const respNome = w.respId ? (nomeFuncPorId(w.respId)||'').toLowerCase() : '';
-    const mb = !q ||
-      (w.apelido||'').toLowerCase().includes(q) ||
-      (w.numero||'').toLowerCase().includes(q) ||
-      (w.setor||'').toLowerCase().includes(q) ||
-      (w.operadora||'').toLowerCase().includes(q) ||
-      respNome.includes(q);
-    return ms && mb;
-  });
-
-  document.getElementById('tblCount').textContent = `${lista.length} ${lista.length===1?'linha':'linhas'}`;
-
-  if(lista.length===0){
-    document.getElementById('tabela').style.display='none';
-    document.getElementById('emptyState').style.display='block';
-    return;
-  }
-  document.getElementById('tabela').style.display='';
-  document.getElementById('emptyState').style.display='none';
-
-  document.getElementById('tblBody').innerHTML = lista.map(w=>{
-    const idx = whatsapps.indexOf(w);
-    let respDisplay = '—';
-    if(w.tipo==='Vendedor' && w.respId) respDisplay = nomeFuncPorId(w.respId)||'(removido)';
-    else if(w.tipo==='Setor' && w.setor) respDisplay = `🏢 ${w.setor}`;
-    else if(w.tipo==='CRM') respDisplay = '🤖 CRM';
-    else if(w.tipo==='Disponível') respDisplay = '📦 Estoque';
-
-    return `
-    <tr onclick="verDetalheWpp(${idx})">
-      <td class="td-bold">${w.apelido||'—'}</td>
-      <td class="td-mono">${fmtTel(w.numero)||'—'}</td>
-      <td>${badgeTipoWpp(w.tipo)}</td>
-      <td>${respDisplay}</td>
-      <td>${w.operadora||'—'}</td>
-      <td>${w.plano||'—'}</td>
-      <td class="td-red">${moeda(w.valor)}</td>
-      <td>${badgeStatusWpp(w.status)}</td>
-      <td class="td-acoes" onclick="event.stopPropagation()">
-        <button class="btn-edit" onclick="abrirModalWpp(${idx})">✏️</button>
-        <button class="btn-del" onclick="excluirWhatsapp(${idx})">🗑</button>
-      </td>
-    </tr>`;
-  }).join('');
-}
-
-function badgeTipoWpp(t){
-  const mp = {
-    'Vendedor':'badge-azul',
-    'CRM':'badge-roxo',
-    'Setor':'badge-amarelo',
-    'Disponível':'badge-cinza',
-  };
-  return `<span class="badge ${mp[t]||'badge-cinza'}">${t||'—'}</span>`;
-}
-function badgeStatusWpp(s){
-  const mp = {
-    'Ativo':'badge-verde',
-    'Suspenso':'badge-amarelo',
-    'Cancelado':'badge-cinza',
-  };
-  return `<span class="badge ${mp[s]||'badge-cinza'}">${s||'—'}</span>`;
-}
-
-function abrirModalWpp(idx=null){
-  editandoIdx = idx;
-  document.getElementById('wppModalTitulo').textContent = idx!==null ? 'Editar Linha WhatsApp' : 'Novo Número WhatsApp';
-  // Popula select de responsáveis
-  const respSel = document.getElementById('wResp');
-  respSel.innerHTML = '<option value="">— Selecione —</option>' +
-    funcionarios.filter(f=>f.status==='Ativo')
-      .map(f=>`<option value="${f.id}">${f.nome} (${f.cargo})</option>`).join('');
-
-  const w = idx!==null ? whatsapps[idx] : {};
-  document.getElementById('wApelido').value   = w.apelido||'';
-  document.getElementById('wNumero').value    = w.numero||'';
-  document.getElementById('wTipo').value      = w.tipo||'Vendedor';
-  document.getElementById('wStatus').value    = w.status||'Ativo';
-  document.getElementById('wResp').value      = w.respId||'';
-  document.getElementById('wSetor').value     = w.setor||'';
-  document.getElementById('wOperadora').value = w.operadora||'';
-  document.getElementById('wPlano').value     = w.plano||'';
-  document.getElementById('wValor').value     = w.valor||'';
-  document.getElementById('wVenc').value      = w.vencimento||'';
-  document.getElementById('wObs').value       = w.obs||'';
-  onWppTipoChange();
-  document.getElementById('modalWpp').classList.add('on');
-}
-
-function onWppTipoChange(){
-  const t = document.getElementById('wTipo').value;
-  const grpResp = document.getElementById('grpWppResp');
-  const grpSetor = document.getElementById('grpWppSetor');
-  const lblResp = document.getElementById('lblWppResp');
-  if(t==='Vendedor'){
-    grpResp.style.display=''; grpSetor.style.display='none';
-    lblResp.textContent = 'Vendedor responsável';
-  } else if(t==='Setor'){
-    grpResp.style.display='none'; grpSetor.style.display='';
-  } else if(t==='CRM'){
-    grpResp.style.display='none'; grpSetor.style.display='none';
-  } else { // Disponível
-    grpResp.style.display='none'; grpSetor.style.display='none';
-  }
-}
-
-function salvarWhatsapp(){
-  const apelido = document.getElementById('wApelido').value.trim();
-  const numero = document.getElementById('wNumero').value.trim();
-  if(!apelido || !numero){
-    alert('Preencha apelido e número.');
-    return;
-  }
-  const tipo = document.getElementById('wTipo').value;
-  const obj = {
-    id:         editandoIdx!==null ? whatsapps[editandoIdx].id : uid(),
-    apelido,
-    numero,
-    tipo,
-    status:     document.getElementById('wStatus').value,
-    respId:     tipo==='Vendedor' ? document.getElementById('wResp').value : '',
-    setor:      tipo==='Setor' ? document.getElementById('wSetor').value.trim() : '',
-    operadora:  document.getElementById('wOperadora').value,
-    plano:      document.getElementById('wPlano').value.trim(),
-    valor:      document.getElementById('wValor').value.trim(),
-    vencimento: document.getElementById('wVenc').value,
-    obs:        document.getElementById('wObs').value.trim(),
-  };
-  if(editandoIdx!==null){
-    obj.criadoEm = whatsapps[editandoIdx].criadoEm;
-    whatsapps[editandoIdx] = obj;
-  } else {
-    obj.criadoEm = new Date().toISOString();
-    whatsapps.unshift(obj);
-  }
-  fecharModal('modalWpp');
-  salvarStorage();
-  render();
-  showToast('✅ Linha salva!');
-}
-
-function excluirWhatsapp(idx){
-  const w = whatsapps[idx];
-  if(!confirm(`Excluir a linha ${w.apelido} (${w.numero})?`)) return;
-  whatsapps.splice(idx,1);
-  fecharModal('modalDetalhe');
-  salvarStorage();
-  render();
-  showToast('🗑 Linha removida');
-}
-
-function verDetalheWpp(idx){
-  const w = whatsapps[idx];
-  document.getElementById('dHead').style.background = 'linear-gradient(130deg,var(--wpp),#1ea954)';
-  document.getElementById('dTitulo').textContent = w.apelido||'Linha';
-  document.getElementById('dSub').textContent = `${fmtTel(w.numero)} · ${w.tipo||'—'}`;
-
-  let respDisplay = '—';
-  if(w.tipo==='Vendedor' && w.respId) respDisplay = nomeFuncPorId(w.respId)||'(removido)';
-  else if(w.tipo==='Setor' && w.setor) respDisplay = w.setor;
-  else if(w.tipo==='CRM') respDisplay = '🤖 Integrado ao CRM';
-  else if(w.tipo==='Disponível') respDisplay = '📦 Em estoque';
-
-  document.getElementById('detalheGrid').innerHTML = `
-    <div class="dg-item"><div class="dg-lbl">Tipo</div><div class="dg-val">${badgeTipoWpp(w.tipo)}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val">${badgeStatusWpp(w.status)}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Apelido</div><div class="dg-val">${w.apelido||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Número</div><div class="dg-val" style="font-family:'SF Mono',monospace;color:var(--wpp)">${fmtTel(w.numero)||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">${w.tipo==='Setor'?'Setor':'Responsável'}</div><div class="dg-val">${respDisplay}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Operadora</div><div class="dg-val">${w.operadora||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Plano</div><div class="dg-val">${w.plano||'—'}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Valor mensal</div><div class="dg-val red">${moeda(w.valor)}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Vencimento</div><div class="dg-val">${w.vencimento?'dia '+w.vencimento:'—'}</div></div>
-    ${w.obs?`<div class="dg-item full"><div class="dg-lbl">Observações</div><div class="dg-val">${w.obs}</div></div>`:''}
-  `;
-
-  const tel = (w.numero||'').replace(/\D/g,'');
-  document.getElementById('detalheActions').innerHTML = `
-    ${tel?`<a href="https://wa.me/55${tel}" target="_blank" style="flex:1;text-decoration:none"><button class="det-btn det-btn-wpp" style="width:100%">💬 Abrir WhatsApp</button></a>`:''}
-    <button class="det-btn det-btn-edit" onclick="fecharModal('modalDetalhe');abrirModalWpp(${idx})">✏️ Editar</button>
-    <button class="det-btn det-btn-del" onclick="excluirWhatsapp(${idx})">🗑 Excluir</button>
-  `;
-
-  document.getElementById('modalDetalhe').classList.add('on');
-}
-
-/* ════════════════════════════════════════════════
-   ═══════════ MÓDULO COMISSÕES ═══════════
-   ════════════════════════════════════════════════ */
-const CMSN_GRUPOS = [
-  {key:'Atendimento', titulo:'Time de Atendimento',      ico:'📞', cor:'#007AFF'},
-  {key:'Vendas',      titulo:'Equipe de Vendas',         ico:'💼', cor:'#c8102e'},
-  {key:'Geral',       titulo:'Comissões Gerais da Loja', ico:'🏪', cor:'#34C759'},
-];
-
-/* Extrai o primeiro valor em R$ de uma string. Ex: "R$ 100,00 + bônus" → 100 */
-function parseRS(s){
-  const m = String(s||'').match(/R\$\s*([\d.,]+)/);
-  if(!m) return 0;
-  return parseFloat(m[1].replace(/\./g,'').replace(',','.')) || 0;
-}
-
-function renderComissoes(){
-  if(abaCmsn==='regras') renderCmsnRegras();
-  else if(abaCmsn==='vendas') renderEscalonamento('vendas');
-  else if(abaCmsn==='acessorios') renderEscalonamento('acessorios');
-}
-
-function renderCmsnRegras(){
-  const cont = document.getElementById('cmsnGrupos');
-  cont.innerHTML = CMSN_GRUPOS.map(grp=>{
-    const itens = comissoes.filter(c=>c.categoria===grp.key);
-    const ativas = itens.filter(c=>c.ativo);
-    const somaGrupo = ativas
-      .filter(c=>c.tipoValor==='Fixo')
-      .reduce((a,c)=>a+parseRS(c.valor),0);
-    return `
-      <div class="cmsn-grupo" style="--cor-grupo:${grp.cor}">
-        <div class="cmsn-grupo-head">
-          <div class="cmsn-grupo-titulo"><span class="ico">${grp.ico}</span> ${grp.titulo}</div>
-          <div class="cmsn-grupo-meta">
-            ${somaGrupo>0?`<span class="cmsn-grupo-soma">💰 ${moeda(somaGrupo)} em fixas</span>`:''}
-            <span class="cmsn-grupo-count">${ativas.length} ${ativas.length===1?'regra ativa':'regras ativas'}</span>
-          </div>
-        </div>
-        ${itens.length>0
-          ? `<div class="cmsn-grid">${itens.map(c=>cmsnCardHTML(c, grp.cor)).join('')}</div>`
-          : `<div class="cmsn-grupo-empty">Nenhuma regra nesta categoria</div>`
-        }
-      </div>
-    `;
-  }).join('');
-}
-
-function cmsnCardHTML(c, corGrupo){
-  const idx = comissoes.indexOf(c);
-  let valorClass = 'fixo';
-  let valorTxt = c.valor || '—';
-  let tipoLbl = '';
-  if(c.tipoValor==='Fixo'){ valorClass='fixo'; tipoLbl='Valor fixo'; }
-  else if(c.tipoValor==='Percentual'){ valorClass='percent'; tipoLbl='Percentual'; }
-  else if(c.tipoValor==='Tabela'){ valorClass='tabela'; tipoLbl='Tabelada'; if(!c.valor) valorTxt='Conforme tabela'; }
-  else if(c.tipoValor==='Bonus'){ valorClass='bonus'; tipoLbl='Bônus'; }
-  else if(c.tipoValor==='Texto'){ valorClass='texto'; tipoLbl='Regra'; valorTxt = c.valor || '—'; }
-  return `
-    <div class="cmsn-card ${c.ativo?'':'inativa'}" style="--cor-card:${corGrupo}" onclick="verDetalheCmsn(${idx})">
-      <div class="cm-valor-bg ${valorClass}">${valorTxt}</div>
-      <div class="cm-titulo">${c.titulo||'—'}</div>
-      ${c.descricao?`<div class="cm-desc">${c.descricao}</div>`:''}
-      ${tipoLbl?`<div class="cm-tipo-tag">${tipoLbl}${c.ativo?'':' · pausada'}</div>`:''}
-    </div>
-  `;
-}
-
-function abrirModalCmsn(idx=null){
-  editandoIdx = idx;
-  document.getElementById('cmsnModalTitulo').textContent = idx!==null ? 'Editar Regra' : 'Nova Regra de Comissão';
-  const c = idx!==null ? comissoes[idx] : {};
-  document.getElementById('cCat').value       = c.categoria||'Atendimento';
-  document.getElementById('cTipoValor').value = c.tipoValor||'Fixo';
-  document.getElementById('cTitulo').value    = c.titulo||'';
-  document.getElementById('cValor').value     = c.valor||'';
-  document.getElementById('cDesc').value      = c.descricao||'';
-  document.getElementById('cAtivo').checked   = idx!==null ? !!c.ativo : true;
-  document.getElementById('modalCmsn').classList.add('on');
-}
-
-function salvarComissao(){
-  const titulo = document.getElementById('cTitulo').value.trim();
-  if(!titulo){ alert('Informe o título da regra.'); return; }
-  const obj = {
-    id:         editandoIdx!==null ? comissoes[editandoIdx].id : uid(),
-    categoria:  document.getElementById('cCat').value,
-    tipoValor:  document.getElementById('cTipoValor').value,
-    titulo,
-    valor:      document.getElementById('cValor').value.trim(),
-    descricao:  document.getElementById('cDesc').value.trim(),
-    ativo:      document.getElementById('cAtivo').checked,
-  };
-  if(editandoIdx!==null){
-    obj.criadoEm = comissoes[editandoIdx].criadoEm;
-    obj.atualizadoEm = new Date().toISOString();
-    comissoes[editandoIdx] = obj;
-  } else {
-    obj.criadoEm = new Date().toISOString();
-    comissoes.unshift(obj);
-  }
-  fecharModal('modalCmsn');
-  salvarStorage();
-  render();
-  showToast('✅ Regra salva!');
-}
-
-function excluirComissao(idx){
-  const c = comissoes[idx];
-  if(!confirm(`Excluir a regra "${c.titulo}"?`)) return;
-  comissoes.splice(idx,1);
-  fecharModal('modalDetalhe');
-  salvarStorage();
-  render();
-  showToast('🗑 Regra removida');
-}
-
-function toggleAtivoCmsn(idx){
-  comissoes[idx].ativo = !comissoes[idx].ativo;
-  salvarStorage();
-  render();
-  showToast(comissoes[idx].ativo ? '✅ Regra reativada' : '⏸️ Regra pausada');
-}
-
-function verDetalheCmsn(idx){
-  const c = comissoes[idx];
-  const grp = CMSN_GRUPOS.find(g=>g.key===c.categoria) || {titulo:c.categoria,ico:'📋'};
-  document.getElementById('dHead').style.background = 'linear-gradient(130deg,var(--roxo),#7e2fb3)';
-  document.getElementById('dTitulo').textContent = c.titulo||'Regra';
-  document.getElementById('dSub').textContent = `${grp.ico} ${grp.titulo}`;
-
-  document.getElementById('detalheGrid').innerHTML = `
-    <div class="dg-item"><div class="dg-lbl">Categoria</div><div class="dg-val">${grp.ico} ${grp.titulo}</div></div>
-    <div class="dg-item"><div class="dg-lbl">Tipo de valor</div><div class="dg-val">${c.tipoValor||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Título</div><div class="dg-val">${c.titulo||'—'}</div></div>
-    <div class="dg-item full"><div class="dg-lbl">Valor</div><div class="dg-val red">${c.valor||'—'}</div></div>
-    ${c.descricao?`<div class="dg-item full"><div class="dg-lbl">Descrição</div><div class="dg-val" style="white-space:pre-line">${c.descricao}</div></div>`:''}
-    <div class="dg-item"><div class="dg-lbl">Status</div><div class="dg-val ${c.ativo?'verde':''}">${c.ativo?'✅ Ativa':'⏸️ Inativa'}</div></div>
-    ${c.atualizadoEm?`<div class="dg-item"><div class="dg-lbl">Última edição</div><div class="dg-val">${new Date(c.atualizadoEm).toLocaleDateString('pt-BR')}</div></div>`:''}
-  `;
-
-  document.getElementById('detalheActions').innerHTML = `
-    <button class="det-btn" style="background:${c.ativo?'#fff7e6':'#e8faf0'};color:${c.ativo?'var(--amarelo)':'var(--verde)'}" onclick="toggleAtivoCmsn(${idx});fecharModal('modalDetalhe')">${c.ativo?'⏸️ Pausar':'✅ Reativar'}</button>
-    <button class="det-btn det-btn-edit" onclick="fecharModal('modalDetalhe');abrirModalCmsn(${idx})">✏️ Editar</button>
-    <button class="det-btn det-btn-del" onclick="excluirComissao(${idx})">🗑 Excluir</button>
-  `;
-  document.getElementById('modalDetalhe').classList.add('on');
-}
-
-/* ── Escalonamento (Vendas / Acessórios) ── */
-function renderEscalonamento(tipo){
-  const arr = tipo==='vendas' ? escVendas : escAcess;
-  const bodyEl = document.getElementById(tipo==='vendas' ? 'escVendasBody' : 'escAcessBody');
-  const countEl = document.getElementById(tipo==='vendas' ? 'escVendasCount' : 'escAcessCount');
-  const emptyEl = document.getElementById(tipo==='vendas' ? 'escVendasEmpty' : 'escAcessEmpty');
-
-  countEl.textContent = `${arr.length} ${arr.length===1?'faixa':'faixas'}`;
-  if(arr.length===0){
-    bodyEl.innerHTML = '';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  emptyEl.style.display = 'none';
-
-  // Ordena por min ascendente
-  const sorted = [...arr].sort((a,b)=>{
-    const am = parseFloat(String(a.min).replace(',','.'))||0;
-    const bm = parseFloat(String(b.min).replace(',','.'))||0;
-    return am - bm;
-  });
-
-  bodyEl.innerHTML = sorted.map(e=>{
-    const idx = arr.indexOf(e);
-    const faixa = e.max ? `${e.min||'0'} — ${e.max}` : `acima de ${e.min||'0'}`;
-    return `
-      <tr>
-        <td class="td-bold">${faixa}</td>
-        <td class="td-red">${e.valor||'—'}</td>
-        <td>${e.aplica||'—'}</td>
-        <td style="color:#555">${e.obs||'—'}</td>
-        <td class="td-acoes">
-          <button class="btn-edit" onclick="abrirModalEsc('${tipo}',${idx})">✏️</button>
-          <button class="btn-del" onclick="excluirEscalonamento('${tipo}',${idx})">🗑</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function abrirModalEsc(tipo, idx=null){
-  editandoTipoEsc = tipo;
-  editandoIdx = idx;
-  const arr = tipo==='vendas' ? escVendas : escAcess;
-  const e = idx!==null ? arr[idx] : {};
-  document.getElementById('escModalTitulo').textContent = idx!==null ? 'Editar Faixa' : 'Nova Faixa';
-  document.getElementById('escModalSub').textContent = tipo==='vendas' ? 'Escalonamento — Vendas' : 'Escalonamento — Acessórios';
-  document.getElementById('eMin').value    = e.min||'';
-  document.getElementById('eMax').value    = e.max||'';
-  document.getElementById('eValor').value  = e.valor||'';
-  document.getElementById('eAplica').value = e.aplica||'';
-  document.getElementById('eObs').value    = e.obs||'';
-  document.getElementById('modalEsc').classList.add('on');
-}
-
-function salvarEscalonamento(){
-  const valor = document.getElementById('eValor').value.trim();
-  if(!valor){ alert('Informe o valor / comissão da faixa.'); return; }
-  const arr = editandoTipoEsc==='vendas' ? escVendas : escAcess;
-  const obj = {
-    id:     editandoIdx!==null ? arr[editandoIdx].id : uid(),
-    min:    document.getElementById('eMin').value.trim(),
-    max:    document.getElementById('eMax').value.trim(),
-    valor,
-    aplica: document.getElementById('eAplica').value.trim(),
-    obs:    document.getElementById('eObs').value.trim(),
-  };
-  if(editandoIdx!==null){
-    obj.criadoEm = arr[editandoIdx].criadoEm;
-    arr[editandoIdx] = obj;
-  } else {
-    obj.criadoEm = new Date().toISOString();
-    arr.unshift(obj);
-  }
-  fecharModal('modalEsc');
-  salvarStorage();
-  render();
-  showToast('✅ Faixa salva!');
-}
-
-function excluirEscalonamento(tipo, idx){
-  const arr = tipo==='vendas' ? escVendas : escAcess;
-  if(!confirm(`Excluir esta faixa de escalonamento?`)) return;
-  arr.splice(idx,1);
-  salvarStorage();
-  render();
-  showToast('🗑 Faixa removida');
-}
-
-/* ════════════════════════════════════════════════
-   MODAL HELPERS
-   ════════════════════════════════════════════════ */
-function fecharModal(id){ document.getElementById(id).classList.remove('on'); }
-function fecharOv(e, id){ if(e.target===document.getElementById(id)) fecharModal(id); }
-
-/* ════════════════════════════════════════════════
-   INIT
-   ════════════════════════════════════════════════ */
-function initAdmin(){
-  carregarStorage();
-  // Migração: remove categorias antigas que não são comissões puras
-  const categoriasValidas = CMSN_GRUPOS.map(g=>g.key);
-  const antesQtd = comissoes.length;
-  comissoes = comissoes.filter(c => categoriasValidas.includes(c.categoria));
-  if(comissoes.length !== antesQtd) salvarStorage();
-  // Se for primeira vez, popula com dados de exemplo
-  if(funcionarios.length===0 && inventario.length===0 && whatsapps.length===0){
-    seedExemplos();
-  }
-  // Pré-cadastra a política de comissões se ainda estiver vazia
-  if(comissoes.length===0){
-    seedComissoes();
-  }
-  render();
-}
-
-/* Dados de exemplo iniciais (apaga ao primeiro cadastro real) */
-function seedExemplos(){
-  const fId1 = uid(), fId2 = uid(), fId3 = uid();
-  funcionarios = [
-    {id:fId1, nome:'João Silva', cargo:'Vendedor', status:'Ativo', tel:'11990000001', email:'joao@revendapple.com.br', admissao:'2024-03-10', salario:'2200,00', comissao:'1.5', cpf:'', rg:'', endereco:'', obs:'', criadoEm:new Date().toISOString()},
-    {id:fId2, nome:'Maria Souza', cargo:'Gerente', status:'Ativo', tel:'11990000002', email:'maria@revendapple.com.br', admissao:'2023-01-05', salario:'4500,00', comissao:'2', cpf:'', rg:'', endereco:'', obs:'', criadoEm:new Date().toISOString()},
-    {id:fId3, nome:'Pedro Lima', cargo:'Suporte', status:'Férias', tel:'11990000003', email:'pedro@revendapple.com.br', admissao:'2024-08-22', salario:'2800,00', comissao:'0', cpf:'', rg:'', endereco:'', obs:'', criadoEm:new Date().toISOString()},
-  ];
-  inventario = [
-    {id:uid(), tipo:'iPad', status:'Em uso', modelo:'iPad Pro 12.9 M2 256GB Space Gray', serie:'F2LX7Y3HJK', local:'Loja', responsavelId:fId1, obs:'PDV principal', criadoEm:new Date().toISOString()},
-    {id:uid(), tipo:'MacBook', status:'Em uso', modelo:'MacBook Air 13 M2 8GB/256GB Midnight', serie:'C02ZQ8XYZ123', local:'Sala admin', responsavelId:fId2, obs:'', criadoEm:new Date().toISOString()},
-    {id:uid(), tipo:'Monitor', status:'Em uso', modelo:'LG UltraFine 27"', serie:'LG-2024-0142', local:'Sala admin', responsavelId:fId2, obs:'', criadoEm:new Date().toISOString()},
-    {id:uid(), tipo:'TV', status:'Em uso', modelo:'Samsung QLED 55" 4K', serie:'SM-Q55-X8821', local:'Vitrine', responsavelId:'', obs:'Mostruário de produtos', criadoEm:new Date().toISOString()},
-    {id:uid(), tipo:'iPhone', status:'Guardado', modelo:'iPhone 13 64GB Midnight (avaliação)', serie:'IMEI 359201234567890', local:'Estoque', responsavelId:'', obs:'Aparelho de teste', criadoEm:new Date().toISOString()},
-    {id:uid(), tipo:'Computador', status:'Manutenção', modelo:'Dell Optiplex 3080 i5 8GB', serie:'DELL-OP-2199', local:'Assistência técnica', responsavelId:'', obs:'Travando ao iniciar', criadoEm:new Date().toISOString()},
-  ];
-  whatsapps = [
-    {id:uid(), apelido:'WhatsApp Vendas 01', numero:'11940760105', tipo:'Vendedor', status:'Ativo', respId:fId1, setor:'', operadora:'Vivo', plano:'Controle 15GB', valor:'89,90', vencimento:'10', obs:'', criadoEm:new Date().toISOString()},
-    {id:uid(), apelido:'WhatsApp Vendas 02', numero:'11940760106', tipo:'Vendedor', status:'Ativo', respId:fId2, setor:'', operadora:'Vivo', plano:'Controle 15GB', valor:'89,90', vencimento:'10', obs:'', criadoEm:new Date().toISOString()},
-    {id:uid(), apelido:'CRM Principal', numero:'1140760000', tipo:'CRM', status:'Ativo', respId:'', setor:'', operadora:'Claro', plano:'Empresarial', valor:'149,00', vencimento:'15', obs:'Conectado ao Z-API', criadoEm:new Date().toISOString()},
-    {id:uid(), apelido:'Suporte Técnico', numero:'11940760200', tipo:'Setor', status:'Ativo', respId:'', setor:'Suporte', operadora:'TIM', plano:'Black 25GB', valor:'99,90', vencimento:'20', obs:'', criadoEm:new Date().toISOString()},
-    {id:uid(), apelido:'Pós-venda', numero:'11940760201', tipo:'Setor', status:'Ativo', respId:'', setor:'Pós-venda', operadora:'TIM', plano:'Black 25GB', valor:'99,90', vencimento:'20', obs:'', criadoEm:new Date().toISOString()},
-  ];
-  salvarStorage();
-}
-
-/* Pré-cadastro da política de comissões — usuário pode editar/excluir/adicionar */
-function seedComissoes(){
-  const now = new Date().toISOString();
-  const r = (categoria, tipoValor, titulo, valor, descricao) => ({
-    id: uid(), categoria, tipoValor, titulo, valor, descricao, ativo:true, criadoEm: now
-  });
-
-  comissoes = [
-    // ── 1️⃣ TIME DE ATENDIMENTO ──
-    r('Atendimento','Fixo','Atendimento concluído','R$ 3,00 por atendimento',
-      'Por atendimento de venda ou compra concluída.'),
-    r('Atendimento','Tabela','Vendas por código','Conforme tabela',
-      'Comissão conforme tabela de escalonamento vigente (ver aba "Escalonamento — Vendas").'),
-    r('Atendimento','Tabela','Vendas para cliente novo','Conforme tabela',
-      'Comissão conforme tabela de escalonamento vigente.'),
-    r('Atendimento','Fixo','Garantia estendida','R$ 25,00 por garantia',
-      'Valores cobrados do cliente:\n\n• Modelos Normal / Plus\n  – XR ao 14 Pro Max → R$ 250,00 (3 → 6 meses de garantia)\n  – iPhone 15 em diante → R$ 300,00 (6 meses → 1 ano)\n\n• Modelos Pro / Pro Max\n  – XR ao 14 Pro Max → R$ 300,00 (3 → 6 meses)\n  – iPhone 15 em diante → R$ 400,00 (3 meses → 1 ano)'),
-    r('Atendimento','Tabela','Acessórios','Conforme tabela',
-      'Comissão conforme tabela de escalonamento de acessórios (ver aba "Escalonamento — Acessórios").'),
-    r('Atendimento','Bonus','Combo de acessórios','R$ 10,00 por combo + 2% bônus',
-      'R$ 10,00 de bônus por combo vendido.\n+ 2% de bônus sobre acessórios se a meta da equipe for batida.'),
-
-    // ── 2️⃣ EQUIPE DE VENDAS ──
-    r('Vendas','Tabela','Vendas por código','Conforme tabela',
-      'Comissão conforme tabela de escalonamento vigente.'),
-    r('Vendas','Bonus','Meta de equipe','Bônus a definir',
-      'Bônus de R$ X (valor definido pela diretoria) para cada vendedor caso a meta da equipe seja batida.'),
-
-    // ── 3️⃣ COMISSÕES GERAIS DA LOJA ──
-    r('Geral','Fixo','Venda ativa','R$ 100,00',
-      'Cliente trazido de fora pelo vendedor (prospecção ativa).'),
-    r('Geral','Fixo','Compra de aparelho','R$ 35,00',
-      'Por aparelho comprado de cliente (entrada de avaliação).'),
-    r('Geral','Fixo','Venda de aparelho Open Box','R$ 25,00',
-      'Por aparelho Open Box vendido.'),
-  ];
-  salvarStorage();
-}
-</script>
-
 </script>
 </body>
 </html>
