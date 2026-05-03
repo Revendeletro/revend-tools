@@ -15,7 +15,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(--bg);min-height:100vh}
 
-/* ══ LOADING ══ */
+/* LOADING */
 #loading{position:fixed;inset:0;background:#fff;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .4s}
 #loading.gone{opacity:0;pointer-events:none}
 .ld-logo{font-size:30px;font-weight:900;color:var(--red);letter-spacing:-1px}
@@ -23,7 +23,7 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .ld-txt{font-size:11px;color:var(--txt2);font-weight:600}
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ══ CONFIG SCREEN ══ */
+/* CONFIG */
 #configScreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
 #configScreen.hidden{display:none}
 .cfg-box{background:#fff;border-radius:var(--radius);border:1.5px solid var(--brd);padding:32px;width:100%;max-width:500px;box-shadow:var(--shadow-md)}
@@ -45,12 +45,12 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .cfg-proxy-note{background:#f0f7ff;border:1.5px solid #c0dcff;border-radius:10px;padding:12px 14px;font-size:10px;color:#005aaa;font-weight:600;line-height:1.7;margin-bottom:14px}
 .cfg-proxy-note strong{font-weight:800}
 
-/* ══ DEMO BANNER ══ */
+/* DEMO BANNER */
 #demoBanner{background:linear-gradient(130deg,var(--amarelo),#e8850a);color:#fff;padding:10px 20px;text-align:center;font-size:11px;font-weight:700;display:none;align-items:center;justify-content:center;gap:10px}
 #demoBanner.show{display:flex}
 .demo-label{background:rgba(0,0,0,.2);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800}
 
-/* ══ TOPBAR ══ */
+/* TOPBAR */
 .topbar{background:#fff;border-bottom:1px solid var(--brd);padding:14px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:100}
 .tb-logo{font-size:18px;font-weight:900;color:var(--red);letter-spacing:-1px}
 .tb-sep{width:1px;height:18px;background:var(--brd);flex-shrink:0}
@@ -65,11 +65,11 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .tb-btn:hover{background:var(--bg)}
 .tb-btn.danger{border-color:var(--red-dim);color:var(--red)}.tb-btn.danger:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
-/* ══ CONTENT ══ */
+/* CONTENT */
 #mainContent{display:none;padding:22px 24px 60px}
 #mainContent.show{display:block}
 
-/* PERIOD FILTER */
+/* PERIOD */
 .period-bar{display:flex;align-items:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
 .period-btn{padding:6px 14px;border-radius:20px;border:1.5px solid var(--brd);background:#fff;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:700;color:#555;cursor:pointer;transition:all .15s}
 .period-btn:hover{border-color:#bbb}
@@ -79,7 +79,7 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .refresh-btn:hover{background:var(--bg)}
 .refresh-btn.spinning .ri{animation:spin .7s linear infinite;display:inline-block}
 
-/* CARDS KPI */
+/* KPI CARDS */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:22px}
 .kpi-card{background:#fff;border-radius:14px;padding:16px 18px;border:1.5px solid var(--brd);box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
 .kpi-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
@@ -100,16 +100,17 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .funnel-title{font-size:13px;font-weight:800;margin-bottom:14px}
 .funnel-stage{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .funnel-stage:last-child{margin-bottom:0}
-.funnel-name{font-size:11px;font-weight:700;width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.funnel-name{font-size:11px;font-weight:700;width:160px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .funnel-bar-wrap{flex:1;background:#f2f2f7;border-radius:6px;height:24px;position:relative;overflow:hidden}
 .funnel-bar{height:100%;border-radius:6px;transition:width .8s ease;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
 .funnel-bar-n{font-size:10px;font-weight:800;color:#fff}
 .funnel-count{font-size:11px;font-weight:800;width:32px;text-align:right;flex-shrink:0}
 .funnel-pct{font-size:10px;color:var(--txt2);font-weight:600;width:36px;text-align:right;flex-shrink:0}
 
-/* 2-COL GRID */
+/* GRID LAYOUTS */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
-@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:800px){.two-col,.three-col{grid-template-columns:1fr}}
 
 /* TABLE CARD */
 .tbl-card{background:#fff;border-radius:14px;border:1.5px solid var(--brd);box-shadow:var(--shadow);overflow:hidden}
@@ -117,7 +118,7 @@ html,body{font-family:'Montserrat',sans-serif;color:var(--preto);background:var(
 .tbl-head-bar h3{font-size:13px;font-weight:800}
 .tbl-ct{font-size:10px;color:var(--txt2);font-weight:600}
 .tbl-scroll{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:300px}
+table{width:100%;border-collapse:collapse;min-width:260px}
 thead{background:#f5f5f7}
 thead th{padding:9px 14px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);border-bottom:1.5px solid var(--brd);white-space:nowrap}
 tbody tr{border-bottom:1px solid #f0f0f0;transition:background .12s}
@@ -130,11 +131,28 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
 .badge-azul{background:rgba(0,122,255,.12);color:var(--azul)}
 .badge-amarelo{background:rgba(255,149,0,.12);color:var(--amarelo)}
 .badge-red{background:var(--red-dim);color:var(--red)}
+.badge-roxo{background:rgba(175,82,222,.12);color:var(--roxo)}
+
+/* DONUT / BAR CHARTS */
+.chart-card{background:#fff;border-radius:14px;border:1.5px solid var(--brd);box-shadow:var(--shadow);padding:18px;overflow:hidden}
+.chart-card h3{font-size:13px;font-weight:800;margin-bottom:14px}
+.bar-list{display:flex;flex-direction:column;gap:9px}
+.bar-item{display:flex;flex-direction:column;gap:4px}
+.bar-item-top{display:flex;justify-content:space-between;align-items:center}
+.bar-item-label{font-size:11px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%}
+.bar-item-val{font-size:10px;font-weight:800;color:var(--txt2);flex-shrink:0}
+.bar-track{width:100%;background:#f2f2f7;border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+
+/* PILL LIST */
+.pill-list{display:flex;flex-wrap:wrap;gap:7px;padding:4px 0}
+.pill{padding:5px 12px;border-radius:20px;font-size:10px;font-weight:800;background:#f2f2f7;color:#444;display:flex;align-items:center;gap:5px}
+.pill-ct{background:var(--red);color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:900}
 
 /* EMPTY */
-.empty-state{padding:40px 20px;text-align:center;color:var(--txt2)}
-.empty-state .ei{font-size:36px;margin-bottom:8px}
-.empty-state p{font-size:12px;font-weight:600}
+.empty-state{padding:30px 20px;text-align:center;color:var(--txt2)}
+.empty-state .ei{font-size:32px;margin-bottom:8px}
+.empty-state p{font-size:11px;font-weight:600}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#222;color:#fff;padding:9px 20px;border-radius:30px;font-size:11px;font-weight:700;opacity:0;pointer-events:none;transition:all .3s;z-index:9999;font-family:'Montserrat',sans-serif;white-space:nowrap}
@@ -147,58 +165,44 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading">
   <div class="ld-logo">revend</div>
   <div class="ld-spin"></div>
   <div class="ld-txt">Carregando métricas Kommo...</div>
 </div>
 
-<!-- DEMO BANNER -->
 <div id="demoBanner">
   <span class="demo-label">MODO DEMO</span>
   Dados de exemplo — configure sua chave API do Kommo para ver dados reais
   <button onclick="showConfig()" style="background:rgba(0,0,0,.2);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;cursor:pointer">Configurar</button>
 </div>
 
-<!-- CONFIG SCREEN -->
 <div id="configScreen">
   <div class="cfg-box">
     <div class="cfg-logo">revend</div>
     <div class="cfg-sub">Métricas Kommo · Configuração</div>
-
     <div class="cfg-title">Conectar ao seu Kommo CRM</div>
     <div class="cfg-desc">Preencha os dados abaixo para exibir seus dados reais. Tudo fica salvo apenas neste navegador.</div>
-
     <div class="cfg-steps">
       <div class="section-label" style="margin-bottom:8px">Como obter o token</div>
       <li><span class="num">1</span><span>Acesse seu Kommo → <strong>Configurações → Integrações → Criar integração</strong></span></li>
       <li><span class="num">2</span><span>Dê um nome qualquer (ex: Dashboard) e salve</span></li>
       <li><span class="num">3</span><span>Vá na aba <strong>"Chaves e escopos"</strong> e copie o <strong>Long-term access token</strong></span></li>
-      <li><span class="num">4</span><span>Informe o subdomínio (ex: <strong>revendeletro</strong> se a URL for revendeletro.kommo.com)</span></li>
+      <li><span class="num">4</span><span>Subdomínio = <strong>revendeletro</strong> (de revendeletro.kommo.com)</span></li>
     </div>
-
     <label class="cfg-label">Subdomínio da conta</label>
     <input class="cfg-inp" id="cfgDomain" placeholder="ex: revendeletro" />
-
     <label class="cfg-label">Token de acesso da API</label>
     <input class="cfg-inp" id="cfgToken" type="password" placeholder="Cole aqui o token longo..." />
-
     <hr class="cfg-divider">
-
     <div class="cfg-proxy-note">
-      <strong>⚡ URL do Proxy (obrigatório para funcionar)</strong><br>
-      Para contornar o bloqueio CORS do navegador, é necessário um proxy.<br>
-      Crie o seu gratuitamente em <strong>workers.cloudflare.com</strong> usando o arquivo<br>
-      <strong>cloudflare-worker-proxy.js</strong> que acompanha este dashboard.<br>
-      Depois cole a URL do Worker abaixo (ex: https://meu-proxy.USUARIO.workers.dev)
+      <strong>⚡ URL do Proxy (Cloudflare Worker)</strong><br>
+      Necessário para contornar o bloqueio CORS do navegador.<br>
+      Use o arquivo <strong>cloudflare-worker-proxy.js</strong> em workers.cloudflare.com
     </div>
-
-    <label class="cfg-label">URL do Proxy (Cloudflare Worker)</label>
+    <label class="cfg-label">URL do Proxy</label>
     <input class="cfg-inp" id="cfgProxy" placeholder="https://meu-proxy.usuario.workers.dev" />
-
     <button class="cfg-btn" onclick="salvarConfig()">🔗 Conectar ao Kommo</button>
-
     <div class="cfg-note">
       Não tem o token agora?
       <a href="#" onclick="carregarDemo(); return false">Ver com dados de demonstração</a>
@@ -206,7 +210,6 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
   </div>
 </div>
 
-<!-- TOPBAR -->
 <div class="topbar" id="topbar" style="display:none">
   <div class="tb-logo">revend</div>
   <div class="tb-sep"></div>
@@ -218,22 +221,20 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
   </div>
 </div>
 
-<!-- MAIN CONTENT -->
 <div id="mainContent">
 
-  <!-- PERÍODO -->
   <div class="period-bar">
     <span class="period-lbl">Período:</span>
-    <button class="period-btn on" onclick="setPeriod(7, this)">7 dias</button>
-    <button class="period-btn" onclick="setPeriod(30, this)">30 dias</button>
-    <button class="period-btn" onclick="setPeriod(90, this)">90 dias</button>
-    <button class="period-btn" onclick="setPeriod(365, this)">1 ano</button>
+    <button class="period-btn on" onclick="setPeriod(7,this)">7 dias</button>
+    <button class="period-btn" onclick="setPeriod(30,this)">30 dias</button>
+    <button class="period-btn" onclick="setPeriod(90,this)">90 dias</button>
+    <button class="period-btn" onclick="setPeriod(365,this)">1 ano</button>
     <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
       <span class="ri">🔄</span> Atualizar
     </button>
   </div>
 
-  <!-- KPIs -->
+  <!-- KPIs PRINCIPAIS -->
   <div class="section-label">Visão geral</div>
   <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -244,65 +245,119 @@ td{padding:10px 14px;font-size:11px;font-weight:600;vertical-align:middle}
     <div id="funnelStages"></div>
   </div>
 
-  <!-- 2 COLUNAS -->
+  <!-- VENDEDORES + NEGÓCIOS -->
   <div class="two-col">
-
-    <!-- TOP VENDEDORES -->
     <div class="tbl-card">
       <div class="tbl-head-bar">
-        <h3>Performance por vendedor</h3>
+        <h3>🏆 Performance por vendedor</h3>
         <span class="tbl-ct" id="vendedoresCt"></span>
       </div>
       <div class="tbl-scroll">
         <table>
-          <thead>
-            <tr>
-              <th>Vendedor</th>
-              <th>Fechados</th>
-              <th>Em aberto</th>
-              <th>Taxa</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Vendedor</th><th>Fechados</th><th>Em aberto</th><th>Taxa</th></tr></thead>
           <tbody id="vendedoresBody"></tbody>
         </table>
       </div>
     </div>
-
-    <!-- ÚLTIMOS NEGÓCIOS -->
     <div class="tbl-card">
       <div class="tbl-head-bar">
-        <h3>Últimos negócios fechados</h3>
+        <h3>💰 Últimos negócios fechados</h3>
         <span class="tbl-ct" id="negociosCt"></span>
       </div>
       <div class="tbl-scroll">
         <table>
-          <thead>
-            <tr>
-              <th>Cliente</th>
-              <th>Valor</th>
-              <th>Data</th>
-            </tr>
-          </thead>
+          <thead><tr><th>Cliente</th><th>Produto</th><th>Valor</th><th>Data</th></tr></thead>
           <tbody id="negociosBody"></tbody>
         </table>
       </div>
     </div>
+  </div>
+
+  <!-- PRODUTOS + PAGAMENTO + DESCONTO -->
+  <div class="section-label">Análise de produtos e vendas</div>
+  <div class="three-col">
+
+    <div class="chart-card">
+      <h3>📦 Produtos mais vendidos</h3>
+      <div class="bar-list" id="produtosList"></div>
+    </div>
+
+    <div class="chart-card">
+      <h3>💳 Método de pagamento</h3>
+      <div class="bar-list" id="pagamentoList"></div>
+    </div>
+
+    <div class="chart-card">
+      <h3>🏷️ Descontos aplicados</h3>
+      <div class="bar-list" id="descontoList"></div>
+    </div>
 
   </div>
 
-  <!-- TEMPO MÉDIO -->
+  <!-- PRODUTO INTERESSE + OBJEÇÕES -->
+  <div class="two-col">
+
+    <div class="chart-card" style="margin-bottom:22px">
+      <h3>🔍 Produtos de interesse (leads)</h3>
+      <div id="interesseList" class="pill-list"></div>
+    </div>
+
+    <div class="chart-card" style="margin-bottom:22px">
+      <h3>⚠️ Principais objeções</h3>
+      <div class="bar-list" id="objecoesList"></div>
+    </div>
+
+  </div>
+
+  <!-- TEMPO + BOT -->
   <div class="section-label">Tempo de atendimento</div>
   <div class="kpi-grid" id="tempoGrid"></div>
 
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
+/* ══ IDs DOS CAMPOS CUSTOMIZADOS ══ */
+const CF = {
+  VENDEDOR:        1028240,
+  PRODUTO:         686670,
+  NOME_CLIENTE:    686942,
+  DATA_AGEND:      686720,
+  COD_AGEND:       686620,
+  PAGAMENTO:       662334,
+  DESCONTO:        662336,
+  ENDERECO:        662332,
+  RASTREAMENTO:    662330,
+  OBJECAO:         1028236,
+  INTERESSE:       1041418,
+};
+
+/* Enums mapeados */
+const ENUM_PAGAMENTO = {548774:'Pix', 548776:'Cartão', 548778:'Dinheiro'};
+const ENUM_DESCONTO  = {548780:'5%', 548782:'10%', 548784:'15%', 569498:'R$50', 569500:'R$100'};
+const ENUM_OBJECAO   = {
+  905212:'Taxa/Cartão',
+  905214:'Valor do Produto',
+  905216:'Concorrência',
+  905218:'Indeciso/Pesquisando',
+  905220:'Sem resposta'
+};
+const ENUM_INTERESSE = {
+  911026:'iPhone XR',911028:'iPhone 11',911030:'iPhone 11 PRO',911032:'iPhone 11 PRO MAX',
+  911034:'iPhone 12',911036:'iPhone 12 PRO',911038:'iPhone 12 PRO MAX',911052:'iPhone 12 MINI',
+  911040:'iPhone 13',911042:'iPhone 13 MINI',911044:'iPhone 13 PRO',911046:'iPhone 13 PRO MAX',
+  911048:'iPhone 14',911050:'iPhone 14 PLUS',911054:'iPhone 14 PRO',911056:'iPhone 14 PRO MAX',
+  911058:'iPhone 15',911060:'iPhone 15 PLUS',911062:'iPhone 15 PRO',911064:'iPhone 15 PRO MAX',
+  911066:'iPhone 16',911068:'iPhone 16E',911070:'iPhone 16 PLUS',911072:'iPhone 16 PRO',911074:'iPhone 16 PRO MAX',
+  911076:'iPhone 17',911080:'iPhone 17 AIR',911082:'iPhone 17 PRO',911084:'iPhone 17 PRO MAX',
+  911086:'iPad Mini',911088:'iPad 9',911090:'iPad 10',911092:'iPad 11',911094:'iPad Pro',911096:'iPad Air',
+  911098:'Macbook Pro',911100:'Macbook Air M1',911102:'Macbook Air M2',911104:'Macbook Air M3',911106:'Macbook Air M4'
+};
+
 /* ══ ESTADO ══ */
-let domain = '', token = '', proxyUrl = '', isDemo = false, currentDays = 7;
-const STORAGE_KEY = 'revend_kommo_cfg';
+let domain='', token='', proxyUrl='', isDemo=false, currentDays=7;
+const STORAGE_KEY = 'revend_kommo_cfg_v2';
 
 /* ══ INIT ══ */
 window.addEventListener('load', () => {
@@ -311,9 +366,7 @@ window.addEventListener('load', () => {
   if (saved) {
     try {
       const cfg = JSON.parse(saved);
-      domain   = cfg.domain   || '';
-      token    = cfg.token    || '';
-      proxyUrl = cfg.proxyUrl || '';
+      domain=cfg.domain||''; token=cfg.token||''; proxyUrl=cfg.proxyUrl||'';
       if (domain && token && proxyUrl) { iniciarPainel(false); return; }
     } catch(e){}
   }
@@ -322,24 +375,19 @@ window.addEventListener('load', () => {
 
 /* ══ CONFIG ══ */
 function salvarConfig() {
-  const d = document.getElementById('cfgDomain').value.trim()
-    .replace('https://','').replace('.kommo.com','').replace('/','');
+  const d = document.getElementById('cfgDomain').value.trim().replace('https://','').replace('.kommo.com','').replace('/','');
   const t = document.getElementById('cfgToken').value.trim();
-  const p = document.getElementById('cfgProxy').value.trim().replace(/\/$/, '');
-
-  if (!d || !t) { toast('⚠️ Preencha o subdomínio e o token'); return; }
+  const p = document.getElementById('cfgProxy').value.trim().replace(/\/$/,'');
+  if (!d||!t) { toast('⚠️ Preencha o subdomínio e o token'); return; }
   if (!p) { toast('⚠️ Preencha a URL do proxy Cloudflare'); return; }
-
-  domain = d; token = t; proxyUrl = p;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ domain, token, proxyUrl }));
+  domain=d; token=t; proxyUrl=p;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify({domain,token,proxyUrl}));
   iniciarPainel(false);
 }
 
 function showConfig() {
-  // Preenche campos com valores já salvos
-  if (domain)   document.getElementById('cfgDomain').value = domain;
-  if (proxyUrl) document.getElementById('cfgProxy').value  = proxyUrl;
-
+  if (domain) document.getElementById('cfgDomain').value = domain;
+  if (proxyUrl) document.getElementById('cfgProxy').value = proxyUrl;
   document.getElementById('configScreen').classList.remove('hidden');
   document.getElementById('topbar').style.display = 'none';
   document.getElementById('mainContent').classList.remove('show');
@@ -348,23 +396,17 @@ function showConfig() {
 
 function limparConfig() {
   localStorage.removeItem(STORAGE_KEY);
-  domain = ''; token = ''; proxyUrl = ''; isDemo = false;
-  document.getElementById('cfgDomain').value = '';
-  document.getElementById('cfgToken').value  = '';
-  document.getElementById('cfgProxy').value  = '';
+  domain=''; token=''; proxyUrl=''; isDemo=false;
+  ['cfgDomain','cfgToken','cfgProxy'].forEach(id => document.getElementById(id).value='');
   showConfig();
 }
 
-function carregarDemo() {
-  isDemo = true;
-  domain = 'demo'; token = 'demo'; proxyUrl = 'demo';
-  iniciarPainel(true);
-}
+function carregarDemo() { isDemo=true; domain='demo'; token='demo'; proxyUrl='demo'; iniciarPainel(true); }
 
 function iniciarPainel(demo) {
-  isDemo = demo;
+  isDemo=demo;
   document.getElementById('configScreen').classList.add('hidden');
-  document.getElementById('topbar').style.display = 'flex';
+  document.getElementById('topbar').style.display='flex';
   document.getElementById('mainContent').classList.add('show');
   if (demo) document.getElementById('demoBanner').classList.add('show');
   setStatus('loading');
@@ -373,8 +415,8 @@ function iniciarPainel(demo) {
 
 /* ══ PERÍODO ══ */
 function setPeriod(days, btn) {
-  currentDays = days;
-  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('on'));
+  currentDays=days;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   carregarTudo();
 }
@@ -382,172 +424,185 @@ function setPeriod(days, btn) {
 function refreshData() {
   const btn = document.getElementById('refreshBtn');
   btn.classList.add('spinning');
-  carregarTudo().finally(() => {
-    setTimeout(() => btn.classList.remove('spinning'), 800);
-  });
+  carregarTudo().finally(()=>setTimeout(()=>btn.classList.remove('spinning'),800));
 }
 
 /* ══ STATUS ══ */
 function setStatus(s) {
-  const tag = document.getElementById('statusTag');
-  const txt = document.getElementById('statusTxt');
-  tag.className = 'tb-tag';
-  if (s === 'loading') { tag.classList.add('loading'); txt.textContent = 'Carregando...'; }
-  else if (s === 'ok')  { txt.textContent = isDemo ? 'Demo' : 'Conectado'; }
-  else if (s === 'error') { tag.classList.add('error'); txt.textContent = 'Erro na API'; }
+  const tag=document.getElementById('statusTag'), txt=document.getElementById('statusTxt');
+  tag.className='tb-tag';
+  if (s==='loading'){tag.classList.add('loading');txt.textContent='Carregando...';}
+  else if (s==='ok'){txt.textContent=isDemo?'Demo':'Conectado';}
+  else if (s==='error'){tag.classList.add('error');txt.textContent='Erro na API';}
 }
 
-/* ══ API KOMMO VIA PROXY ══ */
+/* ══ API VIA PROXY ══ */
 async function kommoGet(path) {
   const targetUrl = `https://${domain}.kommo.com/api/v4/${path}`;
-  const proxyEndpoint = `${proxyUrl}?url=${encodeURIComponent(targetUrl)}`;
-
-  const r = await fetch(proxyEndpoint, {
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
+  const r = await fetch(`${proxyUrl}?url=${encodeURIComponent(targetUrl)}`, {
+    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
   });
-
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return r.json();
 }
 
 function dateFrom(days) {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  return Math.floor(d.getTime() / 1000);
+  const d=new Date(); d.setDate(d.getDate()-days);
+  return Math.floor(d.getTime()/1000);
 }
 
 /* ══ CARREGAR TUDO ══ */
 async function carregarTudo() {
   renderSkeleton();
   if (isDemo) {
-    await new Promise(r => setTimeout(r, 900));
-    renderDemo();
-    setStatus('ok');
-    return;
+    await new Promise(r=>setTimeout(r,900));
+    renderDemo(); setStatus('ok'); return;
   }
   try {
     const from = dateFrom(currentDays);
     const [pipelines, leadsGanhos, leadsTotal, usuarios] = await Promise.all([
       kommoGet('leads/pipelines'),
-      kommoGet(`leads?filter[closed_at][from]=${from}&filter[statuses][0][status_id]=142&with=contacts,users&limit=50`),
-      kommoGet(`leads?filter[created_at][from]=${from}&with=users&limit=250`),
+      kommoGet(`leads?filter[closed_at][from]=${from}&filter[statuses][0][status_id]=142&with=contacts,users,custom_fields&limit=250`),
+      kommoGet(`leads?filter[created_at][from]=${from}&with=users,custom_fields&limit=250`),
       kommoGet('users?limit=50'),
     ]);
-    renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios });
+    renderReal({pipelines, leadsGanhos, leadsTotal, usuarios});
     setStatus('ok');
   } catch(e) {
-    console.error(e);
-    setStatus('error');
-    toast('❌ Erro ao carregar dados. Verifique o token, subdomínio e URL do proxy.');
+    console.error(e); setStatus('error');
+    toast('❌ Erro ao carregar. Verifique token, subdomínio e proxy.');
     renderErro();
   }
 }
 
+/* ══ HELPER: pega valor de campo customizado ══ */
+function getCF(lead, fieldId) {
+  const cfs = lead.custom_fields_values || [];
+  const f = cfs.find(c => c.field_id === fieldId);
+  if (!f || !f.values || !f.values.length) return null;
+  return f.values[0].value;
+}
+
+function getCFEnum(lead, fieldId) {
+  const cfs = lead.custom_fields_values || [];
+  const f = cfs.find(c => c.field_id === fieldId);
+  if (!f || !f.values || !f.values.length) return null;
+  return f.values[0].enum_id;
+}
+
+function getCFMultiEnum(lead, fieldId) {
+  const cfs = lead.custom_fields_values || [];
+  const f = cfs.find(c => c.field_id === fieldId);
+  if (!f || !f.values || !f.values.length) return [];
+  return f.values.map(v => v.enum_id);
+}
+
 /* ══ RENDER REAL ══ */
-function renderReal({ pipelines, leadsGanhos, leadsTotal, usuarios }) {
+function renderReal({pipelines, leadsGanhos, leadsTotal, usuarios}) {
   const ganhos = leadsGanhos?._embedded?.leads || [];
   const todos  = leadsTotal?._embedded?.leads  || [];
   const pipes  = pipelines?._embedded?.pipelines || [];
   const users  = usuarios?._embedded?.users || [];
 
-  const totalGanho = ganhos.reduce((s, l) => s + (l.sale || 0), 0);
-  const perdidos = todos.filter(l => l.status_id === 143).length;
-  const abertos  = todos.filter(l => l.status_id !== 142 && l.status_id !== 143).length;
-  const taxa = todos.length > 0 ? Math.round((ganhos.length / todos.length) * 100) : 0;
-
-  let tempoMed = 0;
-  if (ganhos.length > 0) {
-    const soma = ganhos.reduce((s, l) => {
-      const diff = (l.closed_at || 0) - (l.created_at || 0);
-      return s + (diff > 0 ? diff : 0);
-    }, 0);
-    tempoMed = Math.round(soma / ganhos.length / 86400);
+  /* KPIs */
+  const totalGanho = ganhos.reduce((s,l)=>s+(l.sale||0),0);
+  const perdidos = todos.filter(l=>l.status_id===143).length;
+  const abertos  = todos.filter(l=>l.status_id!==142&&l.status_id!==143).length;
+  const taxa = todos.length>0 ? Math.round((ganhos.length/todos.length)*100) : 0;
+  let tempoMed=0;
+  if (ganhos.length>0) {
+    const soma=ganhos.reduce((s,l)=>{const d=(l.closed_at||0)-(l.created_at||0);return s+(d>0?d:0);},0);
+    tempoMed=Math.round(soma/ganhos.length/86400);
   }
-
   renderKPIs(ganhos.length, fmtMoeda(totalGanho), abertos, taxa, perdidos);
   renderTempo(tempoMed, ganhos.length);
 
-  if (pipes.length > 0) {
-    const pipe = pipes[0];
-    const stages = pipe._embedded?.statuses || [];
-    const stagesData = stages
-      .filter(s => s.id !== 142 && s.id !== 143)
-      .map(s => ({
-        name: s.name,
-        count: todos.filter(l => l.status_id === s.id).length,
-        color: s.color || '#c8102e'
-      }))
-      .filter(s => s.count > 0);
-    document.getElementById('funnelTitle').textContent = pipe.name || 'Pipeline principal';
+  /* FUNIL */
+  if (pipes.length>0) {
+    const pipe=pipes[0];
+    const stages=pipe._embedded?.statuses||[];
+    const stagesData=stages
+      .filter(s=>s.id!==142&&s.id!==143)
+      .map(s=>({name:s.name,count:todos.filter(l=>l.status_id===s.id).length,color:s.color||'#c8102e'}))
+      .filter(s=>s.count>0);
+    document.getElementById('funnelTitle').textContent=pipe.name||'Pipeline principal';
     renderFunnel(stagesData);
   }
 
-  const byUser = {};
-  users.forEach(u => { byUser[u.id] = { name: u.name, ganhos: 0, abertos: 0 }; });
-  ganhos.forEach(l => {
+  /* VENDEDORES (campo custom Vendedor) */
+  const byVendedor = {};
+  ganhos.forEach(l=>{
+    const nome = getCF(l,CF.VENDEDOR) || getCF(l,CF.NOME_CLIENTE) || `Lead ${l.id}`;
+    // Usa campo Vendedor do lead (custom), fallback para responsável
     const uid = l.responsible_user_id;
-    if (!byUser[uid]) byUser[uid] = { name: `User ${uid}`, ganhos: 0, abertos: 0 };
-    byUser[uid].ganhos++;
+    const user = users.find(u=>u.id===uid);
+    const vendNome = getCF(l,CF.VENDEDOR) || (user?user.name:`User ${uid}`);
+    if (!byVendedor[vendNome]) byVendedor[vendNome]={name:vendNome,ganhos:0,abertos:0};
+    byVendedor[vendNome].ganhos++;
   });
-  todos.filter(l => l.status_id !== 142 && l.status_id !== 143).forEach(l => {
-    const uid = l.responsible_user_id;
-    if (!byUser[uid]) byUser[uid] = { name: `User ${uid}`, ganhos: 0, abertos: 0 };
-    byUser[uid].abertos++;
+  todos.filter(l=>l.status_id!==142&&l.status_id!==143).forEach(l=>{
+    const uid=l.responsible_user_id;
+    const user=users.find(u=>u.id===uid);
+    const vendNome=getCF(l,CF.VENDEDOR)||(user?user.name:`User ${uid}`);
+    if (!byVendedor[vendNome]) byVendedor[vendNome]={name:vendNome,ganhos:0,abertos:0};
+    byVendedor[vendNome].abertos++;
   });
-  const vendedores = Object.values(byUser)
-    .filter(v => v.ganhos > 0 || v.abertos > 0)
-    .sort((a,b) => b.ganhos - a.ganhos)
-    .slice(0, 8);
+  const vendedores=Object.values(byVendedor).filter(v=>v.ganhos>0||v.abertos>0).sort((a,b)=>b.ganhos-a.ganhos).slice(0,8);
   renderVendedores(vendedores);
 
-  const ultimos = [...ganhos]
-    .sort((a,b) => (b.closed_at||0) - (a.closed_at||0))
-    .slice(0, 8)
-    .map(l => ({
-      nome: l.name || 'Sem nome',
-      valor: fmtMoeda(l.sale || 0),
-      data: l.closed_at ? fmtData(l.closed_at * 1000) : '—'
-    }));
+  /* ÚLTIMOS NEGÓCIOS com produto */
+  const ultimos=[...ganhos].sort((a,b)=>(b.closed_at||0)-(a.closed_at||0)).slice(0,8).map(l=>({
+    nome: getCF(l,CF.NOME_CLIENTE)||l.name||'Sem nome',
+    produto: getCF(l,CF.PRODUTO)||'—',
+    valor: fmtMoeda(l.sale||0),
+    data: l.closed_at?fmtData(l.closed_at*1000):'—'
+  }));
   renderNegocios(ultimos);
-}
 
-/* ══ RENDER DEMO ══ */
-function renderDemo() {
-  renderKPIs(23, 'R$ 48.700', 17, 64, 5);
-  renderTempo(4, 23);
-  renderFunnel([
-    { name: 'Novo contato',     count: 34, color: '#007AFF' },
-    { name: 'Interesse',        count: 22, color: '#AF52DE' },
-    { name: 'Proposta enviada', count: 15, color: '#FF9500' },
-    { name: 'Negociação',       count:  9, color: '#c8102e' },
-    { name: 'Fechamento',       count:  4, color: '#34C759' },
-  ]);
-  renderVendedores([
-    { name: 'João Silva',  ganhos: 9, abertos: 7 },
-    { name: 'Maria Souza', ganhos: 8, abertos: 5 },
-    { name: 'Pedro Lima',  ganhos: 6, abertos: 5 },
-  ]);
-  renderNegocios([
-    { nome: 'iPhone 16 Pro Max — Carlos M.', valor: 'R$ 9.500', data: hoje(-1) },
-    { nome: 'iPhone 15 — Ana Paula',          valor: 'R$ 6.200', data: hoje(-2) },
-    { nome: 'iPhone 16 Plus — Roberto F.',    valor: 'R$ 7.800', data: hoje(-3) },
-    { nome: 'iPhone 14 Pro — Fernanda L.',    valor: 'R$ 4.900', data: hoje(-4) },
-    { nome: 'iPhone 15 Pro Max — Lucas T.',   valor: 'R$ 8.100', data: hoje(-5) },
-  ]);
-}
+  /* PRODUTOS MAIS VENDIDOS (campo Produto dos fechados) */
+  const produtos={};
+  ganhos.forEach(l=>{
+    const p=getCF(l,CF.PRODUTO);
+    if (p) produtos[p]=(produtos[p]||0)+1;
+  });
+  renderBarList('produtosList', produtos, '#c8102e');
 
-function hoje(offsetDias) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDias);
-  return d.toLocaleDateString('pt-BR');
+  /* MÉTODO DE PAGAMENTO */
+  const pagamentos={};
+  ganhos.forEach(l=>{
+    const eid=getCFEnum(l,CF.PAGAMENTO);
+    if (eid) { const n=ENUM_PAGAMENTO[eid]||`ID ${eid}`; pagamentos[n]=(pagamentos[n]||0)+1; }
+  });
+  renderBarList('pagamentoList', pagamentos, '#007AFF');
+
+  /* DESCONTOS */
+  const descontos={};
+  ganhos.forEach(l=>{
+    const eid=getCFEnum(l,CF.DESCONTO);
+    if (eid) { const n=ENUM_DESCONTO[eid]||`ID ${eid}`; descontos[n]=(descontos[n]||0)+1; }
+  });
+  renderBarList('descontoList', descontos, '#34C759');
+
+  /* PRODUTO INTERESSE (todos os leads) */
+  const interesses={};
+  todos.forEach(l=>{
+    const eids=getCFMultiEnum(l,CF.INTERESSE);
+    eids.forEach(eid=>{ const n=ENUM_INTERESSE[eid]||`ID ${eid}`; interesses[n]=(interesses[n]||0)+1; });
+  });
+  renderPills('interesseList', interesses);
+
+  /* OBJEÇÕES (todos os leads) */
+  const objecoes={};
+  todos.forEach(l=>{
+    const eid=getCFEnum(l,CF.OBJECAO);
+    if (eid) { const n=ENUM_OBJECAO[eid]||`ID ${eid}`; objecoes[n]=(objecoes[n]||0)+1; }
+  });
+  renderBarList('objecoesList', objecoes, '#FF9500');
 }
 
 /* ══ RENDER HELPERS ══ */
-function renderKPIs(fechados, receita, abertos, taxa, perdidos) {
-  document.getElementById('kpiGrid').innerHTML = `
+function renderKPIs(fechados,receita,abertos,taxa,perdidos) {
+  document.getElementById('kpiGrid').innerHTML=`
     <div class="kpi-card hero">
       <div class="kpi-ico" style="background:rgba(255,255,255,.2)">💰</div>
       <div class="kpi-n">${receita}</div>
@@ -577,13 +632,11 @@ function renderKPIs(fechados, receita, abertos, taxa, perdidos) {
 }
 
 function renderTempo(diasMed, totalFechados) {
-  const eficiencia = totalFechados > 0
-    ? (diasMed <= 3 ? '🟢 Excelente' : diasMed <= 7 ? '🟡 Bom' : '🔴 Atenção')
-    : '—';
-  document.getElementById('tempoGrid').innerHTML = `
+  const eficiencia = totalFechados>0 ? (diasMed<=3?'🟢 Excelente':diasMed<=7?'🟡 Bom':'🔴 Atenção') : '—';
+  document.getElementById('tempoGrid').innerHTML=`
     <div class="kpi-card">
       <div class="kpi-ico" style="background:#e8fdf0">⏱</div>
-      <div class="kpi-n">${diasMed || '—'}<span style="font-size:14px;font-weight:600;"> dias</span></div>
+      <div class="kpi-n">${diasMed||'—'}<span style="font-size:14px;font-weight:600;"> dias</span></div>
       <div class="kpi-lbl">Tempo médio de fechamento</div>
       <div class="kpi-sub neutral">${eficiencia}</div>
     </div>
@@ -597,32 +650,29 @@ function renderTempo(diasMed, totalFechados) {
 }
 
 function renderFunnel(stages) {
-  const max = Math.max(...stages.map(s => s.count), 1);
-  const total = stages.reduce((s, st) => s + st.count, 0);
-  document.getElementById('funnelStages').innerHTML = stages.map(s => `
+  const max=Math.max(...stages.map(s=>s.count),1);
+  const total=stages.reduce((s,st)=>s+st.count,0);
+  document.getElementById('funnelStages').innerHTML=stages.map(s=>`
     <div class="funnel-stage">
       <div class="funnel-name" title="${s.name}">${s.name}</div>
       <div class="funnel-bar-wrap">
-        <div class="funnel-bar" style="width:${Math.round((s.count/max)*100)}%;background:${s.color || 'var(--red)'}">
-          ${s.count >= 2 ? `<span class="funnel-bar-n">${s.count}</span>` : ''}
+        <div class="funnel-bar" style="width:${Math.round((s.count/max)*100)}%;background:${s.color||'var(--red)'}">
+          ${s.count>=2?`<span class="funnel-bar-n">${s.count}</span>`:''}
         </div>
       </div>
       <div class="funnel-count">${s.count}</div>
-      <div class="funnel-pct">${total > 0 ? Math.round((s.count/total)*100) : 0}%</div>
+      <div class="funnel-pct">${total>0?Math.round((s.count/total)*100):0}%</div>
     </div>
-  `).join('') || '<div class="empty-state"><div class="ei">📭</div><p>Nenhum lead encontrado no período</p></div>';
+  `).join('')||'<div class="empty-state"><div class="ei">📭</div><p>Nenhum lead no período</p></div>';
 }
 
 function renderVendedores(vs) {
-  document.getElementById('vendedoresCt').textContent = `${vs.length} vendedores`;
-  if (!vs.length) {
-    document.getElementById('vendedoresBody').innerHTML = '<tr><td colspan="4"><div class="empty-state"><div class="ei">👤</div><p>Sem dados</p></div></td></tr>';
-    return;
-  }
-  document.getElementById('vendedoresBody').innerHTML = vs.map((v, i) => {
-    const tot = v.ganhos + v.abertos;
-    const taxa = tot > 0 ? Math.round((v.ganhos / tot) * 100) : 0;
-    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+  document.getElementById('vendedoresCt').textContent=`${vs.length} vendedores`;
+  if (!vs.length){document.getElementById('vendedoresBody').innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">👤</div><p>Sem dados</p></div></td></tr>';return;}
+  document.getElementById('vendedoresBody').innerHTML=vs.map((v,i)=>{
+    const tot=v.ganhos+v.abertos;
+    const taxa=tot>0?Math.round((v.ganhos/tot)*100):0;
+    const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':'';
     return `<tr>
       <td class="td-name">${medal} ${v.name}</td>
       <td><span class="badge badge-verde">✓ ${v.ganhos}</span></td>
@@ -633,49 +683,114 @@ function renderVendedores(vs) {
 }
 
 function renderNegocios(ns) {
-  document.getElementById('negociosCt').textContent = `${ns.length} negócios`;
-  if (!ns.length) {
-    document.getElementById('negociosBody').innerHTML = '<tr><td colspan="3"><div class="empty-state"><div class="ei">📭</div><p>Sem negócios no período</p></div></td></tr>';
-    return;
-  }
-  document.getElementById('negociosBody').innerHTML = ns.map(n => `
+  document.getElementById('negociosCt').textContent=`${ns.length} negócios`;
+  if (!ns.length){document.getElementById('negociosBody').innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="ei">📭</div><p>Sem negócios</p></div></td></tr>';return;}
+  document.getElementById('negociosBody').innerHTML=ns.map(n=>`
     <tr>
       <td class="td-name">${n.nome}</td>
+      <td style="color:var(--txt2);font-size:10px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${n.produto}</td>
       <td style="color:var(--verde);font-weight:800">${n.valor}</td>
       <td style="color:var(--txt2)">${n.data}</td>
     </tr>
   `).join('');
 }
 
-function renderErro() {
-  ['kpiGrid','funnelStages','vendedoresBody','negociosBody','tempoGrid'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.innerHTML = '<div class="empty-state"><div class="ei">⚠️</div><p>Erro ao carregar. Verifique a configuração.</p></div>';
-  });
-}
-
-function renderSkeleton() {
-  document.getElementById('kpiGrid').innerHTML = [1,2,3,4,5].map(() => `
-    <div class="kpi-card">
-      <div class="skel" style="width:38px;height:38px;border-radius:10px;margin-bottom:10px"></div>
-      <div class="skel" style="width:80px;height:28px;margin-bottom:6px"></div>
-      <div class="skel" style="width:60px;height:10px"></div>
+function renderBarList(elId, obj, color) {
+  const el=document.getElementById(elId);
+  const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,7);
+  if (!entries.length){el.innerHTML='<div class="empty-state"><div class="ei">📭</div><p>Sem dados no período</p></div>';return;}
+  const max=entries[0][1];
+  el.innerHTML=entries.map(([label,val])=>`
+    <div class="bar-item">
+      <div class="bar-item-top">
+        <span class="bar-item-label" title="${label}">${label}</span>
+        <span class="bar-item-val">${val}</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" style="width:${Math.round((val/max)*100)}%;background:${color}"></div>
+      </div>
     </div>
   `).join('');
 }
 
+function renderPills(elId, obj) {
+  const el=document.getElementById(elId);
+  const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+  if (!entries.length){el.innerHTML='<div class="empty-state"><div class="ei">📭</div><p>Sem dados</p></div>';return;}
+  el.innerHTML=entries.map(([label,val])=>`
+    <div class="pill">${label}<span class="pill-ct">${val}</span></div>
+  `).join('');
+}
+
+function renderErro() {
+  ['kpiGrid','funnelStages','vendedoresBody','negociosBody','tempoGrid',
+   'produtosList','pagamentoList','descontoList','interesseList','objecoesList'].forEach(id=>{
+    const el=document.getElementById(id);
+    if (el) el.innerHTML='<div class="empty-state"><div class="ei">⚠️</div><p>Erro ao carregar</p></div>';
+  });
+}
+
+function renderSkeleton() {
+  document.getElementById('kpiGrid').innerHTML=[1,2,3,4,5].map(()=>`
+    <div class="kpi-card">
+      <div class="skel" style="width:38px;height:38px;border-radius:10px;margin-bottom:10px"></div>
+      <div class="skel" style="width:80px;height:28px;margin-bottom:6px"></div>
+      <div class="skel" style="width:60px;height:10px"></div>
+    </div>`).join('');
+  ['produtosList','pagamentoList','descontoList','objecoesList'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.innerHTML=[1,2,3].map(()=>`
+      <div class="bar-item">
+        <div class="skel" style="height:10px;margin-bottom:4px"></div>
+        <div class="skel" style="height:8px;width:80%"></div>
+      </div>`).join('');
+  });
+}
+
+/* ══ DEMO DATA ══ */
+function renderDemo() {
+  renderKPIs(23,'R$ 48.700',17,64,5);
+  renderTempo(4,23);
+  renderFunnel([
+    {name:'Novo contato',count:34,color:'#007AFF'},
+    {name:'Interesse',count:22,color:'#AF52DE'},
+    {name:'Proposta enviada',count:15,color:'#FF9500'},
+    {name:'Negociação',count:9,color:'#c8102e'},
+    {name:'Fechamento',count:4,color:'#34C759'},
+  ]);
+  renderVendedores([
+    {name:'João Silva',ganhos:9,abertos:7},
+    {name:'Maria Souza',ganhos:8,abertos:5},
+    {name:'Pedro Lima',ganhos:6,abertos:5},
+  ]);
+  renderNegocios([
+    {nome:'Carlos M.',produto:'iPhone 16 Pro Max',valor:'R$ 9.500',data:hoje(-1)},
+    {nome:'Ana Paula',produto:'iPhone 15',valor:'R$ 6.200',data:hoje(-2)},
+    {nome:'Roberto F.',produto:'iPhone 16 Plus',valor:'R$ 7.800',data:hoje(-3)},
+    {nome:'Fernanda L.',produto:'iPhone 14 Pro',valor:'R$ 4.900',data:hoje(-4)},
+    {nome:'Lucas T.',produto:'Macbook Air M3',valor:'R$ 8.100',data:hoje(-5)},
+  ]);
+  renderBarList('produtosList',{'iPhone 16 Pro Max':8,'iPhone 15':6,'iPhone 14 Pro':4,'Macbook Air M3':3,'iPhone 16':2},'#c8102e');
+  renderBarList('pagamentoList',{'Pix':14,'Cartão':7,'Dinheiro':2},'#007AFF');
+  renderBarList('descontoList',{'5%':9,'10%':7,'R$50':4,'15%':2,'R$100':1},'#34C759');
+  renderPills('interesseList',{'iPhone 16 Pro Max':12,'iPhone 15':10,'iPhone 16':8,'Macbook Air M3':7,'iPhone 14 Pro':6,'iPad Pro':4,'iPhone 17 PRO MAX':3});
+  renderBarList('objecoesList',{
+    'Taxa/Cartão':8,
+    'Valor do Produto':6,
+    'Indeciso/Pesquisando':5,
+    'Concorrência':3,
+    'Sem resposta':2
+  },'#FF9500');
+}
+
 /* ══ UTIL ══ */
-function fmtMoeda(val) {
-  return 'R$ ' + Number(val/100).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
-function fmtData(ts) {
-  return new Date(ts).toLocaleDateString('pt-BR');
-}
-function toast(msg, dur = 3000) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), dur);
+function hoje(off){const d=new Date();d.setDate(d.getDate()+off);return d.toLocaleDateString('pt-BR');}
+function fmtMoeda(val){return 'R$ '+Number(val/100).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});}
+function fmtData(ts){return new Date(ts).toLocaleDateString('pt-BR');}
+function toast(msg,dur=3000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
 }
 </script>
 </body>
