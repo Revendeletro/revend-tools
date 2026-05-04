@@ -332,9 +332,55 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:middle}
 }
 
 @media(min-width:769px){.add-float{display:none!important}}
+
+/* ══ TELA DE LOGIN ══ */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(145deg,#c8102e 0%,#7a0019 100%);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .35s}
+#loginScreen.gone{opacity:0;pointer-events:none}
+.login-card{background:#fff;border-radius:24px;padding:44px 38px 36px;width:100%;max-width:370px;box-shadow:0 24px 64px rgba(0,0,0,.35);text-align:center}
+.login-logo{font-size:38px;font-weight:900;color:var(--red);letter-spacing:-1.5px;margin-bottom:2px}
+.login-slogan{font-size:10px;font-weight:700;color:var(--txt2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:36px}
+.login-field-lbl{font-size:10px;font-weight:800;color:#444;text-align:left;display:block;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.login-inp{width:100%;padding:13px 16px;border:2px solid var(--brd);border-radius:12px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:600;outline:none;transition:border .15s;color:var(--preto);letter-spacing:2px}
+.login-inp:focus{border-color:var(--red)}
+.login-erro{color:var(--red);font-size:11px;font-weight:700;margin:6px 0 14px;min-height:16px;text-align:left}
+.login-btn{width:100%;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:background .15s;margin-top:6px;letter-spacing:.2px}
+.login-btn:active{background:var(--red-dark)}
+/* ══ SYNC BANNER ══ */
+#syncBanner{position:fixed;top:0;left:0;right:0;z-index:9990;font-size:11px;font-weight:700;text-align:center;padding:7px 16px;display:none;align-items:center;justify-content:center;gap:8px;font-family:'Montserrat',sans-serif}
+#syncBanner.show{display:flex}
+#syncBanner.loading{background:#007AFF;color:#fff}
+#syncBanner.ok{background:#34C759;color:#fff}
+#syncBanner.err{background:#c8102e;color:#fff}
+/* ══ BADGE USUÁRIO ══ */
+.user-badge{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;cursor:pointer;border:none;font-family:'Montserrat',sans-serif}
+.user-badge.admin{color:var(--red);background:var(--red-dim)}
+.user-badge.operador{color:var(--azul);background:rgba(0,122,255,.1)}
+/* ══ MÓDULO BLOQUEADO (operador) ══ */
+.modulo-bloqueado{display:none}
+body.role-operador .nav-btn[data-modulo="funcionarios"],
+body.role-operador .nav-btn[data-modulo="comissoes"],
+body.role-operador .mob-tab[data-modulo="funcionarios"],
+body.role-operador .mob-tab[data-modulo="comissoes"]{display:none}
 </style>
 </head>
 <body>
+
+<!-- SYNC BANNER -->
+<div id="syncBanner"></div>
+
+<!-- TELA DE LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">revend</div>
+    <div class="login-slogan">Administração · Revend Eletro</div>
+    <label class="login-field-lbl">Senha de acesso</label>
+    <input class="login-inp" type="password" id="loginInput" placeholder="••••••••"
+           oninput="document.getElementById('loginErro').textContent=''"
+           onkeydown="if(event.key==='Enter') fazerLogin()">
+    <div class="login-erro" id="loginErro"></div>
+    <button class="login-btn" onclick="fazerLogin()">Entrar →</button>
+  </div>
+</div>
 
 <!-- TOAST -->
 <div id="copyToast">✅ Copiado!</div>
@@ -368,6 +414,11 @@ td{padding:12px 14px;font-size:12px;font-weight:600;vertical-align:middle}
     <div class="sb-logo">
       <div class="sb-logo-txt">revend</div>
       <div class="live-pill"><div class="live-dot"></div><span>admin</span></div>
+    </div>
+    <!-- badge do usuário logado -->
+    <div style="padding:8px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between">
+      <button class="user-badge admin" id="userBadge" onclick="fazerLogout()" title="Clique para sair">👤 <span id="userBadgeTxt">admin</span></button>
+      <button onclick="fazerLogout()" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--txt2);cursor:pointer;padding:4px 8px;border-radius:8px" title="Sair">Sair ↩</button>
     </div>
     <div class="sb-search">
       <input class="inp-search" type="search" id="deskSearch" placeholder="🔍 Buscar..." oninput="buscar(this.value)">
@@ -890,23 +941,138 @@ const KEYS = {
   escAcess:     'revend_esc_acess',
 };
 
+/* ════════════════════════════════════════════════
+   SENHAS E PERMISSÕES
+   ════════════════════════════════════════════════ */
+const SENHAS = {
+  'revend2024admin': 'admin',    // acesso total
+  'estoque123':      'operador', // somente inventário + whatsapp
+};
+var perfilAtual = null;
+
+function fazerLogin(){
+  const senha = document.getElementById('loginInput').value.trim();
+  const perfil = SENHAS[senha];
+  if(!perfil){
+    document.getElementById('loginErro').textContent = '❌ Senha incorreta. Tente novamente.';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginInput').focus();
+    return;
+  }
+  perfilAtual = perfil;
+  sessionStorage.setItem('revend_sessao', perfil);
+  document.getElementById('loginScreen').classList.add('gone');
+  aplicarPermissoes();
+}
+
+function fazerLogout(){
+  sessionStorage.removeItem('revend_sessao');
+  perfilAtual = null;
+  document.getElementById('loginInput').value = '';
+  document.getElementById('loginErro').textContent = '';
+  document.getElementById('loginScreen').classList.remove('gone');
+}
+
+function aplicarPermissoes(){
+  const badge = document.getElementById('userBadge');
+  const txt   = document.getElementById('userBadgeTxt');
+  if(badge && txt){
+    if(perfilAtual === 'operador'){
+      badge.className = 'user-badge operador';
+      txt.textContent = 'Operador';
+    } else {
+      badge.className = 'user-badge admin';
+      txt.textContent = 'Admin';
+    }
+  }
+  // Esconde módulos bloqueados para operador
+  if(perfilAtual === 'operador'){
+    document.querySelectorAll('[data-modulo="funcionarios"],[data-modulo="comissoes"]').forEach(el=>{
+      el.style.display = 'none';
+    });
+    trocarModulo('inventario');
+  } else {
+    render();
+  }
+  atualizarBotoesEdicao();
+}
+
+function atualizarBotoesEdicao(){
+  const podeEditar = perfilAtual === 'admin' ||
+    (perfilAtual === 'operador' && (moduloAtual==='inventario' || moduloAtual==='whatsapp'));
+  document.querySelectorAll('.tb-add-btn, .add-btn-sb').forEach(b=>b.style.display = podeEditar ? '' : 'none');
+}
+
+function logout(){
+  fazerLogout();
+}
+
+/* ════════════════════════════════════════════════
+   FIREBASE — SINCRONIZAÇÃO ENTRE DISPOSITIVOS
+   ════════════════════════════════════════════════ */
+function mostrarSync(msg, tipo){
+  const bar = document.getElementById('syncBanner');
+  if(!bar) return;
+  bar.textContent = msg;
+  bar.className = 'show ' + (tipo || 'loading');
+  clearTimeout(bar._t);
+  if(tipo === 'ok' || tipo === 'err'){
+    bar._t = setTimeout(()=>bar.classList.remove('show'), 3000);
+  }
+}
+window.mostrarSync = mostrarSync;
+
 function carregarStorage(){
-  try{ funcionarios = JSON.parse(localStorage.getItem(KEYS.funcionarios)||'[]'); }catch(e){ funcionarios=[]; }
-  try{ inventario   = JSON.parse(localStorage.getItem(KEYS.inventario)  ||'[]'); }catch(e){ inventario=[]; }
-  try{ whatsapps    = JSON.parse(localStorage.getItem(KEYS.whatsapps)   ||'[]'); }catch(e){ whatsapps=[]; }
-  try{ comissoes    = JSON.parse(localStorage.getItem(KEYS.comissoes)   ||'[]'); }catch(e){ comissoes=[]; }
-  try{ escVendas    = JSON.parse(localStorage.getItem(KEYS.escVendas)   ||'[]'); }catch(e){ escVendas=[]; }
-  try{ escAcess     = JSON.parse(localStorage.getItem(KEYS.escAcess)    ||'[]'); }catch(e){ escAcess=[]; }
+  // carrega do cache local enquanto Firebase não chega
+  try{
+    const c = JSON.parse(localStorage.getItem('revend_cache') || 'null');
+    if(c){
+      funcionarios = Array.isArray(c.funcionarios) ? c.funcionarios : [];
+      inventario   = Array.isArray(c.inventario)   ? c.inventario   : [];
+      whatsapps    = Array.isArray(c.whatsapps)    ? c.whatsapps    : [];
+      comissoes    = Array.isArray(c.comissoes)    ? c.comissoes    : [];
+      escVendas    = Array.isArray(c.escVendas)    ? c.escVendas    : [];
+      escAcess     = Array.isArray(c.escAcess)     ? c.escAcess     : [];
+    }
+  }catch(e){}
 }
 
 function salvarStorage(){
-  localStorage.setItem(KEYS.funcionarios, JSON.stringify(funcionarios));
-  localStorage.setItem(KEYS.inventario,   JSON.stringify(inventario));
-  localStorage.setItem(KEYS.whatsapps,    JSON.stringify(whatsapps));
-  localStorage.setItem(KEYS.comissoes,    JSON.stringify(comissoes));
-  localStorage.setItem(KEYS.escVendas,    JSON.stringify(escVendas));
-  localStorage.setItem(KEYS.escAcess,     JSON.stringify(escAcess));
+  // Cache local unificado (fallback offline)
+  const dados = { funcionarios, inventario, whatsapps, comissoes, escVendas, escAcess };
+  try{ localStorage.setItem('revend_cache', JSON.stringify(dados)); }catch(e){}
+  // Firebase (sincroniza todos os dispositivos em tempo real)
+  if(window._fbSalvarFn){
+    mostrarSync('⏳ Salvando...', 'loading');
+    window._fbSalvarFn(dados)
+      .then(()=> mostrarSync('✅ Salvo e sincronizado!', 'ok'))
+      .catch(e => mostrarSync('⚠️ Erro: '+e.message, 'err'));
+  }
 }
+
+// Chamado pelo module Firebase quando dados chegam do servidor
+window._onFirebaseData = function(dados){
+  if(dados && typeof dados === 'object'){
+    funcionarios = Array.isArray(dados.funcionarios) ? dados.funcionarios : [];
+    inventario   = Array.isArray(dados.inventario)   ? dados.inventario   : [];
+    whatsapps    = Array.isArray(dados.whatsapps)    ? dados.whatsapps    : [];
+    comissoes    = Array.isArray(dados.comissoes)    ? dados.comissoes    : [];
+    escVendas    = Array.isArray(dados.escVendas)    ? dados.escVendas    : [];
+    escAcess     = Array.isArray(dados.escAcess)     ? dados.escAcess     : [];
+    // Atualiza cache local unificado
+    try{ localStorage.setItem('revend_cache', JSON.stringify({funcionarios,inventario,whatsapps,comissoes,escVendas,escAcess})); }catch(e){}
+  } else {
+    // Banco vazio — primeiro acesso, faz seed
+    carregarStorage();
+    const categoriasValidas = CMSN_GRUPOS.map(g=>g.key);
+    comissoes = comissoes.filter(c => categoriasValidas.includes(c.categoria));
+    if(funcionarios.length===0 && inventario.length===0 && whatsapps.length===0) seedExemplos();
+    if(comissoes.length===0) seedComissoes();
+    salvarStorage();
+  }
+  mostrarSync('🔥 Firebase sincronizado!', 'ok');
+  if(perfilAtual) render(); // só renderiza se já fez login
+};
 
 /* ════════════════════════════════════════════════
    HELPERS
@@ -2040,22 +2206,17 @@ function fecharOv(e, id){ if(e.target===document.getElementById(id)) fecharModal
    INIT
    ════════════════════════════════════════════════ */
 window.addEventListener('load',()=>{
-  carregarStorage();
-  // Migração: remove categorias antigas que não são comissões puras
-  const categoriasValidas = CMSN_GRUPOS.map(g=>g.key);
-  const antesQtd = comissoes.length;
-  comissoes = comissoes.filter(c => categoriasValidas.includes(c.categoria));
-  if(comissoes.length !== antesQtd) salvarStorage();
-  // Se for primeira vez, popula com dados de exemplo
-  if(funcionarios.length===0 && inventario.length===0 && whatsapps.length===0){
-    seedExemplos();
+  document.getElementById('loading').classList.add('gone');
+  carregarStorage(); // carrega cache local (Firebase vai sobrescrever em breve)
+  // Verifica se há sessão ativa neste browser/aba
+  const sessao = sessionStorage.getItem('revend_sessao');
+  if(sessao === 'admin' || sessao === 'operador'){
+    perfilAtual = sessao;
+    document.getElementById('loginScreen').classList.add('gone');
+    aplicarPermissoes();
+  } else {
+    document.getElementById('loginInput').focus();
   }
-  // Pré-cadastra a política de comissões se ainda estiver vazia
-  if(comissoes.length===0){
-    seedComissoes();
-  }
-  setTimeout(()=>{ document.getElementById('loading').classList.add('gone'); },400);
-  render();
 });
 
 /* Dados de exemplo iniciais (apaga ao primeiro cadastro real) */
@@ -2122,6 +2283,42 @@ function seedComissoes(){
   ];
   salvarStorage();
 }
+</script>
+
+<!-- ════ FIREBASE — SINCRONIZAÇÃO EM TEMPO REAL ════ -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+  authDomain:        "materiais-revend.firebaseapp.com",
+  databaseURL:       "https://materiais-revend-default-rtdb.firebaseio.com",
+  projectId:         "materiais-revend",
+  storageBucket:     "materiais-revend.firebasestorage.app",
+  messagingSenderId: "509931102943",
+  appId:             "1:509931102943:web:579bebaf744856e29b7f6a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// Expõe função de salvar para o código principal
+window._fbSalvarFn = async (dados) => {
+  await set(ref(db, 'revend_admin'), dados);
+};
+
+// Escuta mudanças em tempo real (atualiza em todos os dispositivos)
+onValue(ref(db, 'revend_admin'), snap => {
+  const val = snap.val();
+  if(typeof window._onFirebaseData === 'function'){
+    window._onFirebaseData(val);
+  }
+}, err => {
+  if(typeof window.mostrarSync === 'function'){
+    window.mostrarSync('❌ Firebase: ' + err.message, 'err');
+  }
+});
 </script>
 
 </body>
