@@ -458,6 +458,25 @@
         }
         .grupo-add-btn:hover { background: #111; }
 
+        /* ── PROMOÇÃO BADGE (tabela) ── */
+        .promo-badge-tbl { display: none; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #ffe4e8; color: #be123c; margin-left: 6px; vertical-align: middle; }
+        .promo-badge-tbl.show { display: inline-block; }
+
+        /* ── PROMOÇÃO TOGGLE (gestor) ── */
+        .promo-toggle-wrap { display: none; align-items: center; gap: 6px; margin-top: 5px; }
+        body.gestor-mode .promo-toggle-wrap { display: inline-flex; }
+        .promo-toggle { appearance: none; width: 34px; height: 18px; border-radius: 9px; background: #ddd; cursor: pointer; position: relative; transition: background 0.2s; flex-shrink: 0; border: none; outline: none; }
+        .promo-toggle::after { content: ''; position: absolute; left: 3px; top: 3px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .promo-toggle:checked { background: #c8102e; }
+        .promo-toggle:checked::after { left: 19px; }
+        .promo-toggle-lbl { font-size: 10px; font-weight: 700; color: #888; cursor: pointer; }
+        body.gestor-mode .promo-toggle-lbl { color: #be123c; }
+
+        /* Toggle de promoção por cor */
+        .cor-promo-toggle { width: 14px; height: 14px; cursor: pointer; accent-color: #be123c; flex-shrink: 0; }
+        .cor-promo-lbl { font-size: 9px; font-weight: 800; color: #be123c; cursor: pointer; white-space: nowrap; }
+        .cor-gestor-item.em-promo { background: #fff0f2; border-color: #f5aab8; }
+
         /* ── MODAL NOVO PRODUTO ── */
         .modal-box-lg { width: 420px; max-width: calc(100vw - 24px); }
         .modal-novo-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; }
@@ -922,10 +941,6 @@ const catalog = [
                 "MacBook Pro M5 14\" 16GB 1TB",
                 "MacBook Pro M5 14\" 24GB 1TB",
             ]},
-            { title: "MacBook Neo — LACRADO · Garantia 1 ano Apple", items: [
-                "MacBook Neo 13\"",
-                "MacBook Neo 15\"",
-            ]},
             { title: "iMac — LACRADO · Garantia 1 ano Apple", items: [
                 "iMac M4 24\" 16GB 256GB",
                 "iMac M4 24\" 16GB 512GB",
@@ -937,103 +952,15 @@ const catalog = [
         id: "acessorios",
         tab: "🛡️ Acessórios",
         groups: [
-            { title: "Energia e Cabos — Apple · Garantia 1 ano", items: [
-                "Cabo Lightning p/ USB (1 m)",
-                "Cabo Lightning p/ USB (2 m)",
-                "Cabo USB-C p/ Lightning (1 m)",
-                "Cabo USB-C p/ Lightning (2 m)",
-                "Cabo USB-C p/ C (1 m) — Linha iPhone 15 e 16",
-                "Carregador USB 5W",
-                "Carregador USB-C 20W Apple",
-                "Carregador USB-C 35W Apple",
-                "Carregador 2 Saídas USB-C 35W Apple",
-                "Carregador Apple Watch USB",
-                "Carregador Apple Watch USB-C",
-                "Carregador MagSafe",
-                "Bateria MagSafe",
-            ]},
-            { title: "Cabos IWILL · Garantia 3 anos", items: [
-                "Cabo Hard USB-C p/ Lightning (1,2 m)",
-            ]},
-            { title: "Cabos IWILL Strong · Garantia 5 anos", items: [
-                "Cabo Strong Lightning TPE (1,2 m)",
-                "Cabo Strong Lightning TPE (2 m)",
-                "Cabo Strong Lightning Nylon (1,2 m)",
-                "Cabo Strong USB-C p/ Lightning TPE (1,2 m)",
-                "Cabo Strong USB-C p/ Lightning TPE (2 m)",
-            ]},
-            { title: "Carregadores IWILL · Garantia 2 anos", items: [
-                "Carregador 2 Saídas (USB + USB-C) 20W",
-                "Carregador 2 Saídas USB-C 35W IWILL",
-                "Carregador USB-C 20W IWILL",
-                "Carregador USB-C 20W COLORS",
-            ]},
-            { title: "Power Bank & Adaptadores · Garantia 1 ano", items: [
-                "Power Bank Speed 20W USB-C (10000mAh)",
-                "Adaptador Hub 3 em 1 (USB - HDMI - USB-C)",
-            ]},
-            { title: "Fones de Ouvido e Som · Garantia 1 ano", items: [
-                "Fone EarPods Lightning",
-                "Fone EarPods Tipo C",
-            ]},
-            { title: "Fones Premium · Garantia 90 dias", items: [
-                "AirPods Max Premium",
-                "AirPods Premium",
-                "AirPods Pro Premium",
-            ]},
-            { title: "Kits · Garantia 1 ano", items: [
-                "Kit USB",
-                "Kit Turbo USB-C",
-                "Kit USB c/ Fone",
-                "Kit Turbo USB-C c/ Fone",
-                "Kit Turbo USB-C — Linha iPhone 15 e 16",
-                "Kit Turbo USB-C c/ Fone — Linha iPhone 15 e 16",
-            ]},
-            { title: "Capas iPhone", items: [
-                "Capa Luxy",
-                "Capa Luxy Focus",
-                "Capa Silk",
-                "Capa Clear MagSafe",
-                "Capa Colors MagSafe",
-                "Capa New Skin",
-                "Capa Silicone Apple",
-                "Capa Space Anti-Impacto",
-                "Capa Space Color",
-                "Capa Glass",
-                "Capa Auto Focus",
-                "Capa Perfect C/ Kit Lentes",
-                "Capa Fashion C/ Kit Lentes",
-                "Kit King Kong (Capa + Película Tela + Câmera)",
-            ]},
-            { title: "Capas IWILL", items: [
-                "Capa Double Lux",
-                "Capa Double Lux — Linha iPhone 14 e 15",
-                "Capa Duall",
-                "Capa Clarity",
-                "Capa Clarity — Linha iPhone 14 e 15",
-            ]},
-            { title: "Capas iPad & Watch", items: [
-                "Capa iPad",
-                "Capa Apple Watch Transparente",
-            ]},
-            { title: "Pulseiras Apple Watch", items: [
-                "Pulseira Apple Watch (Loop, Milanesa, Nylon)",
-                "Pulseira Apple Watch GSHIELD",
-                "Pulseira Apple Watch IWILL",
-            ]},
-            { title: "Películas", items: [
-                "Película Normal",
-                "Película Privacidade",
-                "Película King - Resistente",
-                "Película Câmera Traseira Completa",
-                "Película Câmera Traseira Individual",
-                "Película iPad",
-                "Película Apple Watch Ultra",
-                "Película Apple Watch SE/S8/S9/S10",
-            ]},
-            { title: "Outros Acessórios", items: [
-                "Protetor de Cabo",
-            ]},
+            { title: "Cabos IWILL Lightning",    items: ["Cabo Hard USB-C p/ Lightning (1,2 m)","Cabo Strong Lightning TPE (1,2 m)","Cabo Strong Lightning TPE (2 m)","Cabo Strong Lightning Nylon (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (2 m)"] },
+            { title: "Carregadores IWILL",       items: ["Carregador 2 Saídas (USB + USB-C) 20W","Carregador 2 Saídas USB-C 35W IWILL","Carregador USB-C 20W IWILL","Carregador USB-C 20W COLORS"] },
+            { title: "Power Bank & Adaptadores", items: ["Power Bank Speed 20W USB-C (10000mAh)","Adaptador Hub 3 em 1 (USB - HDMI - USB-C)"] },
+            { title: "Fones IWILL",              items: ["Fone EarPods Lightning","Fone EarPods Tipo C"] },
+            { title: "Capas iPhone",             items: ["Capa Luxy","Capa Luxy Focus","Capa Silk","Capa Clear MagSafe","Capa Colors MagSafe","Capa Silicone Apple","Capa Space Anti-Impacto","Capa Space Color","Capa Glass","Capa Auto Focus","Capa Double Lux","Capa Duall","Capa Clarity","Capa Perfect C/ Kit Lentes","Capa Fashion C/ Kit Lentes","Capa New Skin","Kit King Kong (Capa + Película Tela + Câmera)"] },
+            { title: "Capas iPad & Watch",       items: ["Capa iPad","Capa Apple Watch Transparente"] },
+            { title: "Pulseiras Apple Watch",    items: ["Pulseira Apple Watch (Loop, Milanesa, Nylon)","Pulseira Apple Watch GSHIELD","Pulseira Apple Watch IWILL"] },
+            { title: "Películas",                items: ["Película Normal","Película Privacidade","Película King - Resistente","Película Câmera Traseira Completa","Película Câmera Traseira Individual","Película iPad","Película Apple Watch Ultra","Película Apple Watch SE/S8/S9/S10"] },
+            { title: "Outros Acessórios",        items: ["Protetor de Cabo"] },
         ]
     }
 ];
@@ -1192,93 +1119,6 @@ const DEFAULT_PRECOS = {
   "AIRPODS_AIRPODSMAX": { avista: 3449.99 },
   "AIRPODS_AIRTAG": { avista: 349.99 },
   "AIRPODS_AIRTAGPACK4UN": { avista: 849.99 },
-  // ── Acessórios — Energia e Cabos Apple ──
-  "ACESSORIOS_CABOLIGHTNINGPUSB1M": { avista: 99.99 },
-  "ACESSORIOS_CABOLIGHTNINGPUSB2M": { avista: 139.99 },
-  "ACESSORIOS_CABOUSBCPLIGHTNING1M": { avista: 114.99 },
-  "ACESSORIOS_CABOUSBCPLIGHTNING2M": { avista: 169.99 },
-  "ACESSORIOS_CABOUSBCPC1MLINHAIPHONE15E16": { avista: 119.99 },
-  "ACESSORIOS_CARREGADORUSB5W": { avista: 99.99 },
-  "ACESSORIOS_CARREGADORUSBCAPPLE20W": { avista: 189.99 },
-  "ACESSORIOS_CARREGADORUSBCAPPLE35W": { avista: 219.99 },
-  "ACESSORIOS_CARREGADOR2SAIDASUSBC35WAPPLE": { avista: 249.99 },
-  "ACESSORIOS_CARREGADORAPPLEWATCHUSB": { avista: 199.99 },
-  "ACESSORIOS_CARREGADORAPPLEWATCHUSBC": { avista: 249.99 },
-  "ACESSORIOS_CARREGADORMAGSAFE": { avista: 199.99 },
-  "ACESSORIOS_BATERIAMAGSAFE": { avista: 219.99 },
-  // ── Cabos IWILL ──
-  "ACESSORIOS_CABOHARDUSBCPLIGHTNING12M": { avista: 139.99 },
-  "ACESSORIOS_CABOSTRONGLIGHTNINGTPE12M": { avista: 119.99 },
-  "ACESSORIOS_CABOSTRONGLIGHTNINGTPE2M": { avista: 149.99 },
-  "ACESSORIOS_CABOSTRONGLIGHTNINGNYLON12M": { avista: 129.99 },
-  "ACESSORIOS_CABOSTRONGUSBCPLIGHTNINGTPE12M": { avista: 129.99 },
-  "ACESSORIOS_CABOSTRONGUSBCPLIGHTNINGTPE2M": { avista: 159.99 },
-  // ── Carregadores IWILL ──
-  "ACESSORIOS_CARREGADOR2SAIDASUSBUSBC20W": { avista: 159.99 },
-  "ACESSORIOS_CARREGADOR2SAIDASUSBC35WIWILL": { avista: 219.99 },
-  "ACESSORIOS_CARREGADORUSBCIWILL20W": { avista: 159.99 },
-  "ACESSORIOS_CARREGADORUSBC20WCOLORS": { avista: 169.99 },
-  // ── Power Bank & Adaptadores ──
-  "ACESSORIOS_POWERBANKSPEED20WUSBC10000MAH": { avista: 229.99 },
-  "ACESSORIOS_ADAPTADORHUB3EM1USBHDMIUSBC": { avista: 349.99 },
-  // ── Fones ──
-  "ACESSORIOS_FONEEARPODSLIGHTNING": { avista: 149.99 },
-  "ACESSORIOS_FONEEARPODSTIPOC": { avista: 189.99 },
-  "ACESSORIOS_AIRPODSMAXPREMIUM": { avista: 249.99 },
-  "ACESSORIOS_AIRPODSPREMIUM": { avista: 229.99 },
-  "ACESSORIOS_AIRPODSPROPREMIUM": { avista: 249.99 },
-  // ── Kits ──
-  "ACESSORIOS_KITUSB": { avista: 149.99 },
-  "ACESSORIOS_KITTURBOUSBC": { avista: 259.99 },
-  "ACESSORIOS_KITUSBCFONE": { avista: 249.99 },
-  "ACESSORIOS_KITTUROBOUSBCCFONE": { avista: 349.99 },
-  "ACESSORIOS_KITTURBOUSBCLINHAIPHONE15E16": { avista: 269.99 },
-  "ACESSORIOS_KITTUROBOUSBCCFONELINHAIPHONE15E16": { avista: 369.99 },
-  // ── Capas iPhone ──
-  "ACESSORIOS_CAPALUXY": { avista: 49.99 },
-  "ACESSORIOS_CAPALUXYFOCUS": { avista: 49.99 },
-  "ACESSORIOS_CAPASILK": { avista: 69.99 },
-  "ACESSORIOS_CAPACLEARMAGSAFE": { avista: 49.99 },
-  "ACESSORIOS_CAPACOLORSMAGSAFE": { avista: 49.99 },
-  "ACESSORIOS_CAPANEWSKIN": { avista: 49.99 },
-  "ACESSORIOS_CAPASILICONEAPPLE": { avista: 49.99 },
-  "ACESSORIOS_CAPASPACEANTIMPACTO": { avista: 49.99 },
-  "ACESSORIOS_CAPASPACECOLOR": { avista: 59.99 },
-  "ACESSORIOS_CAPAGLASS": {},
-  "ACESSORIOS_CAPAAUTOFOCUS": {},
-  "ACESSORIOS_CAPAPERFECTCKITLENS": { avista: 89.99 },
-  "ACESSORIOS_CAPAFASHIONCKITLENS": { avista: 89.99 },
-  "ACESSORIOS_KITKINGKONGCAPAPELICULATELACAMERA": { avista: 159.99 },
-  // ── Capas IWILL ──
-  "ACESSORIOS_CAPAFASHIONCFASHLENTES": {},
-  "ACESSORIOS_CAPAGLASS2": {},
-  "ACESSORIOS_CAPADOUBLELUX": { avista: 89.99 },
-  "ACESSORIOS_CAPADOUBLELUXLINHAIPHONE14E15": { avista: 99.99 },
-  "ACESSORIOS_CAPADUALL": { avista: 79.99 },
-  "ACESSORIOS_CAPACLARITY": { avista: 59.99 },
-  "ACESSORIOS_CAPACLARITYLINHAIPHONE14E15": { avista: 79.99 },
-  // ── Capas iPad & Watch ──
-  "ACESSORIOS_CAPAIPAD": { avista: 79.99 },
-  "ACESSORIOS_CAPAAPPLEWATCHTRANSPARENTE": { avista: 39.99 },
-  // ── Pulseiras ──
-  "ACESSORIOS_PULSEIRAAPPLEWATCHLOOPMILANESANYLON": { avista: 49.99 },
-  "ACESSORIOS_PULSEIRAAPPLEWATCHGSHIELD": { avista: 99.99 },
-  "ACESSORIOS_PULSEIRAAPPLEWATCHIWILL": { avista: 139.99 },
-  // ── Películas ──
-  "ACESSORIOS_PELICULANORMAL": { avista: 39.99 },
-  "ACESSORIOS_PELICULAPRIVACIDADE": { avista: 39.99 },
-  "ACESSORIOS_PELICULAKINGRESISTENTE": { avista: 79.99 },
-  "ACESSORIOS_PELICULACAMERATRASEIRACOMPLETA": { avista: 49.99 },
-  "ACESSORIOS_PELICULACAMERATRASEIRAINVIDUAL": { avista: 29.99 },
-  "ACESSORIOS_PELICULAIPAD": { avista: 59.99 },
-  "ACESSORIOS_PELICULAAPPLEWATCHULTRA": { avista: 59.99 },
-  "ACESSORIOS_PELICULAAPPLEWATCHSES8S9S10": { avista: 49.99 },
-  // ── Outros ──
-  "ACESSORIOS_PROTETORDECABO": { avista: 14.99 },
-
-  // ── MacBook Neo ──
-  "MAC_MACBOOKNEO13": {},
-  "MAC_MACBOOKNEO15": {},
   // ── Mac ──
   "MAC_MACMINIM28GB256GB": { avista: 3749.99 },
   "MAC_MACMINIM416GB256GB": { avista: 4349.99 },
@@ -1318,6 +1158,7 @@ let gestorMode   = false;
 // Gerenciamento de produtos (sincronizado via Firebase)
 let _prodStatus = {};   // { KEY: 'desativado' | 'excluido' }
 let _prodNovos  = {};   // { KEY: { tabId, grupoIdx, nome, criadoEm } }
+let _promocoes  = {};   // { KEY: { produto: true, cores: { NomeCor: true } } }
 
 // ── Ordenação natural para inserir novos produtos no lugar certo ──
 // Trata números (incluindo TB→GB), variantes (PRO MAX > PRO > PLUS > AIR > regular)
@@ -1579,8 +1420,9 @@ function renderCoresGestor(key, tabId, itemName) {
 
     const itens = Object.entries(todasCores).map(([nome, v]) => {
         const esc = nome.replace(/'/g,"\\'");
+        const isCorPromo = !!(_promocoes[key]?.cores?.[nome]);
         return `
-        <div class="cor-gestor-item" id="cgi_${key}_${btoa(encodeURIComponent(nome)).replace(/=/g,'')}" data-cor="${nome.replace(/"/g,'&quot;')}">
+        <div class="cor-gestor-item${isCorPromo?' em-promo':''}" id="cgi_${key}_${btoa(encodeURIComponent(nome)).replace(/=/g,'')}" data-cor="${nome.replace(/"/g,'&quot;')}">
             <span class="cor-gestor-dot" style="background:${v.hex}"></span>
             <span class="cor-gestor-nome">${nome}</span>
             <input type="checkbox" class="cor-gestor-toggle" id="cgt_${key}_${esc}"
@@ -1591,6 +1433,11 @@ function renderCoresGestor(key, tabId, itemName) {
                 title="Preço específico desta cor (deixe vazio = preço padrão)"
                 onfocus="this.select()" onblur="formatInput(this);salvarCores('${key}')"
                 oninput="markCorDirty('${key}','${esc}')">
+            <label title="Marcar esta cor como promoção" style="display:flex;align-items:center;gap:2px">
+                <input type="checkbox" class="cor-promo-toggle" ${isCorPromo?'checked':''}
+                    onchange="togglePromocaoCor('${key}','${esc}',this.checked)">
+                <span class="cor-promo-lbl">🔥</span>
+            </label>
             <button class="cor-rm-btn" onclick="removerCor('${key}','${esc}')" title="Remover cor">✕</button>
         </div>`;
     }).join('');
@@ -1606,6 +1453,50 @@ function renderCoresGestor(key, tabId, itemName) {
         </div>
     </div>`;
 }
+
+// ════════════════════════════════════════════
+// PROMOÇÃO — toggle por produto e por cor (gestor)
+// ════════════════════════════════════════════
+async function togglePromocao(key, ativo) {
+    showBanner(ativo ? 'Marcando como promoção...' : 'Removendo promoção...', 'loading');
+    try {
+        if (!window._fbSalvarPromocao) throw new Error('Firebase não inicializado');
+        await window._fbSalvarPromocao(key, ativo);
+        const row = document.querySelector(`tr[data-key="${key}"]`);
+        if (row) {
+            const badge = row.querySelector('.promo-badge-tbl');
+            if (badge) badge.classList.toggle('show', ativo);
+        }
+        showBanner(ativo ? '🔥 Produto em promoção!' : '✅ Promoção removida', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao salvar promoção.', 'err');
+        const toggle = document.getElementById('promo_' + key);
+        if (toggle) toggle.checked = !ativo;
+    }
+}
+window.togglePromocao = togglePromocao;
+
+async function togglePromocaoCor(key, nomeCor, ativo) {
+    showBanner(ativo ? 'Marcando cor como promoção...' : 'Removendo promoção da cor...', 'loading');
+    try {
+        if (!window._fbSalvarPromocaoCor) throw new Error('Firebase não inicializado');
+        await window._fbSalvarPromocaoCor(key, nomeCor, ativo);
+        const cgid = document.getElementById('cgrid_' + key);
+        if (cgid) {
+            const el = cgid.querySelector(`[data-cor="${nomeCor.replace(/"/g,'\\"')}"]`);
+            if (el) el.classList.toggle('em-promo', ativo);
+        }
+        const corPromos = (_promocoes[key]?.cores) || {};
+        corPromos[nomeCor] = ativo || undefined;
+        const alguma = Object.values(corPromos).some(Boolean);
+        const badge = document.querySelector(`tr[data-key="${key}"] .promo-badge-tbl`);
+        if (badge) badge.classList.toggle('show', alguma || !!(_promocoes[key]?.produto));
+        showBanner(ativo ? '🔥 Cor em promoção!' : '✅ Promoção removida', 'ok');
+    } catch(e) {
+        showBanner('❌ Erro ao salvar.', 'err');
+    }
+}
+window.togglePromocaoCor = togglePromocaoCor;
 
 // ════════════════════════════════════════════
 // RENDER TABS
@@ -1665,6 +1556,8 @@ function renderAll() {
                     isNovo                  ? 'prod-novo'       : '',
                 ].filter(Boolean).join(' ');
 
+                const isPromo = !!_promocoes[key];
+
                 // botões de gerenciamento (gestor)
                 const escNome = itemName.replace(/'/g,"\\'");
                 const btnDesat = status === 'desativado'
@@ -1679,9 +1572,16 @@ function renderAll() {
                     </td>
                     <td class="item-name">
                         ${itemName}
+                        <span class="promo-badge-tbl${isPromo?' show':''}">🔥 PROMO</span>
                         ${temCores ? renderCoresDisplay(key, p.avista) : ''}
                         ${temCores ? renderCoresGestor(key, section.id, itemName) : ''}
-                        <div class="prod-actions">${btnDesat}${btnExcl}</div>
+                        <div class="prod-actions">
+                            ${btnDesat}${btnExcl}
+                            <label class="promo-toggle-wrap" title="Marcar como promoção — aparece em destaque no catálogo dos clientes">
+                                <input type="checkbox" class="promo-toggle" id="promo_${key}" ${isPromo?'checked':''} onchange="togglePromocao('${key}',this.checked)">
+                                <span class="promo-toggle-lbl">🔥 Promoção</span>
+                            </label>
+                        </div>
                     </td>
 
                     <!-- À VISTA -->
@@ -3010,6 +2910,13 @@ window._fbSalvarStatus = async (key, status) => {
     // status = 'desativado' | 'excluido' | null (limpa)
     await set(ref(_db, 'produtos_status/' + key), status);
 };
+window._fbSalvarPromocao = async (key, ativo) => {
+    await set(ref(_db, 'promocoes/' + key + '/produto'), ativo ? true : null);
+};
+window._fbSalvarPromocaoCor = async (key, nomeCor, ativo) => {
+    const safeNome = nomeCor.replace(/[.#$/[\]]/g, '_');
+    await set(ref(_db, 'promocoes/' + key + '/cores/' + safeNome), ativo ? true : null);
+};
 
 // Listeners em tempo real
 onValue(ref(_db, 'precos'), snap => {
@@ -3029,6 +2936,21 @@ onValue(ref(_db, 'produtos_status'), snap => {
 onValue(ref(_db, 'produtos_novos'), snap => {
     _prodNovos = snap.val() || {};
     renderAll();
+});
+
+onValue(ref(_db, 'promocoes'), snap => {
+    _promocoes = snap.val() || {};
+    document.querySelectorAll('tbody tr[data-key]').forEach(row => {
+        const key = row.getAttribute('data-key');
+        const badge = row.querySelector('.promo-badge-tbl');
+        const toggle = document.getElementById('promo_' + key);
+        const pd = _promocoes[key];
+        const isProduto = !!(pd?.produto);
+        const algumaCor = pd?.cores ? Object.values(pd.cores).some(Boolean) : false;
+        const show = isProduto || algumaCor;
+        if (badge) badge.classList.toggle('show', show);
+        if (toggle) toggle.checked = isProduto;
+    });
 });
 
 onValue(ref(_db, 'cores'), snap => {
