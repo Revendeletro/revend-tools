@@ -385,6 +385,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
     <div class="sb-foot">
       <button class="sb-btn r" id="sb-btn-novo" style="display:none" onclick="abrirEntrada()">+ Novo Produto</button>
       <button class="sb-btn b" onclick="abrirCompraRapida()">🧾 Lançar Nº Compra</button>
+      <button class="sb-btn" style="background:#f0f0f5;color:#555;font-size:11px" onclick="salvarFirebase()">🔥 Sincronizar Firebase</button>
     </div>
   </aside>
 
@@ -5108,45 +5109,125 @@ var CATALOGO_DATA = {
 <!-- FIREBASE -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import{getDatabase,ref,onValue,set}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-const cfg={apiKey:"AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",authDomain:"materiais-revend.firebaseapp.com",databaseURL:"https://materiais-revend-default-rtdb.firebaseio.com",projectId:"materiais-revend",storageBucket:"materiais-revend.firebasestorage.app",messagingSenderId:"509931102943",appId:"1:509931102943:web:579bebaf744856e29b7f6a"};
-const app=initializeApp(cfg);const db=getDatabase(app);
-window._fbSalvar=async(p,c)=>{
-  await set(ref(db,'estoque_revend'),p);
-  await set(ref(db,'catalogo_revend'),c);
+import{getDatabase,ref,onValue,set,get}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const cfg={
+  apiKey:"AIzaSyC3bOOF0U7b0L7aaul0Lr-1hUZqURIhLfA",
+  authDomain:"materiais-revend.firebaseapp.com",
+  databaseURL:"https://materiais-revend-default-rtdb.firebaseio.com",
+  projectId:"materiais-revend",
+  storageBucket:"materiais-revend.firebasestorage.app",
+  messagingSenderId:"509931102943",
+  appId:"1:509931102943:web:579bebaf744856e29b7f6a"
 };
-onValue(ref(db,'estoque_revend'),snap=>{
-  const v=snap.val();
-  let d=null;
-  if(Array.isArray(v)&&v.length>0) d=v.filter(Boolean);
-  else if(v&&typeof v==='object'&&Object.keys(v).length>0) d=Object.values(v).filter(x=>x&&typeof x==='object');
-  if(d&&d.length>0){window.produtos=d;render();window.banner('🔥 Firebase: '+d.length+' produtos','ok');}
-  else window.banner('📦 Dados locais ativos','ok');
-});
-onValue(ref(db,'catalogo_revend'),snap=>{
-  const v=snap.val();
-  if(v&&typeof v==='object'&&!Array.isArray(v)){
-    window.catalogo={...window.catalogo,...v};
-    document.getElementById('sb-cat').textContent=Object.keys(window.catalogo).length;
-  }
-});
+
+let app, db;
+try {
+  app = initializeApp(cfg);
+  db = getDatabase(app);
+} catch(e) {
+  console.error('Firebase init error:', e);
+  window.banner('⚠️ Firebase não inicializou: '+e.message,'err');
+}
+
+if(db) {
+  // Função de salvar exposta globalmente
+  window._fbSalvar = async(p, c) => {
+    await set(ref(db,'estoque_revend'), p);
+    await set(ref(db,'catalogo_revend'), c);
+  };
+
+  // Listener do estoque com tratamento de erro
+  onValue(
+    ref(db,'estoque_revend'),
+    snap => {
+      const v = snap.val();
+      let d = null;
+      if(Array.isArray(v) && v.length > 0)
+        d = v.filter(Boolean);
+      else if(v && typeof v === 'object' && Object.keys(v).length > 0)
+        d = Object.values(v).filter(x => x && typeof x === 'object');
+
+      if(d && d.length > 0) {
+        // Atualiza o array global sem quebrar a referência usada pelo resto do app
+        produtos.length = 0;
+        d.forEach(item => produtos.push(item));
+        window.produtos = produtos;
+        render();
+        window.banner('🔥 Firebase: ' + d.length + ' produtos carregados', 'ok');
+      } else {
+        // Banco vazio: envia dados locais para o Firebase automaticamente
+        window.banner('📦 Firebase vazio — enviando dados locais...', 'loading');
+        if(window._fbSalvar && window.produtos && window.produtos.length > 0) {
+          window._fbSalvar(window.produtos, window.catalogo)
+            .then(() => window.banner('✅ Dados locais sincronizados com Firebase!', 'ok'))
+            .catch(e2 => window.banner('❌ Erro ao enviar dados: '+e2.message,'err'));
+        } else {
+          window.banner('📦 Dados locais ativos (Firebase vazio)', 'ok');
+        }
+      }
+    },
+    error => {
+      // Erro de permissão ou conexão
+      console.error('Firebase onValue error:', error);
+      const msg = error.code === 'PERMISSION_DENIED'
+        ? '🔒 Firebase: permissão negada — verifique as Regras do banco'
+        : '⚠️ Firebase offline: ' + error.message;
+      window.banner(msg, 'err');
+      // App continua funcionando com dados locais
+    }
+  );
+
+  // Listener do catálogo com tratamento de erro
+  onValue(
+    ref(db,'catalogo_revend'),
+    snap => {
+      const v = snap.val();
+      if(v && typeof v === 'object' && !Array.isArray(v)) {
+        window.catalogo = Object.assign(window.catalogo || {}, v);
+        const el = document.getElementById('sb-cat');
+        if(el) el.textContent = Object.keys(window.catalogo).length;
+      }
+    },
+    error => {
+      console.error('Firebase catálogo error:', error);
+    }
+  );
+}
 </script>
 
 <!-- INIT -->
 <script>
-window.salvarFirebase=function(){
-  if(!window._fbSalvar){banner('⚠️ Firebase não conectou — dados locais salvos.','err');return;}
-  banner('Salvando...','loading');
-  window._fbSalvar(window.produtos,window.catalogo)
-    .then(()=>banner('🔥 Salvo!','ok'))
-    .catch(e=>banner('❌ Erro: '+e.message,'err'));
+window.salvarFirebase = function(){
+  if(!window._fbSalvar){
+    banner('⚠️ Firebase não conectou. Verifique as Regras do banco ou a conexão.','err');
+    return;
+  }
+  banner('Salvando no Firebase...','loading');
+  // Garante usar o array global correto
+  const p = window.produtos || produtos;
+  const c = window.catalogo || catalogo;
+  window._fbSalvar(p, c)
+    .then(() => banner('🔥 Salvo no Firebase! (' + p.length + ' produtos)','ok'))
+    .catch(e => {
+      console.error('Erro ao salvar:', e);
+      const msg = e.code === 'PERMISSION_DENIED'
+        ? '🔒 Permissão negada — configure as Regras do Firebase para permitir escrita.'
+        : '❌ Erro ao salvar: ' + e.message;
+      banner(msg,'err');
+    });
 };
 
-window.addEventListener('DOMContentLoaded',()=>{
-  // Inicializa dados locais
+window.addEventListener('DOMContentLoaded', () => {
+  // Inicializa dados locais e sincroniza com a variável global
   window.produtos = PRODUTOS_DATA.slice();
-  window.catalogo = Object.assign({},CATALOGO_DATA);
+  window.catalogo = Object.assign({}, CATALOGO_DATA);
+  // Sincroniza com o array local 'produtos' usado pelo render()
+  produtos.length = 0;
+  window.produtos.forEach(item => produtos.push(item));
+  catalogo = window.catalogo;
   render();
+  banner('📦 Dados locais carregados. Aguardando Firebase...', 'loading');
 });
 </script>
 </body>
