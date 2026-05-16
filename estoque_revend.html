@@ -1697,7 +1697,7 @@ function abrirEntrada(){
 }
 
 function salvarEntrada(){
-  let familia,modelo,gb,cor,condicao,produtoCompleto,codProduto;
+  let familia,modelo,gb,cor,condicao,produtoCompleto,codProduto,_tamanhoEnt='';
   
   if(modoEntrada==='codigo'){
     if(!prodSelecionadoCodigo){
@@ -1713,13 +1713,14 @@ function salvarEntrada(){
     const c=prodSelecionadoCodigo;
     familia=c.familia; modelo=c.modelo; gb=c.gb; cor=c.cor;
     condicao=c.condicao; produtoCompleto=c.produtoCompleto; codProduto=c.codigo;
+    _tamanhoEnt=c.tamanho||'';
   } else {
     familia=document.getElementById('eFam').value;
     modelo=document.getElementById('eModelo').value;
     if(!modelo){alert('Selecione o modelo.');return;}
     const _isWatchSaveEnt=(familia||'').includes('Apple Watch');
     gb=_isWatchSaveEnt?'':document.getElementById('eGb').value;
-    const _tamanhoEnt=_isWatchSaveEnt?document.getElementById('eGb').value:'';
+    _tamanhoEnt=_isWatchSaveEnt?document.getElementById('eGb').value:'';
     cor=document.getElementById('eCor').value.trim();
     condicao=document.getElementById('eCondicao').value;
     codProduto=document.getElementById('eCodigoManual').value.trim();
