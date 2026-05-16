@@ -1139,6 +1139,13 @@ function exibirCor(p){
 function enriquecerItem(item){
   // Normaliza familia logo de entrada
   if(item.familia) item.familia = normFamilia(item.familia);
+  // Sanitiza codProduto inválido (ex: "ENTRADA", "SAIDA", strings curtas que não são código de produto)
+  if(item.codProduto && (
+    /^(ENTRADA|SAIDA|SA[IÍ]DA|AGUARDANDO|EM.?ESTOQUE|VENDIDO|RESERVADO|LABORATORIO|GARANTIA)$/i.test(item.codProduto.trim()) ||
+    (item.codProduto.trim().length < 8 && /^\d+$/.test(item.codProduto.trim()) === false)
+  )) {
+    item.codProduto = '';
+  }
   const cat = window.catalogo && item.codProduto ? window.catalogo[item.codProduto] : null;
   if(cat){
     if(!item.gb && cat.gb) item.gb = cat.gb;
@@ -1312,7 +1319,9 @@ function renderTabela(){
     // Código do Produto (do catálogo)
     const _np2 = (p.produtoCompleto||'').trim().toUpperCase();
     const _cl2 = (window._catPorNome && _np2 && window._catPorNome[_np2]) || '';
-    const _codProd = _cl2 || p.codProduto || '';
+    const _codProdRaw = _cl2 || p.codProduto || '';
+    // Garante que valores inválidos como "ENTRADA", "SAIDA" etc. não apareçam como código
+    const _codProd = /^(ENTRADA|SAIDA|SA[IÍ]DA|AGUARDANDO|EM.?ESTOQUE|VENDIDO|RESERVADO|LABORATORIO|GARANTIA)$/i.test(_codProdRaw.trim()) ? '' : _codProdRaw;
     const codProdHTML = _codProd
       ? `<span class="cod-badge">${esc(_codProd)}</span>`
       : `<span class="cod-badge sem" title="Clique em 🧾 para lançar o Código" style="cursor:help;border:1.5px dashed var(--amarelo);color:var(--amarelo);background:rgba(255,149,0,.07)">⏳ Pendente</span>`;
