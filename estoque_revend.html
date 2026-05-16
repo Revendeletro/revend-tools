@@ -1139,7 +1139,7 @@ function exibirCor(p){
 function enriquecerItem(item){
   // Normaliza familia logo de entrada
   if(item.familia) item.familia = normFamilia(item.familia);
-  const cat = window.catalogo && item.nCompra ? window.catalogo[item.nCompra] : null;
+  const cat = window.catalogo && item.codProduto ? window.catalogo[item.codProduto] : null;
   if(cat){
     if(!item.gb && cat.gb) item.gb = cat.gb;
     if(!item.cor && cat.cor) item.cor = cat.cor;
@@ -1431,6 +1431,16 @@ function popularVendsDash(){
 }
 
 // ══════════════════════════════
+//  LIMPAR CÓDIGOS CURTOS DO CATÁLOGO
+// ══════════════════════════════
+function limparCodigosCurtosCatalogo(cat){
+  // Remove entradas cujo código tenha menos de 8 dígitos (ex: 5924, 5916...)
+  Object.keys(cat).forEach(k=>{
+    if(/^\d+$/.test(k) && k.length < 8) delete cat[k];
+  });
+}
+
+// ══════════════════════════════
 //  CATÁLOGO
 // ══════════════════════════════
 function renderCatalogo(){
@@ -1592,6 +1602,12 @@ function buscarCodigo(q){
     return c.codigo.includes(q)||
       (c.produtoCompleto||'').toLowerCase().includes(q.toLowerCase())||
       (c.modelo||'').toLowerCase().includes(q.toLowerCase());
+  }).sort((a,b)=>{
+    // Prioriza códigos longos (códigos corretos do catálogo) sobre curtos
+    const la=String(a.codigo||'').length, lb=String(b.codigo||'').length;
+    if(la!==lb) return lb-la;
+    // Secundário: modelo alfabético
+    return (a.modelo||'').localeCompare(b.modelo||'');
   }).slice(0,8);
   
   if(!res.length){
@@ -1601,9 +1617,9 @@ function buscarCodigo(q){
   }
   
   wrap.innerHTML=res.map(c=>`<div class="cod-res-item" onclick="selecionarCodigoCatalogo(catalogo['${esc(c.codigo)}'])">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
       <div class="cod-res-nome">${FAM_ICO[c.familia]||'🍎'} ${esc(c.modelo||'—')} ${c.gb?'<span style="color:var(--azul);font-size:10px;font-weight:800;background:rgba(0,122,255,.1);padding:2px 6px;border-radius:5px">'+esc(c.gb)+'</span>':''} ${c.tamanho?'<span style="color:var(--azul);font-size:10px;font-weight:800;background:rgba(0,122,255,.1);padding:2px 6px;border-radius:5px">'+esc(c.tamanho)+'</span>':''}</div>
-      <div class="cod-res-cod" style="font-size:9px;white-space:nowrap">${esc(c.codigo)}</div>
+      <div style="font-family:monospace;font-size:10px;font-weight:900;color:var(--amarelo);background:rgba(255,149,0,.1);padding:2px 8px;border-radius:6px;white-space:nowrap;flex-shrink:0;letter-spacing:.3px">${esc(c.codigo)}</div>
     </div>
     <div class="cod-res-sub" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
       ${c.cor?'<span style="background:rgba(175,82,222,.1);color:var(--roxo);padding:1px 7px;border-radius:5px;font-size:9px;font-weight:800">🎨 '+esc(c.cor)+'</span>':''}
@@ -1829,10 +1845,7 @@ function salvarCompraRap(){
   p.nCompra=cod;
   p.dataCompraEntrada=document.getElementById('crData').value;
   if(p.status!=='vendido') p.status='emEstoque';
-  if(!catalogo[cod]){
-    catalogo[cod]={codigo:cod,familia:p.familia,modelo:p.modelo,gb:p.gb||'',cor:p.cor||'',condicao:p.condicao||'',produtoCompleto:p.produtoCompleto||''};
-    set('sb-cat',Object.keys(catalogo).length);
-  }
+  // NÃO auto-cadastra nCompra no catálogo — catálogo usa apenas códigos longos do produto
   fM('mCompraRap'); render(); salvarFirebase();
   toast('🧾 Código lançado!');
 }
@@ -2428,6 +2441,7 @@ if(db) {
       const v = snap.val();
       if(v && typeof v === 'object' && !Array.isArray(v)) {
         window.catalogo = Object.assign(window.catalogo || {}, v);
+        limparCodigosCurtosCatalogo(window.catalogo);
         const el = document.getElementById('sb-cat');
         if(el) el.textContent = Object.keys(window.catalogo).length;
         // Re-enriquece produtos já carregados com os dados do catálogo
@@ -2470,6 +2484,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // Inicializa dados locais e sincroniza com a variável global
   window.produtos = PRODUTOS_DATA.slice();
   window.catalogo = Object.assign({}, CATALOGO_DATA);
+  limparCodigosCurtosCatalogo(window.catalogo);
   // Sincroniza com o array local 'produtos' usado pelo render()
   produtos.length = 0;
   window.produtos.forEach(item => {
