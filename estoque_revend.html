@@ -398,6 +398,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
     <div class="sb-foot">
       <button class="sb-btn r" id="sb-btn-novo" style="display:none" onclick="abrirEntrada()">+ Novo Produto</button>
       <button class="sb-btn b" onclick="abrirCompraRapida()">🧾 Lançar Nº Compra</button>
+      <button class="sb-btn" onclick="abrirVendaRapida()" style="background:#1a7a3a;color:#fff">💰 Lançar Nº Venda</button>
       
     </div>
   </aside>
@@ -570,7 +571,16 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             <option value="AirPods">🎧 AirPods</option>
           </select>
           <label>Vendedor</label>
-          <select id="dashVend" onchange="renderDash()"><option value="">Todos</option></select>
+          <select id="dashVend" onchange="handleVendedorChange(this);renderDash()">
+<option value="">— Selecione —</option>
+<option value="STEPHANIE">STEPHANIE</option>
+<option value="FELIPE DIAS">FELIPE DIAS</option>
+<option value="ATACADO - FELIPE">ATACADO - FELIPE</option>
+<option value="RUBENS">RUBENS</option>
+<option value="CLIENTE NOVO">CLIENTE NOVO</option>
+<option value="YASMIN">YASMIN</option>
+<option value="__novo__">➕ Adicionar vendedor...</option>
+</select>
           <button class="btn-dash" onclick="resetDash()">↺ Limpar</button>
         </div>
         <div class="ds-title">📊 Resumo do Período <span id="dashLabel"></span></div>
@@ -798,6 +808,37 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
   </div>
 </div>
 
+<!-- MODAL LANÇAR Nº VENDA RÁPIDA -->
+<div class="modal-ov" id="mVendaRap" onclick="fOv(event,'mVendaRap')">
+  <div class="modal-box sm">
+    <div class="mh a"><div><h3>💰 Lançar Nº Venda</h3><p>Busque o produto pelo IMEI ou modelo</p></div><button class="m-x" onclick="fM('mVendaRap')">✕</button></div>
+    <div class="mb">
+      <div class="form-g" style="margin-bottom:12px"><label>Buscar produto</label><input id="vrBusca" placeholder="IMEI, modelo, código..." oninput="vrBuscar(this.value)" autocomplete="off"></div>
+      <div id="vrRes" style="display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto;margin-bottom:12px"></div>
+      <div id="vrSel" style="display:none" class="ibox a"><div class="ibox-lbl">Produto Selecionado</div><div class="ibox-val" id="vrSelInfo">—</div></div>
+      <div class="fg" style="margin-top:14px">
+        <div class="form-g f1"><label>Nº Venda *</label><input id="vrCod" placeholder="Ex: 25541"></div>
+        <div class="form-g"><label>Data Venda</label><input type="date" id="vrData"></div>
+      </div>
+      <div class="fg" style="margin-top:10px">
+        <div class="form-g f1"><label>Vendedor</label>
+          <select id="vrVend" onchange="handleVendedorChange(this)">
+            <option value="">— Selecione —</option>
+            <option value="STEPHANIE">STEPHANIE</option>
+            <option value="FELIPE DIAS">FELIPE DIAS</option>
+            <option value="ATACADO - FELIPE">ATACADO - FELIPE</option>
+            <option value="RUBENS">RUBENS</option>
+            <option value="CLIENTE NOVO">CLIENTE NOVO</option>
+            <option value="YASMIN">YASMIN</option>
+            <option value="__novo__">➕ Adicionar vendedor...</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="mf"><button class="btn-x" onclick="fM('mVendaRap')">Cancelar</button><button class="btn-s" onclick="salvarVendaRap()" style="background:#1a7a3a">💰 Confirmar Venda</button></div>
+  </div>
+</div>
+
 <!-- MODAL VENDA -->
 <div class="modal-ov" id="mVenda" onclick="fOv(event,'mVenda')">
   <div class="modal-box" style="width:560px">
@@ -837,28 +878,18 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="form-g">
           <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Vendedor *</label>
-          <select id="vVend"
+          <select id="vVend" onchange="handleVendedorChange(this)"
             style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff;cursor:pointer"
             onchange="this.style.borderColor=this.value?'var(--verde)':'var(--brd)'">
-            <option value="">— Selecione o vendedor —</option>
-            <option>Stephanie</option>
-            <option>Julia</option>
-            <option>Angélica</option>
-            <option>Larissa Salles</option>
-            <option>Felipe Carvalho</option>
-            <option>Felipe Dias</option>
-            <option>Felipe Tavares</option>
-            <option>Natascha</option>
-            <option>Rubens</option>
-            <option>Yasmin</option>
-            <option>Beatriz</option>
-            <option>Sac</option>
-            <option>Cliente Novo</option>
-            <option>Atacado - Felipe</option>
-            <option>Atacado - Marcos</option>
-            <option>Site</option>
-            <option>Garantia</option>
-          </select>
+<option value="">— Selecione —</option>
+<option value="STEPHANIE">STEPHANIE</option>
+<option value="FELIPE DIAS">FELIPE DIAS</option>
+<option value="ATACADO - FELIPE">ATACADO - FELIPE</option>
+<option value="RUBENS">RUBENS</option>
+<option value="CLIENTE NOVO">CLIENTE NOVO</option>
+<option value="YASMIN">YASMIN</option>
+<option value="__novo__">➕ Adicionar vendedor...</option>
+</select>
         </div>
         <div class="form-g">
           <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Nº Agendamento</label>
@@ -908,16 +939,16 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         <div class="form-g"><label>Nº Venda</label><input id="edNVenda"></div>
         <div class="form-g"><label>Data Venda</label><input type="date" id="edDataVd"></div>
         <div class="form-g"><label>Vendedor</label>
-          <select id="edVend" style="width:100%;padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fafafa">
-            <option value="">— Selecione —</option>
-            <option>Stephanie</option><option>Julia</option><option>Angélica</option>
-            <option>Larissa Salles</option><option>Felipe Carvalho</option>
-            <option>Felipe Dias</option><option>Felipe Tavares</option>
-            <option>Natascha</option><option>Rubens</option><option>Yasmin</option>
-            <option>Beatriz</option><option>Sac</option><option>Cliente Novo</option>
-            <option>Atacado - Felipe</option><option>Atacado - Marcos</option>
-            <option>Site</option><option>Garantia</option>
-          </select></div>
+          <select id="edVend" onchange="handleVendedorChange(this)" style="width:100%;padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fafafa">
+<option value="">— Selecione —</option>
+<option value="STEPHANIE">STEPHANIE</option>
+<option value="FELIPE DIAS">FELIPE DIAS</option>
+<option value="ATACADO - FELIPE">ATACADO - FELIPE</option>
+<option value="RUBENS">RUBENS</option>
+<option value="CLIENTE NOVO">CLIENTE NOVO</option>
+<option value="YASMIN">YASMIN</option>
+<option value="__novo__">➕ Adicionar vendedor...</option>
+</select></div>
 
         <div class="form-g"><label>Status</label>
           <select id="edStatus">
@@ -1390,7 +1421,7 @@ function renderTabela(){
       return `<span class="dias-badge ${cls}">${icoDias} ${dias}d</span>`;
     })();
     const btnC=st==='aguardando'?`<button class="btn-c" onclick="event.stopPropagation();abrirCompra(${idx})">🧾</button>`:'';
-    const btnV=!p.nVenda?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Dar Baixa — Registrar Venda">🏷️ Baixa</button>`:'';
+    const btnV=p.status==='emEstoque'?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Registrar Venda" style="background:#1a7a3a;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 Vender</button>`:'';
     const btnE=isAdmin()?`<button class="btn-e" onclick="event.stopPropagation();editarP(${idx})">✏️</button>`:'';
     const btnD=isAdmin()?`<button class="btn-d" onclick="event.stopPropagation();deletarP(${idx})">🗑</button>`:'';
     const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar linha">📋</button>`;
@@ -1907,6 +1938,67 @@ function salvarCompraRap(){
 }
 
 // ══════════════════════════════
+//  LANÇAR Nº VENDA RÁPIDA
+// ══════════════════════════════
+let vrIdxR = null;
+function abrirVendaRapida(){
+  vrIdxR = null;
+  document.getElementById('vrBusca').value = '';
+  document.getElementById('vrRes').innerHTML = '';
+  document.getElementById('vrSel').style.display = 'none';
+  document.getElementById('vrCod').value = '';
+  document.getElementById('vrData').value = hoje();
+  document.getElementById('vrVend').value = '';
+  document.getElementById('mVendaRap').classList.add('on');
+}
+function vrBuscar(q){
+  const wrap = document.getElementById('vrRes');
+  if(!q){ wrap.innerHTML=''; return; }
+  const res = produtos.filter(p => {
+    // Mostra produtos em estoque ou que já têm venda (para corrigir)
+    const h = [p.modelo, p.imei, p.familia, p.gb, p.cor, p.produtoCompleto, p.nCompra].join(' ').toLowerCase();
+    return h.includes(q.toLowerCase());
+  }).slice(0, 6);
+  if(!res.length){
+    wrap.innerHTML=`<div style="padding:10px;text-align:center;font-size:11px;color:var(--txt2);font-weight:600">Nenhum produto encontrado</div>`;
+    return;
+  }
+  wrap.innerHTML = res.map(p => {
+    const idx = p._idx;
+    const ico = FAM_ICO[p.familia] || '🍎';
+    return `<div onclick="vrSelP(${idx})" style="padding:10px 14px;border-radius:10px;border:1.5px solid var(--brd);cursor:pointer;transition:all .15s;background:#fff" onmouseover="this.style.borderColor='#1a7a3a'" onmouseout="this.style.borderColor='var(--brd)'">
+      <div style="font-size:12px;font-weight:800">${ico} ${esc(p.modelo||'—')} ${p.gb?'<span style="color:var(--azul);font-size:11px">'+esc(p.gb)+'</span>':''}</div>
+      <div style="font-size:10px;color:var(--txt2);margin-top:2px">IMEI: ${esc(p.imei||'—')} ${p.cor?'· '+esc(p.cor):''} ${p.condicao?'· '+esc(p.condicao):''} · Status: ${esc(p.status||'—')}</div>
+    </div>`;
+  }).join('');
+}
+function vrSelP(idx){
+  vrIdxR = idx;
+  const p = produtos[idx];
+  document.getElementById('vrSel').style.display = 'block';
+  document.getElementById('vrSelInfo').textContent = `${FAM_ICO[p.familia]||'🍎'} ${nomeProduto(p)} · IMEI: ${p.imei||'—'}`;
+  document.getElementById('vrRes').innerHTML = '';
+  document.getElementById('vrBusca').value = '';
+  // Preenche dados existentes se já tiver venda
+  if(p.nVenda) document.getElementById('vrCod').value = p.nVenda;
+  if(p.dataVenda) document.getElementById('vrData').value = p.dataVenda;
+  if(p.vendedor) document.getElementById('vrVend').value = p.vendedor;
+}
+function salvarVendaRap(){
+  if(vrIdxR === null){ alert('Selecione um produto.'); return; }
+  const cod = document.getElementById('vrCod').value.trim();
+  if(!cod){ alert('Informe o Nº da Venda.'); return; }
+  const p = produtos[vrIdxR];
+  p.nVenda = cod;
+  p.dataVenda = document.getElementById('vrData').value;
+  const vend = document.getElementById('vrVend').value;
+  if(vend && vend !== '__novo__') p.vendedor = vend;
+  p.status = 'vendido';
+  fM('mVendaRap'); render(); salvarFirebase();
+  toast('💰 Venda lançada!');
+}
+
+// ══════════════════════════════
 //  MODAL VENDA
 // ══════════════════════════════
 function abrirVenda(idx){
@@ -2389,6 +2481,9 @@ window.abrirEntrada=abrirEntrada;
 window.abrirCompra=abrirCompra;
 window.abrirVenda=abrirVenda;
 window.abrirCompraRapida=abrirCompraRapida;
+window.abrirVendaRapida=abrirVendaRapida;
+window.vrSelP=vrSelP;
+window.salvarVendaRap=salvarVendaRap;
 window.verDetalhe=verDetalhe;
 window.editarP=editarP;
 window.preencherDoCatalogo=preencherDoCatalogo;
@@ -2550,6 +2645,29 @@ window.salvarFirebase = function(){
         banner('🔒 Firebase: permissão negada — verifique as Regras do banco.','err');
     });
 };
+
+
+// Handler para adicionar novo vendedor
+function handleVendedorChange(sel) {
+  if(sel.value === '__novo__') {
+    const novo = prompt('Nome do novo vendedor:');
+    if(novo && novo.trim()) {
+      const nv = novo.trim().toUpperCase();
+      // Adiciona em todos os selects de vendedor
+      document.querySelectorAll('select[id*="end"][id*="V"], select[id*="end"][id*="v"]').forEach(s => {
+        const exists = Array.from(s.options).some(o => o.value === nv);
+        if(!exists) {
+          const opt = document.createElement('option');
+          opt.value = nv; opt.textContent = nv;
+          s.insertBefore(opt, s.querySelector('option[value="__novo__"]'));
+        }
+        s.value = nv;
+      });
+    } else {
+      sel.value = '';
+    }
+  }
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   // Inicializa dados locais e sincroniza com a variável global
