@@ -532,6 +532,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             <option value="AirPods">🎧 AirPods</option>
           </select>
           <button class="tb-btn r" id="btn-cadastrar-prod" onclick="abrirCadastrarProduto()">+ Cadastrar Produto</button>
+          <button class="tb-btn b" onclick="exportarEstoquePDF()" title="Exportar produtos em estoque como PDF">📄 PDF Estoque</button>
         </div>
         <div class="tbl-wrap">
           <div class="tbl-hbar"><h3>Catálogo de Produtos</h3><span class="tbl-ct" id="cat-ct">0 produtos</span></div>
@@ -645,9 +646,9 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           </div>
           <div class="form-g">
             <label>Modelo</label>
-            <select id="eModelo" onchange="atualizarPreviewManual()">
-              <option value="">Selecione...</option>
-            </select>
+            <input id="eModelo" list="eModeloList" placeholder="Selecione ou digite novo modelo..." oninput="atualizarPreviewManual();_checkNovoModelo()" autocomplete="off" style="width:100%;padding:9px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:600;outline:none;transition:border .15s" onfocus="this.style.borderColor='var(--red)'" onblur="this.style.borderColor='var(--brd)'">
+            <datalist id="eModeloList"></datalist>
+            <div id="eNovoModeloHint" style="display:none;font-size:10px;color:var(--azul);font-weight:700;margin-top:4px">✨ Novo modelo — será salvo automaticamente ao registrar</div>
           </div>
           <div class="form-g">
             <label>Capacidade (GB/TB)</label>
@@ -1752,8 +1753,13 @@ function abrirCadProdComCod(cod){
 // ══════════════════════════════
 function atualizarModelos(){
   const fam=document.getElementById('eFam').value;
-  const sel=document.getElementById('eModelo');
-  sel.innerHTML='<option value="">Selecione o modelo...</option>'+(MODELOS_LIST[fam]||[]).map(m=>`<option>${m}</option>`).join('');
+  const dl=document.getElementById('eModeloList');
+  const inp=document.getElementById('eModelo');
+  // Popula datalist com modelos existentes
+  dl.innerHTML=(MODELOS_LIST[fam]||[]).map(m=>`<option value="${esc(m)}">`).join('');
+  if(inp) inp.value='';
+  const hint=document.getElementById('eNovoModeloHint');
+  if(hint) hint.style.display='none';
   // Ajusta GB/Tamanho conforme família
   const isWatch=fam==='Apple Watch';
   const lbl=document.getElementById('eGbLabel');
@@ -1766,6 +1772,13 @@ function atualizarModelos(){
     gb.value='';
   }
   atualizarPreviewManual();
+}
+function _checkNovoModelo(){
+  const fam=document.getElementById('eFam').value;
+  const val=(document.getElementById('eModelo').value||'').trim();
+  const isNovo=val&&!(MODELOS_LIST[fam]||[]).includes(val);
+  const hint=document.getElementById('eNovoModeloHint');
+  if(hint) hint.style.display=isNovo?'':'none';
 }
 function atualizarPreviewManual(){
   const fam=document.getElementById('eFam').value;
@@ -1837,6 +1850,11 @@ function salvarEntrada(){
     if(codProduto&&!catalogo[codProduto]){
       catalogo[codProduto]={codigo:codProduto,familia,modelo,gb,cor,condicao,produtoCompleto};
       set('sb-cat',Object.keys(catalogo).length);
+    }
+    // Salva novo modelo na lista se for inédito
+    if(MODELOS_LIST[familia]&&!MODELOS_LIST[familia].includes(modelo)){
+      MODELOS_LIST[familia].push(modelo);
+      MODELOS_LIST[familia].sort();
     }
   }
   
@@ -2431,7 +2449,112 @@ function buscar(q){busca=q;document.getElementById('dskSearch').value=q;document
 function sort(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderTabela();}
 
 // ══════════════════════════════
-//  EXPORTAR
+//  EXPORTAR PDF ESTOQUE
+// ══════════════════════════════
+function exportarEstoquePDF(){
+  const emEstoque=produtos.filter(p=>getSt(p)==='emEstoque');
+  if(!emEstoque.length){toast('📦 Nenhum produto em estoque para exportar.');return;}
+  
+  // Agrupa por família
+  const porFam={};
+  emEstoque.forEach(p=>{
+    const f=p.familia||'Outros';
+    if(!porFam[f]) porFam[f]=[];
+    porFam[f].push(p);
+  });
+  
+  const dataBr=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const horaStr=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  
+  // Gera linhas da tabela por família
+  let corpoHtml='';
+  const famsOrdem=['iPhones','Ipads','Macbooks','Apple Watch','AirPods','Outros'];
+  famsOrdem.forEach(fam=>{
+    const lista=porFam[fam];
+    if(!lista||!lista.length) return;
+    const ico=FAM_ICO[fam]||'📦';
+    corpoHtml+=`
+      <tr class="fam-header"><td colspan="5">${ico} ${fam} <span class="fam-count">${lista.length} un.</span></td></tr>`;
+    lista.sort((a,b)=>(a.modelo||'').localeCompare(b.modelo||'')).forEach(p=>{
+      const gb=exibirGB(p)||exibirTamanho(p)||'—';
+      const cor=exibirCor(p)||p.cor||'—';
+      const cond=exibirCondicao(p)||p.condicao||'—';
+      const entrada=fmtD(p.dataCompraEntrada)||'—';
+      const diasEst=p.dataCompraEntrada?Math.round((new Date()-new Date(p.dataCompraEntrada))/(1000*60*60*24)):'-';
+      const diasCls=diasEst>60?'dias-alert':diasEst>30?'dias-med':'dias-ok';
+      corpoHtml+=`<tr>
+        <td class="td-model">${esc(p.modelo||'—')}</td>
+        <td>${esc(gb)}</td>
+        <td>${esc(cor)}</td>
+        <td><span class="badge-cond">${esc(cond)}</span></td>
+        <td>${entrada} <span class="${diasCls}">${diasEst}d</span></td>
+      </tr>`;
+    });
+  });
+  
+  const html=`<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Estoque Disponível — Revend ${dataBr}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Helvetica Neue',Arial,sans-serif;font-size:11px;color:#111;background:#fff;padding:20px 24px}
+  .header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #c8102e;padding-bottom:10px;margin-bottom:16px}
+  .logo{font-size:26px;font-weight:900;color:#c8102e;letter-spacing:-1px}
+  .header-info{text-align:right;font-size:10px;color:#666;font-weight:600;line-height:1.6}
+  .header-info strong{font-size:12px;color:#111}
+  table{width:100%;border-collapse:collapse}
+  th{background:#c8102e;color:#fff;padding:7px 10px;text-align:left;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px}
+  td{padding:6px 10px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+  tr:nth-child(even) td{background:#fafafa}
+  .fam-header td{background:#222;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;border-bottom:none}
+  .fam-count{background:rgba(255,255,255,.2);padding:2px 8px;border-radius:12px;font-size:9px;font-weight:700;margin-left:8px}
+  .td-model{font-weight:800;font-size:11px}
+  .badge-cond{display:inline-block;background:rgba(52,199,89,.12);color:#1a7a3a;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px}
+  .dias-ok{color:#1a7a3a;font-size:10px;font-weight:800;margin-left:5px}
+  .dias-med{color:#c07000;font-size:10px;font-weight:800;margin-left:5px}
+  .dias-alert{color:#c8102e;font-size:10px;font-weight:800;margin-left:5px}
+  .footer{margin-top:16px;font-size:9px;color:#999;text-align:center;border-top:1px solid #eee;padding-top:8px}
+  @media print{body{padding:8px 10px}.header{margin-bottom:10px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <div>
+    <div class="logo">Revend</div>
+    <div style="font-size:12px;font-weight:800;margin-top:2px">Relatório de Estoque Disponível</div>
+  </div>
+  <div class="header-info">
+    <strong>${emEstoque.length} produtos em estoque</strong><br>
+    Gerado em ${dataBr} às ${horaStr}
+  </div>
+</div>
+<table>
+  <thead><tr>
+    <th>Modelo</th>
+    <th>GB / Tam.</th>
+    <th>Cor</th>
+    <th>Condição</th>
+    <th>Entrada / Dias</th>
+  </tr></thead>
+  <tbody>${corpoHtml}</tbody>
+</table>
+<div class="footer">Revend — Gestão de Estoque · Gerado em ${dataBr}</div>
+</body>
+</html>`;
+  
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){toast('⚠️ Pop-up bloqueado. Permita pop-ups para gerar o PDF.');return;}
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{win.print();},400);
+  toast('📄 PDF gerado! Use Ctrl+P ou Imprimir para salvar.');
+}
+
+// ══════════════════════════════
+//  EXPORTAR CSV
 // ══════════════════════════════
 function exportarCSV(){
   var cols=['familia','modelo','gb','cor','condicao','produtoCompleto','imei','dataCompraEntrada','nCompra','responsavel','status','dataVenda','nVenda','vendedor','nAgendamento','obs'];
@@ -2505,6 +2628,7 @@ window.salvarEdicao=salvarEdicao;
 window.fM=fM;
 window.fOv=fOv;
 window.exportarCSV=exportarCSV;
+window.exportarEstoquePDF=exportarEstoquePDF;
 window.selPerfil=selPerfil;
 window.login=login;
 window.logout=logout;
