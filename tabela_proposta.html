@@ -952,14 +952,14 @@ const catalog = [
         id: "acessorios",
         tab: "🛡️ Acessórios",
         groups: [
-            { title: "Cabos Apple — Garantia 1 ano",         items: ["Cabo Lightning p/ USB (1 m)","Cabo Lightning p/ USB (2 m)","Cabo USB-C p/ Lightning (1 m)","Cabo USB-C p/ Lightning (2 m)","Cabo USB-C p/ C (1 m) | Linha iPhone 15 e 16"] },
+            { title: "Cabos Apple — Garantia 1 ano",         items: ["Cabo Lightning p/ USB (1 m)","Cabo Lightning p/ USB (2 m)","Cabo USB-C p/ Lightning (1 m)","Cabo USB-C p/ Lightning (2 m)","Cabo USB-C p/ C (1 m)"] },
             { title: "Carregadores Apple — Garantia 1 ano",  items: ["Carregador USB 5W","Carregador USB-C 20W","Carregador USB-C 35W","Carregador 2 Saídas USB-C 35W"] },
             { title: "MagSafe & AirTag Apple",               items: ["Carregador Apple Watch USB","Carregador Apple Watch USB-C","Carregador MagSafe","Bateria MagSafe","AirTag","AirTag Pack"] },
             { title: "Cabos IWILL — Garantia 3/5 anos",      items: ["Cabo Hard USB-C p/ Lightning (1,2 m)","Cabo Strong Lightning TPE (1,2 m)","Cabo Strong Lightning TPE (2 m)","Cabo Strong Lightning Nylon (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (1,2 m)","Cabo Strong USB-C p/ Lightning TPE (2 m)"] },
             { title: "Carregadores IWILL — Garantia 2 anos", items: ["Carregador 2 Saídas (USB + USB-C) 20W","Carregador 2 Saídas USB-C 35W IWILL","Carregador USB-C 20W IWILL","Carregador USB-C 20W COLORS"] },
             { title: "Power Bank & Adaptadores",             items: ["Power Bank Speed 20W USB-C (10000mAh)","Adaptador Hub 3 em 1 (USB - HDMI - USB-C)"] },
             { title: "Fones de Ouvido",                      items: ["Fone EarPods Lightning","Fone EarPods Tipo C","AirPods Max Premium","AirPods Premium","AirPods Pro Premium"] },
-            { title: "Kits",                                 items: ["Kit USB","Kit Turbo USB-C","Kit USB c/ Fone","Kit Turbo USB-C c/ Fone","Kit Turbo USB-C - Linha iPhone 15 e 16"] },
+            { title: "Kits",                                 items: ["Kit USB","Kit Turbo USB-C","Kit USB c/ Fone","Kit Turbo USB-C c/ Fone"] },
             { title: "Capas iPhone",                         items: ["Capa Luxy","Capa Luxy Focus","Capa Silk","Capa Clear MagSafe","Capa Colors MagSafe","Capa Silicone Apple","Capa Space Anti-Impacto","Capa Space Color","Capa Glass","Capa Auto Focus","Capa Double Lux","Capa Double Lux | Linha iPhone 14 e 15","Capa Duall","Capa Clarity","Capa Clarity | Linha iPhone 14 e 15","Capa Perfect C/ Kit Lentes","Capa Fashion C/ Kit Lentes","Capa New Skin","Kit King Kong (Capa + Película Tela + Câmera)"] },
             { title: "Capas iPad & Watch",                   items: ["Capa iPad","Capa Apple Watch Transparente"] },
             { title: "Pulseiras Apple Watch",                items: ["Pulseira Apple Watch (Loop, Milanesa, Nylon)","Pulseira Apple Watch GSHIELD","Pulseira Apple Watch IWILL"] },
@@ -1154,7 +1154,7 @@ const DEFAULT_PRECOS = {
   "ACESSORIOS_CABOLIGHTNINGPUSB2M": { avista: 139.99 },
   "ACESSORIOS_CABOUSBCPLIGHTNING1M": { avista: 114.99 },
   "ACESSORIOS_CABOUSBCPLIGHTNING2M": { avista: 169.99 },
-  "ACESSORIOS_CABOUSBCPC1MLINHAIPHONE15E16": { avista: 119.99 },
+  "ACESSORIOS_CABOUSBCPC1M": { avista: 119.99 },
   // ── Acessórios — Carregadores Apple ──
   "ACESSORIOS_CARREGADORUSB5W": { avista: 99.99 },
   "ACESSORIOS_CARREGADORUSBC20W": { avista: 189.99 },
@@ -1193,7 +1193,6 @@ const DEFAULT_PRECOS = {
   "ACESSORIOS_KITTURBOUSBC": { avista: 259.99 },
   "ACESSORIOS_KITUSBCFONE": { avista: 249.99 },
   "ACESSORIOS_KITTURBOUSBCCFONE": { avista: 349.99 },
-  "ACESSORIOS_KITTURBOUSBCLINHAIPHONE15E16": { avista: 269.99 },
   // ── Acessórios — Capas iPhone ──
   "ACESSORIOS_CAPALUXY": { avista: 49.99 },
   "ACESSORIOS_CAPALUXYFOCUS": { avista: 49.99 },
@@ -1417,6 +1416,7 @@ const CORES_PADRAO = {
 // Determina qual paleta usar para um produto
 function paleta(tabId, itemName) {
     const n = itemName.toUpperCase();
+    if (tabId === 'acessorios') return null; // acessórios nunca têm cores
     if (tabId === 'watch') return 'watch';
     if (tabId === 'ipad')  return 'ipad';
     if (tabId === 'mac')   return 'mac';
