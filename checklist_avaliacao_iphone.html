@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checklist de Avaliação — Revend Eletro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C0272D;
+    --red-dark: #9B1F24;
+    --bg: #F4F5F7;
+    --bg-white: #FFFFFF;
+    --bg-dark: #1A1D23;
+    --text-primary: #111318;
+    --text-secondary: #4A5568;
+    --text-muted: #8A94A6;
+    --border: #E2E8F0;
+    --border-dark: #CBD5E0;
+    --green: #16A34A;
+    --green-bg: #F0FDF4;
+    --amber: #D97706;
+    --amber-bg: #FFFBEB;
+    --blue: #1D4ED8;
+    --blue-bg: #EFF6FF;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow: 0 4px 6px rgba(0,0,0,0.07);
+    --radius: 8px;
+    --radius-lg: 12px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--red);
+    color: white;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(192,39,45,0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 20px; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 11px; opacity: 0.75; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-subtitle { font-size: 12px; opacity: 0.7; }
+  .header-tags { display: flex; gap: 6px; }
+  .h-tag { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 500; }
+
+  /* LAYOUT */
+  .app-body { display: flex; min-height: calc(100vh - 56px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: var(--bg-dark);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+  }
+  .sidebar-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #4A5568;
+    padding: 10px 10px 6px;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
+    cursor: pointer;
+    color: #94A3B8;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    text-align: left;
+    width: 100%;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #E2E8F0; }
+  .nav-item.active { background: var(--red); color: #fff; }
+  .nav-icon { font-size: 15px; width: 20px; text-align: center; }
+  .nav-status { margin-left: auto; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(255,255,255,0.08); color: #64748B; }
+  .nav-item.active .nav-status { background: rgba(255,255,255,0.2); color: #fff; }
+  .nav-item.done-ok .nav-status { background: #14532D; color: #86EFAC; }
+  .nav-item.done-atencao .nav-status { background: #78350F; color: #FDE68A; }
+  .nav-item.done-falhou .nav-status { background: #7F1D1D; color: #FECACA; }
+  .nav-item.done-ok { color: #86EFAC; }
+  .nav-item.done-atencao { color: #FDE68A; }
+  .nav-item.done-falhou { color: #FECACA; }
+
+  /* MAIN */
+  .main { flex: 1; padding: 24px; overflow-y: auto; }
+
+  /* PROGRESS BAR */
+  .progress-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .prog-label { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+  .prog-bar-bg { flex: 1; height: 8px; background: var(--border); border-radius: 99px; overflow: hidden; }
+  .prog-bar-fill { height: 100%; border-radius: 99px; background: var(--red); transition: width 0.35s, background 0.35s; }
+  .prog-counter { font-size: 13px; font-weight: 700; color: var(--text-primary); white-space: nowrap; min-width: 52px; text-align: right; }
+
+  /* SCORE ROW */
+  .score-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 16px; }
+  .score-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 15px;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+  }
+  .score-val { font-size: 26px; font-weight: 700; line-height: 1; }
+  .score-val.green { color: var(--green); }
+  .score-val.amber { color: var(--amber); }
+  .score-val.red { color: var(--red); }
+  .score-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-top: 3px; }
+
+  /* PAGE HEADER */
+  .page-header {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-sm);
+  }
+  .page-title { font-size: 16px; font-weight: 700; }
+  .page-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* BADGE */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+  }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-red { background: #FEF2F2; color: #DC2626; }
+  .badge-dark { background: #F1F5F9; color: #334155; }
+
+  /* TEST CARD */
+  .test-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 12px;
+  }
+
+  /* ILLUSTRATION AREA */
+  .illus-area {
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    min-height: 150px;
+  }
+  .illus-area svg { display: block; }
+
+  /* TEST BODY */
+  .test-body { padding: 18px 20px; }
+  .test-cat { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 4px; }
+  .test-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .test-hint { font-size: 13px; color: var(--text-secondary); line-height: 1.65; margin-bottom: 16px; }
+
+  /* ACTION BUTTONS */
+  .action-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .abtn {
+    padding: 12px 6px;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    background: var(--bg-white);
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.12s;
+  }
+  .abtn .ico { font-size: 18px; }
+  .abtn:hover { background: #F8FAFC; border-color: #94A3B8; }
+  .abtn.sel-ok { background: var(--green-bg); border-color: #86EFAC; color: var(--green); }
+  .abtn.sel-atencao { background: var(--amber-bg); border-color: #FDE68A; color: var(--amber); }
+  .abtn.sel-falhou { background: #FEF2F2; border-color: #FECACA; color: #DC2626; }
+
+  /* NAV ROW */
+  .nav-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .nbtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    background: var(--bg-white);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+  .nbtn:hover { background: #F1F5F9; }
+  .nbtn:disabled { opacity: 0.3; cursor: default; }
+  .nbtn.primary { background: var(--red); color: white; border-color: var(--red); font-weight: 600; }
+  .nbtn.primary:hover { background: var(--red-dark); }
+  .skip-link { font-size: 12px; color: var(--text-muted); background: none; border: none; cursor: pointer; text-decoration: underline; font-family: 'Inter', sans-serif; }
+  .skip-link:hover { color: var(--text-secondary); }
+
+  /* DOT TRACK */
+  .dot-track {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    box-shadow: var(--shadow-sm);
+  }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--border);
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .dot:hover { transform: scale(1.3); }
+  .dot.current { background: var(--red); transform: scale(1.4); }
+  .dot.ok { background: var(--green); }
+  .dot.atencao { background: var(--amber); }
+  .dot.falhou { background: #DC2626; }
+  .dot.na { background: #CBD5E0; }
+
+  /* TIP */
+  .tip {
+    display: flex;
+    gap: 8px;
+    background: var(--amber-bg);
+    border: 1px solid #FDE68A;
+    border-radius: var(--radius);
+    padding: 10px 13px;
+    font-size: 12px;
+    color: #92400E;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* RESULT SCREEN */
+  .result-screen { display: none; }
+  .result-screen.visible { display: block; }
+  .result-banner {
+    border-radius: var(--radius-lg);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .result-banner.aprovado { background: var(--green-bg); border: 1px solid #86EFAC; }
+  .result-banner.ressalvas { background: var(--amber-bg); border: 1px solid #FDE68A; }
+  .result-banner.reprovado { background: #FEF2F2; border: 1px solid #FECACA; }
+  .result-icon { font-size: 36px; }
+  .result-title { font-size: 18px; font-weight: 700; }
+  .result-sub { font-size: 13px; margin-top: 3px; opacity: 0.8; }
+  .result-banner.aprovado .result-title { color: #14532D; }
+  .result-banner.aprovado .result-sub { color: #166534; }
+  .result-banner.ressalvas .result-title { color: #78350F; }
+  .result-banner.ressalvas .result-sub { color: #92400E; }
+  .result-banner.reprovado .result-title { color: #7F1D1D; }
+  .result-banner.reprovado .result-sub { color: #991B1B; }
+
+  .prob-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+  }
+  .prob-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 10px; }
+  .prob-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .prob-item.falhou { background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; }
+  .prob-item.atencao { background: var(--amber-bg); color: #92400E; border: 1px solid #FDE68A; }
+  .prob-item .pcat { font-size: 11px; font-weight: 400; opacity: 0.7; margin-left: 4px; }
+
+  .action-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    gap: 10px;
+  }
+  .cbtn {
+    flex: 1;
+    padding: 11px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dark);
+    background: var(--bg-white);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    transition: all 0.12s;
+  }
+  .cbtn:hover { background: #F1F5F9; }
+  .cbtn.red { background: var(--red); color: white; border-color: var(--red); }
+  .cbtn.red:hover { background: var(--red-dark); }
+  .cbtn.copied { background: var(--green-bg); color: var(--green); border-color: #86EFAC; }
+
+  /* MOBILE TABS */
+  @media (max-width: 768px) {
+    .sidebar { display: none; }
+    .main { padding: 12px; }
+    .score-row { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .header-tags { display: none; }
+    .mobile-tabs {
+      display: flex;
+      overflow-x: auto;
+      gap: 6px;
+      padding: 10px 12px;
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    .mobile-tabs::-webkit-scrollbar { display: none; }
+    .mobile-tab {
+      flex-shrink: 0;
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      background: white;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      font-family: 'Inter', sans-serif;
+    }
+    .mobile-tab.active { background: var(--red); color: white; border-color: var(--red); }
+    .action-row { gap: 6px; }
+  }
+  @media (min-width: 769px) { .mobile-tabs { display: none; } }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-left">
+    <div>
+      <div class="logo-text">revend</div>
+      <div class="logo-sub">Eletro</div>
+    </div>
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-title">Checklist de Avaliação — iPhone</div>
+      <div class="header-subtitle">Compra · Garantia · Protocolo de Campo</div>
+    </div>
+  </div>
+  <div class="header-tags">
+    <div class="h-tag">🔍 Inspeção Visual</div>
+    <div class="h-tag">⚙️ Testes Funcionais</div>
+    <div class="h-tag">📋 Laudo</div>
+  </div>
+</header>
+
+<!-- MOBILE TABS (categorias) -->
+<div class="mobile-tabs" id="mobileTabs"></div>
+
+<div class="app-body">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar"></nav>
+
+  <main class="main">
+
+    <!-- BARRA DE PROGRESSO -->
+    <div class="progress-card">
+      <div class="prog-label">Progresso</div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" id="progBar" style="width:0%"></div></div>
+      <div class="prog-counter" id="progCounter">0 / 28</div>
+    </div>
+
+    <!-- SCORE -->
+    <div class="score-row">
+      <div class="score-card">
+        <div class="score-val green" id="sc-ok">0</div>
+        <div class="score-lbl">OK</div>
+      </div>
+      <div class="score-card">
+        <div class="score-val amber" id="sc-at">0</div>
+        <div class="score-lbl">Atenção</div>
+      </div>
+      <div class="score-card">
+        <div class="score-val red" id="sc-fa">0</div>
+        <div class="score-lbl">Falhou</div>
+      </div>
+    </div>
+
+    <!-- TRILHA DE DOTS -->
+    <div class="dot-track" id="dotTrack"></div>
+
+    <!-- TELA DE TESTE (PRINCIPAL) -->
+    <div id="testScreen">
+
+      <!-- PAGE HEADER dinâmico -->
+      <div class="page-header">
+        <div>
+          <div class="page-title" id="phTitle"></div>
+          <div class="page-desc" id="phDesc"></div>
+        </div>
+        <span class="badge" id="phBadge"></span>
+      </div>
+
+      <!-- CARD DE TESTE -->
+      <div class="test-card">
+        <div class="illus-area" id="illusArea"></div>
+        <div class="test-body">
+          <div class="test-cat" id="testCat"></div>
+          <div class="test-title" id="testTitle"></div>
+          <div class="test-hint" id="testHint"></div>
+          <div class="action-row">
+            <button class="abtn" id="btn-ok" onclick="answer('ok')">
+              <span class="ico">✓</span>OK
+            </button>
+            <button class="abtn" id="btn-atencao" onclick="answer('atencao')">
+              <span class="ico">⚠</span>Atenção
+            </button>
+            <button class="abtn" id="btn-falhou" onclick="answer('falhou')">
+              <span class="ico">✕</span>Falhou
+            </button>
+          </div>
+          <div class="nav-row">
+            <button class="nbtn" id="btnBack" onclick="goBack()">← Voltar</button>
+            <button class="skip-link" onclick="skipItem()">Pular (N/A)</button>
+            <button class="nbtn primary" id="btnNext" onclick="goNext()">Próximo →</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /testScreen -->
+
+    <!-- TELA DE RESULTADO -->
+    <div id="resultScreen" class="result-screen">
+
+      <div class="result-banner" id="resultBanner">
+        <div class="result-icon" id="rIcon"></div>
+        <div>
+          <div class="result-title" id="rTitle"></div>
+          <div class="result-sub" id="rSub"></div>
+        </div>
+      </div>
+
+      <div class="score-row" style="margin-bottom:16px">
+        <div class="score-card"><div class="score-val green" id="rr-ok">0</div><div class="score-lbl">OK</div></div>
+        <div class="score-card"><div class="score-val amber" id="rr-at">0</div><div class="score-lbl">Atenção</div></div>
+        <div class="score-card"><div class="score-val red" id="rr-fa">0</div><div class="score-lbl">Falhou</div></div>
+      </div>
+
+      <div class="prob-card" id="probCard" style="display:none">
+        <div class="prob-label">Itens com Problema</div>
+        <div id="probList"></div>
+      </div>
+
+      <div class="action-card">
+        <button class="cbtn" id="btnCopy" onclick="copyLaudo()">📋 Copiar Laudo</button>
+        <button class="cbtn red" onclick="restart()">🔄 Novo Aparelho</button>
+      </div>
+
+    </div><!-- /resultScreen -->
+
+  </main>
+</div>
+
+<script>
+const CATS = [
+  { id:'visual',      icon:'👁️',  label:'Inspeção Visual',   badge:'badge-dark',  badgeTxt:'Sem ligar o aparelho' },
+  { id:'energia',     icon:'⚡',  label:'Energia & Bateria',  badge:'badge-amber', badgeTxt:'Crítico' },
+  { id:'tela',        icon:'📱',  label:'Tela & Touch',       badge:'badge-red',   badgeTxt:'Alto impacto no valor' },
+  { id:'audio',       icon:'🔊',  label:'Áudio & Microfone',  badge:'badge-blue',  badgeTxt:'4 componentes' },
+  { id:'conectiv',    icon:'📶',  label:'Conectividade',      badge:'badge-blue',  badgeTxt:'Wi-Fi, Chip, BT' },
+  { id:'camera',      icon:'📷',  label:'Câmera & Flash',     badge:'badge-dark',  badgeTxt:'Frontal & Traseira' },
+  { id:'biometria',   icon:'🔐',  label:'Biometria',          badge:'badge-red',   badgeTxt:'Face ID / Touch ID' },
+  { id:'botoes',      icon:'🔘',  label:'Botões & Vibra',     badge:'badge-dark',  badgeTxt:'Mecânico' },
+  { id:'software',    icon:'💻',  label:'Software & iCloud',  badge:'badge-amber', badgeTxt:'Essencial' },
+];
+
+const TESTS = [
+  // VISUAL
+  { cat:'visual', title:'Vidro frontal', hint:'Inspecionar sob luz lateral — rachaduras finas aparecem melhor assim. Verificar toda a superfície da tela.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="8" width="80" height="134" rx="14" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="87" y="18" width="66" height="114" rx="7" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+      <circle cx="120" cy="18" r="5" fill="#CBD5E0"/>
+      <line x1="22" y1="70" x2="87" y2="70" stroke="#D97706" stroke-width="2" stroke-dasharray="5 3"/>
+      <text x="18" y="67" font-size="10" fill="#D97706" text-anchor="middle" font-family="Inter,sans-serif">luz</text>
+      <line x1="92" y1="65" x2="115" y2="98" stroke="#DC2626" stroke-width="2" opacity="0.6"/>
+      <line x1="100" y1="52" x2="118" y2="75" stroke="#DC2626" stroke-width="2" opacity="0.35"/>
+      <text x="120" y="148" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">verificar trincas sob luz lateral</text>
+    </svg>`},
+  { cat:'visual', title:'Vidro traseiro & carcaça', hint:'Verificar cantos e bordas — amassados indicam queda. Atenção especial à área em volta da câmera.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="8" width="80" height="134" rx="14" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="87" y="18" width="66" height="114" rx="7" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="93" y="24" width="32" height="32" rx="9" fill="#E2E8F0" stroke="#CBD5E0" stroke-width="1"/>
+      <circle cx="109" cy="38" r="8" fill="#CBD5E0"/>
+      <circle cx="109" cy="38" r="5" fill="#F1F5F9"/>
+      <circle cx="119" cy="28" r="4.5" fill="#CBD5E0"/>
+      <circle cx="119" cy="28" r="2.5" fill="#F1F5F9"/>
+      <path d="M80 16 Q80 8 88 8" fill="none" stroke="#DC2626" stroke-width="2.5"/>
+      <circle cx="80" cy="16" r="4" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+      <text x="120" y="148" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">amassados nas bordas indicam queda</text>
+    </svg>`},
+  { cat:'visual', title:'Lente da câmera', hint:'Arranhões profundos na lente afetam a qualidade das fotos. Usar lanterna para inspecionar internamente.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="18" width="60" height="60" rx="12" fill="#F1F5F9" stroke="#CBD5E0" stroke-width="2"/>
+      <circle cx="120" cy="48" r="24" fill="none" stroke="#CBD5E0" stroke-width="1.5"/>
+      <circle cx="120" cy="48" r="17" fill="none" stroke="#E2E8F0" stroke-width="1"/>
+      <circle cx="120" cy="48" r="11" fill="#F8FAFC" stroke="#CBD5E0" stroke-width="1.5"/>
+      <circle cx="120" cy="48" r="5" fill="#CBD5E0"/>
+      <circle cx="115" cy="43" r="2.5" fill="white" opacity="0.7"/>
+      <line x1="160" y1="26" x2="175" y2="12" stroke="#D97706" stroke-width="2"/>
+      <circle cx="178" cy="9" r="5" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1"/>
+      <text x="120" y="100" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">verificar arranhões e trincas</text>
+      <text x="120" y="114" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">com auxílio de lanterna</text>
+    </svg>`},
+  { cat:'visual', title:'Entrada de dados (porta)', hint:'Usar lanterna para inspecionar a entrada. Verificar corrosão, pinos dobrados ou entupimento de sujeira.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="108" y="110" width="24" height="12" rx="6" fill="#E2E8F0"/>
+      <rect x="113" y="112" width="14" height="8" rx="4" fill="#CBD5E0"/>
+      <line x1="120" y1="148" x2="120" y2="122" stroke="#D97706" stroke-width="2.5" stroke-dasharray="4 3"/>
+      <text x="120" y="148" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">inspecionar com lanterna</text>
+      <circle cx="170" cy="100" r="14" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+      <line x1="164" y1="94" x2="176" y2="106" stroke="#92400E" stroke-width="2"/>
+      <line x1="176" y1="94" x2="164" y2="106" stroke="#92400E" stroke-width="2"/>
+    </svg>`},
+  { cat:'visual', title:'Indicador de umidade', hint:'Remover o bandejão do SIM e verificar o indicador. Branco = nunca teve contato com água. Vermelho = contato detectado.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="70" y="36" width="100" height="20" rx="10" fill="#F1F5F9" stroke="#CBD5E0" stroke-width="2"/>
+      <circle cx="174" cy="46" r="9" fill="#F1F5F9" stroke="#CBD5E0" stroke-width="1.5"/>
+      <rect x="78" y="40" width="52" height="12" rx="6" fill="#E2E8F0"/>
+      <circle cx="140" cy="46" r="6" fill="#16A34A"/>
+      <text x="140" y="50" font-size="7" fill="white" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">OK</text>
+      <circle cx="68" cy="100" r="22" fill="#FEF2F2" stroke="#FECACA" stroke-width="1.5"/>
+      <circle cx="68" cy="100" r="12" fill="#DC2626"/>
+      <text x="68" y="130" font-size="10" fill="#991B1B" text-anchor="middle" font-family="Inter,sans-serif">contato c/ água</text>
+      <circle cx="172" cy="100" r="22" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+      <circle cx="172" cy="100" r="12" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+      <text x="172" y="130" font-size="10" fill="#166534" text-anchor="middle" font-family="Inter,sans-serif">sem contato</text>
+      <text x="120" y="148" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">branco = OK · vermelho = foi molhado</text>
+    </svg>`},
+
+  // ENERGIA
+  { cat:'energia', title:'Saúde da bateria', hint:'Ajustes → Bateria → Saúde e Carga da Bateria. ≥85% = OK · 75–84% = Atenção · <75% = Falhou. Anotar o valor exato.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="70" y="38" width="88" height="44" rx="5" fill="white" stroke="#CBD5E0" stroke-width="2"/>
+      <rect x="158" y="52" width="10" height="16" rx="3" fill="#CBD5E0"/>
+      <rect x="75" y="43" width="22" height="34" rx="3" fill="#DC2626"/>
+      <rect x="98" y="43" width="14" height="34" rx="3" fill="#D97706"/>
+      <rect x="113" y="43" width="40" height="34" rx="3" fill="#16A34A"/>
+      <text x="75" y="100" font-size="9" fill="#DC2626" font-family="Inter,sans-serif">0%</text>
+      <text x="96" y="100" font-size="9" fill="#D97706" font-family="Inter,sans-serif">75%</text>
+      <text x="116" y="100" font-size="9" fill="#16A34A" font-family="Inter,sans-serif">85%+</text>
+      <text x="120" y="125" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">Ajustes → Bateria → Saúde</text>
+    </svg>`},
+  { cat:'energia', title:'Carregamento com cabo', hint:'Usar cabo e fonte de referência. O ícone de raio ⚡ deve aparecer e o percentual subir. Testar também o encaixe do cabo.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="97" y="74" width="46" height="34" rx="0" fill="#BFDBFE"/>
+      <rect x="97" y="16" width="46" height="58" rx="0" fill="#F8FAFC"/>
+      <text x="120" y="96" font-size="11" fill="#1D4ED8" text-anchor="middle" font-family="Inter,sans-serif" font-weight="700">84%</text>
+      <text x="123" y="50" font-size="22" fill="#D97706" text-anchor="middle">⚡</text>
+      <rect x="108" y="110" width="24" height="8" rx="4" fill="#E2E8F0"/>
+      <line x1="120" y1="118" x2="120" y2="136" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="96" y="136" width="48" height="14" rx="4" fill="#E2E8F0"/>
+      <text x="120" y="147" font-size="9" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">fonte</text>
+    </svg>`},
+  { cat:'energia', title:'Carregamento sem fio (MagSafe)', hint:'Testar com carregador MagSafe ou Qi. O ícone de raio deve aparecer. Marcar N/A se não houver carregador sem fio disponível.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="120" cy="130" rx="50" ry="8" fill="#F1F5F9" stroke="#E2E8F0" stroke-width="1"/>
+      <rect x="85" y="30" width="70" height="100" rx="14" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="92" y="38" width="56" height="86" rx="8" fill="#F8FAFC"/>
+      <circle cx="120" cy="120" r="14" fill="none" stroke="#CBD5E0" stroke-width="2"/>
+      <circle cx="120" cy="120" r="8" fill="#E2E8F0"/>
+      <text x="123" y="78" font-size="22" fill="#D97706" text-anchor="middle">⚡</text>
+      <path d="M60 115 Q60 75 85 75" fill="none" stroke="#CBD5E0" stroke-width="2" stroke-dasharray="4 3"/>
+      <circle cx="55" cy="115" r="8" fill="#F1F5F9" stroke="#CBD5E0" stroke-width="1.5"/>
+      <text x="55" y="119" font-size="8" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">pwr</text>
+    </svg>`},
+  { cat:'energia', title:'Liga e reinicia normalmente', hint:'Reiniciar o aparelho e observar o boot completo. Não deve travar na logo Apple, nem demorar demais para inicializar.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <text x="120" y="68" font-size="30" text-anchor="middle"></text>
+      <text x="120" y="88" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">inicializando...</text>
+      <rect x="99" y="94" width="14" height="5" rx="2.5" fill="#1D4ED8"/>
+      <rect x="114" y="94" width="28" height="5" rx="2.5" fill="#E2E8F0"/>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">reiniciar e aguardar boot completo</text>
+    </svg>`},
+  { cat:'energia', title:'Sem superaquecimento', hint:'Usar o aparelho normalmente por alguns minutos. A parte traseira não deve ficar quente sem uso intenso de CPU.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <text x="120" y="72" font-size="36" text-anchor="middle">🌡️</text>
+      <path d="M165 50 L175 50 M165 62 L172 62 M165 74 L175 74" stroke="#D97706" stroke-width="2"/>
+      <text x="120" y="126" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">usar por 2 min e verificar temperatura</text>
+    </svg>`},
+
+  // TELA
+  { cat:'tela', title:'Pixels mortos e manchas', hint:'Testar com telas sólidas: preto, branco, vermelho, verde, azul. Buscar pontos escuros, manchas ou áreas diferentes.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#DC2626"/>
+      <circle cx="110" cy="48" r="5" fill="#7F1D1D" opacity="0.8"/>
+      <circle cx="126" cy="70" r="3.5" fill="#7F1D1D" opacity="0.5"/>
+      <text x="120" y="96" font-size="8" fill="#FECACA" text-anchor="middle" font-family="Inter,sans-serif">tela vermelha — buscar pontos</text>
+      <rect x="20" y="40" width="32" height="18" rx="3" fill="#111"/>
+      <text x="36" y="52" font-size="8" fill="#aaa" text-anchor="middle" font-family="Inter,sans-serif">preto</text>
+      <rect x="20" y="65" width="32" height="18" rx="3" fill="#f5f5f5" stroke="#E2E8F0" stroke-width="0.5"/>
+      <text x="36" y="77" font-size="8" fill="#666" text-anchor="middle" font-family="Inter,sans-serif">branco</text>
+      <rect x="188" y="40" width="32" height="18" rx="3" fill="#16A34A"/>
+      <text x="204" y="52" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif">verde</text>
+      <rect x="188" y="65" width="32" height="18" rx="3" fill="#1D4ED8"/>
+      <text x="204" y="77" font-size="8" fill="white" text-anchor="middle" font-family="Inter,sans-serif">azul</text>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">5 cores sólidas para teste completo</text>
+    </svg>`},
+  { cat:'tela', title:'Touch em toda a tela', hint:'Deslizar o dedo em toda a superfície, incluindo bordas e cantos. Todas as áreas devem registrar o toque sem falha.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <path d="M100 22 Q108 34 100 56 Q104 66 120 62 Q136 66 140 56 Q132 34 140 22" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.8"/>
+      <circle cx="100" cy="22" r="4" fill="#1D4ED8" opacity="0.5"/>
+      <circle cx="140" cy="22" r="4" fill="#16A34A" opacity="0.5"/>
+      <circle cx="120" cy="62" r="4" fill="#D97706" opacity="0.5"/>
+      <circle cx="100" cy="100" r="4" fill="#1D4ED8" opacity="0.5"/>
+      <circle cx="140" cy="100" r="4" fill="#16A34A" opacity="0.5"/>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">deslizar em toda a superfície</text>
+    </svg>`},
+  { cat:'tela', title:'Sensor de proximidade', hint:'Fazer uma ligação de teste. Cobrir o sensor no topo frontal com a mão — a tela deve apagar automaticamente.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="104" y="16" width="32" height="12" rx="0" fill="#111" rx="4"/>
+      <path d="M68 36 Q83 24 104 26" fill="none" stroke="#D97706" stroke-width="1.5" stroke-dasharray="4 2"/>
+      <text x="58" y="33" font-size="9" fill="#D97706" text-anchor="middle" font-family="Inter,sans-serif">sensor</text>
+      <rect x="97" y="60" width="46" height="38" rx="0" fill="#111" opacity="0.75"/>
+      <text x="120" y="84" font-size="9" fill="#aaa" text-anchor="middle" font-family="Inter,sans-serif">tela apaga</text>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">cobrir sensor durante ligação</text>
+    </svg>`},
+  { cat:'tela', title:'Toque fantasma', hint:'Deixar o aparelho parado em uma tela simples por 30 segundos. Se ações ocorrerem sem toque, há defeito no touch.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <circle cx="115" cy="52" r="12" fill="none" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.7"/>
+      <circle cx="128" cy="74" r="9" fill="none" stroke="#DC2626" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.4"/>
+      <text x="115" y="56" font-size="10" fill="#DC2626" text-anchor="middle" font-family="Inter,sans-serif">?</text>
+      <text x="128" y="78" font-size="9" fill="#DC2626" text-anchor="middle" font-family="Inter,sans-serif">?</text>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">deixar parado e observar 30s</text>
+    </svg>`},
+  { cat:'tela', title:'Rotação de tela', hint:'Ativar rotação automática e girar o aparelho. A tela deve alternar entre retrato e paisagem sem demora ou travamento.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="100" y="8" width="40" height="68" rx="8" fill="none" stroke="#CBD5E0" stroke-width="2"/>
+      <rect x="105" y="14" width="30" height="56" rx="4" fill="#EFF6FF"/>
+      <rect x="82" y="90" width="76" height="46" rx="8" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+      <rect x="87" y="95" width="66" height="36" rx="4" fill="#BFDBFE"/>
+      <path d="M122 76 Q135 82 140 90" fill="none" stroke="#1D4ED8" stroke-width="2" marker-end="url(#arr)"/>
+      <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#1D4ED8"/></marker></defs>
+      <text x="120" y="148" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">retrato → paisagem deve funcionar</text>
+    </svg>`},
+
+  // AUDIO
+  { cat:'audio', title:'Alto-falante principal', hint:'Tocar música ou vídeo em volume médio e alto. Chiado (crackling) piora com volume. Saída fica na base do aparelho.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="104" y="110" width="32" height="6" rx="3" fill="#E2E8F0"/>
+      <text x="120" y="72" font-size="28" text-anchor="middle">♪</text>
+      <path d="M162 58 Q172 52 172 72 Q172 92 162 86" fill="none" stroke="#1D4ED8" stroke-width="2.5"/>
+      <path d="M170 50 Q184 42 184 72 Q184 102 170 94" fill="none" stroke="#1D4ED8" stroke-width="2" opacity="0.55"/>
+      <path d="M178 42 Q196 32 196 72 Q196 112 178 102" fill="none" stroke="#1D4ED8" stroke-width="1.5" opacity="0.28"/>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">saída na base — ouvir chiado ou distorção</text>
+    </svg>`},
+  { cat:'audio', title:'Microfone', hint:'Abrir o app Gravador de Voz. Gravar 5 segundos e reproduzir. Verificar se o áudio está claro, sem abafamento ou ruído excessivo.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="104" y="12" width="32" height="54" rx="16" fill="white" stroke="#CBD5E0" stroke-width="2"/>
+      <rect x="110" y="22" width="20" height="34" rx="10" fill="#E2E8F0"/>
+      <path d="M82 54 Q82 82 120 82 Q158 82 158 54" fill="none" stroke="#CBD5E0" stroke-width="2"/>
+      <line x1="120" y1="82" x2="120" y2="100" stroke="#CBD5E0" stroke-width="2"/>
+      <line x1="104" y1="100" x2="136" y2="100" stroke="#CBD5E0" stroke-width="2"/>
+      <rect x="162" y="62" width="40" height="22" rx="5" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1"/>
+      <text x="182" y="77" font-size="10" fill="#16A34A" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">gravar</text>
+      <text x="120" y="128" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">Gravador de Voz → gravar → ouvir</text>
+    </svg>`},
+  { cat:'audio', title:'Auricular (earpiece)', hint:'Fazer uma ligação de teste. Pressionar o aparelho na orelha e verificar se a voz do outro lado está clara e audível.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="106" y="18" width="28" height="8" rx="4" fill="#CBD5E0"/>
+      <path d="M162 38 Q178 38 178 62 Q178 86 162 86" fill="none" stroke="#CBD5E0" stroke-width="1.5" stroke-dasharray="4 2"/>
+      <text x="188" y="66" font-size="9" fill="#8A94A6" font-family="Inter,sans-serif">orelha</text>
+      <circle cx="138" cy="98" r="10" fill="#BFDBFE" stroke="#378ADD" stroke-width="1.5"/>
+      <text x="138" y="102" font-size="8" fill="#0C447C" text-anchor="middle" font-family="Inter,sans-serif">tel</text>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">auricular no topo frontal do aparelho</text>
+    </svg>`},
+  { cat:'audio', title:'Chave / botão de silencioso', hint:'Alternar a chave de silencioso e verificar o ícone na tela. Em iPhones sem chave física, verificar o Botão de Ação.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="92" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="99" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="82" y="32" width="10" height="22" rx="5" fill="#CBD5E0" stroke="#94A3B8" stroke-width="1"/>
+      <line x1="87" y1="32" x2="87" y2="44" stroke="white" stroke-width="2"/>
+      <text x="58" y="40" font-size="9" fill="#16A34A" text-anchor="middle" font-family="Inter,sans-serif">🔔 som</text>
+      <text x="58" y="56" font-size="9" fill="#DC2626" text-anchor="middle" font-family="Inter,sans-serif">🔕 mudo</text>
+      <text x="122" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">lateral esquerda — alternar e verificar</text>
+    </svg>`},
+
+  // CONECTIVIDADE
+  { cat:'conectiv', title:'Wi-Fi', hint:'Conectar à rede do estabelecimento e abrir um site. Verificar estabilidade — sinal não deve cair durante o teste.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <path d="M48 82 Q120 22 192 82" fill="none" stroke="#1D4ED8" stroke-width="3" opacity="0.18"/>
+      <path d="M64 90 Q120 42 176 90" fill="none" stroke="#1D4ED8" stroke-width="3" opacity="0.38"/>
+      <path d="M80 98 Q120 62 160 98" fill="none" stroke="#1D4ED8" stroke-width="3" opacity="0.65"/>
+      <path d="M96 106 Q120 86 144 106" fill="none" stroke="#1D4ED8" stroke-width="3"/>
+      <circle cx="120" cy="116" r="7" fill="#1D4ED8"/>
+      <text x="120" y="142" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">conectar e navegar em um site</text>
+    </svg>`},
+  { cat:'conectiv', title:'Sinal de operadora & ligação', hint:'Inserir SIM ativo e verificar barras de sinal no topo. Fazer uma ligação de teste para confirmar funcionamento.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="76" width="12" height="34" rx="2" fill="#1D4ED8"/>
+      <rect x="22" y="62" width="12" height="48" rx="2" fill="#1D4ED8"/>
+      <rect x="38" y="48" width="12" height="62" rx="2" fill="#1D4ED8" opacity="0.5"/>
+      <rect x="54" y="36" width="12" height="74" rx="2" fill="#1D4ED8" opacity="0.28"/>
+      <rect x="90" y="22" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="30" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <text x="104" y="48" font-size="8" fill="#4A5568" font-family="Inter,sans-serif">Claro 5G</text>
+      <rect x="97" y="30" width="16" height="6" rx="1" fill="#16A34A"/>
+      <rect x="114" y="30" width="10" height="6" rx="1" fill="#16A34A"/>
+      <rect x="125" y="30" width="8" height="6" rx="1" fill="#16A34A"/>
+      <rect x="134" y="30" width="6" height="6" rx="1" fill="#E2E8F0"/>
+      <circle cx="120" cy="88" r="24" fill="none" stroke="#E2E8F0" stroke-width="1.5"/>
+      <text x="120" y="96" font-size="24" text-anchor="middle">📞</text>
+    </svg>`},
+  { cat:'conectiv', title:'Bluetooth', hint:'Ativar Bluetooth e parear com dispositivo externo (fone, caixa de som). Verificar se conecta sem erros ou quedas.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="28" width="60" height="96" rx="10" fill="none" stroke="#1D4ED8" stroke-width="2"/>
+      <text x="120" y="84" font-size="40" text-anchor="middle" fill="#1D4ED8" font-weight="300" font-family="Georgia,serif">&#8472;</text>
+      <line x1="152" y1="68" x2="188" y2="50" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="5 3"/>
+      <rect x="178" y="28" width="48" height="34" rx="7" fill="#F8FAFC" stroke="#CBD5E0" stroke-width="1.5"/>
+      <text x="202" y="50" font-size="9" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">fone/caixa</text>
+      <text x="120" y="142" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">parear com dispositivo externo</text>
+    </svg>`},
+
+  // CÂMERA
+  { cat:'camera', title:'Câmera traseira principal', hint:'Fotografar objetos próximos e distantes. Verificar foco automático, nitidez e ausência de manchas ou embaçamento.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="8" width="80" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="87" y="16" width="66" height="92" rx="7" fill="#F8FAFC"/>
+      <rect x="90" y="20" width="36" height="36" rx="9" fill="#E2E8F0" stroke="#CBD5E0" stroke-width="1"/>
+      <circle cx="108" cy="34" rx="9" r="9" fill="#CBD5E0"/>
+      <circle cx="108" cy="34" r="5.5" fill="#F8FAFC"/>
+      <circle cx="108" cy="34" r="3" fill="#CBD5E0"/>
+      <circle cx="120" cy="24" r="5" fill="#CBD5E0"/>
+      <circle cx="120" cy="24" r="2.5" fill="#F8FAFC"/>
+      <rect x="87" y="66" width="66" height="36" rx="4" fill="white" stroke="#F1F5F9" stroke-width="0.5"/>
+      <rect x="90" y="69" width="22" height="14" rx="3" fill="#9FE1CB" opacity="0.5"/>
+      <rect x="114" y="69" width="36" height="14" rx="3" fill="#BFDBFE" opacity="0.5"/>
+      <rect x="90" y="85" width="60" height="12" rx="3" fill="#FAEEDA" opacity="0.45"/>
+      <circle cx="130" cy="96" r="5" fill="#D97706" opacity="0.55"/>
+    </svg>`},
+  { cat:'camera', title:'Câmera frontal (selfie)', hint:'Abrir a câmera no modo selfie. Verificar nitidez, foco e ausência de manchas. A imagem deve ser estável.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <circle cx="120" cy="22" r="5" fill="#CBD5E0"/>
+      <circle cx="120" cy="22" r="2.5" fill="#F8FAFC"/>
+      <circle cx="120" cy="62" r="22" fill="white" stroke="#E2E8F0" stroke-width="1"/>
+      <circle cx="120" cy="54" r="9" fill="#D3D1C7"/>
+      <path d="M102 72 Q120 66 138 72" fill="#D3D1C7"/>
+      <rect x="99" y="88" width="42" height="14" rx="4" fill="#E2E8F0"/>
+      <text x="120" y="99" font-size="8" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">câmera selfie</text>
+    </svg>`},
+  { cat:'camera', title:'Flash / Lanterna', hint:'Ativar a lanterna pelo Centro de Controle. Tirar uma foto com flash forçado. Os dois modos devem funcionar.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="14" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="22" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="90" y="22" width="18" height="18" rx="6" fill="#E2E8F0"/>
+      <circle cx="99" cy="31" r="5" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5"/>
+      <line x1="99" y1="14" x2="99" y2="22" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="107" y1="17" x2="104" y2="24" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="113" y1="24" x2="107" y2="27" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="113" y1="40" x2="106" y2="37" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="107" y1="47" x2="104" y2="40" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="84" y1="37" x2="91" y2="35" stroke="#D97706" stroke-width="1.5"/>
+      <line x1="81" y1="31" x2="90" y2="31" stroke="#D97706" stroke-width="1.5"/>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">Centro de Controle → lanterna</text>
+    </svg>`},
+
+  // BIOMETRIA
+  { cat:'biometria', title:'Face ID', hint:'Ajustes → Face ID e Código → Configurar. Após cadastrar, testar desbloqueio várias vezes em ângulos diferentes.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="4" width="60" height="116" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="12" width="46" height="100" rx="6" fill="#F8FAFC"/>
+      <rect x="108" y="14" width="24" height="10" rx="5" fill="#CBD5E0"/>
+      <rect x="101" y="32" width="38" height="62" rx="5" fill="white" stroke="#E2E8F0" stroke-width="0.5"/>
+      <path d="M106 60 Q106 44 120 44 Q134 44 134 60 Q134 76 120 76 Q106 76 106 60" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-dasharray="4 2.5"/>
+      <circle cx="113" cy="54" r="2.5" fill="#1D4ED8"/>
+      <circle cx="127" cy="54" r="2.5" fill="#1D4ED8"/>
+      <path d="M113 68 Q120 74 127 68" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+      <line x1="120" y1="46" x2="120" y2="41" stroke="#1D4ED8" stroke-width="1" stroke-dasharray="2 2"/>
+      <text x="120" y="128" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">Ajustes → Face ID → Configurar</text>
+    </svg>`},
+  { cat:'biometria', title:'Touch ID (modelos com botão Home)', hint:'Ajustes → Touch ID e Código. Cadastrar um dedo e testar desbloqueio. Marcar N/A se o modelo usar Face ID.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="4" width="60" height="116" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="12" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <circle cx="120" cy="112" r="12" fill="white" stroke="#CBD5E0" stroke-width="2"/>
+      <circle cx="120" cy="112" r="7" fill="#E2E8F0"/>
+      <path d="M114 112 Q116 106 120 106 Q124 106 126 112 Q124 118 120 118 Q116 118 114 112" fill="none" stroke="#1D4ED8" stroke-width="1" stroke-dasharray="2.5 2"/>
+      <text x="120" y="60" font-size="34" text-anchor="middle" opacity="0.18">👆</text>
+      <text x="120" y="86" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">apoiar dedo no botão home</text>
+      <text x="120" y="138" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">N/A para modelos com Face ID</text>
+    </svg>`},
+
+  // BOTÕES
+  { cat:'botoes', title:'Botão Power (lateral)', hint:'Pressionar rápido para bloquear. Segurar para o menu de desligamento. Verificar clique tátil firme e sem folga.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="14" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="22" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="150" y="42" width="10" height="28" rx="5" fill="#CBD5E0" stroke="#94A3B8" stroke-width="1.5"/>
+      <circle cx="155" cy="56" r="3.5" fill="#94A3B8"/>
+      <line x1="162" y1="56" x2="180" y2="56" stroke="#D97706" stroke-width="2" stroke-dasharray="4 3"/>
+      <text x="195" y="59" font-size="9" fill="#D97706" font-family="Inter,sans-serif">clique</text>
+      <text x="120" y="136" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">lateral direita do aparelho</text>
+    </svg>`},
+  { cat:'botoes', title:'Botões de volume', hint:'Pressionar + e − verificando o indicador de volume na tela. Ambos devem ter clique físico tátil e resposta imediata.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="95" y="14" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="102" y="22" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <rect x="85" y="36" width="10" height="18" rx="5" fill="#CBD5E0" stroke="#94A3B8" stroke-width="1.5"/>
+      <rect x="85" y="58" width="10" height="18" rx="5" fill="#CBD5E0" stroke="#94A3B8" stroke-width="1.5"/>
+      <text x="80" y="49" font-size="14" fill="#1D4ED8" text-anchor="middle" font-weight="700">+</text>
+      <text x="80" y="71" font-size="14" fill="#1D4ED8" text-anchor="middle" font-weight="700">−</text>
+      <rect x="108" y="58" width="34" height="7" rx="3.5" fill="#E2E8F0"/>
+      <rect x="108" y="58" width="22" height="7" rx="3.5" fill="#1D4ED8"/>
+      <text x="125" y="50" font-size="9" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">volume</text>
+      <text x="125" y="136" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">lateral esquerda do aparelho</text>
+    </svg>`},
+  { cat:'botoes', title:'Vibração (Taptic Engine)', hint:'Ajustes → Sons e Tátil → Tátil do Sistema. Ativar e tocar nas opções — a vibração deve ser nítida e consistente.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="95" y="20" width="50" height="96" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="102" y="28" width="36" height="80" rx="7" fill="#F8FAFC"/>
+      <path d="M68 65 L80 65 M65 55 L77 55 M63 45 L75 45 M62 35 L74 35" stroke="#1D4ED8" stroke-width="2" opacity="0.7"/>
+      <path d="M172 65 L160 65 M175 55 L163 55 M177 45 L165 45 M178 35 L166 35" stroke="#1D4ED8" stroke-width="2" opacity="0.7"/>
+      <text x="120" y="76" font-size="10" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">Ajustes → Sons</text>
+      <text x="120" y="90" font-size="10" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">e Tátil</text>
+      <text x="120" y="134" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">vibração deve ser forte e consistente</text>
+    </svg>`},
+
+  // SOFTWARE
+  { cat:'software', title:'iCloud removido', hint:'Ajustes → [Nome] → Sair. A tela deve mostrar "Fazer login no iPhone". NUNCA aceitar aparelho com iCloud de terceiro ativo.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <text x="120" y="46" font-size="9" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">Ajustes</text>
+      <rect x="99" y="50" width="42" height="10" rx="3" fill="white" stroke="#E2E8F0" stroke-width="0.5"/>
+      <circle cx="107" cy="55" r="3.5" fill="#D3D1C7"/>
+      <text x="128" y="58" font-size="7.5" fill="#4A5568" font-family="Inter,sans-serif">[Seu Nome]</text>
+      <circle cx="58" cy="90" r="22" fill="#FEF2F2" stroke="#FECACA" stroke-width="1.5"/>
+      <line x1="49" y1="81" x2="67" y2="99" stroke="#DC2626" stroke-width="2.5"/>
+      <line x1="67" y1="81" x2="49" y2="99" stroke="#DC2626" stroke-width="2.5"/>
+      <text x="58" y="120" font-size="9" fill="#991B1B" text-anchor="middle" font-family="Inter,sans-serif">com conta</text>
+      <circle cx="182" cy="90" r="22" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.5"/>
+      <line x1="172" y1="90" x2="179" y2="98" stroke="#16A34A" stroke-width="2.5"/>
+      <line x1="179" y1="98" x2="192" y2="82" stroke="#16A34A" stroke-width="2.5"/>
+      <text x="182" y="120" font-size="9" fill="#166534" text-anchor="middle" font-family="Inter,sans-serif">sem conta</text>
+    </svg>`},
+  { cat:'software', title:'Desbloqueado para operadoras', hint:'Ajustes → Geral → Informações → Bloqueio de Operadora. Deve mostrar "Sem SIM Restrito". Bloqueado = perde muito valor.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="8" width="60" height="108" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="16" width="46" height="92" rx="6" fill="#F8FAFC"/>
+      <text x="120" y="36" font-size="8" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">Geral → Informações</text>
+      <rect x="99" y="42" width="42" height="10" rx="2" fill="white" stroke="#E2E8F0" stroke-width="0.5"/>
+      <text x="120" y="50" font-size="7" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">Bloqueio de Operadora</text>
+      <rect x="99" y="55" width="42" height="12" rx="2" fill="#F0FDF4" stroke="#86EFAC" stroke-width="0.5"/>
+      <text x="120" y="64" font-size="7.5" fill="#16A34A" text-anchor="middle" font-family="Inter,sans-serif" font-weight="600">Sem SIM Restrito ✓</text>
+      <text x="120" y="130" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">deve aceitar qualquer operadora</text>
+    </svg>`},
+  { cat:'software', title:'Autenticidade das peças', hint:'Ajustes → Geral → Informações. Verificar tela, bateria e câmera. "Peça genuína Apple" = original. Qualquer aviso = peça trocada.',
+    svg:`<svg viewBox="0 0 240 150" width="240" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="90" y="4" width="60" height="116" rx="12" fill="none" stroke="#CBD5E0" stroke-width="2.5"/>
+      <rect x="97" y="12" width="46" height="100" rx="6" fill="#F8FAFC"/>
+      <text x="120" y="32" font-size="8" fill="#4A5568" text-anchor="middle" font-family="Inter,sans-serif">Geral → Informações</text>
+      <rect x="99" y="36" width="42" height="11" rx="2" fill="white" stroke="#E2E8F0" stroke-width="0.5"/>
+      <text x="120" y="44" font-size="7" fill="#16A34A" text-anchor="middle" font-family="Inter,sans-serif">Tela: Peça genuína Apple ✓</text>
+      <rect x="99" y="50" width="42" height="11" rx="2" fill="white" stroke="#E2E8F0" stroke-width="0.5"/>
+      <text x="120" y="58" font-size="7" fill="#16A34A" text-anchor="middle" font-family="Inter,sans-serif">Bateria: Peça genuína Apple ✓</text>
+      <rect x="99" y="64" width="42" height="11" rx="2" fill="#FFFBEB" stroke="#FDE68A" stroke-width="0.5"/>
+      <text x="120" y="72" font-size="7" fill="#92400E" text-anchor="middle" font-family="Inter,sans-serif">Câmera: Peça de terceiros ⚠</text>
+      <text x="120" y="128" font-size="10" fill="#8A94A6" text-anchor="middle" font-family="Inter,sans-serif">identificar peças substituídas</text>
+    </svg>`},
+];
+
+let current = 0;
+let answers = Array(TESTS.length).fill(null);
+
+// Build sidebar
+function buildSidebar() {
+  const sb = document.getElementById('sidebar');
+  const mt = document.getElementById('mobileTabs');
+  CATS.forEach((c, ci) => {
+    const tests = TESTS.filter(t => t.cat === c.id);
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.id = 'nav-' + c.id;
+    btn.onclick = () => goToCategory(c.id);
+    btn.innerHTML = `<span class="nav-icon">${c.icon}</span>${c.label}<span class="nav-status" id="ns-${c.id}">0/${tests.length}</span>`;
+    sb.appendChild(btn);
+
+    const mb = document.createElement('button');
+    mb.className = 'mobile-tab';
+    mb.id = 'mtab-' + c.id;
+    mb.onclick = () => goToCategory(c.id);
+    mb.textContent = c.icon + ' ' + c.label;
+    mt.appendChild(mb);
+  });
+}
+
+function goToCategory(catId) {
+  const idx = TESTS.findIndex(t => t.cat === catId);
+  if (idx >= 0) { current = idx; render(); }
+}
+
+// Build dots
+function buildDots() {
+  const dt = document.getElementById('dotTrack');
+  dt.innerHTML = '';
+  TESTS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.id = 'dot-' + i;
+    d.title = TESTS[i].title;
+    d.onclick = () => { current = i; render(); };
+    dt.appendChild(d);
+  });
+}
+
+const catBadgeColors = {
+  'badge-dark': '#F1F5F9',
+  'badge-amber': '#FFFBEB',
+  'badge-blue': '#EFF6FF',
+  'badge-red': '#FEF2F2',
+  'badge-green': '#F0FDF4',
+};
+const catBadgeText = {
+  'badge-dark': '#334155',
+  'badge-amber': '#D97706',
+  'badge-blue': '#1D4ED8',
+  'badge-red': '#DC2626',
+  'badge-green': '#16A34A',
+};
+
+function render() {
+  const t = TESTS[current];
+  const catInfo = CATS.find(c => c.id === t.cat);
+
+  // page header
+  document.getElementById('phTitle').textContent = catInfo.icon + ' ' + catInfo.label;
+  document.getElementById('phDesc').textContent = 'Teste ' + (current + 1) + ' de ' + TESTS.length + ' · ' + catInfo.label;
+  const badge = document.getElementById('phBadge');
+  badge.textContent = catInfo.badgeTxt;
+  badge.className = 'badge ' + catInfo.badge;
+
+  // test content
+  document.getElementById('testCat').textContent = catInfo.label;
+  document.getElementById('testTitle').textContent = t.title;
+  document.getElementById('testHint').textContent = t.hint;
+  document.getElementById('illusArea').innerHTML = t.svg;
+
+  // buttons
+  const ans = answers[current];
+  const states = ['ok','atencao','falhou'];
+  states.forEach(s => {
+    document.getElementById('btn-'+s).className = 'abtn' + (ans === s ? ' sel-'+s : '');
+  });
+
+  // nav
+  document.getElementById('btnBack').disabled = current === 0;
+  const isLast = current === TESTS.length - 1;
+  const nextBtn = document.getElementById('btnNext');
+  nextBtn.textContent = isLast ? 'Ver Resultado →' : 'Próximo →';
+
+  // progress
+  const done = answers.filter(a => a !== null).length;
+  const pct = Math.round((done / TESTS.length) * 100);
+  document.getElementById('progBar').style.width = pct + '%';
+  const progFill = document.getElementById('progBar');
+  progFill.style.background = done === TESTS.length ? '#16A34A' : '#C0272D';
+  document.getElementById('progCounter').textContent = done + ' / ' + TESTS.length;
+
+  // score
+  const ok = answers.filter(a => a === 'ok').length;
+  const at = answers.filter(a => a === 'atencao').length;
+  const fa = answers.filter(a => a === 'falhou').length;
+  document.getElementById('sc-ok').textContent = ok;
+  document.getElementById('sc-at').textContent = at;
+  document.getElementById('sc-fa').textContent = fa;
+
+  // dots
+  TESTS.forEach((_, i) => {
+    const d = document.getElementById('dot-' + i);
+    d.className = 'dot' + (i === current ? ' current' : answers[i] ? ' ' + answers[i] : '');
+  });
+
+  // sidebar nav status
+  CATS.forEach(c => {
+    const catTests = TESTS.filter(t => t.cat === c.id);
+    const catAnswers = catTests.map((_, ci) => answers[TESTS.findIndex(t2 => t2 === catTests[ci])]);
+    const catDone = catAnswers.filter(a => a !== null).length;
+    const ns = document.getElementById('ns-' + c.id);
+    if (ns) ns.textContent = catDone + '/' + catTests.length;
+    const navBtn = document.getElementById('nav-' + c.id);
+    const mbTab = document.getElementById('mtab-' + c.id);
+    if (!navBtn) return;
+    const isActive = t.cat === c.id;
+    if (isActive) {
+      navBtn.className = 'nav-item active';
+      if (mbTab) mbTab.className = 'mobile-tab active';
+    } else if (catDone === catTests.length) {
+      const hasFalhou = catAnswers.some(a => a === 'falhou');
+      const hasAtencao = catAnswers.some(a => a === 'atencao');
+      const cls = hasFalhou ? 'done-falhou' : hasAtencao ? 'done-atencao' : 'done-ok';
+      navBtn.className = 'nav-item ' + cls;
+      if (mbTab) mbTab.className = 'mobile-tab';
+    } else {
+      navBtn.className = 'nav-item';
+      if (mbTab) mbTab.className = 'mobile-tab';
+    }
+  });
+}
+
+function answer(status) {
+  answers[current] = status;
+  render();
+  setTimeout(() => {
+    if (current < TESTS.length - 1) { current++; render(); }
+    else { showResult(); }
+  }, 380);
+}
+
+function goNext() {
+  if (current < TESTS.length - 1) { current++; render(); }
+  else { showResult(); }
+}
+
+function goBack() {
+  if (current > 0) { current--; render(); }
+}
+
+function skipItem() {
+  answers[current] = 'na';
+  render();
+  if (current < TESTS.length - 1) { current++; render(); }
+  else { showResult(); }
+}
+
+function showResult() {
+  document.getElementById('testScreen').style.display = 'none';
+  document.getElementById('resultScreen').classList.add('visible');
+  document.getElementById('progBar').style.width = '100%';
+  document.getElementById('progBar').style.background = '#16A34A';
+  document.getElementById('progCounter').textContent = TESTS.length + ' / ' + TESTS.length;
+
+  const ok = answers.filter(a => a === 'ok').length;
+  const at = answers.filter(a => a === 'atencao').length;
+  const fa = answers.filter(a => a === 'falhou').length;
+
+  document.getElementById('rr-ok').textContent = ok;
+  document.getElementById('rr-at').textContent = at;
+  document.getElementById('rr-fa').textContent = fa;
+
+  const banner = document.getElementById('resultBanner');
+  if (fa === 0 && at === 0) {
+    banner.className = 'result-banner aprovado';
+    document.getElementById('rIcon').textContent = '✅';
+    document.getElementById('rTitle').textContent = 'Aparelho aprovado';
+    document.getElementById('rSub').textContent = 'Todos os testes passaram sem problemas.';
+  } else if (fa === 0) {
+    banner.className = 'result-banner ressalvas';
+    document.getElementById('rIcon').textContent = '⚠️';
+    document.getElementById('rTitle').textContent = 'Aprovado com ressalvas';
+    document.getElementById('rSub').textContent = at + ' item(s) precisam de atenção antes de aceitar.';
+  } else {
+    banner.className = 'result-banner reprovado';
+    document.getElementById('rIcon').textContent = '❌';
+    document.getElementById('rTitle').textContent = 'Problemas encontrados';
+    document.getElementById('rSub').textContent = fa + ' falha(s) detectada(s). Avaliar criteriosamente antes de aceitar.';
+  }
+
+  const probs = answers.map((a, i) => ({ a, i })).filter(x => x.a === 'falhou' || x.a === 'atencao');
+  const probCard = document.getElementById('probCard');
+  if (probs.length > 0) {
+    probCard.style.display = 'block';
+    document.getElementById('probList').innerHTML = probs.map(x => {
+      const t = TESTS[x.i];
+      const cat = CATS.find(c => c.id === t.cat);
+      return `<div class="prob-item ${x.a}">${x.a === 'falhou' ? '❌' : '⚠️'} ${t.title}<span class="pcat">· ${cat.label}</span></div>`;
+    }).join('');
+  } else {
+    probCard.style.display = 'none';
+  }
+
+  TESTS.forEach((_, i) => {
+    const d = document.getElementById('dot-' + i);
+    if (d) d.className = 'dot ' + (answers[i] || 'na');
+  });
+}
+
+function copyLaudo() {
+  const ok = answers.filter(a => a === 'ok').length;
+  const at = answers.filter(a => a === 'atencao').length;
+  const fa = answers.filter(a => a === 'falhou').length;
+  const probs = answers.map((a, i) => ({ a, i })).filter(x => x.a === 'falhou' || x.a === 'atencao');
+  let txt = 'REVEND ELETRO — CHECKLIST DE AVALIAÇÃO IPHONE\n';
+  txt += 'Data: ' + new Date().toLocaleDateString('pt-BR') + '\n\n';
+  txt += 'RESULTADO: OK ' + ok + ' | Atenção ' + at + ' | Falhou ' + fa + '\n\n';
+  if (probs.length > 0) {
+    txt += 'PROBLEMAS ENCONTRADOS:\n';
+    probs.forEach(x => {
+      const t = TESTS[x.i];
+      const cat = CATS.find(c => c.id === t.cat);
+      txt += (x.a === 'falhou' ? '❌' : '⚠️') + ' ' + t.title + ' (' + cat.label + ')\n';
+    });
+  } else {
+    txt += 'Nenhum problema detectado.\n';
+  }
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('btnCopy');
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copiar Laudo'; btn.classList.remove('copied'); }, 2200);
+  });
+}
+
+function restart() {
+  current = 0;
+  answers = Array(TESTS.length).fill(null);
+  document.getElementById('testScreen').style.display = 'block';
+  document.getElementById('resultScreen').classList.remove('visible');
+  render();
+}
+
+buildSidebar();
+buildDots();
+render();
+</script>
+</body>
+</html>

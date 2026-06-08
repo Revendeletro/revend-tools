@@ -268,6 +268,17 @@ iframe{width:100%;height:100%;border:none;display:block}
       </button>
 
       <div class="sb-sep"></div>
+      <div class="nav-label">Avaliação & Produtos</div>
+      <button class="nav-btn" data-key="checklist" onclick="openTool('checklist')">
+        <span class="em">✅</span> Checklist Apple
+        <span class="nav-tag verde">Apple</span>
+      </button>
+      <button class="nav-btn" data-key="estoque_prod" onclick="openTool('estoque_prod')">
+        <span class="em">🏪</span> Estoque de Produtos
+        <span class="nav-tag laranja">Produtos</span>
+      </button>
+
+      <div class="sb-sep"></div>
       <div class="nav-label">CRM & Administração</div>
       <button class="nav-btn" data-key="kommo" onclick="openTool('kommo')">
         <span class="em">📊</span> Métricas Kommo
@@ -317,7 +328,7 @@ iframe{width:100%;height:100%;border:none;display:block}
         </div>
         <div class="hero-right">
           <div class="hero-stat">
-            <div class="hs-n">9</div>
+            <div class="hs-n">11</div>
             <div class="hs-l">Ferramentas</div>
           </div>
           <div class="hero-stat">
@@ -402,6 +413,20 @@ iframe{width:100%;height:100%;border:none;display:block}
           <div class="tc-name">Painel Admin</div>
           <div class="tc-desc">Gerencie funcionários, inventário, WhatsApps e comissões. Acesso restrito a administradores.</div>
           <div class="tc-badge red">🔐 Restrito</div>
+        </div>
+
+        <div class="tool-card" style="--accent:var(--verde)" onclick="openTool('checklist')">
+          <div class="tc-icon-wrap" style="--ic-bg:#e8fdf0">✅</div>
+          <div class="tc-name">Checklist Apple</div>
+          <div class="tc-desc">Checklist completo de avaliação de iPhones. Verifique condições físicas, funcionais e gere laudos.</div>
+          <div class="tc-badge verde">Apple · Avaliação</div>
+        </div>
+
+        <div class="tool-card" style="--accent:var(--laranja)" onclick="openTool('estoque_prod')">
+          <div class="tc-icon-wrap" style="--ic-bg:#fff3e0">🏪</div>
+          <div class="tc-name">Estoque de Produtos</div>
+          <div class="tc-desc">Controle completo do estoque de produtos da Revend com entradas, saídas e saldo atualizado.</div>
+          <div class="tc-badge laranja">Produtos</div>
         </div>
 
       </div>
@@ -497,6 +522,18 @@ const TOOLS = {
     file: 'admin_revend.html',
     sub: 'Administração · Revend Eletro',
     restrito: true,
+  },
+  checklist: {
+    name: 'Checklist Apple',
+    icon: '✅',
+    file: 'checklist_avaliacao_iphone.html',
+    sub: 'Avaliação de iPhones · Revend',
+  },
+  estoque_prod: {
+    name: 'Estoque de Produtos',
+    icon: '🏪',
+    file: 'estoque_revend.html',
+    sub: 'Controle de produtos · Revend',
   },
 };
 
