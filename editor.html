@@ -274,6 +274,8 @@ input[type=range].trng{width:65px;accent-color:var(--yellow)}
     <div class="tg">
       <span class="tlbl">Template</span>
       <select class="tsel" id="tplSel" onchange="changeTpl(this.value)">
+        <option value="copa2026">🏆 Copa do Mundo 2026</option>
+        <option value="namorados">💕 Dia dos Namorados</option>
         <option value="maes">💝 Dia das Mães</option>
         <option value="revend">Revend Week</option>
         <option value="queima">🔥 Queima</option>
@@ -540,6 +542,7 @@ const CATALOG = [
 ];
 
 const CAMPAIGNS = [
+  {id:"copa2026",ico:"🏆",nm:"Copa do Mundo 2026",desc:"Verde, amarelo e azul — energia de jogo",faixa:"COPA DO MUNDO 2026",fC:"#009c3b",fTC:"#FFDF00",i1:"PRONTA ENTREGA",i2:"NOTA FISCAL",cta:"GARANTA O SEU ⚽"},
   {id:"maes",    ico:"💝",nm:"Dia das Mães",   desc:"Tema romântico com corações e fundo preto",faixa:"ofertas de",fC:"#e91e8c",fTC:"#fff",i1:"GARANTIA 1 ANO",i2:"NOTA FISCAL",cta:"O PRESENTE PERFEITO 💝"},
   {id:"namorados",ico:"💕",nm:"Dia dos Namorados",desc:"Elegância escura com rose gold e pétalas",faixa:"presente ideal",fC:"#b5696b",fTC:"#fff",i1:"GARANTIA 1 ANO",i2:"NOTA FISCAL",cta:"SURPREENDA QUEM VOCÊ AMA 💕"},
   {id:"revend",  ico:"📅",nm:"Revend Week",    desc:"Campanha semanal, faixa amarela",         faixa:"REVEND WEEK !",fC:"#F5C400",fTC:"#000",i1:"GARANTIA 1 ANO",i2:"NOTA FISCAL",cta:"ARRASTE PARA CIMA 👆"},
@@ -1334,7 +1337,7 @@ function drawReadShadows(ctx,W,H,sl,layout){
 
 // Solid BG (no photo)
 function drawSolidBg(ctx,W,H,sl){
-  const bgs={revend:'#111',queima:'#0d0d0d',launch:'#050505',oferta:'#111',clean:'#f5f5f7',dark:'#050505',promo:'#0a0a0a',gradient:'#0f0f2e',maes:'#0a0a0a',namorados:'#0a0608'};
+  const bgs={copa2026:'#001a09',revend:'#111',queima:'#0d0d0d',launch:'#050505',oferta:'#111',clean:'#f5f5f7',dark:'#050505',promo:'#0a0a0a',gradient:'#0f0f2e',maes:'#0a0a0a',namorados:'#0a0608'};
   ctx.fillStyle=bgs[sl.template]||'#111'; ctx.fillRect(0,0,W,H);
   // No-photo accent
   if(sl.template==='gradient'){
@@ -1734,7 +1737,7 @@ function drawNamoradosHeader(ctx, W, topPad){
   if(ctx.roundRect) ctx.roundRect(cx - pillW/2, y, pillW, pillH, pillH/2);
   else ctx.rect(cx - pillW/2, y, pillW, pillH);
   ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#d4918a';
+  ctx.fillStyle = '#fadadd';
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.fillText(piText, cx, y + pillH/2);
   ctx.restore();
@@ -1756,10 +1759,10 @@ function drawNamoradosHeader(ctx, W, topPad){
   const nmSize = Math.round(W * 0.175);
   ctx.font = `${nmSize}px "Great Vibes","Dancing Script",cursive`;
   // Rose gold gradient fill via shadow + color blend
-  ctx.fillStyle = '#c9907a';
+  ctx.fillStyle = '#ffb3c1';
   ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-  ctx.shadowColor = 'rgba(140,40,50,0.6)';
-  ctx.shadowBlur = 22;
+  ctx.shadowColor = 'rgba(140,40,50,0.7)';
+  ctx.shadowBlur = 28;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 5;
   ctx.fillText('Namorados', cx, y + nmSize * 0.82);
@@ -1837,7 +1840,7 @@ function drawNamoradosTemplate(ctx, W, H, sl){
     let fs = Math.round(W * 0.076);
     ctx.font = `900 ${fs}px "Poppins",sans-serif`;
     while(ctx.measureText(sl.modelo).width > W * 0.86 && fs > 28){ fs -= 2; ctx.font = `900 ${fs}px "Poppins",sans-serif`; }
-    ctx.fillStyle = '#e8c4b8';
+    ctx.fillStyle = '#ffe8e0';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'alphabetic';
     ctx.shadowColor = 'rgba(0,0,0,0.75)';
@@ -1857,13 +1860,11 @@ function drawNamoradosTemplate(ctx, W, H, sl){
     const vph = vFs + 22, vpw = vtw + 48;
     ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0;
     ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
-    ctx.strokeStyle = 'rgba(181,105,107,0.8)';
-    ctx.lineWidth = 1.5;
-    ctx.fillStyle = 'rgba(60,15,20,0.75)';
+    ctx.fillStyle = 'rgba(255,255,255,0.96)';
     if(ctx.roundRect) ctx.roundRect(W/2 - vpw/2, by, vpw, vph, 6);
     else ctx.rect(W/2 - vpw/2, by, vpw, vph);
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = '#e8c4b8';
+    ctx.fill();
+    ctx.fillStyle = '#2a0008';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(pillTxt, W/2, by + vph/2);
@@ -1887,9 +1888,9 @@ function drawNamoradosTemplate(ctx, W, H, sl){
     ctx.save();
     let pFs = Math.round(W * 0.074);
     ctx.font = `900 ${pFs}px "Poppins",sans-serif`;
-    ctx.fillStyle = '#f5ece8';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.shadowColor = 'rgba(0,0,0,0.65)'; ctx.shadowBlur = 12;
+    ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 16;
     ctx.fillText(sl.preco, W/2, by + pFs);
     by += pFs + 6;
     ctx.restore();
@@ -1899,7 +1900,7 @@ function drawNamoradosTemplate(ctx, W, H, sl){
       ctx.save();
       const iFs = Math.round(W * 0.034);
       ctx.font = `600 italic ${iFs}px "Cormorant Garamond",serif`;
-      ctx.fillStyle = '#c9907a';
+      ctx.fillStyle = '#ffb3c1';
       ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
       ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6;
       ctx.fillText('✦ ' + sl.info1 + ' ✦', W/2, by + iFs);
@@ -1934,9 +1935,9 @@ function drawNamoradosTemplate(ctx, W, H, sl){
     const ctaY = H - botPad - 10;
     const ctaFs = Math.round(W * 0.044);
     ctx.font = `600 italic ${ctaFs}px "Cormorant Garamond",serif`;
-    ctx.fillStyle = '#c9907a';
+    ctx.fillStyle = '#ffb3c1';
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-    ctx.shadowColor = 'rgba(0,0,0,0.5)'; ctx.shadowBlur = 8;
+    ctx.shadowColor = 'rgba(0,0,0,0.7)'; ctx.shadowBlur = 10;
     ctx.fillText(sl.cta, W/2, ctaY);
     ctx.restore();
   }
@@ -1947,11 +1948,362 @@ function drawNamoradosTemplate(ctx, W, H, sl){
 }
 
 
+// ════════════════════════════════════════════════
+// COPA DO MUNDO 2026 — DRAW FUNCTION
+// Verde, amarelo, azul — Brasil + Copa vibe
+// ════════════════════════════════════════════════
+
+function drawCopa2026Stars(ctx, W, H){
+  // Decorative 5-point stars scattered in edges
+  const stars = [
+    [0.06, 0.055, 18, 0.9],
+    [0.90, 0.04,  14, 0.8],
+    [0.96, 0.10,  10, 0.6],
+    [0.04, 0.14,  11, 0.65],
+    [0.93, 0.19,  16, 0.75],
+    [0.05, 0.86,  13, 0.55],
+    [0.92, 0.88,  15, 0.60],
+    [0.10, 0.93,  10, 0.45],
+    [0.82, 0.94,  12, 0.50],
+    [0.50, 0.03,   9, 0.5],
+  ];
+  stars.forEach(([xp,yp,sz,al])=>{
+    ctx.save();
+    ctx.globalAlpha = al;
+    ctx.fillStyle = '#FFDF00';
+    ctx.shadowColor = 'rgba(255,220,0,0.6)';
+    ctx.shadowBlur = 8;
+    ctx.translate(W*xp, H*yp);
+    ctx.beginPath();
+    for(let i=0;i<5;i++){
+      const a = (i*2*Math.PI/5) - Math.PI/2;
+      const ai = a + Math.PI/5;
+      const or = sz, ir = sz*0.42;
+      if(i===0) ctx.moveTo(Math.cos(a)*or, Math.sin(a)*or);
+      else ctx.lineTo(Math.cos(a)*or, Math.sin(a)*or);
+      ctx.lineTo(Math.cos(ai)*ir, Math.sin(ai)*ir);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.restore();
+  });
+}
+
+function drawCopa2026Ball(ctx, cx, cy, r){
+  // Simple football icon for decorative use
+  ctx.save();
+  ctx.globalAlpha = 0.08;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI*2);
+  ctx.fillStyle = '#ffffff';
+  ctx.fill();
+  // Pentagon pattern suggestion
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = r * 0.06;
+  ctx.globalAlpha = 0.05;
+  // Just a few lines suggesting football panels
+  for(let i=0;i<6;i++){
+    const a = i * Math.PI / 3;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(a)*r*0.75, cy + Math.sin(a)*r*0.75);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawCopa2026Header(ctx, W, topPad){
+  const cx = W / 2;
+  let y = topPad + 10;
+
+  // Top accent line — green-yellow
+  ctx.save();
+  const lg = ctx.createLinearGradient(cx - W*0.25, 0, cx + W*0.25, 0);
+  lg.addColorStop(0, 'rgba(0,156,59,0)');
+  lg.addColorStop(0.5, 'rgba(255,223,0,0.9)');
+  lg.addColorStop(1, 'rgba(0,156,59,0)');
+  ctx.strokeStyle = lg;
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(cx - W*0.25, y+4); ctx.lineTo(cx + W*0.25, y+4); ctx.stroke();
+  y += 16;
+
+  // "COPA DO MUNDO" — compact green pill
+  ctx.save();
+  const c1Txt = 'COPA DO MUNDO';
+  const c1Fs = Math.round(W * 0.048);
+  ctx.font = `900 ${c1Fs}px "Poppins",sans-serif`;
+  const c1W = ctx.measureText(c1Txt).width;
+  const c1PH = Math.round(c1Fs * 1.65);
+  const c1PW = c1W + 56;
+  ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0;
+  // Green background pill
+  ctx.fillStyle = '#009c3b';
+  if(ctx.roundRect) ctx.roundRect(cx - c1PW/2, y, c1PW, c1PH, 8);
+  else ctx.rect(cx - c1PW/2, y, c1PW, c1PH);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,223,0,0.7)';
+  ctx.lineWidth = 2;
+  if(ctx.roundRect) ctx.roundRect(cx - c1PW/2, y, c1PW, c1PH, 8);
+  else ctx.rect(cx - c1PW/2, y, c1PW, c1PH);
+  ctx.stroke();
+  ctx.fillStyle = '#FFDF00';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(c1Txt, cx, y + c1PH/2);
+  ctx.restore();
+  y += c1PH + 8;
+
+  // "2026" — giant yellow number
+  ctx.save();
+  const yearFs = Math.round(W * 0.22);
+  ctx.font = `900 ${yearFs}px "Montserrat","Poppins",sans-serif`;
+  ctx.fillStyle = '#FFDF00';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = 'rgba(0,100,30,0.7)';
+  ctx.shadowBlur = 30;
+  ctx.shadowOffsetX = 0;
+  ctx.shadowOffsetY = 6;
+  // Stroke for depth
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = 'rgba(0,80,20,0.6)';
+  ctx.lineJoin = 'round';
+  ctx.strokeText('2026', cx, y + yearFs * 0.82);
+  ctx.fillText('2026', cx, y + yearFs * 0.82);
+  ctx.restore();
+  y += yearFs * 0.86 + 4;
+
+  // Subtitle "Brasil-Estados Unidos-México" — small italic
+  ctx.save();
+  const subFs = Math.round(W * 0.032);
+  ctx.font = `600 italic ${subFs}px "Poppins",sans-serif`;
+  ctx.fillStyle = 'rgba(200,255,180,0.75)';
+  ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 6;
+  ctx.fillText('Brasil · EUA · México', cx, y + subFs);
+  ctx.restore();
+  y += subFs + 12;
+
+  // Bottom accent line
+  ctx.save();
+  const lg2 = ctx.createLinearGradient(cx - W*0.20, 0, cx + W*0.20, 0);
+  lg2.addColorStop(0, 'rgba(0,156,59,0)');
+  lg2.addColorStop(0.5, 'rgba(0,156,59,0.7)');
+  lg2.addColorStop(1, 'rgba(0,156,59,0)');
+  ctx.strokeStyle = lg2;
+  ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx - W*0.20, y); ctx.lineTo(cx + W*0.20, y); ctx.stroke();
+  ctx.restore();
+  y += 14;
+
+  return y;
+}
+
+function drawCopa2026Template(ctx, W, H, sl){
+  const {topPad, botPad} = safePx(H, sl);
+
+  // 1. Background
+  if(sl.photoImg){
+    drawBgPhoto(ctx, W, H, sl);
+  } else {
+    // Deep green-black gradient
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0, '#001a09');
+    bg.addColorStop(0.45, '#003015');
+    bg.addColorStop(1, '#000d04');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+    // Grid pattern like a football pitch
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0,156,59,0.07)';
+    ctx.lineWidth = 1;
+    const step = Math.round(W * 0.12);
+    for(let x=0;x<W;x+=step){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for(let y=0;y<H;y+=step){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+    ctx.restore();
+    // Football ball background decorations
+    drawCopa2026Ball(ctx, W*0.15, H*0.45, W*0.35);
+    drawCopa2026Ball(ctx, W*0.85, H*0.55, W*0.28);
+  }
+
+  // 2. Dark gradient overlays top + bottom
+  const topGrad = ctx.createLinearGradient(0, 0, 0, H * 0.42);
+  topGrad.addColorStop(0, 'rgba(0,8,2,0.92)');
+  topGrad.addColorStop(0.5, 'rgba(0,8,2,0.55)');
+  topGrad.addColorStop(1, 'rgba(0,8,2,0)');
+  ctx.fillStyle = topGrad;
+  ctx.fillRect(0, 0, W, H * 0.42);
+
+  const botGrad = ctx.createLinearGradient(0, H * 0.58, 0, H);
+  botGrad.addColorStop(0, 'rgba(0,5,1,0)');
+  botGrad.addColorStop(0.35, 'rgba(0,5,1,0.72)');
+  botGrad.addColorStop(1, 'rgba(0,3,1,0.97)');
+  ctx.fillStyle = botGrad;
+  ctx.fillRect(0, H * 0.58, W, H * 0.42);
+
+  // 3. Green ambient glow at top
+  const greenGlow = ctx.createRadialGradient(W*0.5, H*0.06, 0, W*0.5, H*0.06, W*0.7);
+  greenGlow.addColorStop(0, 'rgba(0,156,59,0.20)');
+  greenGlow.addColorStop(0.6, 'rgba(0,100,30,0.07)');
+  greenGlow.addColorStop(1, 'rgba(0,50,10,0)');
+  ctx.fillStyle = greenGlow;
+  ctx.fillRect(0, 0, W, H * 0.38);
+
+  // 4. Yellow glow at bottom
+  const yellowGlow = ctx.createRadialGradient(W*0.5, H*0.95, 0, W*0.5, H*0.95, W*0.65);
+  yellowGlow.addColorStop(0, 'rgba(255,223,0,0.10)');
+  yellowGlow.addColorStop(1, 'rgba(255,223,0,0)');
+  ctx.fillStyle = yellowGlow;
+  ctx.fillRect(0, H*0.65, W, H*0.35);
+
+  // 5. Stars decoration
+  drawCopa2026Stars(ctx, W, H);
+
+  // 6. Header
+  drawCopa2026Header(ctx, W, topPad);
+
+  // 7. Bottom product block
+  let by = H * 0.685;
+
+  // Product name — bold white
+  if(sl.modelo){
+    ctx.save();
+    let fs = Math.round(W * 0.078);
+    ctx.font = `900 ${fs}px "Poppins",sans-serif`;
+    while(ctx.measureText(sl.modelo).width > W * 0.86 && fs > 28){ fs -= 2; ctx.font = `900 ${fs}px "Poppins",sans-serif`; }
+    ctx.fillStyle = '#ffffff';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,80,20,0.7)'; ctx.shadowBlur = 16;
+    ctx.fillText(sl.modelo, W/2, by + fs);
+    by += fs + 8;
+    ctx.restore();
+  }
+
+  // Variante pill — yellow background
+  if(sl.variante){
+    ctx.save();
+    const pillTxt = sl.variante.toUpperCase();
+    const vFs = Math.round(W * 0.040);
+    ctx.font = `800 ${vFs}px "Poppins",sans-serif`;
+    const vtw = ctx.measureText(pillTxt).width;
+    const vph = vFs + 22, vpw = vtw + 48;
+    ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+    ctx.fillStyle = '#FFDF00';
+    if(ctx.roundRect) ctx.roundRect(W/2 - vpw/2, by, vpw, vph, 6);
+    else ctx.rect(W/2 - vpw/2, by, vpw, vph);
+    ctx.fill();
+    ctx.fillStyle = '#003010';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(pillTxt, W/2, by + vph/2);
+    by += vph + 12;
+    ctx.restore();
+  }
+
+  // Cor
+  if(sl.cor){
+    ctx.save();
+    ctx.font = `600 ${Math.round(W*0.034)}px "Poppins",sans-serif`;
+    ctx.fillStyle = 'rgba(150,255,150,0.75)';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText(sl.cor, W/2, by + Math.round(W*0.034));
+    by += Math.round(W*0.034) + 8;
+    ctx.restore();
+  }
+
+  // Faixa banner — green
+  if(sl.faixa){
+    const fh = Math.round(H * 0.058);
+    const fy = by;
+    ctx.save();
+    ctx.fillStyle = sl.faixaCor || '#009c3b';
+    ctx.fillRect(0, fy, W, fh);
+    // yellow border lines
+    ctx.strokeStyle = sl.faixaTextCor || '#FFDF00';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0,fy); ctx.lineTo(W,fy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,fy+fh); ctx.lineTo(W,fy+fh); ctx.stroke();
+    const bFs = Math.min(54, fh*0.56)|0;
+    ctx.font = `900 ${bFs}px "Poppins",sans-serif`;
+    ctx.fillStyle = sl.faixaTextCor || '#FFDF00';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(sl.faixa.toUpperCase(), W/2, fy + fh/2);
+    ctx.restore();
+    by += fh + 14;
+  }
+
+  // Price block
+  if(sl.showPrice !== false && sl.preco){
+    ctx.save();
+    let pFs = Math.round(W * 0.082);
+    ctx.font = `900 ${pFs}px "Poppins",sans-serif`;
+    ctx.fillStyle = '#FFDF00';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,80,20,0.8)'; ctx.shadowBlur = 18;
+    ctx.strokeStyle = 'rgba(0,60,15,0.5)';
+    ctx.lineWidth = 4; ctx.lineJoin = 'round';
+    ctx.strokeText(sl.preco, W/2, by + pFs);
+    ctx.fillText(sl.preco, W/2, by + pFs);
+    by += pFs + 6;
+    ctx.restore();
+
+    if(sl.info1){
+      ctx.save();
+      const iFs = Math.round(W * 0.034);
+      ctx.font = `700 ${iFs}px "Poppins",sans-serif`;
+      ctx.fillStyle = '#7dffaa';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+      ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 6;
+      ctx.fillText('✓ ' + sl.info1, W/2, by + iFs);
+      by += iFs + 6;
+      ctx.restore();
+    }
+
+    if(sl.parcela){
+      ctx.save();
+      const parTxt = 'à vista ou até ' + sl.parcela;
+      const parFs = Math.round(W * 0.036);
+      ctx.font = `700 ${parFs}px "Poppins",sans-serif`;
+      const parW = ctx.measureText(parTxt).width + 40;
+      const parH = parFs + 20;
+      ctx.shadowColor = 'rgba(0,0,0,0)'; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+      ctx.fillStyle = '#FFDF00';
+      if(ctx.roundRect) ctx.roundRect(W/2 - parW/2, by, parW, parH, 5);
+      else ctx.rect(W/2 - parW/2, by, parW, parH);
+      ctx.fill();
+      ctx.fillStyle = '#002a0d';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(parTxt, W/2, by + parH/2);
+      by += parH + 8;
+      ctx.restore();
+    }
+  }
+
+  // CTA
+  if(sl.cta){
+    ctx.save();
+    const ctaY = H - botPad - 10;
+    const ctaFs = Math.round(W * 0.044);
+    ctx.font = `800 ${ctaFs}px "Poppins",sans-serif`;
+    ctx.fillStyle = '#7dffaa';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0,0,0,0.6)'; ctx.shadowBlur = 8;
+    ctx.fillText(sl.cta, W/2, ctaY);
+    ctx.restore();
+  }
+
+  // Sticker + Logo
+  drawSticker(ctx, W, topPad, sl);
+  drawLogo(ctx, W, H - botPad + 22, sl, false);
+}
+
 function drawTemplate(ctx,W,H,sl){
   ctx.clearRect(0,0,W,H);
   const layout=resolveLayout(sl);
   const hasPhoto=!!sl.photoImg;
   const {topPad,botPad}=safePx(H,sl);
+
+  // ── COPA DO MUNDO 2026 special template ──
+  if(sl.template === 'copa2026'){
+    drawCopa2026Template(ctx, W, H, sl);
+    return;
+  }
 
   // ── DIA DOS NAMORADOS special template ──
   if(sl.template === 'namorados'){
