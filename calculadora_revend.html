@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora Revend | Parcelamento & Frete</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{
+  --red:#c8102e;--red-dark:#a00d24;--red-dim:rgba(200,16,46,.10);
+  --preto:#111;--bg:#F2F2F7;--card:#fff;--brd:#E5E5EA;
+  --txt2:#8E8E93;--verde:#34C759;--azul:#007AFF;--wpp:#25D366;
+  --radius:16px;--shadow:0 2px 14px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--preto);min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:230px;background:#fff;border-right:1px solid var(--brd);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto}
+.sb-logo{padding:20px 18px 14px;border-bottom:1px solid var(--brd)}
+.sb-logo-txt{font-size:22px;font-weight:900;color:var(--red);letter-spacing:-1.5px;line-height:1}
+.sb-logo-sub{font-size:9px;font-weight:700;color:var(--txt2);letter-spacing:.5px;text-transform:uppercase;margin-top:3px}
+.sb-nav{padding:10px 8px;flex:1}
+.nav-label{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.8px;padding:12px 10px 6px}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;border-radius:10px;background:none;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;color:#555;text-align:left;transition:all .15s;margin-bottom:2px}
+.nav-btn:hover{background:var(--bg);color:var(--preto)}
+.nav-btn.on{background:var(--red-dim);color:var(--red)}
+.nav-btn .em{font-size:16px;flex-shrink:0}
+.sb-foot{padding:14px;border-top:1px solid var(--brd)}
+.sb-version{font-size:10px;color:var(--txt2);font-weight:600;text-align:center}
+
+/* MAIN */
+.main{margin-left:230px;flex:1;display:flex;flex-direction:column}
+.topbar{background:#fff;border-bottom:1px solid var(--brd);padding:14px 28px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:90}
+.topbar-info h1{font-size:17px;font-weight:900;letter-spacing:-.4px}
+.topbar-info p{font-size:10px;color:var(--txt2);font-weight:600;margin-top:2px}
+.tb-badge{background:var(--red-dim);color:var(--red);font-size:10px;font-weight:800;padding:4px 12px;border-radius:20px;margin-left:auto;border:1px solid rgba(200,16,46,.2)}
+
+/* CONTENT */
+.content{padding:24px 28px 80px}
+
+/* PANELS */
+.sec-panel{display:none}
+.sec-panel.on{display:block}
+
+/* HERO */
+.hero-card{background:linear-gradient(130deg,var(--red) 0%,var(--red-dark) 100%);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;color:#fff}
+.hero-card h2{font-size:17px;font-weight:900;letter-spacing:-.3px}
+.hero-card p{font-size:11px;opacity:.75;font-weight:600;margin-top:4px}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* CARD */
+.card{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px}
+.card-head{padding:14px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
+.card-head h3{font-size:13px;font-weight:800;letter-spacing:-.2px}
+.card-head .icon{font-size:18px}
+.card-body{padding:18px}
+
+/* FORM */
+.field{margin-bottom:14px}
+.field label{display:block;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.field input,.field select{width:100%;padding:10px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:600;color:var(--preto);background:#fafafa;outline:none;transition:border .15s}
+.field input:focus,.field select:focus{border-color:var(--red);background:#fff}
+.field-row{display:flex;gap:10px}
+.field-row .field{flex:1}
+
+/* TOGGLE */
+.toggle-wrap{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--brd);border-radius:10px;background:#fafafa;cursor:pointer;transition:all .15s;margin-bottom:14px}
+.toggle-wrap:hover{border-color:var(--red)}
+.toggle-wrap input{display:none}
+.toggle-track{width:38px;height:22px;background:#ddd;border-radius:11px;position:relative;transition:background .2s;flex-shrink:0}
+.toggle-track::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.toggle-wrap input:checked+.toggle-track{background:var(--red)}
+.toggle-wrap input:checked+.toggle-track::after{transform:translateX(16px)}
+.toggle-label{font-size:12px;font-weight:700}
+
+/* BTN */
+.btn{width:100%;padding:12px;border:none;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:var(--red-dark)}
+.btn-dark{background:var(--preto);color:#fff}
+.btn-dark:hover{background:#333}
+.btn-ghost{background:#f0f0f5;color:#555}
+.btn-ghost:hover{background:#e0e0e8}
+.btn-wpp{background:var(--wpp);color:#fff}
+.btn-wpp:hover{background:#1fb855}
+.btn-sm{padding:8px 16px;font-size:11px;width:auto;border-radius:8px}
+
+/* PROPOSTA TABLE */
+.prop-wrap{background:#1a1a1a;border-radius:12px;padding:18px 20px;margin-top:16px;font-family:'Courier New',monospace;font-size:12px;color:#e8e8e8;line-height:1.7;white-space:pre;overflow-x:auto}
+.prop-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+/* PARCELAS TABLE */
+.parc-table{width:100%;border-collapse:collapse}
+.parc-table th{padding:9px 14px;background:var(--preto);color:rgba(255,255,255,.7);font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;text-align:left}
+.parc-table td{padding:9px 14px;border-bottom:1px solid #f5f5f7;font-size:12px;font-weight:600;vertical-align:middle}
+.parc-table tbody tr:hover{background:#fff8f9}
+.parc-table tbody tr.row-debito td{background:#f0fdf4}
+.parc-table tbody tr.row-avista td{background:#eff6ff}
+.parc-table tbody tr.row-melhor td{background:#fff7ed;font-weight:800}
+.badge-parc{background:var(--red-dim);color:var(--red);font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;border:1px solid rgba(200,16,46,.2);white-space:nowrap}
+.badge-deb{background:#d1fae5;color:#065f46;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px}
+.badge-av{background:#dbeafe;color:#1e40af;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px}
+
+/* BREAKDOWN */
+.breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.bk-item{background:#f8f8f8;border:1px solid var(--brd);border-radius:10px;padding:12px 14px}
+.bk-item .bk-lbl{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
+.bk-item .bk-val{font-size:16px;font-weight:900;margin-top:2px}
+.bk-item.hl{background:var(--red-dim);border-color:rgba(200,16,46,.25)}
+.bk-item.hl .bk-val{color:var(--red)}
+
+/* FRETE */
+.rota-visual{background:var(--preto);border-radius:12px;padding:16px 20px;margin:16px 0;color:#fff;display:flex;align-items:center}
+.rota-ponto{text-align:center;flex:0 0 auto;min-width:80px}
+.rota-ponto .rp-icon{font-size:22px}
+.rota-ponto .rp-label{font-size:9px;font-weight:800;opacity:.5;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.rota-ponto .rp-val{font-size:10px;font-weight:700;margin-top:2px}
+.rota-linha{flex:1;text-align:center;padding:0 8px}
+.rota-linha .rl-seta{font-size:11px;opacity:.4;letter-spacing:-2px}
+.rota-linha .rl-km{font-size:11px;font-weight:800;color:#fff;margin:2px 0}
+.rota-linha .rl-tipo{font-size:9px;opacity:.5;font-weight:700;text-transform:uppercase}
+
+/* SERVICO CARDS */
+.servicos-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.svc-card{border:2px solid var(--brd);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s;position:relative}
+.svc-card:hover{border-color:var(--red)}
+.svc-card.selected{border-color:var(--red);background:var(--red-dim)}
+.svc-card .svc-nome{font-size:12px;font-weight:800}
+.svc-card .svc-prazo{font-size:10px;color:var(--txt2);font-weight:600;margin-top:2px}
+.svc-card .svc-preco{font-size:16px;font-weight:900;color:var(--red);margin-top:6px}
+.svc-card .svc-badge{position:absolute;top:8px;right:8px;background:var(--verde);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px}
+.svc-loading{text-align:center;padding:30px;color:var(--txt2);font-size:12px;font-weight:600}
+
+/* CORREIOS SUB-TABS */
+.sub-tabs{display:flex;gap:6px;margin-bottom:16px}
+.sub-tab{padding:7px 16px;border:1.5px solid var(--brd);border-radius:20px;background:#fff;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;color:#888;transition:all .2s}
+.sub-tab:hover{border-color:var(--red);color:var(--red)}
+.sub-tab.on{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:36px 20px;color:var(--txt2)}
+.empty-state .es-icon{font-size:38px;margin-bottom:10px}
+.empty-state p{font-size:12px;font-weight:600}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--preto);color:#fff;padding:12px 20px;border-radius:12px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;max-width:280px}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.green{background:#059669}
+.toast.red{background:var(--red)}
+
+.div-line{height:1px;background:var(--brd);margin:16px 0}
+
+@media(max-width:900px){
+  .sidebar{width:200px}.main{margin-left:200px}
+  .grid-2{grid-template-columns:1fr}
+  .servicos-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:650px){
+  .sidebar{display:none}.main{margin-left:0}
+  .field-row{flex-direction:column}
+  .servicos-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<div style="display:flex;min-height:100vh">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-txt">Revend</div>
+    <div class="sb-logo-sub">Ferramentas do Vendedor</div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-label">Calculadoras</div>
+    <button class="nav-btn on" onclick="trocarAba('parc',this)">
+      <span class="em">💳</span> Parcelamento
+    </button>
+    <button class="nav-btn" onclick="trocarAba('frete',this)">
+      <span class="em">🚚</span> Frete
+    </button>
+  </nav>
+  <div class="sb-foot">
+    <div class="sb-version">Revend Eletro · v2.0</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-info">
+      <h1 id="topbar-title">Calculadora de Parcelamento</h1>
+      <p id="topbar-sub">Simule parcelamentos e gere propostas para o cliente</p>
+    </div>
+    <div class="tb-badge" id="tb-badge-token" style="cursor:pointer" onclick="trocarAba('frete',document.querySelectorAll('.nav-btn')[1]);trocarFrete('correios',document.querySelectorAll('.sub-tab')[1])">🔑 Token ME</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PAINEL PARCELAMENTO                        -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="sec-panel on" id="panel-parc">
+      <div class="hero-card">
+        <h2>💳 Simulação de Parcelamento</h2>
+        <p>Taxas reais da maquininha · Débito até 18x · Proposta formatada para WhatsApp</p>
+      </div>
+
+      <div class="grid-2">
+        <!-- FORMULÁRIO -->
+        <div class="card">
+          <div class="card-head"><span class="icon">📱</span><h3>Dados do Produto</h3></div>
+          <div class="card-body">
+            <div class="field">
+              <label>Modelo / Produto</label>
+              <input type="text" id="p-modelo" placeholder="Ex: iPhone 17 256GB" oninput="calcularParc()">
+            </div>
+            <div class="field">
+              <label>Valor Base (à vista, R$)</label>
+              <input type="number" id="p-valor" placeholder="0,00" min="0" step="0.01" oninput="calcularParc()">
+            </div>
+            <div class="div-line"></div>
+            <div class="field">
+              <label>Nome do Cliente (opcional)</label>
+              <input type="text" id="p-cliente" placeholder="Ex: João Silva" oninput="renderProposta()">
+            </div>
+            <div class="field">
+              <label>Observação (opcional)</label>
+              <input type="text" id="p-obs" placeholder="Ex: Produto novo lacrado, garantia Apple" oninput="renderProposta()">
+            </div>
+            <button class="btn btn-red" onclick="calcularParc()">🧮 Calcular Parcelamento</button>
+          </div>
+        </div>
+
+        <!-- TABELA DE PARCELAS -->
+        <div class="card" style="max-height:620px;overflow:hidden;display:flex;flex-direction:column">
+          <div class="card-head"><span class="icon">📊</span><h3>Tabela de Parcelas</h3></div>
+          <div style="flex:1;overflow-y:auto">
+            <div id="parc-tabela">
+              <div class="empty-state">
+                <div class="es-icon">💳</div>
+                <p>Informe o valor base<br>para ver a simulação completa</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROPOSTA -->
+      <div class="card" id="proposta-parc-card" style="display:none">
+        <div class="card-head"><span class="icon">📄</span><h3>Proposta para WhatsApp</h3></div>
+        <div class="card-body" id="proposta-parc-body"></div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- PAINEL FRETE                               -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="sec-panel" id="panel-frete">
+      <div class="hero-card">
+        <h2>🚚 Calculadora de Frete</h2>
+        <p>Motoboy R$ 2,50/km · Correios via Melhor Envio · CEP origem: 03307-005</p>
+      </div>
+
+      <!-- SUB-TABS -->
+      <div class="sub-tabs">
+        <button class="sub-tab on" onclick="trocarFrete('motoboy',this)">🛵 Motoboy</button>
+        <button class="sub-tab" onclick="trocarFrete('correios',this)">📦 Correios</button>
+      </div>
+
+      <!-- MOTOBOY -->
+      <div id="frete-motoboy" class="grid-2">
+        <div class="card">
+          <div class="card-head"><span class="icon">📍</span><h3>Dados da Entrega</h3></div>
+          <div class="card-body">
+            <div class="field">
+              <label>CEP de Destino</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="mb-cep" placeholder="00000-000" maxlength="9" style="flex:1" oninput="mascaraCEP(this,'mb')" onblur="buscarCEPMotoboy()">
+                <button class="btn btn-ghost btn-sm" onclick="buscarCEPMotoboy()" id="btn-mb-cep">🔍</button>
+              </div>
+            </div>
+            <div class="field" id="mb-end-wrap" style="display:none">
+              <label>Endereço</label>
+              <div style="padding:9px 12px;background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:10px;font-size:11px;font-weight:700;color:#059669" id="mb-end-txt"></div>
+            </div>
+            <div class="field">
+              <label>Distância (km)</label>
+              <input type="number" id="mb-km" placeholder="Ex: 12.5" min="0.1" step="0.1" oninput="calcularMotoboy()">
+            </div>
+            <label class="toggle-wrap">
+              <input type="checkbox" id="mb-idavolta" onchange="calcularMotoboy()">
+              <div class="toggle-track"></div>
+              <span class="toggle-label">🔄 Ida e Volta</span>
+            </label>
+            <div class="field-row">
+              <div class="field">
+                <label>R$/km</label>
+                <input type="number" id="mb-taxa" value="2.50" min="0.5" step="0.10" oninput="calcularMotoboy()">
+              </div>
+              <div class="field">
+                <label>Mínimo (R$)</label>
+                <input type="number" id="mb-minimo" value="15.00" min="0" step="1" oninput="calcularMotoboy()">
+              </div>
+            </div>
+            <div class="div-line"></div>
+            <div class="field">
+              <label>Nome do Cliente (opcional)</label>
+              <input type="text" id="mb-cliente" placeholder="Ex: Maria Souza" oninput="renderPropostaFrete()">
+            </div>
+            <button class="btn btn-red" onclick="calcularMotoboy()">🛵 Calcular Frete</button>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-head"><span class="icon">📊</span><h3>Resultado</h3></div>
+            <div class="card-body" id="mb-resultado">
+              <div class="empty-state">
+                <div class="es-icon">🛵</div>
+                <p>Informe o CEP ou a distância<br>para calcular o frete motoboy</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" id="proposta-frete-card" style="display:none">
+            <div class="card-head"><span class="icon">📄</span><h3>Mensagem para WhatsApp</h3></div>
+            <div class="card-body" id="proposta-frete-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CORREIOS -->
+      <div id="frete-correios" style="display:none" class="grid-2">
+        <div class="card">
+          <div class="card-head"><span class="icon">📦</span><h3>Dados da Encomenda</h3></div>
+          <div class="card-body">
+            <div class="field">
+              <label>CEP de Destino</label>
+              <div style="display:flex;gap:8px">
+                <input type="text" id="cr-cep" placeholder="00000-000" maxlength="9" style="flex:1" oninput="mascaraCEP(this,'cr')">
+                <button class="btn btn-red btn-sm" onclick="simularCorreios()" id="btn-simular">🔍 Simular</button>
+              </div>
+            </div>
+            <div class="field" id="cr-end-wrap" style="display:none">
+              <label>Destino</label>
+              <div style="padding:9px 12px;background:#f0fdf4;border:1.5px solid #6ee7b7;border-radius:10px;font-size:11px;font-weight:700;color:#059669" id="cr-end-txt"></div>
+            </div>
+            <div class="div-line"></div>
+            <div style="margin-bottom:10px;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px">Dimensões da Embalagem</div>
+            <div class="field-row">
+              <div class="field"><label>Peso (kg)</label><input type="number" id="cr-peso" value="0.5" min="0.1" step="0.1"></div>
+              <div class="field"><label>Comprimento (cm)</label><input type="number" id="cr-comp" value="20" min="1"></div>
+            </div>
+            <div class="field-row">
+              <div class="field"><label>Largura (cm)</label><input type="number" id="cr-larg" value="15" min="1"></div>
+              <div class="field"><label>Altura (cm)</label><input type="number" id="cr-alt" value="10" min="1"></div>
+            </div>
+            <div class="field">
+              <label>Valor declarado (R$)</label>
+              <input type="number" id="cr-valor-dec" value="0" min="0" step="10" placeholder="0 = sem declarar">
+            </div>
+            <div class="div-line"></div>
+            <div class="field">
+              <label>Nome do Cliente (opcional)</label>
+              <input type="text" id="cr-cliente" placeholder="Ex: Carlos Lima" oninput="renderPropostaCorreios()">
+            </div>
+            <div style="margin-bottom:14px;padding:12px 14px;background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe">
+              <div style="font-size:10px;font-weight:800;color:#1e40af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">🔑 Token Melhor Envio</div>
+              <input type="password" id="cr-token" placeholder="eyJ0eXAiOiJKV1Qi..." oninput="salvarToken()" style="width:100%;padding:9px 12px;border:1.5px solid #bfdbfe;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:600;background:#fff;outline:none">
+              <div style="margin-top:5px;font-size:9px;color:#3b82f6;font-weight:700">Obtenha em melhorenvio.com.br → Perfil → Tokens de Acesso · Salvo no navegador</div>
+            </div>
+            <button class="btn btn-red" onclick="simularCorreios()">📦 Simular Frete Correios</button>
+            <div style="margin-top:10px;padding:10px;background:#fff7ed;border-radius:8px;border:1px solid #fed7aa;font-size:10px;font-weight:600;color:#92400e;line-height:1.5">
+              ⚠️ Os valores são estimativas e podem variar. Confirme sempre no site oficial.
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="card">
+            <div class="card-head"><span class="icon">📊</span><h3>Serviços Disponíveis</h3></div>
+            <div class="card-body" id="cr-resultado">
+              <div class="empty-state">
+                <div class="es-icon">📦</div>
+                <p>Preencha os dados e clique em<br>Simular para ver as opções</p>
+              </div>
+            </div>
+          </div>
+          <div class="card" id="proposta-correios-card" style="display:none">
+            <div class="card-head"><span class="icon">📄</span><h3>Mensagem para WhatsApp</h3></div>
+            <div class="card-body" id="proposta-correios-body"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════
+const fmt  = v => 'R$\u00a0' + Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtN = (v,d=1) => Number(v).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pad  = (s,n,dir='r') => { s=String(s); return dir==='r' ? s.padEnd(n) : s.padStart(n); };
+
+function toast(msg,tipo=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'toast show ' + tipo;
+  clearTimeout(t._to);
+  t._to = setTimeout(()=>{ t.className='toast'; }, 3500);
+}
+
+function trocarAba(aba, btn){
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.sec-panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('panel-'+aba).classList.add('on');
+  const map = {
+    parc:  ['Calculadora de Parcelamento','Simule parcelamentos e gere propostas para o cliente'],
+    frete: ['Calculadora de Frete','Motoboy e Correios · CEP origem 03307-005']
+  };
+  document.getElementById('topbar-title').textContent = map[aba][0];
+  document.getElementById('topbar-sub').textContent   = map[aba][1];
+}
+
+function trocarFrete(tipo, btn){
+  document.querySelectorAll('.sub-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('frete-motoboy').style.display   = tipo==='motoboy' ? 'grid' : 'none';
+  document.getElementById('frete-correios').style.display  = tipo==='correios' ? 'grid' : 'none';
+}
+
+// ══════════════════════════════════════════════════
+// TAXAS DE PARCELAMENTO
+// Tabela exata extraída do exemplo fornecido
+// ══════════════════════════════════════════════════
+// Percentual de acréscimo sobre o valor base por modalidade:
+const TAXAS = {
+  debito: 2.00,
+  1:  4.00,  2:  5.00,  3:  6.00,  4:  7.00,
+  5:  8.00,  6:  9.00,  7: 10.00,  8: 11.00,
+  9: 12.10, 10: 13.40, 11: 14.70, 12: 16.00,
+ 13: 17.30, 14: 18.60, 15: 19.90, 16: 20.20,
+ 17: 21.50, 18: 22.80
+};
+
+function calcMod(base, mod){
+  const pct = TAXAS[mod];
+  const total = base * (1 + pct/100);
+  const parcela = (mod === 'debito' || mod === 1) ? total : total / mod;
+  return { total, parcela, pct };
+}
+
+let _dadosParc = null;
+
+function calcularParc(){
+  const base   = parseFloat(document.getElementById('p-valor').value) || 0;
+  const modelo = document.getElementById('p-modelo').value.trim();
+  if(base <= 0){
+    document.getElementById('parc-tabela').innerHTML = `<div class="empty-state"><div class="es-icon">💳</div><p>Informe o valor base para ver a simulação</p></div>`;
+    return;
+  }
+
+  _dadosParc = { base, modelo };
+
+  // Monta tabela
+  let rows = '';
+
+  // Débito
+  const deb = calcMod(base,'debito');
+  rows += `<tr class="row-debito">
+    <td><span class="badge-deb">Débito</span></td>
+    <td style="font-weight:800;color:#059669">${fmt(deb.parcela)}</td>
+    <td style="color:var(--txt2)">—</td>
+  </tr>`;
+
+  // 1x à vista no crédito
+  const av = calcMod(base,1);
+  rows += `<tr class="row-avista">
+    <td><span class="badge-av">1x</span></td>
+    <td style="font-weight:800;color:#1d4ed8">${fmt(av.parcela)}</td>
+    <td style="color:#1d4ed8;font-weight:700">${fmt(av.total)}</td>
+  </tr>`;
+
+  // 2x a 18x
+  for(let n=2; n<=18; n++){
+    const r = calcMod(base, n);
+    const isDestaque = n===6||n===12;
+    rows += `<tr${isDestaque?' style="background:#fff8f9"':''}>
+      <td><span class="badge-parc">${n}x</span></td>
+      <td style="font-weight:800${isDestaque?';color:var(--red)':''}">${fmt(r.parcela)}</td>
+      <td style="font-weight:700">${fmt(r.total)}</td>
+    </tr>`;
+  }
+
+  document.getElementById('parc-tabela').innerHTML = `
+    <table class="parc-table">
+      <thead><tr><th>Forma</th><th>Parcela</th><th>Total</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+
+  renderProposta();
+}
+
+function renderProposta(){
+  if(!_dadosParc) return;
+  const { base, modelo } = _dadosParc;
+  const cliente = document.getElementById('p-cliente').value.trim();
+  const obs     = document.getElementById('p-obs').value.trim();
+  const modeloTxt = modelo || 'Produto';
+
+  // Monta texto no formato exato do exemplo
+  const sep = '━━━━━━━━━━━━━━━━━━━━';
+  let linhas = [];
+  linhas.push(`💳 *Simulação de Parcelamento*`);
+  if(modeloTxt) linhas.push(`📱 *${modeloTxt}*`);
+  linhas.push(`💰 Base: ${fmt(base)}`);
+  linhas.push(sep);
+  linhas.push(`Forma     | Parcela      | Total`);
+  linhas.push(sep);
+
+  // Débito
+  const deb = calcMod(base,'debito');
+  linhas.push(`Débito   | ${fmt(deb.parcela).padEnd(12)} | —`);
+
+  // 1x a 18x
+  for(let n=1; n<=18; n++){
+    const r = calcMod(base,n);
+    const forma = (n+'x').padEnd(8);
+    const parc  = fmt(r.parcela).padEnd(12);
+    const tot   = n===1 ? fmt(r.total) : fmt(r.total);
+    linhas.push(`${forma} | ${parc} | ${tot}`);
+  }
+
+  linhas.push(`_Revend Eletro — preços sujeitos a alteração_`);
+  if(obs) linhas.push(`📝 ${obs}`);
+  if(cliente) linhas.splice(1, 0, `👤 ${cliente}`);
+
+  const txt = linhas.join('\n');
+
+  document.getElementById('proposta-parc-card').style.display = 'block';
+  document.getElementById('proposta-parc-body').innerHTML = `
+    <div class="prop-wrap" id="prop-parc-txt">${escHtml(txt)}</div>
+    <div class="prop-actions">
+      <button class="btn btn-dark btn-sm" onclick="copiar('prop-parc-txt')">📋 Copiar</button>
+      <button class="btn btn-wpp btn-sm" onclick="abrirWpp('prop-parc-txt')">💬 WhatsApp</button>
+      <button class="btn btn-ghost btn-sm" onclick="salvarImagemParc()">🖼️ Salvar Imagem</button>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// FRETE — MOTOBOY
+// ══════════════════════════════════════════════════
+const CEP_ORIGEM = '03307005';
+let _dadosMb = null;
+
+function mascaraCEP(el, pref){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length > 5) v = v.slice(0,5)+'-'+v.slice(5,8);
+  el.value = v;
+}
+
+async function buscarEndereco(cep){
+  const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+  const d = await r.json();
+  if(d.erro) return null;
+  return `${d.logradouro ? d.logradouro+', ' : ''}${d.bairro} — ${d.localidade}/${d.uf}`;
+}
+
+async function estimarKm(cepDest){
+  const [r1,r2] = await Promise.all([
+    fetch(`https://nominatim.openstreetmap.org/search?postalcode=${CEP_ORIGEM}&country=BR&format=json&limit=1`).then(r=>r.json()),
+    fetch(`https://nominatim.openstreetmap.org/search?postalcode=${cepDest}&country=BR&format=json&limit=1`).then(r=>r.json())
+  ]);
+  if(!r1.length||!r2.length) return null;
+  const lat1=+r1[0].lat,lon1=+r1[0].lon,lat2=+r2[0].lat,lon2=+r2[0].lon;
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return +(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.35).toFixed(1);
+}
+
+async function buscarCEPMotoboy(){
+  const cepRaw = document.getElementById('mb-cep').value.replace(/\D/g,'');
+  if(cepRaw.length!==8) return;
+  const btn = document.getElementById('btn-mb-cep');
+  btn.textContent='⏳'; btn.disabled=true;
+  try{
+    const [end, km] = await Promise.all([buscarEndereco(cepRaw), estimarKm(cepRaw)]);
+    if(end){
+      document.getElementById('mb-end-txt').textContent = end;
+      document.getElementById('mb-end-wrap').style.display = 'block';
+    }
+    if(km){ document.getElementById('mb-km').value = km; toast(`📍 Distância estimada: ${km} km`,'green'); calcularMotoboy(); }
+    else toast('Distância não calculada. Informe manualmente.','');
+  }catch(e){ toast('Erro ao buscar CEP.','red'); }
+  btn.textContent='🔍'; btn.disabled=false;
+}
+
+function calcularMotoboy(){
+  const km      = parseFloat(document.getElementById('mb-km').value)||0;
+  const iv      = document.getElementById('mb-idavolta').checked;
+  const taxa    = parseFloat(document.getElementById('mb-taxa').value)||2.5;
+  const minimo  = parseFloat(document.getElementById('mb-minimo').value)||15;
+  if(km<=0) return;
+
+  const kmTotal  = iv ? km*2 : km;
+  const calc     = kmTotal*taxa;
+  const valor    = Math.max(calc, minimo);
+  const temMin   = calc < minimo;
+  _dadosMb = { km, kmTotal, iv, taxa, minimo, valor };
+
+  const cep = document.getElementById('mb-cep').value||'—';
+  document.getElementById('mb-resultado').innerHTML = `
+    <div class="rota-visual">
+      <div class="rota-ponto">
+        <div class="rp-icon">📦</div>
+        <div class="rp-label">Origem</div>
+        <div class="rp-val">03307-005</div>
+      </div>
+      <div class="rota-linha">
+        <div class="rl-seta">${iv?'◀━━━━▶':'━━━━▶'}</div>
+        <div class="rl-km">${fmtN(kmTotal)} km${iv?' total':''}</div>
+        <div class="rl-tipo">${iv?'Ida e Volta':'Somente Ida'}</div>
+      </div>
+      <div class="rota-ponto">
+        <div class="rp-icon">📍</div>
+        <div class="rp-label">Destino</div>
+        <div class="rp-val">${cep}</div>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="bk-item hl"><div class="bk-lbl">Valor do Frete</div><div class="bk-val">${fmt(valor)}</div></div>
+      <div class="bk-item"><div class="bk-lbl">KM Total</div><div class="bk-val">${fmtN(kmTotal)} km</div></div>
+      <div class="bk-item"><div class="bk-lbl">Taxa/km</div><div class="bk-val">${fmt(taxa)}</div></div>
+      <div class="bk-item"><div class="bk-lbl">Tipo</div><div class="bk-val" style="font-size:13px">${iv?'🔄 Ida+Volta':'➡️ Só Ida'}</div></div>
+    </div>
+    ${temMin?`<div style="margin-top:10px;padding:9px 12px;background:#fef3c7;border-radius:8px;border:1px solid #fcd34d;font-size:10px;font-weight:700;color:#92400e">⚠️ Valor mínimo aplicado: ${fmt(minimo)}</div>`:''}`;
+  renderPropostaFrete();
+}
+
+function renderPropostaFrete(){
+  if(!_dadosMb) return;
+  const { km, kmTotal, iv, valor } = _dadosMb;
+  const cliente = document.getElementById('mb-cliente').value.trim();
+  const cep     = document.getElementById('mb-cep').value||'';
+  const end     = document.getElementById('mb-end-txt').textContent||'';
+  const saud    = cliente ? `Olá, ${cliente}! 😊` : `Olá! 😊`;
+
+  let txt = `${saud}\n\n🛵 *Frete Motoboy — Revend Eletro*\n\n`;
+  txt += `📍 Origem: 03307-005 (SP)\n`;
+  if(cep) txt += `📮 Destino: ${cep}${end?' — '+end:''}\n`;
+  txt += `🛣️ Distância: ${fmtN(km)} km${iv ? ` × 2 (ida e volta) = ${fmtN(kmTotal)} km` : ''}\n`;
+  txt += `\n💰 *Frete: ${fmt(valor)}*\n`;
+  txt += `\nEstamos à disposição! 🚀\n_Revend Eletro_`;
+
+  document.getElementById('proposta-frete-card').style.display='block';
+  document.getElementById('proposta-frete-body').innerHTML=`
+    <div class="prop-wrap" id="prop-mb-txt">${escHtml(txt)}</div>
+    <div class="prop-actions">
+      <button class="btn btn-dark btn-sm" onclick="copiar('prop-mb-txt')">📋 Copiar</button>
+      <button class="btn btn-wpp btn-sm" onclick="abrirWpp('prop-mb-txt')">💬 WhatsApp</button>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// FRETE — CORREIOS (via Melhor Envio API pública)
+// ══════════════════════════════════════════════════
+let _servicoSelecionado = null;
+let _dadosCorreios      = null;
+
+async function simularCorreios(){
+  const cepDest = document.getElementById('cr-cep').value.replace(/\D/g,'');
+  if(cepDest.length!==8){ toast('Informe um CEP válido.','red'); return; }
+
+  const token = obterToken();
+
+  const peso = parseFloat(document.getElementById('cr-peso').value)||0.5;
+  const comp = parseInt(document.getElementById('cr-comp').value)||20;
+  const larg = parseInt(document.getElementById('cr-larg').value)||15;
+  const alt  = parseInt(document.getElementById('cr-alt').value)||10;
+  const valDec = parseFloat(document.getElementById('cr-valor-dec').value)||0;
+
+  const btn = document.getElementById('btn-simular');
+  btn.textContent='⏳ Buscando...'; btn.disabled=true;
+  document.getElementById('cr-resultado').innerHTML=`<div class="svc-loading">🔄 Buscando tarifas...</div>`;
+
+  try{
+    const end = await buscarEndereco(cepDest);
+    if(end){
+      document.getElementById('cr-end-txt').textContent=end;
+      document.getElementById('cr-end-wrap').style.display='block';
+    }
+  } catch(e){}
+
+  if(!token){
+    document.getElementById('cr-resultado').innerHTML=`
+      <div style="padding:16px 18px">
+        <div style="padding:12px 14px;background:#fff7ed;border-radius:10px;border:1px solid #fed7aa;font-size:11px;font-weight:700;color:#92400e;line-height:1.6">
+          🔑 <strong>Token não configurado</strong><br>
+          Insira seu token do Melhor Envio no campo abaixo para obter cotações reais.<br>
+          <span style="opacity:.7">Obtenha em: melhorenvio.com.br → Perfil → Tokens de Acesso</span>
+        </div>
+      </div>`;
+    btn.textContent='🔍 Simular'; btn.disabled=false;
+    return;
+  }
+
+  const body = {
+    from: { postal_code: CEP_ORIGEM },
+    to:   { postal_code: cepDest },
+    package: { weight: peso, width: larg, height: alt, length: comp },
+    options: { insurance_value: valDec, receipt: false, own_hand: false }
+  };
+
+  // Tenta via proxy CORS para contornar bloqueio de browser
+  const PROXIES = [
+    url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+    url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`
+  ];
+
+  const ME_URL = 'https://melhorenvio.com.br/api/v2/me/shipment/calculate';
+  let sucesso = false;
+
+  for(const proxyFn of PROXIES){
+    try{
+      const proxyUrl = proxyFn(ME_URL);
+      const resp = await fetch(proxyUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'Accept':'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      if(!resp.ok){
+        const errTxt = await resp.text().catch(()=>'');
+        if(resp.status===401){
+          document.getElementById('cr-resultado').innerHTML=`
+            <div style="padding:16px 18px">
+              <div style="padding:12px 14px;background:#fee2e2;border-radius:10px;border:1px solid #fca5a5;font-size:11px;font-weight:700;color:#991b1b;line-height:1.6">
+                🚫 <strong>Token inválido ou expirado</strong><br>
+                Verifique seu token do Melhor Envio e tente novamente.
+              </div>
+            </div>`;
+          btn.textContent='🔍 Simular'; btn.disabled=false;
+          return;
+        }
+        throw new Error(`HTTP ${resp.status}`);
+      }
+
+      const servicos = await resp.json();
+      renderServicos(servicos, cepDest, peso, comp, larg, alt, valDec);
+      sucesso = true;
+      break;
+    } catch(e){ /* tenta próximo proxy */ }
+  }
+
+  if(!sucesso){
+    // Fallback com aviso claro
+    estimativaLocal(cepDest, peso, comp, larg, alt);
+  }
+
+  btn.textContent='🔍 Simular'; btn.disabled=false;
+}
+
+function renderServicos(servicos, cepDest, peso, comp, larg, alt, valDec){
+  _dadosCorreios = { cepDest, peso, comp, larg, alt, valDec };
+  _servicoSelecionado = null;
+
+  // Filtra erros e ordena por preço
+  const validos = (Array.isArray(servicos)?servicos:Object.values(servicos))
+    .filter(s=>s && !s.error && s.price)
+    .sort((a,b)=>parseFloat(a.price)-parseFloat(b.price));
+
+  if(!validos.length){ estimativaLocal(cepDest,peso,comp,larg,alt); return; }
+
+  const html = `
+    <div style="padding:14px 18px 0">
+      <div style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Selecione o serviço:</div>
+      <div class="servicos-grid">
+        ${validos.map((s,i)=>`
+          <div class="svc-card${i===0?' selected':''}" onclick="selecionarServico(this,'${escAttr(JSON.stringify(s))}')">
+            ${i===0?'<div class="svc-badge">Mais barato</div>':''}
+            <div class="svc-nome">${s.name||s.id}</div>
+            <div class="svc-prazo">📅 ${s.delivery_time ? s.delivery_time+' dias úteis' : '—'}</div>
+            <div class="svc-preco">${fmt(parseFloat(s.price))}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('cr-resultado').innerHTML = html;
+
+  // Seleciona o primeiro automaticamente
+  if(validos.length) selecionarServico(
+    document.querySelector('.svc-card.selected'),
+    JSON.stringify(validos[0])
+  );
+}
+
+function selecionarServico(el, jsonStr){
+  document.querySelectorAll('.svc-card').forEach(c=>c.classList.remove('selected'));
+  if(el) el.classList.add('selected');
+  const svc = typeof jsonStr==='string' ? JSON.parse(jsonStr) : jsonStr;
+  _servicoSelecionado = svc;
+  renderPropostaCorreios();
+}
+
+function estimativaLocal(cepDest, peso, comp, larg, alt){
+  // Cálculo aproximado Correios (PAC/SEDEX) — estimativa offline
+  const pesoKg = peso||0.5;
+  const dim = Math.max(comp,larg,alt)||20;
+
+  // SEDEX: base ~20 + peso * 8 + dim * 0.1
+  const sedexBase = 20 + pesoKg*8 + dim*0.1;
+  const pacBase   = 14 + pesoKg*5 + dim*0.06;
+
+  // Ajuste por região aproximada (SP capital = menor; NE/N = maior)
+  const uf = cepDest.slice(0,2);
+  const fatorRegiao = uf>='40'&&uf<='65' ? 1.4 : uf>='66'&&uf<='69' ? 1.6 : uf>='69'&&uf<='79' ? 1.3 : 1.0;
+
+  const sedex = +(sedexBase * fatorRegiao).toFixed(2);
+  const pac   = +(pacBase   * fatorRegiao).toFixed(2);
+
+  const fake = [
+    { name:'SEDEX', price: sedex, delivery_time:2, estimativa:true },
+    { name:'PAC',   price: pac,   delivery_time:8, estimativa:true }
+  ];
+
+  document.getElementById('cr-resultado').innerHTML = `
+    <div style="padding:14px 18px 0">
+      <div style="padding:8px 12px;background:#fff7ed;border-radius:8px;border:1px solid #fed7aa;font-size:10px;font-weight:700;color:#92400e;margin-bottom:12px">
+        ⚠️ Estimativa offline — proxy indisponível no momento. Valores aproximados dos Correios.
+      </div>
+      <div class="servicos-grid">
+        ${fake.map((s,i)=>`
+          <div class="svc-card${i===0?' selected':''}" onclick="selecionarServico(this,'${escAttr(JSON.stringify(s))}')">
+            ${i===0?'<div class="svc-badge">Mais rápido</div>':''}
+            <div class="svc-nome">${s.name} ★ Estimativa</div>
+            <div class="svc-prazo">📅 ~${s.delivery_time} dias úteis</div>
+            <div class="svc-preco">${fmt(s.price)}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+
+  if(fake.length) selecionarServico(
+    document.querySelector('.svc-card.selected'),
+    JSON.stringify(fake[0])
+  );
+}
+
+function renderPropostaCorreios(){
+  if(!_servicoSelecionado||!_dadosCorreios) return;
+  const svc = _servicoSelecionado;
+  const { cepDest, peso } = _dadosCorreios;
+  const cliente = document.getElementById('cr-cliente').value.trim();
+  const end     = document.getElementById('cr-end-txt').textContent||'';
+  const saud    = cliente ? `Olá, ${cliente}! 😊` : `Olá! 😊`;
+
+  let txt = `${saud}\n\n📦 *Frete Correios — Revend Eletro*\n\n`;
+  txt += `📮 Origem: 03307-005 (São Paulo/SP)\n`;
+  if(cepDest) txt += `📍 Destino: ${cepDest.slice(0,5)+'-'+cepDest.slice(5)}${end?' — '+end:''}\n`;
+  txt += `\n🚚 *Serviço:* ${svc.name}\n`;
+  txt += `📅 *Prazo:* ${svc.delivery_time ? svc.delivery_time+' dias úteis' : 'A verificar'}\n`;
+  txt += `💰 *Frete: ${fmt(parseFloat(svc.price))}*\n`;
+  if(svc.estimativa) txt += `\n⚠️ _Valor estimado — confirmar ao gerar etiqueta_\n`;
+  txt += `\nEstamos à disposição! 🚀\n_Revend Eletro_`;
+
+  document.getElementById('proposta-correios-card').style.display='block';
+  document.getElementById('proposta-correios-body').innerHTML=`
+    <div class="prop-wrap" id="prop-cr-txt">${escHtml(txt)}</div>
+    <div class="prop-actions">
+      <button class="btn btn-dark btn-sm" onclick="copiar('prop-cr-txt')">📋 Copiar</button>
+      <button class="btn btn-wpp btn-sm" onclick="abrirWpp('prop-cr-txt')">💬 WhatsApp</button>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════
+// TOKEN MELHOR ENVIO
+// ══════════════════════════════════════════════════
+function salvarToken(){
+  const token = document.getElementById('cr-token').value.trim();
+  try{ localStorage.setItem('me_token', token); } catch(e){}
+}
+function obterToken(){
+  try{ return localStorage.getItem('me_token')||''; } catch(e){ return ''; }
+}
+// Carrega token salvo ao iniciar
+window.addEventListener('load',()=>{
+  const t = obterToken();
+  if(t){ const el=document.getElementById('cr-token'); if(el) el.value=t; }
+});
+
+// ══════════════════════════════════════════════════
+// SALVAR TABELA DE PARCELAMENTO COMO IMAGEM
+// ══════════════════════════════════════════════════
+async function salvarImagemParc(){
+  const tabela = document.getElementById('parc-tabela');
+  const modelo = document.getElementById('p-modelo').value.trim() || 'Parcelamento';
+  if(!tabela || !tabela.querySelector('table')){ toast('Calcule o parcelamento primeiro.','red'); return; }
+
+  // Cria container estilizado para captura
+  const wrapper = document.createElement('div');
+  wrapper.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;padding:20px 24px 24px;border-radius:16px;width:420px;font-family:Montserrat,sans-serif';
+
+  // Header
+  const header = document.createElement('div');
+  header.style.cssText = 'background:linear-gradient(130deg,#c8102e,#a00d24);border-radius:12px;padding:14px 18px;margin-bottom:16px;color:#fff';
+  header.innerHTML = `<div style="font-size:15px;font-weight:900;letter-spacing:-.3px">💳 Simulação de Parcelamento</div>
+    <div style="font-size:11px;opacity:.75;font-weight:600;margin-top:4px">📱 ${escHtml(modelo)}</div>`;
+
+  // Clona tabela
+  const tClone = tabela.cloneNode(true);
+  tClone.style.cssText = 'width:100%';
+
+  const footer = document.createElement('div');
+  footer.style.cssText = 'margin-top:12px;font-size:9px;color:#8E8E93;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.5px';
+  footer.textContent = 'Revend Eletro · Uso Interno';
+
+  wrapper.appendChild(header);
+  wrapper.appendChild(tClone);
+  wrapper.appendChild(footer);
+  document.body.appendChild(wrapper);
+
+  try{
+    const canvas = await html2canvas(wrapper, { scale:2, backgroundColor:'#fff', logging:false });
+    document.body.removeChild(wrapper);
+    const link = document.createElement('a');
+    link.download = `parcelamento-${modelo.replace(/\s+/g,'-').toLowerCase()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    toast('🖼️ Imagem salva!','green');
+  } catch(e){
+    document.body.removeChild(wrapper);
+    toast('Erro ao gerar imagem.','red');
+  }
+}
+
+// ══════════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════════
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return s.replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+function copiar(id){
+  const el = document.getElementById(id);
+  const txt = el ? el.textContent : '';
+  navigator.clipboard.writeText(txt)
+    .then(()=>toast('✅ Copiado!','green'))
+    .catch(()=>{
+      const ta=document.createElement('textarea');
+      ta.value=txt; document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      toast('✅ Copiado!','green');
+    });
+}
+
+function abrirWpp(id){
+  const txt = document.getElementById(id)?.textContent||'';
+  window.open('https://wa.me/?text='+encodeURIComponent(txt),'_blank');
+}
+</script>
+</body>
+</html>
