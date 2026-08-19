@@ -699,6 +699,23 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           <input id="eResp" placeholder="Nome (opcional)">
         </div>
         <div class="form-g f1">
+          <label>🏪 Fornecedor</label>
+          <input id="eFornecedor" list="dlFornecedores" placeholder="Digite para buscar..." autocomplete="off" oninput="_hintNovoForn('eFornecedor','eNovoFornHint')" onblur="_hintNovoForn('eFornecedor','eNovoFornHint')">
+          <div id="eNovoFornHint" style="display:none;font-size:10px;color:var(--azul);font-weight:700;margin-top:4px">✨ Novo fornecedor — será salvo automaticamente ao registrar</div>
+        </div>
+        <div class="form-g">
+          <label>💰 Valor de Compra (R$)</label>
+          <input id="eValorCompra" type="text" inputmode="decimal" placeholder="Ex: 2600 ou 2.600,50">
+        </div>
+        <div class="form-g">
+          <label>💳 Forma de Pagamento</label>
+          <input id="eFormaPagto" list="dlFormasPagto" placeholder="Ex: PIX NEON" autocomplete="off">
+        </div>
+        <div class="form-g f1">
+          <label>Detalhe do Pagamento (opcional)</label>
+          <input id="eDetalhePagto" placeholder="Ex: valor que veio da SumUp">
+        </div>
+        <div class="form-g f1">
           <label>Bateria %</label>
           <input id="eBateria" placeholder="Ex: 89 (opcional)">
         </div>
@@ -707,6 +724,8 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           <textarea id="eObs" placeholder="Informações adicionais..."></textarea>
         </div>
       </div>
+      <datalist id="dlFornecedores"></datalist>
+      <datalist id="dlFormasPagto"></datalist>
     </div>
     <div class="mf">
       <button class="btn-x" onclick="fM('mEntrada')">Cancelar</button>
@@ -936,6 +955,20 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         <div class="form-g"><label>Nº Compra</label><input id="edNCompra" placeholder="Ex: 6304"></div>
         <div class="form-g"><label>Data de Entrada</label><input type="date" id="edDataEnt"></div>
         <div class="form-g"><label>Responsável</label><input id="edResp"></div>
+
+        <div class="form-g f1"><label>🏪 Fornecedor</label>
+          <input id="edFornecedor" list="dlFornecedores" placeholder="Digite para buscar..." autocomplete="off" oninput="_hintNovoForn('edFornecedor','edNovoFornHint')" onblur="_hintNovoForn('edFornecedor','edNovoFornHint')">
+          <div id="edNovoFornHint" style="display:none;font-size:10px;color:var(--azul);font-weight:700;margin-top:4px">✨ Novo fornecedor — será salvo automaticamente</div>
+        </div>
+        <div class="form-g"><label>💰 Valor de Compra (R$)</label>
+          <input id="edValorCompra" type="text" inputmode="decimal" placeholder="Ex: 2600 ou 2.600,50">
+        </div>
+        <div class="form-g"><label>💳 Forma de Pagamento</label>
+          <input id="edFormaPagto" list="dlFormasPagto" placeholder="Ex: PIX NEON" autocomplete="off">
+        </div>
+        <div class="form-g f1"><label>Detalhe do Pagamento (opcional)</label>
+          <input id="edDetalhePagto" placeholder="Ex: valor que veio da SumUp">
+        </div>
 
         <div class="form-g"><label>Nº Venda</label><input id="edNVenda"></div>
         <div class="form-g"><label>Data Venda</label><input type="date" id="edDataVd"></div>
@@ -1425,7 +1458,7 @@ function renderTabela(){
     const btnV=p.status==='emEstoque'?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Registrar Venda" style="background:#1a7a3a;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 Vender</button>`:'';
     const btnE=isAdmin()?`<button class="btn-e" onclick="event.stopPropagation();editarP(${idx})">✏️</button>`:'';
     const btnD=isAdmin()?`<button class="btn-d" onclick="event.stopPropagation();deletarP(${idx})">🗑</button>`:'';
-    const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar linha">📋</button>`;
+    const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar mensagem de compra (WhatsApp)">💬</button>`;
     return `<tr class="${trCls}" onclick="verDetalhe(${idx})">
       <td><span class="ft">${ico} ${esc(p.familia||'—')}</span></td>
       <td class="td-prod">
@@ -1464,6 +1497,7 @@ function copiarImei(el){
   });
 }
 
+// Copia mensagem de compra pronta para o WhatsApp da Fabiana (formato Gestão Click)
 function copiarLinha(idx){
   const p=produtos[idx];
   const imei=(p.imei||'').trim()||'—';
@@ -1472,17 +1506,49 @@ function copiarLinha(idx){
   const _cl = (window._catPorNome && _np && window._catPorNome[_np]) || '';
   const codigoProduto = (_cl || p.codProduto || '—').toString().trim();
   const nome=(p.produtoCompleto||nomeProduto(p)||'—').trim();
-  const texto=`${imei}\t${codigoProduto}\t${nome}`;
-  navigator.clipboard.writeText(texto).then(()=>{
-    toast('📋 Copiado!');
-  }).catch(()=>{
+  const data = fmtD(p.dataCompraEntrada||hoje());
+
+  // Compõe linha por linha — omite campos vazios (exceto PRODUTO, que sai sempre)
+  const linhas = [];
+  linhas.push(data);
+  linhas.push('');
+  linhas.push(`*PRODUTO*  ${imei}\t${codigoProduto}\t${nome}`);
+  const forn = (p.fornecedor||'').trim();
+  if(forn) linhas.push(`*FORNECEDOR*  ${forn}`);
+  if(p.valorCompra!==undefined && p.valorCompra!=='' && p.valorCompra!==null){
+    linhas.push(`*VALOR* ${fmtValor(p.valorCompra)}`);
+  }
+  const pag = (p.formaPagamento||'').trim();
+  const det = (p.detalhePagamento||'').trim();
+  if(pag || det){
+    const pagto = pag + (det?` (${det})`:'');
+    linhas.push(`*PAGAMENTO* ${pagto}`);
+  }
+  const obs = (p.obs||'').trim();
+  if(obs) linhas.push(`*OBS* ${obs}`);
+
+  const texto = linhas.join('\n');
+
+  const _ok = ()=>{
+    // Aviso extra se faltarem campos importantes para o financeiro
+    const faltas = [];
+    if(!forn) faltas.push('fornecedor');
+    if(p.valorCompra===undefined||p.valorCompra===''||p.valorCompra===null) faltas.push('valor');
+    if(!pag) faltas.push('pagamento');
+    if(faltas.length){
+      toast('📋 Copiado! Faltam: '+faltas.join(', '));
+    } else {
+      toast('📋 Mensagem copiada!');
+    }
+  };
+  navigator.clipboard.writeText(texto).then(_ok).catch(()=>{
     const ta=document.createElement('textarea');
     ta.value=texto;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    toast('📋 Copiado!');
+    _ok();
   });
 }
 
@@ -1507,6 +1573,64 @@ function badgeSt(st){
 }
 
 const VENDEDORES_FIXOS = ['Stephanie','Julia','Angélica','Larissa Salles','Felipe Carvalho','Felipe Dias','Felipe Tavares','Natascha','Rubens','Yasmin','Beatriz','Sac','Cliente Novo','Atacado - Felipe','Atacado - Marcos','Site','Garantia'];
+
+// ══════════════════════════════
+//  FORNECEDORES & FORMAS DE PAGAMENTO
+// ══════════════════════════════
+const FORNECEDORES_INICIAIS = [
+  "011 ELETRO","1 HORA","188 IT CLUBE (ACESSORIOS)","A CASA DAS PEÇAS","A CLASS","A+ IPHONE","ABC ASSISTÊNCIA","ABE CELL","ACESS APPLE","AD CEL","ADAMS SHOP","ADRIANA PEÇAS","AKI IPHONE","ALA","ALAN FORNECEDOR CHINÊS","ALAN MAIA","ALEX CELL","ALEX CHINA","ALEXANDRE","ALI EXPRESS","ALI SHAAR","ALIE JANETH","ALLAN CHINES","ALPHA","AMERICA MOBILE","AMG TELAS","AMIR CELL","APPLE BAND","APPLE BRAND","APPLE CELL","APPLE LAND","APPLE START","APPLE WORD","APPLESHOW","ARMANDO","ARMANDO 2","ARMANDO 3","AT IMPORTS","ATACADO SHOP","ATR","AWALLA CELL","AYOUB CELL","AYUB","AZ MIX","AZUR","B2W COMPANHIA DIGITAL","BA IMPORTS","BAGDA","BAHIA CELL","BAKKOUR","BANANA SHOPPING CELL","BATE PAPO CELL","BAYDOK","BLACK CEL","BLACK JACK","BO ALI STORE","BOB CELL","BRASIL GAMES","BRAYAN","BROCKTECH IN224","BRUNO BLAYA","BRUNO BROKER","BRUNO GOLD","BRUNO IPHONES","BRUNO REPARO RÁPIDO","BRUNO ZAMPOL","BZ","CABANA IMÓVEIS","CADU CELL","CAMILA PAVAN","CAMILA PAVÃO","CAPITAL STORE","CAPTAIN","CARLOS ALEX","CARLOS ALEXIS","CARLOS DE JESUS ALVES JUNIOR","CELL CENTER","CELLZONE","CELULAR DELIVERY","CHAID OLIVEIRA","CHEGA MAIS","CITY CELL","CK IMPORTS","CK REPAIR","CK ROBSON","CLARY CELL","CLIENTE REVENDAPPLE","CNN PEÇAS","CRISTAL","D IMPORTS","DAEWOO DISTRIBUIDORA","DANIEL FORNECEDOR","DANILO FORNECEDOR","DANTE MARON","DARLY SANTANA","DAVI  USA","DAVI BASSI CARDOSO","DAVID MURIEL (STORE IPHONE)","DAVOS","DAYLON","DELTA SHOP","DERICK","DESEJO CEL","DG ACESSÓRIOS","DHALTON","DIGITAL CELULAR","DIVERSOS","DJOKO","DK ASSISTENCIA (KELVIN)","DOMINIO GAMES","DOUGLAS DO CARMO","DOUGLAS SILVA","DS CELL","E-COMMERCE CD ESPIRITO SANTO","EASY APPLE","ECX COMPANY LTDA","EDUARDO CESARIO","EDY","ELITE MOBILE","EMILIO CELL","EMPORIUM DO CELULAR","ENZO LE IMPORT","ERICK BATISTA","EVERTON BORGES","EXCLUSIVE","EXTRA VIA VAREJO","FABIO DE BRITO","FACE ID STORE","FAM CELULARES","FAST PHONE","FAVORITOS","FEI HU","FELIPE MAGANHA","FELIPE PENCO","FELIPE TUDO APPLE","FH CELL","FILIPE LIMA FIGEIREDO","FIRE CEL","FONECEDOR TM","FONIX","FORNCEDOR  ABUD","FORNECEDOR BAKKKUR","FORNECEDOR FORTE (CELSO)","FORNECEDOR HEBERT","FORNECEDOR KING","FORNECEDOR MARCO AURÉLIO","FORNECEDOR MICHAEL","FORNECEDOR MUSTAFA","FORNECEDOR PATRICK (USA)","FORNECEDOR TROY","FORNECEDORA CHINA","FORNECEDORA LARISSA","FORNECEDORES DIVERSOS","FORTE FORNECEDOR","FORTE FORNECEDOR (CELSO)","FOX CELL","FULL FLEX","G10","GALAXY CELL","GD MONY  IMPORTS","GOLD IPHONE","GOLD ONE","GREGORY","GRU IPHONES","GRUPO M.A.","GS STORE","GUI DUARDTE (USA)","GUILHERME DA SILVA REIS","GUILHERME FRANÇA","H.N HUSSEIN PEÇAS","H10 CELULARES","H2","H3","H7 EMBALAGENS","HACO","HAKO","HASSAN","HASSAN ACESSORIOS","HASSAN BYMAC","HASSAN THIAGO","HBB","HD","HELDER","HENRIQUE TORRES","HH CELL","HM","HN","HR CELL","HUSSEIN","HYH","I SMART","IBIONIC CELL","IBLESS","IBOSS","IBROKEN PEÇAS E ACESSÓRIOS","IDOCTOR ASSISTENCIA","IGUAÇU CELL","IMAC LAB EXTERNO","IMAX CELL","IMAX EXPRESS","IMPÉRIO CELL","INDICA PHONE","IPHONE BRANDS","IPHONE CELL","IPHONE MILENIUM","IPHONE OUTLET SWAP","IPHONE SWAP","IPHONE WORLD","IPHONES MEN","ISAFE","ISEK","ISSA CEL","ITECH FELIPE","IWILL","IWORD","IZONETECH","J. A. CELULARES","JAPA PROTETOR","JEAN ANDRADE","JEFF CASTRO","JERRY","JETPASS","JL IMPORTS","JNB","JOBS STORE","JOHN AYRES","JOYCE","JOÃO VINICIUS","JR CELULARES","JULIA ACESSORIOS","JULIA CELULARES","JULIA PHONE LINK","JUNIOR GONÇALVES","KAKA DOS IPHONES","KAKIA PEÇAS","KANGURU PEÇAS","KARYNA","KAWZANI SHOP","KAYAN","KAZWINI SHOP","KING PUFF","KING SHOP","KR CELL","KS ELETRO STIG","L7 IMPORTS","LAURA CAPAS","LEANDRO ELETRONICO","LEANDRO PAIAO","LEEN TECH","LEO ANDRADE","LEO APPLE OWNER","LEO CREMONEZI","LEONARDO MONTEZE IPHONE","LILIA DIAS MARIANO","LOJA 31","LOJA A","LOJA INOVA","LOJA MOBI","LS TELAS","LUCA ILOOP","LUCAS CAMACHO","LUCAS CARITO","LUCAS GABRIEL","LUCAS LOPES","LUCAS PONTO CERTO","LUCIANO (LUK)","LUCK","LUIZ PUJOL","LUNA CEL","LÉO EXCHNGE","MACPRO IMPORTS","MAGAZINE LUIZA S/A","MAHER CELL","MAIKON","MALAK ELETRO","MARCELO CEL","MARESIAS CAPAS","MARINA","MARLON VINICIUS GONCALVES DOS SANTOS","MASTER WORK","MAYSA","ME","MEGA CENTER","MEI ACESSÓRIOS","MELK","MESTRE","MESTRE HUSSEIN","MEU CEL SP","MEU CELULAR","MEU CELULAR FAVORITO","MEU MUNDO APPLE","MF","MH A CELL","MH CELL","MIAMI","MIAMI STORE","MICHEL CURY","MICHEL MAUTONE","MICKEY","MILAR","MK CLASS","MM ELETRONICOS","MOHAMED","MOHAMMED NASSER","MOISES","MR CELL","MR REPAIR","MS CELL","MT CELL RODRIGO VIEIRA","MUMBAI SHOP","MUNDO BAKI","MUNDO DO IPHONE","MURILO","MY IPHONE","NATHAN LIMA","NEXTEL","NICOLAS","NORDESTE","NR STORE - RAFAEL","NUMBER ONE","NY CELL","ON CEL","ORIENTE CELL","OUD EMPIRE","PALACIO DAS CAPAS","PALÁCIO DAS CAPAS","PAOLLA SION","PAPITO CELL","PARAGUAY","PARAISO DOS IPHONES","PARDAL CELL","PEDRO APPLE GRADE","PENTHALFA","PHONE CELL DIBI","PHONE LINK","PINGUIM CELL","PLACE SHOP","PLANETA CELL","POWER HUSSEIN FADEL","PRIME CELL","PRIMO IMPÉRIO","PRIMO IPHONE","PRISCILA","PRIVATECH","PRO PHONE","PXT","PY","QUARTEL DO IPHONE","RAEL","RAFAEL CELL","RAPOSA CEL","RAVAN","RAWAN","RED CELL","REI CELL","REI DAS CAIXAS","REIS STORE","REVEND (USA)","RICARDO NIZA","RICARDO ROYAL","RK IPHONES","RM OUTLET","ROBERT","ROBERT RD IMPORTS","ROSA","RSD MORUMBI","SAM CELL","SAMMY CHAM","SAN CELL","SANDRA TAVARES","SELENA CELL","SERGIO AZUSA","SEVEN START","SHOP CELL","SILVIO","SKAYKY ACESSÓRIOS","SKYLINE","SLIM REPARO - BRUNO","SMART 7","SODEXO","SOUNA CEL","SPACE SHOP","SPEED CONSERT","STAR GAMES","STV","SÓ IPHONE","T FAMILY","TAI APPLE","TALA CELL","TAN","TAVARES PHONE","TECNOLOGIA PRO","TECNOPONTO","TELA TERCEIRO ANDAR","TELEMAX","THAINA SIQUEIRA","THIAGO THOME","TIAGO ELCAPITAIN","TIO CELL","TIO SAN","TJR IPHONE","TM 2","TM 3","TOKYO","TOP AMERICAN","TOP ELETRONICOS","TOPCELL","TR CELL","TREND","TRIPHONE","TRKBIT","TYROS","ULTRA IPHONE","UPCELL","VAI E VEM","VEDAS CEVO - TELAS ORIGINAIS","VELHO CAPITAO","VEM DE PHONE","VGT","VIBE CELL","VICTOR FERNANDES","VICTOR MORAES","VICTOR NEVES","VICTOR RODRIGUES","VILSON","VINI SCLAVO","VINICIUS DE PAIVA","VINÍCIUS SCALVO","VIP CELL","W ATACADO","WALID","WAY CELL","WE LINK","WEN CELL","WENDEL NINE","WESLEY","WEST CELL","WINGY","WORLD APPLE","WPC TECH IPHONES -  WILLIAM","WS SMART","XFB","YOUCHA","YOUR APPLE","ZAFANI","ZAKKA CELL","ZAZA CELL","ZEIN","ZN","ZN CEL","ZOI CELL"
+];
+
+const FORMAS_PAGAMENTO = ['PIX NEON','PIX ITAÚ','PIX SUMUP','DINHEIRO','CARTÃO CRÉDITO','CARTÃO DÉBITO','BOLETO','TRANSFERÊNCIA'];
+
+// Lista viva de fornecedores: inicial + adicionados no Firebase + dos produtos existentes
+let FORNECEDORES_EXTRAS = []; // populado pelo Firebase (nó fornecedores_revend, separado — não toca em estoque_revend)
+function listaFornecedores(){
+  const s = new Set(FORNECEDORES_INICIAIS.map(n=>String(n).trim().toUpperCase()).filter(Boolean));
+  FORNECEDORES_EXTRAS.forEach(n=>{ const v=String(n||'').trim().toUpperCase(); if(v) s.add(v); });
+  (window.produtos||[]).forEach(p=>{ const v=String(p&&p.fornecedor||'').trim().toUpperCase(); if(v) s.add(v); });
+  return [...s].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+function popularDLFornecedores(){
+  const dl = document.getElementById('dlFornecedores');
+  if(!dl) return;
+  dl.innerHTML = listaFornecedores().map(n=>`<option value="${esc(n)}">`).join('');
+}
+function popularDLPagamento(){
+  const dl = document.getElementById('dlFormasPagto');
+  if(!dl) return;
+  dl.innerHTML = FORMAS_PAGAMENTO.map(n=>`<option value="${esc(n)}">`).join('');
+}
+async function _fbSalvarFornecedores(){
+  if(!window._fbSalvarNodo) return;
+  try { await window._fbSalvarNodo('fornecedores_revend', FORNECEDORES_EXTRAS); }
+  catch(e){ console.warn('Fornecedores: falha ao salvar', e); }
+}
+function registrarNovoFornecedor(nome){
+  const v = String(nome||'').trim().toUpperCase();
+  if(!v) return '';
+  if(!listaFornecedores().includes(v)){
+    FORNECEDORES_EXTRAS.push(v);
+    _fbSalvarFornecedores();
+    popularDLFornecedores();
+    toast('✅ Fornecedor "'+v+'" adicionado!');
+  }
+  return v;
+}
+// Normaliza valor "R$ 2.600,00" / "2600" / "2.600,50" → número (2600 ou 2600.5)
+function parseValor(str){
+  if(str==null || str==='') return '';
+  const s = String(str).replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.');
+  const n = parseFloat(s);
+  return isNaN(n) ? '' : n;
+}
+// Formata número para exibição: 2600 → "R$ 2.600", 2600.5 → "R$ 2.600,50"
+function fmtValor(n){
+  const v = parseFloat(n);
+  if(isNaN(v)) return '';
+  return 'R$ ' + v.toLocaleString('pt-BR', {minimumFractionDigits: (v%1===0?0:2), maximumFractionDigits:2});
+}
+
 function popularDLs(){
   const resp=[...new Set(produtos.map(p=>p.responsavel).filter(Boolean))];
   fillDL('dlResp',resp);
@@ -1808,8 +1932,20 @@ function abrirEntrada(){
   const _v=(id,v='')=>{const el=document.getElementById(id);if(el)el.value=v;};
   _v('eImei'); _v('eData',hoje()); _v('eResp'); _v('eNCompraEnt');
   _v('eBateria'); _v('eObs');
+  // Campos novos: fornecedor, valor de compra, forma de pagamento, detalhe pagamento
+  _v('eFornecedor'); _v('eValorCompra'); _v('eFormaPagto'); _v('eDetalhePagto');
+  const _hint=document.getElementById('eNovoFornHint'); if(_hint) _hint.style.display='none';
+  popularDLFornecedores(); popularDLPagamento();
   setModoEntrada('codigo');
   document.getElementById('mEntrada').classList.add('on');
+}
+
+// Mostra hint quando o fornecedor digitado ainda não existe na lista
+function _hintNovoForn(inputId, hintId){
+  const el=document.getElementById(inputId); const h=document.getElementById(hintId);
+  if(!el||!h) return;
+  const v=String(el.value||'').trim().toUpperCase();
+  h.style.display = (v && !listaFornecedores().includes(v)) ? 'block' : 'none';
 }
 
 function salvarEntrada(){
@@ -1861,6 +1997,11 @@ function salvarEntrada(){
   const bateria=document.getElementById('eBateria').value.trim();
   const obs=document.getElementById('eObs').value.trim();
   const _gv=(id)=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  // Campos novos de compra/pagamento
+  const fornecedor = registrarNovoFornecedor(_gv('eFornecedor')); // normaliza e cadastra se for novo
+  const valorCompra = parseValor(_gv('eValorCompra'));
+  const formaPagamento = _gv('eFormaPagto').toUpperCase();
+  const detalhePagamento = _gv('eDetalhePagto');
   const p={
     familia,modelo,gb,tamanho:_tamanhoEnt||'',cor,condicao,produtoCompleto,
     imei:_gv('eImei'),
@@ -1869,6 +2010,11 @@ function salvarEntrada(){
     nCompra:_gv('eNCompraEnt'),
     responsavel:_gv('eResp'),
     valorEntrada:'',
+    // NOVOS CAMPOS — não exibidos na listagem principal; usados no botão copiar mensagem
+    fornecedor: fornecedor||'',
+    valorCompra: valorCompra===''?'':valorCompra,
+    formaPagamento: formaPagamento||'',
+    detalhePagamento: detalhePagamento||'',
     status:codProduto?'emEstoque':'aguardando',
     obs:(bateria?'Bateria: '+bateria+'%':'')+(obs?(bateria?' · ':'')+obs:''),
     criadoEm:new Date().toISOString(),
@@ -2117,6 +2263,14 @@ function editarP(idx){
   document.getElementById('edDataEnt').value=p.dataCompraEntrada||'';
   document.getElementById('edDataVd').value=p.dataVenda||'';
   document.getElementById('edStatus').value=getSt(p);
+  // Preenche campos novos (fornecedor / valor / pagamento / detalhe)
+  const _sv=(id,v='')=>{const el=document.getElementById(id);if(el)el.value=v;};
+  _sv('edFornecedor', p.fornecedor||'');
+  _sv('edValorCompra', p.valorCompra!==undefined && p.valorCompra!=='' && p.valorCompra!==null ? String(p.valorCompra).replace('.',',') : '');
+  _sv('edFormaPagto', p.formaPagamento||'');
+  _sv('edDetalhePagto', p.detalhePagamento||'');
+  const _hint=document.getElementById('edNovoFornHint'); if(_hint) _hint.style.display='none';
+  popularDLFornecedores(); popularDLPagamento();
   fM('mDetalhe');
   document.getElementById('mEditar').classList.add('on');
 }
@@ -2131,6 +2285,15 @@ function salvarEdicao(){
   p.dataCompraEntrada=document.getElementById('edDataEnt').value;
   p.dataVenda=document.getElementById('edDataVd').value;
   p.status=document.getElementById('edStatus').value;
+
+  // Salva campos novos (fornecedor / valor / pagamento / detalhe)
+  const _gv2=(id)=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  const _forn = registrarNovoFornecedor(_gv2('edFornecedor'));
+  p.fornecedor = _forn || '';
+  const _val = parseValor(_gv2('edValorCompra'));
+  p.valorCompra = _val==='' ? '' : _val;
+  p.formaPagamento = _gv2('edFormaPagto').toUpperCase();
+  p.detalhePagamento = _gv2('edDetalhePagto');
 
   // Se tinha status 'aguardando' mas agora tem codProduto, promove automaticamente para 'emEstoque'
   if(p.codProduto && p.status==='aguardando') p.status='emEstoque';
@@ -2649,6 +2812,12 @@ window.buscarCodigo=buscarCodigo;
 window.selecionarCodigoCatalogo=selecionarCodigoCatalogo;
 window.crBuscar=crBuscar;
 window.crSel=crSel;
+// Novos handlers (fornecedor/valor/pagamento)
+window._hintNovoForn=_hintNovoForn;
+window.registrarNovoFornecedor=registrarNovoFornecedor;
+window.popularDLFornecedores=popularDLFornecedores;
+window.popularDLPagamento=popularDLPagamento;
+window.copiarLinha=copiarLinha;
 </script>
 
 <!-- DADOS -->
@@ -2686,6 +2855,11 @@ if(db) {
   window._fbSalvar = async(p, c) => {
     await set(ref(db,'estoque_revend'), p);
     await set(ref(db,'catalogo_revend'), c);
+  };
+
+  // Salva um nó específico sem tocar em estoque_revend/catalogo_revend (usado para fornecedores_revend)
+  window._fbSalvarNodo = async(nodo, dados) => {
+    await set(ref(db, nodo), dados);
   };
 
   // Listener do estoque com tratamento de erro
@@ -2751,6 +2925,24 @@ if(db) {
     },
     error => {
       console.error('Firebase catálogo error:', error);
+    }
+  );
+
+  // Listener de FORNECEDORES extras (nó separado, criado sob demanda; NÃO toca em estoque_revend nem catalogo_revend)
+  onValue(
+    ref(db,'fornecedores_revend'),
+    snap => {
+      const v = snap.val();
+      if(Array.isArray(v)) {
+        window.FORNECEDORES_EXTRAS = FORNECEDORES_EXTRAS = v.filter(Boolean).map(n=>String(n).trim().toUpperCase());
+      } else if(v && typeof v === 'object') {
+        window.FORNECEDORES_EXTRAS = FORNECEDORES_EXTRAS = Object.values(v).filter(Boolean).map(n=>String(n).trim().toUpperCase());
+      }
+      if(typeof popularDLFornecedores==='function') popularDLFornecedores();
+    },
+    error => {
+      // Silencioso — se o nó não existir ainda ou não tiver permissão, a lista inicial cobre 100%
+      if(error.code !== 'PERMISSION_DENIED') console.warn('Fornecedores load:', error);
     }
   );
 }
