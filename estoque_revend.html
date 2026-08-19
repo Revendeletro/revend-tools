@@ -3098,9 +3098,25 @@ function egGerarId(rec){
 }
 
 // Persistência: usa _fbSalvarNodo (não toca estoque_revend nem catalogo_revend)
+// TRAVA: bloqueia se Firebase ainda não sincronizou OU se queda >30% no total
 async function egSalvarFirebase(){
   if(!window._fbSalvarNodo){ return; }
-  try { await window._fbSalvarNodo('entrada_geral_revend', window.entradaGeral); }
+  if(!window._fbLoadedEntradaGeral){
+    console.warn('[SEGURANÇA] egSalvarFirebase bloqueado: Firebase ainda não carregou entrada geral');
+    if(typeof banner==='function') banner('🛑 Entrada Geral: gravação bloqueada — recarregue a página','err');
+    return;
+  }
+  const antes = window._fbLastEntradaGeralCount || 0;
+  const agora = Array.isArray(window.entradaGeral) ? window.entradaGeral.length : 0;
+  if(antes > 20 && agora < antes * 0.7){
+    console.error('[SEGURANÇA] Gravação Entrada Geral bloqueada: '+agora+' < '+antes+' (queda >30%)');
+    if(typeof banner==='function') banner('🛑 Entrada Geral: gravação bloqueada ('+agora+' < '+antes+') — recarregue a página','err');
+    return;
+  }
+  try {
+    await window._fbSalvarNodo('entrada_geral_revend', window.entradaGeral);
+    window._fbLastEntradaGeralCount = agora;
+  }
   catch(e){
     if(e && e.code==='PERMISSION_DENIED') banner('🔒 Firebase: permissão negada — verifique as Regras','err');
     else console.warn('EG save error:', e);
@@ -3757,12 +3773,31 @@ try {
 
 if(db) {
   // Função de salvar exposta globalmente
+  // TRAVAS DE SEGURANÇA v4:
+  //  1. Não salva nada no Firebase antes que ele tenha carregado (window._fbLoadedEstoque)
+  //  2. Nunca sobrescreve automaticamente com o snapshot local se o Firebase vier vazio (proteção contra deleção acidental)
+  //  3. Se a próxima gravação vier MUITO menor que o último carregado (>30% de perda), bloqueia e alerta
+  window._fbLoadedEstoque = false;
+  window._fbLastEstoqueCount = 0;
+
   window._fbSalvar = async(p, c) => {
+    if(!window._fbLoadedEstoque){
+      console.warn('[SEGURANÇA] salvarFirebase bloqueado: Firebase ainda não carregou o estoque. Ignorando gravação para não sobrescrever dados.');
+      window.banner('🛑 Gravação bloqueada — Firebase ainda não sincronizou. Recarregue a página.','err');
+      return;
+    }
+    // Trava anti-perda: se local caiu >30% em relação ao último snapshot do Firebase, bloqueia
+    const antes = window._fbLastEstoqueCount || 0;
+    if(antes > 20 && Array.isArray(p) && p.length < antes * 0.7){
+      console.error('[SEGURANÇA] Gravação bloqueada: local='+p.length+' vs último='+antes+' (queda >30%). Recarregue a página antes de continuar.');
+      window.banner('🛑 Gravação bloqueada: local='+p.length+' < último='+antes+' — recarregue a página antes de continuar','err');
+      return;
+    }
     await set(ref(db,'estoque_revend'), p);
     await set(ref(db,'catalogo_revend'), c);
   };
 
-  // Salva um nó específico sem tocar em estoque_revend/catalogo_revend (usado para fornecedores_revend)
+  // Salva um nó específico sem tocar em estoque_revend/catalogo_revend (usado para fornecedores_revend e entrada_geral_revend)
   window._fbSalvarNodo = async(nodo, dados) => {
     await set(ref(db, nodo), dados);
   };
@@ -3786,19 +3821,15 @@ if(db) {
           produtos.push(item);
         });
         window.produtos = produtos;
+        window._fbLoadedEstoque = true;
+        window._fbLastEstoqueCount = d.length;
         render();
         if(typeof egAutoVincular==='function') setTimeout(()=>egAutoVincular(), 300);
         window.banner('🔥 Firebase: ' + d.length + ' produtos carregados', 'ok');
       } else {
-        // Banco vazio: envia dados locais para o Firebase automaticamente
-        window.banner('📦 Firebase vazio — enviando dados locais...', 'loading');
-        if(window._fbSalvar && window.produtos && window.produtos.length > 0) {
-          window._fbSalvar(window.produtos, window.catalogo)
-            .then(() => window.banner('✅ Dados locais sincronizados com Firebase!', 'ok'))
-            .catch(e2 => window.banner('❌ Erro ao enviar dados: '+e2.message,'err'));
-        } else {
-          window.banner('📦 Dados locais ativos (Firebase vazio)', 'ok');
-        }
+        // Banco vazio: NUNCA reenviar snapshot local automaticamente (prevenção contra deleção acidental).
+        window._fbLoadedEstoque = false;
+        window.banner('🛑 Firebase vazio ou inacessível — dados locais NÃO serão enviados automaticamente. Restaure o backup no console do Firebase antes de continuar.','err');
       }
     },
     error => {
@@ -3808,7 +3839,7 @@ if(db) {
         ? '🔒 Firebase: permissão negada — verifique as Regras do banco'
         : '⚠️ Firebase offline: ' + error.message;
       window.banner(msg, 'err');
-      // App continua funcionando com dados locais
+      // App continua funcionando com dados locais, mas gravação está bloqueada até o Firebase responder
     }
   );
 
@@ -3853,6 +3884,8 @@ if(db) {
   );
 
   // Listener de ENTRADA GERAL (nó separado, criado sob demanda; NÃO toca em estoque_revend nem catalogo_revend)
+  window._fbLoadedEntradaGeral = false;
+  window._fbLastEntradaGeralCount = 0;
   onValue(
     ref(db,'entrada_geral_revend'),
     snap => {
@@ -3862,18 +3895,29 @@ if(db) {
       else if(v && typeof v === 'object' && Object.keys(v).length>0) arr = Object.values(v).filter(x=>x && typeof x==='object');
       if(arr && arr.length>0){
         window.entradaGeral = arr;
+        window._fbLoadedEntradaGeral = true;
+        window._fbLastEntradaGeralCount = arr.length;
         if(typeof egRender==='function') egRender();
         if(typeof egAutoVincular==='function') setTimeout(()=>egAutoVincular(), 300);
         window.banner('🔥 Firebase: '+arr.length+' entradas gerais carregadas','ok');
       } else {
-        // Nó vazio: sobe dados iniciais (migração 2026) uma única vez, se disponíveis
+        // Nó vazio: só faz migração automática se a MIGRAÇÃO INICIAL nunca foi feita (flag no Firebase root)
+        // Isto previne overwrite após deleção acidental
         if(window.ENTRADA_GERAL_DATA && window.ENTRADA_GERAL_DATA.length>0 && window._fbSalvarNodo){
-          window.banner('📦 Entrada Geral vazia no Firebase — enviando migração inicial...', 'loading');
-          window.entradaGeral = window.ENTRADA_GERAL_DATA.slice();
-          window._fbSalvarNodo('entrada_geral_revend', window.entradaGeral)
-            .then(()=>window.banner('✅ Migração da Entrada Geral concluída!','ok'))
-            .catch(e=>window.banner('❌ Falha na migração: '+e.message,'err'));
-          if(typeof egRender==='function') egRender();
+          // Sobe uma única vez — depois deixa quieto
+          if(!window._egMigracaoTentada){
+            window._egMigracaoTentada = true;
+            window.banner('📦 Entrada Geral vazia no Firebase — enviando migração inicial (única vez)...', 'loading');
+            window.entradaGeral = window.ENTRADA_GERAL_DATA.slice();
+            window._fbSalvarNodo('entrada_geral_revend', window.entradaGeral)
+              .then(()=>{
+                window._fbLoadedEntradaGeral = true;
+                window._fbLastEntradaGeralCount = window.entradaGeral.length;
+                window.banner('✅ Migração da Entrada Geral concluída ('+window.entradaGeral.length+' registros)!','ok');
+              })
+              .catch(e=>window.banner('❌ Falha na migração: '+e.message,'err'));
+            if(typeof egRender==='function') egRender();
+          }
         } else {
           window.entradaGeral = [];
           if(typeof egRender==='function') egRender();
@@ -3925,25 +3969,39 @@ function handleVendedorChange(sel) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  // Inicializa dados locais e sincroniza com a variável global
-  window.produtos = PRODUTOS_DATA.slice();
-  window.catalogo = Object.assign({}, CATALOGO_DATA);
+  // v4 SEGURO: NÃO carrega PRODUTOS_DATA localmente por padrão.
+  // Deixa o Firebase ser a única fonte de verdade — evita race conditions que possam sobrescrever dados reais.
+  // O snapshot PRODUTOS_DATA/CATALOGO_DATA embutido só é usado se você marcar window.USAR_SNAPSHOT_LOCAL = true antes deste evento.
+  window.catalogo = window.USAR_SNAPSHOT_LOCAL ? Object.assign({}, CATALOGO_DATA) : {};
   limparCodigosCurtosCatalogo(window.catalogo);
-  // Sincroniza com o array local 'produtos' usado pelo render()
-  produtos.length = 0;
-  window.produtos.forEach(item => {
-    enriquecerItem(item);
-    produtos.push(item);
-  });
   catalogo = window.catalogo;
-  // Entrada Geral — carga inicial local (será sobrescrita pelo Firebase quando conectar)
-  window.ENTRADA_GERAL_DATA = window.ENTRADA_GERAL_DATA || [];
-  window.entradaGeral = window.ENTRADA_GERAL_DATA.slice();
+
+  produtos.length = 0;
+  if(window.USAR_SNAPSHOT_LOCAL && Array.isArray(PRODUTOS_DATA)){
+    // Modo snapshot local (offline / debug) — grava tá bloqueada até Firebase confirmar
+    window.produtos = PRODUTOS_DATA.slice();
+    window.produtos.forEach(item => { enriquecerItem(item); produtos.push(item); });
+    banner('⚠️ Modo snapshot LOCAL. Gravação bloqueada até Firebase responder.','loading');
+  } else {
+    window.produtos = produtos;
+  }
+
+  // Entrada Geral — inicia vazio; Firebase preenche (ou dispara migração inicial se nunca subiu)
+  window.entradaGeral = [];
+
   render();
   if(typeof egRender==='function') egRender();
-  // Auto-vincula entradas ↔ produtos pelo par (IMEI, dataEntrada) — vale pra dados históricos
-  if(typeof egAutoVincular==='function') setTimeout(()=>egAutoVincular(), 500);
-  banner('📦 Dados locais carregados. Aguardando Firebase...', 'loading');
+  banner('⏳ Aguardando Firebase carregar os dados...', 'loading');
+
+  // Auto-vincula só depois que temos SIM os dois lados carregados
+  const _tryVincular = () => {
+    if(window._fbLoadedEstoque && window._fbLoadedEntradaGeral){
+      if(typeof egAutoVincular==='function') egAutoVincular();
+    } else {
+      setTimeout(_tryVincular, 500);
+    }
+  };
+  setTimeout(_tryVincular, 1000);
 });
 </script>
 </body>
