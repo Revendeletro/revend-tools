@@ -509,6 +509,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
                 <th onclick="sort('nVenda')">Nº Venda</th>
                 <th onclick="sort('dataVenda')">Dt. Venda</th>
                 <th onclick="sort('vendedor')">Vendedor</th>
+                <th onclick="sort('notaFiscalEmitida')" title="Nota Fiscal Emitida">NF</th>
                 <th>Ações</th>
               </tr></thead>
               <tbody id="tbody"></tbody>
@@ -1278,6 +1279,12 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         <div class="form-g f1"><label>Detalhe do Pagamento (opcional)</label>
           <input id="edDetalhePagto" placeholder="Ex: valor que veio da SumUp">
         </div>
+        <div class="form-g"><label>Nota Fiscal Emitida?</label>
+          <select id="edNotaFiscal">
+            <option value="false">Não</option>
+            <option value="true">Sim (NFE emitida)</option>
+          </select>
+        </div>
 
         <div class="form-g"><label>Nº Venda</label><input id="edNVenda"></div>
         <div class="form-g"><label>Data Venda</label><input type="date" id="edDataVd"></div>
@@ -1709,7 +1716,13 @@ function renderTabela(){
   }
   if(!lista.length){tbody.innerHTML='';empty.style.display='block';return;}
   empty.style.display='none';
-  // Pré-computa mapa imei->idx para O(1) lookup (evita indexOf O(n²))
+  // Pré-computa duplicatas de IMEI (considera TODOS os produtos, não só a lista filtrada)
+  const _imeiCount = new Map();
+  (window.produtos||[]).forEach(pp=>{
+    const im = String(pp.imei||'').trim();
+    if(im) _imeiCount.set(im, (_imeiCount.get(im)||0)+1);
+  });
+  window._imeiCount = _imeiCount;
   tbody.innerHTML=lista.map((p,_li)=>{
     const idx=p._idx;
     const st=getSt(p);
@@ -1776,7 +1789,13 @@ function renderTabela(){
       <td style="white-space:nowrap">${(()=>{const isW=(p.familia||'').includes('Apple Watch');const val=isW?exibirTamanho(p):exibirGB(p);return val?`<span style="font-size:11px;font-weight:800;color:var(--azul);background:rgba(0,122,255,.1);padding:3px 8px;border-radius:6px">${esc(val)}</span>`:'<span style="color:#ccc;font-size:11px">—</span>';})()}</td>
       <td style="white-space:nowrap">${(()=>{const c=exibirCor(p);return c?`<span style="font-size:11px;font-weight:700;color:var(--roxo);background:rgba(175,82,222,.1);padding:3px 8px;border-radius:6px">🎨 ${esc(c)}</span>`:'<span style="color:#ccc;font-size:11px">—</span>';})()}</td>
       <td style="white-space:nowrap">${(()=>{const c=exibirCondicao(p);return c?`<span style="font-size:10px;font-weight:800;color:var(--verde);background:rgba(52,199,89,.1);padding:3px 8px;border-radius:6px">${esc(c)}</span>`:'<span style="color:#ccc;font-size:11px">—</span>';})()}</td>
-      <td class="td-imei" title="Clique para copiar o IMEI" onclick="event.stopPropagation();copiarImei(this)" data-imei="${esc(p.imei||'')}" style="cursor:pointer">${p.imei?`<span style="display:inline-flex;align-items:center;gap:4px">${esc(p.imei)}<span style="font-size:10px;opacity:.45">📋</span></span>`:'—'}</td>
+      ${(function(){
+        const dup = p.imei ? (window._imeiCount.get(p.imei)||0) : 0;
+        const isDup = dup > 1;
+        const bgDup = isDup ? 'background:rgba(255,59,48,.08);border-left:3px solid #ff3b30' : '';
+        const badgeDup = isDup ? `<span onclick="event.stopPropagation();filtrarPorImei('${esc(p.imei)}')" title="IMEI aparece ${dup}× — clique para ver todos" style="cursor:pointer;font-size:9px;font-weight:900;color:#fff;background:#ff3b30;padding:1px 5px;border-radius:8px;margin-left:4px">⚠️ ${dup}×</span>` : '';
+        return `<td class="td-imei" title="Clique para copiar o IMEI" onclick="event.stopPropagation();copiarImei(this)" data-imei="${esc(p.imei||'')}" style="cursor:pointer;${bgDup}">${p.imei?`<span style="display:inline-flex;align-items:center;gap:4px">${esc(p.imei)}<span style="font-size:10px;opacity:.45">📋</span>${badgeDup}</span>`:'—'}</td>`;
+      })()}
       <td class="td-cod">${codProdHTML}</td>
       <td class="td-cod">${nCompraHTML}</td>
       <td class="td-data">${fmtD(p.dataCompraEntrada)}</td>
@@ -1785,9 +1804,34 @@ function renderTabela(){
       <td class="td-venda">${esc(p.nVenda||'—')}</td>
       <td class="td-data">${fmtD(p.dataVenda)}</td>
       <td class="td-resp">${esc(p.vendedor||'—')}</td>
+      <td onclick="event.stopPropagation()">${p.notaFiscalEmitida
+        ? `<span onclick="toggleNFProduto(${idx})" title="Clique para desmarcar NF" style="font-size:10px;font-weight:800;color:var(--verde);background:rgba(52,199,89,.15);padding:4px 10px;border-radius:6px;cursor:pointer;user-select:none">✓ NF</span>`
+        : `<span onclick="toggleNFProduto(${idx})" title="Clique para marcar NF como emitida" style="font-size:10px;font-weight:700;color:#8e8e93;background:#f0f0f0;padding:4px 10px;border-radius:6px;cursor:pointer;user-select:none;border:1.5px dashed #ccc">☐ NF</span>`}
+      </td>
       <td class="td-acts" onclick="event.stopPropagation()">${btnCopy}${btnC}${btnV}${btnE}${btnD}</td>
     </tr>`;
   }).join('');
+}
+
+// Toggle nota fiscal em um produto do estoque (direto na linha, sem abrir modal)
+function toggleNFProduto(idx){
+  if(!isAdmin()){ toast('🔐 Sem permissão para alterar NF.'); return; }
+  const p = produtos[idx];
+  if(!p) return;
+  p.notaFiscalEmitida = !p.notaFiscalEmitida;
+  renderTabela(); salvarFirebase();
+  toast(p.notaFiscalEmitida ? '✓ NF marcada como emitida' : '☐ NF desmarcada');
+}
+
+// Filtra a tabela do estoque por um IMEI específico (útil quando IMEI duplicado)
+function filtrarPorImei(imei){
+  if(!imei) return;
+  busca = imei;
+  const el = document.getElementById('dskSearch'); if(el) el.value = imei;
+  const el2 = document.getElementById('sbSearch'); if(el2) el2.value = imei;
+  atualizarBotaoLimpar();
+  renderTabela();
+  toast('🔍 Filtrado por IMEI '+imei);
 }
 
 function copiarImei(el){
@@ -2590,6 +2634,7 @@ function editarP(idx){
   _sv('edValorCompra', p.valorCompra!==undefined && p.valorCompra!=='' && p.valorCompra!==null ? String(p.valorCompra).replace('.',',') : '');
   _sv('edFormaPagto', p.formaPagamento||'');
   _sv('edDetalhePagto', p.detalhePagamento||'');
+  _sv('edNotaFiscal', p.notaFiscalEmitida ? 'true' : 'false');
   const _hint=document.getElementById('edNovoFornHint'); if(_hint) _hint.style.display='none';
   popularDLFornecedores(); popularDLPagamento();
   fM('mDetalhe');
@@ -2621,6 +2666,8 @@ function salvarEdicao(){
   p.valorCompra = _val==='' ? '' : _val;
   p.formaPagamento = _gv2('edFormaPagto').toUpperCase();
   p.detalhePagamento = _gv2('edDetalhePagto');
+  const _nfSel = document.getElementById('edNotaFiscal');
+  if(_nfSel) p.notaFiscalEmitida = _nfSel.value === 'true';
 
   // Se tinha status 'aguardando' mas agora tem codProduto, promove automaticamente para 'emEstoque'
   if(p.codProduto && p.status==='aguardando') p.status='emEstoque';
@@ -3358,9 +3405,18 @@ function egVerDetalhe(idx){
   document.getElementById('egDetSub').textContent = `IMEI: ${r.imei||'—'}`;
   const body = document.getElementById('egDetalheBody');
   const valorTxt = (r.valorEntrada!==''&&r.valorEntrada!=null) ? fmtValor(r.valorEntrada) : '—';
+  const statusOptions = EG_STATUS_LIST.map(s=>{
+    const m = EG_STATUS_META[s] || {ico:'📌'};
+    return `<option value="${esc(s)}" ${s===st?'selected':''}>${m.ico} ${esc(s)}</option>`;
+  }).join('');
   body.innerHTML = `
     <div class="fg">
-      <div class="dg"><div class="dg-l">Status</div><div class="dg-v"><span class="badge ${meta.cls}" style="font-size:10px">${meta.ico} ${esc(st)}</span></div></div>
+      <div class="dg"><div class="dg-l">Status <span style="font-size:9px;color:var(--txt2)">(altere direto aqui)</span></div>
+        <div class="dg-v">
+          ${isAdmin() ? `<select onchange="egAlterarStatus(${idx}, this.value)" style="padding:6px 12px;border-radius:10px;border:1.5px solid var(--brd);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;background:var(--bg);cursor:pointer;outline:none;color:${meta.color}">${statusOptions}</select>`
+                       : `<span class="badge ${meta.cls}" style="font-size:10px">${meta.ico} ${esc(st)}</span>`}
+        </div>
+      </div>
       <div class="dg"><div class="dg-l">Tipo</div><div class="dg-v">${tipoMeta.ico} ${esc(r.tipoEntrada||'—')}</div></div>
       <div class="dg"><div class="dg-l">Data Entrada</div><div class="dg-v">${fmtD(r.dataEntrada)}</div></div>
       <div class="dg"><div class="dg-l">Data Final</div><div class="dg-v">${fmtD(r.dataFinal)}</div></div>
@@ -3461,7 +3517,8 @@ function egConfirmarLiberacao(){
     condicao: c.condicao || '',
     produtoCompleto: c.produtoCompleto || '',
     imei: r.imei || '',
-    dataCompraEntrada: hoje(),
+    // v5: usa a data de ENTRADA original (quando o aparelho chegou na loja), não a data de liberação
+    dataCompraEntrada: r.dataEntrada || hoje(),
     codProduto: c.codigo,
     nCompra: r.nCompra || '', // pode vir pré-preenchido; senão o estoque lança depois
     responsavel: r.responsavel || '',
@@ -3471,7 +3528,16 @@ function egConfirmarLiberacao(){
     formaPagamento: '',
     detalhePagamento: '',
     status: r.nCompra ? 'emEstoque' : 'aguardando',
-    obs: r.bateria ? ('Bateria: '+r.bateria+'%'+(r.obs?' · '+r.obs:'')) : (r.obs||''),
+    // v5: observação já inclui como o aparelho entrou (tipo de entrada) + bateria + obs originais
+    obs: (function(){
+      const partes = [];
+      if(r.tipoEntrada) partes.push('Entrada: '+r.tipoEntrada);
+      if(r.bateria) partes.push('Bateria: '+r.bateria+'%');
+      if(r.obs) partes.push(r.obs);
+      return partes.join(' · ');
+    })(),
+    // v5: NF herdada da entrada geral (produtos vendidos precisam emitir NF)
+    notaFiscalEmitida: r.notaFiscalEmitida || false,
     entradaGeralId: idEntradaGeral, // link inverso — usado para propagar nCompra depois
     criadoEm: new Date().toISOString(),
   };
@@ -3514,6 +3580,35 @@ function _propagarNCompraParaEstoque(entradaGeralId, novoNCompra){
     if(typeof render==='function') render();
     if(typeof salvarFirebase==='function') salvarFirebase();
   }
+}
+
+// Altera status direto do modal de detalhe (com regras auto pra data final e liberação)
+function egAlterarStatus(idx, novoStatus){
+  if(!isAdmin()){ toast('🔐 Sem permissão para alterar status.'); return; }
+  const r = window.entradaGeral[idx];
+  if(!r) return;
+  const statusAntes = r.statusTriagem;
+  // Se quer LIBERAR pro estoque e o produto ainda não foi liberado, guia o usuário pelo fluxo correto
+  if(novoStatus === 'LIBERADO PARA ESTOQUE' && !r.codProduto){
+    toast('💡 Use o botão "Liberar pro Estoque" — precisa informar o código do produto');
+    fM('mEgDetalhe');
+    setTimeout(()=>egAbrirLiberar(idx), 200);
+    return;
+  }
+  r.statusTriagem = novoStatus;
+  // Se virou um estado FINAL, marca a data final automaticamente
+  const estadosFinais = ['LIBERADO PARA ESTOQUE','DEVOLVIDO AO FORNECEDOR','CANCELADO'];
+  if(estadosFinais.includes(novoStatus) && !r.dataFinal){
+    r.dataFinal = hoje();
+  }
+  // Se voltou de um estado final para um estado intermediário, limpa data final
+  if(!estadosFinais.includes(novoStatus) && estadosFinais.includes(statusAntes)){
+    r.dataFinal = '';
+  }
+  egRender(); egSalvarFirebase();
+  toast('✅ Status alterado para: '+novoStatus);
+  // Re-abre o modal de detalhe pra refletir o novo estado (footer com botões de liberar/etc)
+  setTimeout(()=>egVerDetalhe(idx), 100);
 }
 
 // Toggle NF diretamente na linha (não abre modal)
@@ -3715,6 +3810,8 @@ window.registrarNovoFornecedor=registrarNovoFornecedor;
 window.popularDLFornecedores=popularDLFornecedores;
 window.popularDLPagamento=popularDLPagamento;
 window.copiarLinha=copiarLinha;
+window.toggleNFProduto=toggleNFProduto;
+window.filtrarPorImei=filtrarPorImei;
 // Entrada Geral
 window.egRender=egRender;
 window.egFiltrarSt=egFiltrarSt;
@@ -3733,6 +3830,7 @@ window.egConfirmarLiberacao=egConfirmarLiberacao;
 window.egHandleResp=egHandleResp;
 window.egToggleNF=egToggleNF;
 window.egCopiarImei=egCopiarImei;
+window.egAlterarStatus=egAlterarStatus;
 window.egPopularDLs=egPopularDLs;
 window.egAtualizarDLModelos=egAtualizarDLModelos;
 window.egAutoVincular=egAutoVincular;
