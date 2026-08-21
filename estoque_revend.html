@@ -1226,8 +1226,11 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         <span style="font-size:11px;color:var(--txt2);font-weight:700">Preencha em R$ · deixe vazio pra remover a meta</span>
       </div>
       <table class="metas-tbl" id="metasTbl"></table>
+      <div style="margin-top:12px;display:flex;justify-content:center">
+        <button onclick="metasAdicionarVendedor()" style="padding:8px 14px;background:var(--bg);border:1.5px dashed var(--azul);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;color:var(--azul);cursor:pointer">➕ Adicionar novo vendedor</button>
+      </div>
       <div style="margin-top:14px;padding:10px 12px;background:#fff9e6;border-left:3px solid var(--amarelo);font-size:11px;font-weight:700;color:#8a6200;border-radius:6px">
-        💡 A meta é comparada com o faturamento (soma do valor de venda dos aparelhos vendidos no mês). O acompanhamento aparece no Dashboard, aba "Análise da equipe".
+        💡 A meta é comparada com o faturamento e a quantidade de aparelhos vendidos no mês. O acompanhamento aparece no Dashboard, aba "Análise da equipe".
       </div>
     </div>
     <div class="mf">
@@ -1462,9 +1465,8 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="form-g">
           <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Vendedor *</label>
-          <select id="vVend" onchange="handleVendedorChange(this)"
-            style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff;cursor:pointer"
-            onchange="this.style.borderColor=this.value?'var(--verde)':'var(--brd)'">
+          <select id="vVend" onchange="handleVendedorChange(this);_toggleAtacadoBlock();this.style.borderColor=this.value?'var(--verde)':'var(--brd)'"
+            style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff;cursor:pointer">
 <option value="">— Selecione —</option>
 <option value="STEPHANIE">STEPHANIE</option>
 <option value="FELIPE DIAS">FELIPE DIAS</option>
@@ -1476,9 +1478,32 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
 </select>
         </div>
         <div class="form-g">
-          <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Nº Agendamento</label>
+          <label id="vAgenLabel" style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Nº Agendamento</label>
           <input id="vAgen" placeholder="Ex: AG1234"
             style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;outline:none">
+        </div>
+      </div>
+
+      <!-- BLOCO ATACADO — só aparece quando vendedor é ATACADO -->
+      <div id="vAtacadoBlock" style="display:none;background:linear-gradient(135deg,#f0f9ff,#e6f4ea);border:1.5px dashed var(--verde);border-radius:12px;padding:12px 14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:900;color:var(--verde);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px">🏷️ Informações da Venda Atacado</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-g">
+            <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Nome do Cliente / Loja *</label>
+            <input id="vCliente" list="dlClientesAtc" placeholder="Digite ou selecione..." autocomplete="off"
+              style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fff">
+            <datalist id="dlClientesAtc"></datalist>
+          </div>
+          <div class="form-g">
+            <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Forma de Pagamento *</label>
+            <input id="vPagamento" list="dlFormasPagto" placeholder="Ex: PIX SUMUP" autocomplete="off"
+              style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fff">
+          </div>
+          <div class="form-g" style="grid-column:1/-1">
+            <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Detalhe do Pagamento (opcional)</label>
+            <input id="vDetalhePagto" placeholder="Ex: 1900 SABADO + 290 SEGUNDA"
+              style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fff">
+          </div>
         </div>
       </div>
 
@@ -2081,39 +2106,58 @@ function renderTabela(){
 //  VENDA ATACADO — modal + mensagem formatada
 // ═══════════════════════════════════════════════════
 let _vaIdxAtual = -1;
+// v8: Botão 🏷️ agora só COPIA a mensagem — dados são preenchidos no modal Dar Baixa
 function abrirVendaAtacado(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
   const p = produtos[idx];
   if(!p){ toast('Produto não encontrado.'); return; }
-  _vaIdxAtual = idx;
-  // Resumo do produto no topo
-  const imei = p.imei || '—';
+  // Se ainda não vendeu como atacado, orienta o usuário
+  const va = p.vendaAtacado;
+  const isVendidoAtc = String(p.vendedor||'').toUpperCase().startsWith('ATACADO');
+  if(!va || !va.cliente || !va.pagamento){
+    if(!isVendidoAtc){
+      toast('💡 Registre a venda antes: clique em 💰 Vender e escolha vendedor ATACADO');
+    } else {
+      toast('💡 Complete a venda atacado no modal Dar Baixa (cliente + forma de pagamento)');
+    }
+    return;
+  }
+  // Já tem os dados — gera e copia direto
+  copiarMsgAtacado(idx);
+}
+
+// Gera e copia a mensagem de venda atacado no formato do WhatsApp
+function copiarMsgAtacado(idx){
+  const p = produtos[idx];
+  if(!p){ return; }
+  const va = p.vendaAtacado || {};
+  const imei = (p.imei||'').trim() || '—';
   const _np = _normStr(p.produtoCompleto);
   const _cl = (window._catPorNome && _np && window._catPorNome[_np]) || '';
   const cod = (_cl || p.codProduto || '—').toString().trim();
   const nome = (p.produtoCompleto || nomeProduto(p) || '—').trim();
-  document.getElementById('vaResumo').innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span style="font-size:14px">🏷️</span>
-      <strong>${esc(nome)}</strong>
-      <span style="color:var(--txt2);font-size:11px">· IMEI ${esc(imei)}</span>
-      ${cod!=='—'?`<span style="font-family:monospace;font-size:10px;color:var(--azul)">${esc(cod)}</span>`:''}
-    </div>`;
+  const codRet = va.codRetirada || p.nAgendamento || '—';
+  const cliente = va.cliente || '—';
+  const valor = va.valor!==undefined && va.valor!=='' ? va.valor : p.valorSaida;
+  const pagamento = va.pagamento || '—';
+  const detalhe = va.detalhePagto || '';
+  const obs = va.obs || p.obsVenda || 'TUDO OK';
 
-  // Preenche com dados salvos (se este produto já teve uma venda atacado antes)
-  const v = p.vendaAtacado || {};
-  document.getElementById('vaCodRetirada').value = v.codRetirada || '';
-  document.getElementById('vaCliente').value = v.cliente || '';
-  document.getElementById('vaValor').value = v.valor!==undefined && v.valor!==null && v.valor!=='' ? String(v.valor).replace('.',',') : '';
-  document.getElementById('vaPagamento').value = v.pagamento || '';
-  document.getElementById('vaDetalhePagto').value = v.detalhePagto || '';
-  document.getElementById('vaObs').value = v.obs || 'TUDO OK';
+  const linhas = [];
+  linhas.push(`*Cod Retirada:*   ${codRet}`);
+  linhas.push(`*Nome do cliente|Loja* ${cliente}`);
+  linhas.push(`*iPhone | Capacidade | Cor* ${imei}\t${cod}\t${nome}`);
+  if(valor!=='' && valor!=null) linhas.push(`*Valor*       ${fmtValor(valor)}`);
+  linhas.push(`*Pagamento* ${pagamento}${detalhe?(' '+detalhe):''}`.trim());
+  linhas.push(`*OBS* ${obs}`);
 
-  // Popula datalists
-  popularDLPagamento();
-  _popularDLClientesAtacado();
-
-  document.getElementById('mVendaAtc').classList.add('on');
+  const texto = linhas.join('\n');
+  navigator.clipboard.writeText(texto).then(()=>{
+    toast('📋 Mensagem de venda atacado copiada!');
+  }).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=texto;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    toast('📋 Mensagem de venda atacado copiada!');
+  });
 }
 
 // Coleta clientes de todas as vendas atacado anteriores para autocomplete
@@ -2307,6 +2351,29 @@ const FORNECEDORES_INICIAIS = [
 ];
 
 const FORMAS_PAGAMENTO = ['PIX NEON','PIX ITAÚ','PIX SUMUP','DINHEIRO','CARTÃO CRÉDITO','CARTÃO DÉBITO','BOLETO','TRANSFERÊNCIA'];
+// v8: formas de pagamento persistentes (nó formas_pagamento_revend no Firebase)
+let FORMAS_PAGAMENTO_EXTRAS = [];
+function listaFormasPagamento(){
+  const s = new Set(FORMAS_PAGAMENTO.map(n=>String(n).trim().toUpperCase()));
+  FORMAS_PAGAMENTO_EXTRAS.forEach(n=>{ const v=String(n||'').trim().toUpperCase(); if(v) s.add(v); });
+  return [...s].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+async function _fbSalvarFormasPagto(){
+  if(!window._fbSalvarNodo) return;
+  try { await window._fbSalvarNodo('formas_pagamento_revend', FORMAS_PAGAMENTO_EXTRAS); }
+  catch(e){ console.warn('formas pagto save:', e); }
+}
+function registrarNovaFormaPagto(nome){
+  const v = String(nome||'').trim().toUpperCase();
+  if(!v) return '';
+  if(!listaFormasPagamento().includes(v)){
+    FORMAS_PAGAMENTO_EXTRAS.push(v);
+    _fbSalvarFormasPagto();
+    popularDLPagamento();
+    toast('✅ Forma de pagamento "'+v+'" adicionada!');
+  }
+  return v;
+}
 
 // Lista viva de fornecedores: inicial + adicionados no Firebase + dos produtos existentes
 let FORNECEDORES_EXTRAS = []; // populado pelo Firebase (nó fornecedores_revend, separado — não toca em estoque_revend)
@@ -2324,7 +2391,7 @@ function popularDLFornecedores(){
 function popularDLPagamento(){
   const dl = document.getElementById('dlFormasPagto');
   if(!dl) return;
-  dl.innerHTML = FORMAS_PAGAMENTO.map(n=>`<option value="${esc(n)}">`).join('');
+  dl.innerHTML = listaFormasPagamento().map(n=>`<option value="${esc(n)}">`).join('');
 }
 async function _fbSalvarFornecedores(){
   if(!window._fbSalvarNodo) return;
@@ -2946,9 +3013,34 @@ function abrirVenda(idx){
   if(vSel){vSel.value=p.vendedor||'';vSel.style.borderColor=p.vendedor?'var(--verde)':'var(--brd)';}
   document.getElementById('vAgen').value=p.nAgendamento||'';
   document.getElementById('vObs').value=p.obsVenda||'';
+  // Preenche campos do atacado se existirem (salvos anteriormente)
+  const va = p.vendaAtacado || {};
+  const _vc=document.getElementById('vCliente');   if(_vc) _vc.value = va.cliente || '';
+  const _vp=document.getElementById('vPagamento'); if(_vp) _vp.value = va.pagamento || '';
+  const _vd=document.getElementById('vDetalhePagto'); if(_vd) _vd.value = va.detalhePagto || '';
+  // Popula datalists (formas de pagamento e clientes do atacado)
+  if(typeof popularDLPagamento==='function') popularDLPagamento();
+  if(typeof _popularDLClientesAtacado==='function') _popularDLClientesAtacado();
+  // Toggle bloco atacado baseado no vendedor
+  _toggleAtacadoBlock();
   fM('mDetalhe');
   document.getElementById('mVenda').classList.add('on');
 }
+
+// Mostra/esconde bloco Atacado + muda label do agendamento pra Cód. Retirada quando vendedor for atacado
+function _toggleAtacadoBlock(){
+  const sel=document.getElementById('vVend');
+  const bloco=document.getElementById('vAtacadoBlock');
+  const lbl=document.getElementById('vAgenLabel');
+  const inp=document.getElementById('vAgen');
+  if(!sel||!bloco) return;
+  const v = String(sel.value||'').toUpperCase();
+  const isAtc = v.startsWith('ATACADO');
+  bloco.style.display = isAtc ? '' : 'none';
+  if(lbl) lbl.textContent = isAtc ? 'Cód. Retirada / Nº Agendamento' : 'Nº Agendamento';
+  if(inp) inp.placeholder = isAtc ? 'Ex: FT / TA / AG1234' : 'Ex: AG1234';
+}
+
 function salvarVenda(){
   const nv=document.getElementById('vNV').value.trim();
   const vd=document.getElementById('vVend').value.trim();
@@ -2957,14 +3049,37 @@ function salvarVenda(){
   const _vv=document.getElementById('vValor');
   const _valorV = _vv ? parseValor(_vv.value.trim()) : '';
   if(_valorV === '' || _valorV <= 0){ alert('Informe o Valor da Venda (R$).'); return; }
+  const isAtc = String(vd).toUpperCase().startsWith('ATACADO');
+  // Se atacado, cliente e forma pagamento são obrigatórios
+  const cliente = document.getElementById('vCliente')?.value.trim().toUpperCase() || '';
+  const pagamento = document.getElementById('vPagamento')?.value.trim().toUpperCase() || '';
+  const detalhePagto = document.getElementById('vDetalhePagto')?.value.trim() || '';
+  if(isAtc){
+    if(!cliente){ alert('Venda ATACADO: informe o Nome do Cliente / Loja.'); return; }
+    if(!pagamento){ alert('Venda ATACADO: informe a Forma de Pagamento.'); return; }
+  }
   const p=produtos[idxVenda];
   p.nVenda=nv; p.dataVenda=document.getElementById('vData').value;
   p.valorSaida = _valorV;
   p.vendedor=vd; p.nAgendamento=document.getElementById('vAgen').value.trim();
   p.obsVenda=document.getElementById('vObs').value.trim();
   p.status='vendido';
+  // Salva dados de atacado no produto (se aplicável)
+  if(isAtc){
+    p.vendaAtacado = {
+      codRetirada: p.nAgendamento || '',
+      cliente,
+      pagamento,
+      detalhePagto,
+      obs: p.obsVenda || 'TUDO OK',
+      valor: _valorV,
+      dataGerado: hoje(),
+    };
+    // Registra forma de pagamento nova (persiste no Firebase)
+    if(typeof registrarNovaFormaPagto==='function') registrarNovaFormaPagto(pagamento);
+  }
   fM('mVenda'); render(); salvarFirebase();
-  toast('🏷️ Venda registrada!');
+  toast(isAtc ? '🏷️ Venda atacado salva! Use o botão 🏷️ da linha pra copiar a mensagem.' : '🏷️ Venda registrada!');
 }
 
 // ══════════════════════════════
@@ -3667,9 +3782,11 @@ function abrirMetas(){
 function metasRender(){
   const mes = document.getElementById('metasMesInput').value;
   const metasDoMes = (window.metasRevend && window.metasRevend[mes]) || {};
-  const vendedoresSugeridos = ['STEPHANIE','FELIPE DIAS','JULIA','RUBENS','YASMIN','FELIPE TAVARES','ATACADO - FELIPE','ATACADO - MARCOS','NATASCHA','BEATRIZ','ANGÉLICA','LARISSA SALLES','LUCAS SOUZA','MIRIÃ','SITE','SAC'];
-  const vendedoresDosProdutos = [...new Set((window.produtos||[]).map(p=>String(p.vendedor||'').toUpperCase()).filter(Boolean))];
-  const lista = [...new Set([...vendedoresSugeridos, ...vendedoresDosProdutos, ...Object.keys(metasDoMes)])].sort();
+  // v8: só vendedores REAIS (mesma lista do dropdown de vendas) + os que já têm meta cadastrada + extras adicionados manualmente
+  const vendedoresSugeridos = window.METAS_VENDEDORES_EXTRAS && window.METAS_VENDEDORES_EXTRAS.length
+    ? window.METAS_VENDEDORES_EXTRAS
+    : ['STEPHANIE','FELIPE DIAS','ATACADO - FELIPE','RUBENS','YASMIN'];
+  const lista = [...new Set([...vendedoresSugeridos, ...Object.keys(metasDoMes)])].sort();
   const tbl = document.getElementById('metasTbl');
   tbl.innerHTML = `
     <thead><tr>
@@ -3690,6 +3807,19 @@ function metasRender(){
         </tr>`;
       }).join('')}
     </tbody>`;
+}
+function metasAdicionarVendedor(){
+  const nv = prompt('Nome do novo vendedor (para meta):');
+  if(!nv || !nv.trim()) return;
+  const nome = nv.trim().toUpperCase();
+  window.METAS_VENDEDORES_EXTRAS = window.METAS_VENDEDORES_EXTRAS && window.METAS_VENDEDORES_EXTRAS.length
+    ? window.METAS_VENDEDORES_EXTRAS
+    : ['STEPHANIE','FELIPE DIAS','ATACADO - FELIPE','RUBENS','YASMIN'];
+  if(!window.METAS_VENDEDORES_EXTRAS.includes(nome)){
+    window.METAS_VENDEDORES_EXTRAS.push(nome);
+  }
+  metasRender();
+  toast('✅ Vendedor '+nome+' adicionado — preencha a meta e salve.');
 }
 function metasSalvar(){
   if(!isAdmin()){ toast('🔐 Somente admin.'); return; }
@@ -4738,6 +4868,11 @@ window.gerarPdfFechamento=gerarPdfFechamento;
 window.abrirMetas=abrirMetas;
 window.metasRender=metasRender;
 window.metasSalvar=metasSalvar;
+window.metasAdicionarVendedor=metasAdicionarVendedor;
+window._toggleAtacadoBlock=_toggleAtacadoBlock;
+window.copiarMsgAtacado=copiarMsgAtacado;
+window.registrarNovaFormaPagto=registrarNovaFormaPagto;
+window.listaFormasPagamento=listaFormasPagamento;
 </script>
 
 <!-- DADOS -->
@@ -4884,6 +5019,22 @@ if(db) {
     error => {
       if(error.code !== 'PERMISSION_DENIED') console.warn('Metas load:', error);
       window._fbLoadedMetas = true; // permite gravar mesmo com erro de load (primeira gravação)
+    }
+  );
+
+  // Listener de FORMAS DE PAGAMENTO extras (nó separado; persistência das digitadas pelo usuário)
+  onValue(
+    ref(db,'formas_pagamento_revend'),
+    snap => {
+      const v = snap.val();
+      let arr = [];
+      if(Array.isArray(v)) arr = v.filter(Boolean).map(n=>String(n).trim().toUpperCase());
+      else if(v && typeof v === 'object') arr = Object.values(v).filter(Boolean).map(n=>String(n).trim().toUpperCase());
+      FORMAS_PAGAMENTO_EXTRAS = arr;
+      if(typeof popularDLPagamento==='function') popularDLPagamento();
+    },
+    error => {
+      if(error.code !== 'PERMISSION_DENIED') console.warn('formas pagto load:', error);
     }
   );
 
