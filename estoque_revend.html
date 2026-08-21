@@ -337,6 +337,110 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
 @media(max-width:800px){.two-col{grid-template-columns:1fr!important}}
 @media(min-width:1440px){:root{--sidebar:285px;--pad:36px}}
 @media(max-width:1023px){:root{--sidebar:0px}.sidebar{display:none}.main{margin-left:0}.topbar{padding:10px 16px}.content{padding:14px 14px 70px}}
+
+/* ═════ DASHBOARD v6 (fechamento diário + metas + PDF) ═════ */
+.d-sec{background:#fff;border:1.5px solid var(--brd);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:24px}
+.d-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.d-tit{font-size:15px;font-weight:900;letter-spacing:-.3px}
+.d-sub{font-size:11px;color:var(--txt2);font-weight:700;margin-top:2px}
+.d-per{font-size:10px;color:var(--txt2);font-weight:800;background:var(--bg);padding:5px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+.d-mini-tit{font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.d-split{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:900px){.d-split{grid-template-columns:1fr}}
+
+/* Card variants (herda cards-g já existente) */
+.card-v{background:linear-gradient(135deg,#1a7a3a,#0f5f2b);color:#fff;border-color:#0f5f2b}
+.card-v .ci{background:rgba(255,255,255,.2)}.card-v .cl{color:rgba(255,255,255,.85)}.card-v .cs{color:rgba(255,255,255,.75)}
+
+/* Barra horizontal (ranking) */
+.d-bar-row{display:grid;grid-template-columns:130px 1fr 90px;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--brd)}
+.d-bar-row:last-child{border-bottom:none}
+.d-bar-lbl{font-size:12px;font-weight:800;color:var(--preto);display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.d-bar-lbl .rank{font-size:9px;font-weight:900;color:#fff;background:var(--txt2);width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.d-bar-lbl .rank.gold{background:#eda100}.d-bar-lbl .rank.silver{background:#8e8e93}.d-bar-lbl .rank.bronze{background:#cd7f32}
+.d-bar-track{background:var(--bg);height:22px;border-radius:6px;overflow:hidden;display:flex;align-items:center}
+.d-bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,#1a7a3a,#0f5f2b);display:flex;align-items:center;padding-left:8px;font-size:10px;font-weight:800;color:#fff;transition:width .4s}
+.d-bar-val{text-align:right;font-size:12px;font-weight:800;font-variant-numeric:tabular-nums}
+
+/* Delta */
+.d-delta{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:800;padding:2px 7px;border-radius:20px}
+.d-delta.up{color:#006300;background:rgba(52,199,89,.12)}
+.d-delta.down{color:var(--red);background:rgba(200,16,46,.10)}
+.d-delta.flat{color:var(--txt2);background:var(--bg)}
+
+/* Timeline */
+.d-tl-item{display:grid;grid-template-columns:65px 30px 1fr auto;gap:10px;align-items:center;padding:8px 12px;background:var(--bg);border-radius:10px;font-size:12px;margin-bottom:6px}
+.d-tl-hora{font-size:11px;font-weight:800;color:var(--txt2);font-variant-numeric:tabular-nums}
+.d-tl-ico{font-size:16px;text-align:center}
+.d-tl-desc{font-weight:700;color:var(--preto);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.d-tl-val{font-size:11px;font-weight:800;color:var(--verde);font-variant-numeric:tabular-nums;white-space:nowrap}
+.d-tl-val.saida{color:var(--red)}
+.d-tl-val.neutro{color:var(--txt2)}
+
+/* Hero pair */
+.d-hero-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.d-hero-pair{grid-template-columns:1fr}}
+.d-hero{background:linear-gradient(135deg,#fff,#fafaf7);border:1.5px solid var(--brd);border-radius:16px;padding:20px 24px}
+.d-hero-lbl{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.d-hero-n{font-size:38px;font-weight:900;letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums}
+.d-cifrao{font-size:22px;color:var(--txt2);vertical-align:top;margin-right:2px}
+.d-hero-cmp{font-size:11px;font-weight:700;color:var(--txt2);margin-top:10px}
+
+/* Cmp mês vs mês */
+.d-cmp{display:grid;grid-template-columns:150px 1fr 80px;gap:16px;align-items:center;padding:10px 0;border-bottom:1px solid var(--brd)}
+.d-cmp:last-child{border-bottom:none}
+.d-cmp-name{font-size:12px;font-weight:800;color:var(--preto)}
+.d-cmp-name span{display:block;font-size:9px;color:var(--txt2);font-weight:700;margin-top:2px;text-transform:uppercase;letter-spacing:.3px}
+.d-cmp-bars{display:flex;flex-direction:column;gap:5px}
+.d-cmp-line{display:grid;grid-template-columns:50px 1fr 100px;gap:8px;align-items:center}
+.d-cmp-lbl{font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase}
+.d-cmp-track{background:var(--bg);height:14px;border-radius:4px;overflow:hidden}
+.d-cmp-fill{height:100%;border-radius:4px;transition:width .4s}
+.d-cmp-fill.now{background:linear-gradient(90deg,var(--red),var(--red-dark))}
+.d-cmp-fill.prev{background:linear-gradient(90deg,#8e8e93,#666)}
+.d-cmp-val{font-size:10px;font-weight:800;font-variant-numeric:tabular-nums;text-align:right}
+
+/* Aparelhos parados por faixa */
+.d-buckets{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media(max-width:800px){.d-buckets{grid-template-columns:repeat(2,1fr)}}
+.d-bucket{background:var(--bg);border-radius:14px;padding:16px;text-align:center;border:1.5px solid transparent;cursor:pointer;transition:transform .15s}
+.d-bucket:hover{transform:translateY(-2px)}
+.d-bucket-verde{border-color:rgba(52,199,89,.25);background:rgba(52,199,89,.06)}
+.d-bucket-amarelo{border-color:rgba(255,149,0,.3);background:rgba(255,149,0,.08)}
+.d-bucket-laranja{border-color:rgba(236,131,90,.4);background:rgba(236,131,90,.1)}
+.d-bucket-vermelho{border-color:rgba(200,16,46,.35);background:rgba(200,16,46,.08)}
+.d-bucket-lbl{font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.d-bucket-n{font-size:32px;font-weight:900;line-height:1;font-variant-numeric:tabular-nums}
+.d-bucket-sub{font-size:10px;font-weight:700;color:var(--txt2);margin-top:6px}
+.d-bucket-verde .d-bucket-n{color:#1a7a3a}
+.d-bucket-amarelo .d-bucket-n{color:#c47500}
+.d-bucket-laranja .d-bucket-n{color:#c95a1e}
+.d-bucket-vermelho .d-bucket-n{color:var(--red-dark)}
+
+/* Tabela equipe */
+.d-tbl-eq{width:100%;border-collapse:collapse;font-size:12px}
+.d-tbl-eq th{text-align:left;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;padding:10px 12px;border-bottom:1.5px solid var(--brd);white-space:nowrap}
+.d-tbl-eq td{padding:12px;border-bottom:1px solid var(--brd);font-weight:700;font-variant-numeric:tabular-nums}
+.d-tbl-eq tr:last-child td{border-bottom:none}
+.d-tbl-eq tr:hover td{background:var(--bg)}
+.d-tbl-eq .nome{font-weight:800;color:var(--preto);font-variant-numeric:normal}
+.d-tbl-eq .ok{color:#1a7a3a;font-weight:800}
+.d-tbl-eq .warn{color:var(--amarelo);font-weight:800}
+.d-tbl-eq .r{text-align:right}
+.d-medalha{display:inline-block;font-size:12px;margin-right:6px}
+.d-meta-bar{background:var(--bg);height:8px;border-radius:4px;overflow:hidden;position:relative;margin-top:4px}
+.d-meta-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--verde-dark,#1a7a3a),#0f5f2b);transition:width .4s}
+.d-meta-fill.ok{background:linear-gradient(90deg,#1a7a3a,#0f5f2b)}
+.d-meta-fill.warn{background:linear-gradient(90deg,var(--amarelo),#c47500)}
+.d-meta-fill.crit{background:linear-gradient(90deg,var(--red),var(--red-dark))}
+
+/* Modal Metas */
+.metas-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.metas-tbl th{text-align:left;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:8px 10px;border-bottom:1.5px solid var(--brd)}
+.metas-tbl td{padding:10px;border-bottom:1px solid var(--brd)}
+.metas-tbl input{width:100%;padding:6px 10px;border:1.5px solid var(--brd);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;text-align:right;font-variant-numeric:tabular-nums}
+.metas-tbl input:focus{border-color:var(--red)}
+
 </style>
 </head>
 <body>
@@ -383,7 +487,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
       <button class="nav-btn on" onclick="irPara('estoque',this)"><span class="em">📦</span>Estoque<span class="nb" id="nb-total">0</span></button>
       <button class="nav-btn" onclick="irPara('entradaGeral',this)"><span class="em">🔧</span>Entrada Geral<span class="nb" id="nb-eg">0</span></button>
       <button class="nav-btn" onclick="irPara('catalogo',this)"><span class="em">🗃️</span>Catálogo</button>
-      <button class="nav-btn" onclick="irPara('dashboard',this)"><span class="em">📊</span>Dashboard</button>
+      <button class="nav-btn" id="nav-btn-dashboard" onclick="irPara('dashboard',this)"><span class="em">📊</span>Dashboard</button>
       <div class="nav-lbl" style="margin-top:4px">Filtros Rápidos</div>
       <button class="nav-btn" onclick="filtrarSt('todos',this)" data-st="todos"><span class="em">🗂️</span>Todos<span class="nb" id="nb-t">0</span></button>
       <button class="nav-btn" onclick="filtrarSt('aguardando',this)" data-st="aguardando"><span class="em">⏳</span>Ag. Compra<span class="nb a" id="nb-ag">0</span></button>
@@ -561,50 +665,114 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
 
       <!-- ══ DASHBOARD ══ -->
       <div id="pgDashboard" style="display:none">
-        <div class="dash-filt">
-          <label>Período</label>
-          <input type="month" id="dashMes" onchange="renderDash()">
-          <label>Família</label>
-          <select id="dashFam" onchange="renderDash()">
-            <option value="">Todas</option>
-            <option value="iPhones">📱 iPhones</option>
-            <option value="Ipads">🖥️ iPads</option>
-            <option value="Macbooks">💻 Macbooks</option>
-            <option value="Apple Watch">⌚ Apple Watch</option>
-            <option value="AirPods">🎧 AirPods</option>
-          </select>
-          <label>Vendedor</label>
-          <select id="dashVend" onchange="handleVendedorChange(this);renderDash()">
-<option value="">— Selecione —</option>
-<option value="STEPHANIE">STEPHANIE</option>
-<option value="FELIPE DIAS">FELIPE DIAS</option>
-<option value="ATACADO - FELIPE">ATACADO - FELIPE</option>
-<option value="RUBENS">RUBENS</option>
-<option value="CLIENTE NOVO">CLIENTE NOVO</option>
-<option value="YASMIN">YASMIN</option>
-<option value="__novo__">➕ Adicionar vendedor...</option>
-</select>
-          <button class="btn-dash" onclick="resetDash()">↺ Limpar</button>
+        <!-- Header do dashboard: período + botões PDF/Metas -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Mês</label>
+            <input type="month" id="dashMes" onchange="renderDash()" style="padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff">
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <label style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Família</label>
+            <select id="dashFam" onchange="renderDash()" style="padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff">
+              <option value="">Todas</option>
+              <option value="iPhones">📱 iPhones</option>
+              <option value="Ipads">🖥️ iPads</option>
+              <option value="Macbooks">💻 Macbooks</option>
+              <option value="Apple Watch">⌚ Apple Watch</option>
+              <option value="AirPods">🎧 AirPods</option>
+            </select>
+          </div>
+          <div style="flex:1"></div>
+          <button class="tb-btn r" onclick="gerarPdfFechamento()" style="padding:9px 16px">📄 PDF do fechamento</button>
+          <button class="tb-btn b" onclick="abrirMetas()" style="padding:9px 16px">🎯 Metas mensais</button>
         </div>
-        <div class="ds-title">📊 Resumo do Período <span id="dashLabel"></span></div>
-        <div class="kpi-g">
-          <div class="kpi"><div class="ki">🏷️</div><div class="kn g" id="dk-vd">0</div><div class="kl">Vendas</div><div class="ks" style="color:var(--verde)" id="dk-vd-s"></div></div>
-          <div class="kpi"><div class="ki">📦</div><div class="kn b" id="dk-es">0</div><div class="kl">Em Estoque</div><div class="ks" style="color:var(--azul)" id="dk-es-s"></div></div>
-          <div class="kpi"><div class="ki">⏳</div><div class="kn a" id="dk-ag">0</div><div class="kl">Ag. Código</div><div class="ks" style="color:var(--amarelo)">precisam lançamento</div></div>
-          <div class="kpi"><div class="ki">📥</div><div class="kn r" id="dk-en">0</div><div class="kl">Entradas</div><div class="ks" style="color:var(--red)" id="dk-en-s"></div></div>
+
+        <!-- ═════ FECHAMENTO DO DIA ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">📅 Fechamento do dia</h3>
+              <div class="d-sub">Movimento das últimas 24h</div>
+            </div>
+            <div class="d-per" id="dashHojePeriodo">Hoje</div>
+          </div>
+          <div class="cards-g" style="margin-bottom:20px" id="dashHojeCards"></div>
+          <div class="d-split">
+            <div>
+              <div class="d-mini-tit">💰 Vendas por vendedor (hoje)</div>
+              <div id="dashHojeVendedor" style="min-height:80px"></div>
+            </div>
+            <div>
+              <div class="d-mini-tit">🕐 Movimento do dia (últimos eventos)</div>
+              <div id="dashHojeTimeline" style="min-height:80px"></div>
+            </div>
+          </div>
         </div>
-        <div class="ds-title">📈 Vendas por Mês <span>últimos 6 meses</span></div>
-        <div class="grafico">
-          <div class="barras" id="dashBarras"></div>
-          <div style="display:flex;gap:6px;margin-top:6px" id="dashBLbls"></div>
+
+        <!-- ═════ FATURAMENTO + MARGEM DO MÊS ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">💵 Faturamento & margem do mês</h3>
+              <div class="d-sub">Total realizado + projeção baseada no ritmo</div>
+            </div>
+            <div class="d-per" id="dashMesLabel"></div>
+          </div>
+          <div class="d-hero-pair">
+            <div class="d-hero">
+              <div class="d-hero-lbl">💰 Faturamento acumulado</div>
+              <div class="d-hero-n"><span class="d-cifrao">R$</span> <span id="dashFatN">0</span></div>
+              <div class="d-hero-cmp" id="dashFatCmp"></div>
+            </div>
+            <div class="d-hero">
+              <div class="d-hero-lbl">📈 Lucro bruto acumulado</div>
+              <div class="d-hero-n"><span class="d-cifrao">R$</span> <span id="dashLucN">0</span></div>
+              <div class="d-hero-cmp" id="dashLucCmp"></div>
+            </div>
+          </div>
         </div>
-        <div class="two-col">
-          <div><div class="ds-title">🏆 Ranking Vendedores</div><div class="rank-w" id="rankVend"></div></div>
-          <div><div class="ds-title">📱 Top Modelos</div><div class="rank-w" id="rankMod"></div></div>
+
+        <!-- ═════ COMPARATIVO MÊS VS MÊS ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">📊 Comparativo mês vs mês</h3>
+              <div class="d-sub" id="dashCmpSub"></div>
+            </div>
+            <div class="d-per" id="dashCmpLabel"></div>
+          </div>
+          <div id="dashCmpGrid"></div>
         </div>
-        <div class="ds-title">🍎 Por Família</div>
-        <div class="kpi-g" id="dashFams"></div>
+
+        <!-- ═════ APARELHOS PARADOS POR FAIXA ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">⏱️ Aparelhos parados por faixa</h3>
+              <div class="d-sub">Distribuição dos "em estoque" por tempo desde a entrada</div>
+            </div>
+            <div class="d-per" id="dashParadosTotal">0 em estoque</div>
+          </div>
+          <div class="d-buckets" id="dashBuckets"></div>
+          <div id="dashParadosTop" style="margin-top:16px"></div>
+        </div>
+
+        <!-- ═════ ANÁLISE DA EQUIPE + METAS ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">👥 Análise da equipe · <span id="dashEquipeMes"></span></h3>
+              <div class="d-sub">Performance individual + progresso da meta</div>
+            </div>
+            <div class="d-per" id="dashEquipeTotal">0 vendas</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="d-tbl-eq" id="dashEquipeTbl"></table>
+          </div>
+          <div id="dashInsights" style="margin-top:14px;font-size:10px;color:var(--txt2);font-weight:700"></div>
+        </div>
       </div>
+
 
       <!-- ══ ENTRADA GERAL ══ -->
       <div id="pgEntradaGeral" style="display:none">
@@ -1044,6 +1212,81 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
 </div>
 
 
+<!-- MODAL METAS MENSAIS -->
+<div class="modal-ov" id="mMetas" onclick="fOv(event,'mMetas')">
+  <div class="modal-box">
+    <div class="mh" style="background:linear-gradient(135deg,var(--azul),#0055c7);color:#fff">
+      <div><h3 style="color:#fff">🎯 Metas mensais de faturamento</h3><p style="color:rgba(255,255,255,.85)" id="metasMesLabel">—</p></div>
+      <button class="m-x" onclick="fM('mMetas')" style="color:#fff">✕</button>
+    </div>
+    <div class="mb">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+        <label style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Mês</label>
+        <input type="month" id="metasMesInput" onchange="metasRender()" style="padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none">
+        <span style="font-size:11px;color:var(--txt2);font-weight:700">Preencha em R$ · deixe vazio pra remover a meta</span>
+      </div>
+      <table class="metas-tbl" id="metasTbl"></table>
+      <div style="margin-top:14px;padding:10px 12px;background:#fff9e6;border-left:3px solid var(--amarelo);font-size:11px;font-weight:700;color:#8a6200;border-radius:6px">
+        💡 A meta é comparada com o faturamento (soma do valor de venda dos aparelhos vendidos no mês). O acompanhamento aparece no Dashboard, aba "Análise da equipe".
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-x" onclick="fM('mMetas')">Cancelar</button>
+      <button class="btn-s" style="background:var(--azul);color:#fff" onclick="metasSalvar()">💾 Salvar Metas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VENDA ATACADO -->
+<div class="modal-ov" id="mVendaAtc" onclick="fOv(event,'mVendaAtc')">
+  <div class="modal-box">
+    <div class="mh" style="background:linear-gradient(135deg,var(--verde),#28a745);color:#fff">
+      <div><h3 style="color:#fff">🏷️ Venda Atacado</h3><p style="color:rgba(255,255,255,.85)">Preencha as infos e clique em copiar para gerar a mensagem</p></div>
+      <button class="m-x" onclick="fM('mVendaAtc')" style="color:#fff">✕</button>
+    </div>
+    <div class="mb">
+      <div id="vaResumo" style="background:var(--bg);padding:12px 14px;border-radius:12px;margin-bottom:14px;font-size:12px;font-weight:700"></div>
+      <div class="fg">
+        <div class="form-g">
+          <label>Cód. Retirada</label>
+          <input id="vaCodRetirada" placeholder="Ex: FT" list="dlCodRetirada" autocomplete="off">
+          <datalist id="dlCodRetirada">
+            <option value="FT">
+            <option value="TA">
+            <option value="RT">
+          </datalist>
+        </div>
+        <div class="form-g f1">
+          <label>Nome do Cliente / Loja</label>
+          <input id="vaCliente" list="dlClientesAtc" placeholder="Digite ou selecione..." autocomplete="off">
+          <datalist id="dlClientesAtc"></datalist>
+        </div>
+        <div class="form-g">
+          <label>Valor de Venda (R$)</label>
+          <input id="vaValor" type="text" inputmode="decimal" placeholder="Ex: 2190">
+        </div>
+        <div class="form-g">
+          <label>Forma de Pagamento</label>
+          <input id="vaPagamento" list="dlFormasPagto" placeholder="Ex: PIX SUMUP" autocomplete="off">
+        </div>
+        <div class="form-g f1">
+          <label>Detalhe do Pagamento (opcional)</label>
+          <input id="vaDetalhePagto" placeholder="Ex: 1900 SABADO + 290 SEGUNDA">
+        </div>
+        <div class="form-g f1">
+          <label>Observações</label>
+          <textarea id="vaObs" placeholder="TUDO OK, ou notas adicionais..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-x" onclick="fM('mVendaAtc')">Cancelar</button>
+      <button class="btn-s" style="background:var(--verde);color:#fff" onclick="salvarECopiarVendaAtacado()">📋 Salvar e Copiar Mensagem</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- MODAL CADASTRAR PRODUTO NO CATÁLOGO -->
 <div class="modal-ov" id="mCadProd" onclick="fOv(event,'mCadProd')">
   <div class="modal-box sm">
@@ -1148,10 +1391,11 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
       <div id="vrSel" style="display:none" class="ibox a"><div class="ibox-lbl">Produto Selecionado</div><div class="ibox-val" id="vrSelInfo">—</div></div>
       <div class="fg" style="margin-top:14px">
         <div class="form-g f1"><label>Nº Venda *</label><input id="vrCod" placeholder="Ex: 25541"></div>
-        <div class="form-g"><label>Data Venda</label><input type="date" id="vrData"></div>
+        <div class="form-g"><label>Data Venda *</label><input type="date" id="vrData"></div>
+        <div class="form-g"><label>💰 Valor da Venda (R$) *</label><input id="vrValor" type="text" inputmode="decimal" placeholder="Ex: 3200"></div>
       </div>
       <div class="fg" style="margin-top:10px">
-        <div class="form-g f1"><label>Vendedor</label>
+        <div class="form-g f1"><label>Vendedor *</label>
           <select id="vrVend" onchange="handleVendedorChange(this)">
             <option value="">— Selecione —</option>
             <option value="STEPHANIE">STEPHANIE</option>
@@ -1163,6 +1407,10 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             <option value="__novo__">➕ Adicionar vendedor...</option>
           </select>
         </div>
+        <div class="form-g"><label>Nº Agendamento</label><input id="vrAgen" placeholder="Ex: AG1234"></div>
+      </div>
+      <div class="fg" style="margin-top:10px">
+        <div class="form-g f1"><label>Observações</label><textarea id="vrObs" placeholder="Detalhes adicionais..." style="min-height:50px"></textarea></div>
       </div>
     </div>
     <div class="mf"><button class="btn-x" onclick="fM('mVendaRap')">Cancelar</button><button class="btn-s" onclick="salvarVendaRap()" style="background:#1a7a3a">💰 Confirmar Venda</button></div>
@@ -1189,8 +1437,8 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         <div style="font-size:10px;color:var(--txt2);font-weight:600;margin-top:6px" id="mV-cod">—</div>
       </div>
 
-      <!-- LINHA 1: Nº Venda + Data -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <!-- LINHA 1: Nº Venda + Data + Valor da Venda -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px">
         <div class="form-g">
           <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Nº Venda (sistema) *</label>
           <input id="vNV" placeholder="Ex: V25500"
@@ -1201,6 +1449,12 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Data da Venda *</label>
           <input type="date" id="vData"
             style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;outline:none">
+        </div>
+        <div class="form-g">
+          <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">💰 Valor da Venda (R$) *</label>
+          <input id="vValor" type="text" inputmode="decimal" placeholder="Ex: 3200 ou 3.200,00"
+            style="width:100%;padding:11px 14px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:700;outline:none"
+            oninput="this.style.borderColor=this.value?'var(--verde)':'var(--brd)'">
         </div>
       </div>
 
@@ -1287,6 +1541,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
         </div>
 
         <div class="form-g"><label>Nº Venda</label><input id="edNVenda"></div>
+        <div class="form-g"><label>💰 Valor Venda (R$)</label><input id="edValorSaida" type="text" inputmode="decimal" placeholder="Ex: 3200"></div>
         <div class="form-g"><label>Data Venda</label><input type="date" id="edDataVd"></div>
         <div class="form-g"><label>Vendedor</label>
           <select id="edVend" onchange="handleVendedorChange(this)" style="width:100%;padding:8px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:700;outline:none;background:#fafafa">
@@ -1378,9 +1633,14 @@ function aplicarUI(){
   document.getElementById('sbNome').textContent=a?'Administrador':'Operador';
   document.getElementById('sbPerfil').textContent=a?'Acesso total':'Lançamento / Baixa';
   document.querySelectorAll('#sb-btn-novo,#btn-novo').forEach(el=>el.style.display=a?'flex':'none');
+  // Dashboard: só admin vê
+  const nbDash = document.getElementById('nav-btn-dashboard');
+  if(nbDash) nbDash.style.display = a ? '' : 'none';
 }
 function isAdmin(){return usuarioLogado?.perfil==='admin';}
 function isOp(){return usuarioLogado?.perfil==='operador';}
+// Entrada Geral: liberado pra admin E operador (permissões diferentes do Estoque, onde operador é só leitura + compra/venda)
+function podeEntrada(){return isAdmin() || isOp();}
 
 function aplicarUI(){
   const a=isAdmin();
@@ -1391,6 +1651,9 @@ function aplicarUI(){
   document.getElementById('sbPerfil').textContent=a?'Acesso total':'Compra · Venda · Status';
   // Novo Produto: só admin
   document.querySelectorAll('#sb-btn-novo,#btn-novo').forEach(el=>el.style.display=a?'flex':'none');
+  // Dashboard: só admin vê
+  const nbDash = document.getElementById('nav-btn-dashboard');
+  if(nbDash) nbDash.style.display = a ? '' : 'none';
   // Catálogo - botão cadastrar: só admin
   const btnCat=document.getElementById('btn-cadastrar-prod');
   if(btnCat) btnCat.style.display=a?'':'none';
@@ -1780,7 +2043,8 @@ function renderTabela(){
     const btnV=p.status==='emEstoque'?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Registrar Venda" style="background:#1a7a3a;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 Vender</button>`:'';
     const btnE=isAdmin()?`<button class="btn-e" onclick="event.stopPropagation();editarP(${idx})">✏️</button>`:'';
     const btnD=isAdmin()?`<button class="btn-d" onclick="event.stopPropagation();deletarP(${idx})">🗑</button>`:'';
-    const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar mensagem de compra (WhatsApp)">💬</button>`;
+    const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar mensagem de COMPRA (WhatsApp)">💬</button>`;
+    const btnVendaAtc=`<button class="btn-copy" onclick="event.stopPropagation();abrirVendaAtacado(${idx})" title="Gerar mensagem de VENDA ATACADO" style="background:rgba(52,199,89,.15);color:var(--verde)">🏷️</button>`;
     return `<tr class="${trCls}" onclick="verDetalhe(${idx})">
       <td><span class="ft">${ico} ${esc(p.familia||'—')}</span></td>
       <td class="td-prod">
@@ -1792,9 +2056,9 @@ function renderTabela(){
       ${(function(){
         const dup = p.imei ? (window._imeiCount.get(p.imei)||0) : 0;
         const isDup = dup > 1;
-        const bgDup = isDup ? 'background:rgba(255,59,48,.08);border-left:3px solid #ff3b30' : '';
-        const badgeDup = isDup ? `<span onclick="event.stopPropagation();filtrarPorImei('${esc(p.imei)}')" title="IMEI aparece ${dup}× — clique para ver todos" style="cursor:pointer;font-size:9px;font-weight:900;color:#fff;background:#ff3b30;padding:1px 5px;border-radius:8px;margin-left:4px">⚠️ ${dup}×</span>` : '';
-        return `<td class="td-imei" title="Clique para copiar o IMEI" onclick="event.stopPropagation();copiarImei(this)" data-imei="${esc(p.imei||'')}" style="cursor:pointer;${bgDup}">${p.imei?`<span style="display:inline-flex;align-items:center;gap:4px">${esc(p.imei)}<span style="font-size:10px;opacity:.45">📋</span>${badgeDup}</span>`:'—'}</td>`;
+        // Aparência discreta: só um "×N" pequeno em cinza, com tooltip. Clique nele filtra.
+        const badgeDup = isDup ? `<span onclick="event.stopPropagation();filtrarPorImei('${esc(p.imei)}')" title="Este IMEI aparece ${dup}× no estoque — clique para ver todos" style="cursor:pointer;font-size:9px;font-weight:700;color:#8e8e93;padding:0 4px;margin-left:4px;opacity:.7">×${dup}</span>` : '';
+        return `<td class="td-imei" title="Clique para copiar o IMEI" onclick="event.stopPropagation();copiarImei(this)" data-imei="${esc(p.imei||'')}" style="cursor:pointer">${p.imei?`<span style="display:inline-flex;align-items:center;gap:4px">${esc(p.imei)}<span style="font-size:10px;opacity:.45">📋</span>${badgeDup}</span>`:'—'}</td>`;
       })()}
       <td class="td-cod">${codProdHTML}</td>
       <td class="td-cod">${nCompraHTML}</td>
@@ -1808,14 +2072,122 @@ function renderTabela(){
         ? `<span onclick="toggleNFProduto(${idx})" title="Clique para desmarcar NF" style="font-size:10px;font-weight:800;color:var(--verde);background:rgba(52,199,89,.15);padding:4px 10px;border-radius:6px;cursor:pointer;user-select:none">✓ NF</span>`
         : `<span onclick="toggleNFProduto(${idx})" title="Clique para marcar NF como emitida" style="font-size:10px;font-weight:700;color:#8e8e93;background:#f0f0f0;padding:4px 10px;border-radius:6px;cursor:pointer;user-select:none;border:1.5px dashed #ccc">☐ NF</span>`}
       </td>
-      <td class="td-acts" onclick="event.stopPropagation()">${btnCopy}${btnC}${btnV}${btnE}${btnD}</td>
+      <td class="td-acts" onclick="event.stopPropagation()">${btnCopy}${btnVendaAtc}${btnC}${btnV}${btnE}${btnD}</td>
     </tr>`;
   }).join('');
 }
 
+// ═══════════════════════════════════════════════════
+//  VENDA ATACADO — modal + mensagem formatada
+// ═══════════════════════════════════════════════════
+let _vaIdxAtual = -1;
+function abrirVendaAtacado(idx){
+  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  const p = produtos[idx];
+  if(!p){ toast('Produto não encontrado.'); return; }
+  _vaIdxAtual = idx;
+  // Resumo do produto no topo
+  const imei = p.imei || '—';
+  const _np = _normStr(p.produtoCompleto);
+  const _cl = (window._catPorNome && _np && window._catPorNome[_np]) || '';
+  const cod = (_cl || p.codProduto || '—').toString().trim();
+  const nome = (p.produtoCompleto || nomeProduto(p) || '—').trim();
+  document.getElementById('vaResumo').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:14px">🏷️</span>
+      <strong>${esc(nome)}</strong>
+      <span style="color:var(--txt2);font-size:11px">· IMEI ${esc(imei)}</span>
+      ${cod!=='—'?`<span style="font-family:monospace;font-size:10px;color:var(--azul)">${esc(cod)}</span>`:''}
+    </div>`;
+
+  // Preenche com dados salvos (se este produto já teve uma venda atacado antes)
+  const v = p.vendaAtacado || {};
+  document.getElementById('vaCodRetirada').value = v.codRetirada || '';
+  document.getElementById('vaCliente').value = v.cliente || '';
+  document.getElementById('vaValor').value = v.valor!==undefined && v.valor!==null && v.valor!=='' ? String(v.valor).replace('.',',') : '';
+  document.getElementById('vaPagamento').value = v.pagamento || '';
+  document.getElementById('vaDetalhePagto').value = v.detalhePagto || '';
+  document.getElementById('vaObs').value = v.obs || 'TUDO OK';
+
+  // Popula datalists
+  popularDLPagamento();
+  _popularDLClientesAtacado();
+
+  document.getElementById('mVendaAtc').classList.add('on');
+}
+
+// Coleta clientes de todas as vendas atacado anteriores para autocomplete
+function _popularDLClientesAtacado(){
+  const dl = document.getElementById('dlClientesAtc');
+  if(!dl) return;
+  const s = new Set();
+  (window.produtos||[]).forEach(pp=>{
+    const c = pp.vendaAtacado && pp.vendaAtacado.cliente;
+    if(c) s.add(String(c).trim().toUpperCase());
+  });
+  dl.innerHTML = [...s].sort().map(v=>`<option value="${esc(v)}">`).join('');
+}
+
+function salvarECopiarVendaAtacado(){
+  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  const p = produtos[_vaIdxAtual];
+  if(!p){ toast('Produto não encontrado.'); return; }
+  const _gv=(id)=>{const el=document.getElementById(id);return el?el.value.trim():'';};
+  const codRetirada = _gv('vaCodRetirada').toUpperCase();
+  const cliente = _gv('vaCliente').toUpperCase();
+  const valor = parseValor(_gv('vaValor'));
+  const pagamento = _gv('vaPagamento').toUpperCase();
+  const detalhePagto = _gv('vaDetalhePagto');
+  const obs = _gv('vaObs');
+
+  // Salva os dados no produto para consulta futura
+  p.vendaAtacado = {
+    codRetirada, cliente,
+    valor: (valor===''?'':valor),
+    pagamento, detalhePagto, obs,
+    dataGerado: hoje(),
+  };
+  salvarFirebase();
+
+  // Monta a mensagem no formato do Felipe
+  const imei = (p.imei||'').trim() || '—';
+  const _np = _normStr(p.produtoCompleto);
+  const _cl = (window._catPorNome && _np && window._catPorNome[_np]) || '';
+  const cod = (_cl || p.codProduto || '—').toString().trim();
+  const nome = (p.produtoCompleto || nomeProduto(p) || '—').trim();
+
+  const linhas = [];
+  linhas.push(`*Cod Retirada:*   ${codRetirada || '—'}`);
+  linhas.push(`*Nome do cliente|Loja* ${cliente || '—'}`);
+  linhas.push(`*iPhone | Capacidade | Cor* ${imei}\t${cod}\t${nome}`);
+  if(valor!=='') linhas.push(`*Valor*       ${fmtValor(valor)}`);
+  if(pagamento || detalhePagto){
+    linhas.push(`*Pagamento* ${pagamento}${detalhePagto?(' '+detalhePagto):''}`.trim());
+  }
+  if(obs) linhas.push(`*OBS* ${obs}`);
+
+  const texto = linhas.join('\n');
+  const _ok = () => {
+    const faltas = [];
+    if(!codRetirada) faltas.push('cód retirada');
+    if(!cliente) faltas.push('cliente');
+    if(valor==='') faltas.push('valor');
+    if(!pagamento) faltas.push('pagamento');
+    if(faltas.length) toast('📋 Copiado! Faltam: '+faltas.join(', '));
+    else toast('📋 Mensagem de venda atacado copiada!');
+    fM('mVendaAtc');
+  };
+  navigator.clipboard.writeText(texto).then(_ok).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=texto;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    _ok();
+  });
+}
+
 // Toggle nota fiscal em um produto do estoque (direto na linha, sem abrir modal)
+// Liberado para admin E operador (NF é operação recorrente do dia a dia)
 function toggleNFProduto(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão para alterar NF.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão para alterar NF.'); return; }
   const p = produtos[idx];
   if(!p) return;
   p.notaFiscalEmitida = !p.notaFiscalEmitida;
@@ -1990,6 +2362,7 @@ function popularDLs(){
 }
 function popularVendsDash(){
   const sel=document.getElementById('dashVend');
+  if(!sel) return; // v7: dashboard novo não tem mais filtro por vendedor no header
   const cur=sel.value;
   sel.innerHTML='<option value="">Todos</option>'+VENDEDORES_FIXOS.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');
   if(cur) sel.value=cur;
@@ -2478,6 +2851,9 @@ function abrirVendaRapida(){
   document.getElementById('vrCod').value = '';
   document.getElementById('vrData').value = hoje();
   document.getElementById('vrVend').value = '';
+  const _vv=document.getElementById('vrValor'); if(_vv) _vv.value='';
+  const _va=document.getElementById('vrAgen');  if(_va) _va.value='';
+  const _vo=document.getElementById('vrObs');   if(_vo) _vo.value='';
   document.getElementById('mVendaRap').classList.add('on');
 }
 function vrBuscar(q){
@@ -2512,16 +2888,27 @@ function vrSelP(idx){
   if(p.nVenda) document.getElementById('vrCod').value = p.nVenda;
   if(p.dataVenda) document.getElementById('vrData').value = p.dataVenda;
   if(p.vendedor) document.getElementById('vrVend').value = p.vendedor;
+  const _vv=document.getElementById('vrValor'); if(_vv) _vv.value = (p.valorSaida!==undefined && p.valorSaida!=='' && p.valorSaida!==null) ? String(p.valorSaida).replace('.',',') : '';
+  const _va=document.getElementById('vrAgen');  if(_va) _va.value = p.nAgendamento || '';
+  const _vo=document.getElementById('vrObs');   if(_vo) _vo.value = p.obsVenda || '';
 }
 function salvarVendaRap(){
   if(vrIdxR === null){ alert('Selecione um produto.'); return; }
   const cod = document.getElementById('vrCod').value.trim();
   if(!cod){ alert('Informe o Nº da Venda.'); return; }
+  const vend = document.getElementById('vrVend').value;
+  if(!vend || vend === '__novo__'){ alert('Informe o Vendedor.'); return; }
+  const _vv = document.getElementById('vrValor');
+  const _valorV = _vv ? parseValor(_vv.value.trim()) : '';
+  if(_valorV === '' || _valorV <= 0){ alert('Informe o Valor da Venda (R$).'); return; }
   const p = produtos[vrIdxR];
+  const _antesN = String(p.nCompra||'');
   p.nVenda = cod;
   p.dataVenda = document.getElementById('vrData').value;
-  const vend = document.getElementById('vrVend').value;
-  if(vend && vend !== '__novo__') p.vendedor = vend;
+  p.valorSaida = _valorV;
+  p.vendedor = vend;
+  const _va = document.getElementById('vrAgen'); if(_va && _va.value.trim()) p.nAgendamento = _va.value.trim();
+  const _vo = document.getElementById('vrObs');  if(_vo) p.obsVenda = _vo.value.trim();
   p.status = 'vendido';
   fM('mVendaRap'); render(); salvarFirebase();
   toast('💰 Venda lançada!');
@@ -2553,6 +2940,8 @@ function abrirVenda(idx){
   document.getElementById('vNV').value=p.nVenda||'';
   document.getElementById('vNV').style.borderColor=p.nVenda?'var(--verde)':'var(--brd)';
   document.getElementById('vData').value=p.dataVenda||hoje();
+  const _vVal=document.getElementById('vValor');
+  if(_vVal) _vVal.value = (p.valorSaida!==undefined && p.valorSaida!=='' && p.valorSaida!==null) ? String(p.valorSaida).replace('.',',') : '';
   const vSel=document.getElementById('vVend');
   if(vSel){vSel.value=p.vendedor||'';vSel.style.borderColor=p.vendedor?'var(--verde)':'var(--brd)';}
   document.getElementById('vAgen').value=p.nAgendamento||'';
@@ -2565,9 +2954,12 @@ function salvarVenda(){
   const vd=document.getElementById('vVend').value.trim();
   if(!nv){alert('Informe o Nº da Venda.');return;}
   if(!vd){alert('Informe o vendedor.');return;}
+  const _vv=document.getElementById('vValor');
+  const _valorV = _vv ? parseValor(_vv.value.trim()) : '';
+  if(_valorV === '' || _valorV <= 0){ alert('Informe o Valor da Venda (R$).'); return; }
   const p=produtos[idxVenda];
   p.nVenda=nv; p.dataVenda=document.getElementById('vData').value;
-  p.valorSaida='';
+  p.valorSaida = _valorV;
   p.vendedor=vd; p.nAgendamento=document.getElementById('vAgen').value.trim();
   p.obsVenda=document.getElementById('vObs').value.trim();
   p.status='vendido';
@@ -2635,6 +3027,7 @@ function editarP(idx){
   _sv('edFormaPagto', p.formaPagamento||'');
   _sv('edDetalhePagto', p.detalhePagamento||'');
   _sv('edNotaFiscal', p.notaFiscalEmitida ? 'true' : 'false');
+  _sv('edValorSaida', (p.valorSaida!==undefined && p.valorSaida!=='' && p.valorSaida!==null) ? String(p.valorSaida).replace('.',',') : '');
   const _hint=document.getElementById('edNovoFornHint'); if(_hint) _hint.style.display='none';
   popularDLFornecedores(); popularDLPagamento();
   fM('mDetalhe');
@@ -2668,6 +3061,8 @@ function salvarEdicao(){
   p.detalhePagamento = _gv2('edDetalhePagto');
   const _nfSel = document.getElementById('edNotaFiscal');
   if(_nfSel) p.notaFiscalEmitida = _nfSel.value === 'true';
+  const _vsEl = document.getElementById('edValorSaida');
+  if(_vsEl){ const _pv = parseValor(_vsEl.value.trim()); p.valorSaida = _pv === '' ? '' : _pv; }
 
   // Se tinha status 'aguardando' mas agora tem codProduto, promove automaticamente para 'emEstoque'
   if(p.codProduto && p.status==='aguardando') p.status='emEstoque';
@@ -2853,62 +3248,556 @@ function resetDash(){
   document.getElementById('dashVend').value='';
   renderDash();
 }
-function renderDash(){
-  const mes=document.getElementById('dashMes').value;
-  const fam=document.getElementById('dashFam').value;
-  const vnd=document.getElementById('dashVend').value;
-  const MESES=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const [ano,m]=mes.split('-');
-  document.getElementById('dashLabel').textContent=MESES[parseInt(m)-1]+' '+ano;
-  
-  const vdPeriodo=produtos.filter(p=>getSt(p)==='vendido'&&p.dataVenda&&p.dataVenda.startsWith(mes)&&(!fam||p.familia===fam)&&(!vnd||p.vendedor===vnd));
-  const enPeriodo=produtos.filter(p=>p.dataCompraEntrada&&p.dataCompraEntrada.startsWith(mes)&&(!fam||p.familia===fam));
-  const emEst=produtos.filter(p=>getSt(p)==='emEstoque'&&(!fam||p.familia===fam));
-  const ag=produtos.filter(p=>getSt(p)==='aguardando').length;
-  
-  set('dk-vd',vdPeriodo.length); set('dk-vd-s',fam||'todas as famílias');
-  set('dk-es',emEst.length); set('dk-es-s',fam||'todas');
-  set('dk-ag',ag); set('dk-en',enPeriodo.length); set('dk-en-s',mes);
-  
-  // Barras
-  const meses6=[]; const hoje2=new Date();
-  for(let i=5;i>=0;i--){const d=new Date(hoje2.getFullYear(),hoje2.getMonth()-i,1);meses6.push(d.toISOString().slice(0,7));}
-  const counts=meses6.map(ms=>produtos.filter(p=>getSt(p)==='vendido'&&p.dataVenda&&p.dataVenda.startsWith(ms)&&(!fam||p.familia===fam)&&(!vnd||p.vendedor===vnd)).length);
-  const maxC=Math.max(...counts,1);
-  document.getElementById('dashBarras').innerHTML=counts.map((c,i)=>{
-    const h=Math.round((c/maxC)*100);
-    const [a2,m2]=meses6[i].split('-');
-    return `<div class="b-col"><div class="b-val">${c}</div><div class="b-fill" style="height:${h}px;background:${i===5?'var(--red)':'rgba(200,16,46,.25)'}" data-tip="${MESES[parseInt(m2)-1]} ${a2}: ${c} vendas"></div></div>`;
-  }).join('');
-  document.getElementById('dashBLbls').innerHTML=meses6.map(ms=>{const[,m2]=ms.split('-');return`<div class="b-lbl" style="flex:1">${MESES[parseInt(m2)-1]}</div>`;}).join('');
-  
-  // Ranks
-  const cnt=(arr,key)=>{const o={};arr.forEach(p=>{if(p[key])o[p[key]]=(o[p[key]]||0)+1;});return Object.entries(o).sort((a,b)=>b[1]-a[1]);};
-  const rankVd=cnt(vdPeriodo,'vendedor').slice(0,8);
-  const rankMd=cnt(vdPeriodo,'modelo').slice(0,8);
-  const pCls=['rp-gold','rp-silver','rp-bronze'];
-  const mkRank=(items,tit,icoFn)=>{
-    if(!items.length) return `<div class="rank-h">${tit}</div><div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px;font-weight:600">Sem dados no período</div>`;
-    const maxV=items[0][1];
-    return `<div class="rank-h">${tit}</div>`+items.map(([nome,qtd],i)=>`
-      <div class="rank-i">
-        <div class="rank-p ${pCls[i]||''}">${i+1}</div>
-        <div class="rank-info"><div class="rank-nome">${icoFn?icoFn(nome)+' ':''} ${esc(nome)}</div><div class="rank-det">${qtd} venda${qtd!==1?'s':''}</div></div>
-        <div class="rank-bar-w"><div class="rank-bar"><div class="rank-bar-f" style="width:${Math.round((qtd/maxV)*100)}%;transition:width .4s"></div></div></div>
-        <div class="rank-qtd">${qtd}</div>
-      </div>`).join('');
-  };
-  document.getElementById('rankVend').innerHTML=mkRank(rankVd,'🏆 Vendedores',null);
-  document.getElementById('rankMod').innerHTML=mkRank(rankMd,'📱 Modelos',(nome)=>{const p=produtos.find(p=>p.modelo===nome);return FAM_ICO[p?.familia]||'🍎';});
-  
-  // Famílias
-  const fams=['iPhones','Ipads','Macbooks','Apple Watch','AirPods'];
-  document.getElementById('dashFams').innerHTML=fams.map(f=>{
-    const qtdVd=vdPeriodo.filter(p=>p.familia===f).length;
-    const qtdEs=produtos.filter(p=>getSt(p)==='emEstoque'&&p.familia===f).length;
-    return `<div class="kpi"><div class="ki">${FAM_ICO[f]||'🍎'}</div><div class="kn r">${qtdVd}</div><div class="kl">${f} vendidos</div><div class="ks" style="color:var(--azul)">📦 ${qtdEs} em estoque</div></div>`;
-  }).join('');
+// ═════════════════════════════════════════════════════════════
+//  DASHBOARD v6 — Fechamento + Comparativo + Metas + PDF
+// ═════════════════════════════════════════════════════════════
+
+const D_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const D_MESES_SHORT = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+// Estado de metas (nó separado no Firebase: metas_revend, formato: { "2026-08": { STEPHANIE: 100000, ... } })
+window.metasRevend = window.metasRevend || {};
+window._fbLoadedMetas = false;
+
+async function metasSalvarFirebase(){
+  if(!window._fbSalvarNodo) return;
+  if(!window._fbLoadedMetas){ console.warn('metas: firebase não carregado'); return; }
+  try { await window._fbSalvarNodo('metas_revend', window.metasRevend); }
+  catch(e){ console.warn('metas save:', e); }
 }
+
+// Helper: valor numérico (parseValor já existe)
+function _num(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function _fmtR(n){ if(!n||isNaN(n)) return 'R$ 0'; return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); }
+function _fmtRDec(n){ if(!n||isNaN(n)) return 'R$ 0'; return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function _fmtPct(n){ if(isNaN(n)||!isFinite(n)) return '—'; return (n>=0?'':'') + n.toFixed(1) + '%'; }
+
+// Compõe métricas do MÊS (faturamento, lucro, nº vendas, ticket, margem)
+function _dashMetricasMes(mesStr, famFiltro){
+  const vendas = (window.produtos||[]).filter(p=>{
+    if(!p.dataVenda) return false;
+    if(!String(p.dataVenda).startsWith(mesStr)) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  let fat=0, custo=0, comValor=0;
+  vendas.forEach(p=>{
+    const vs = _num(p.valorSaida);
+    const vc = _num(p.valorCompra);
+    if(vs>0){ fat += vs; comValor++; }
+    if(vc>0) custo += vc;
+  });
+  const lucro = fat - custo;
+  const ticket = comValor > 0 ? fat/comValor : 0;
+  const margem = fat > 0 ? (lucro/fat)*100 : 0;
+  return { vendas: vendas.length, comValor, fat, custo, lucro, ticket, margem };
+}
+
+// Métricas do DIA (usa data local do usuário)
+function _dashMetricasDia(dataStr, famFiltro){
+  // v7: só usa produtos do ESTOQUE (não a Entrada Geral)
+  const vendas = (window.produtos||[]).filter(p=>{
+    if(p.dataVenda !== dataStr) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  const compras = (window.produtos||[]).filter(p=>{
+    if(p.dataCompraEntrada !== dataStr) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  let fat=0, custo=0, custoDosVendidos=0;
+  vendas.forEach(p=>{ fat += _num(p.valorSaida); custoDosVendidos += _num(p.valorCompra); });
+  const lucro = fat - custoDosVendidos;
+  // Valor gasto = soma do valorCompra dos aparelhos QUE ENTRARAM hoje no estoque
+  const valorGasto = compras.reduce((s,p)=> s + _num(p.valorCompra), 0);
+  const nfEmitidas = vendas.filter(p=>p.notaFiscalEmitida).length;
+  return { vendas, compras, fat, custo:custoDosVendidos, lucro, valorGasto, nfEmitidas };
+}
+
+// Ranking do dia por vendedor (com lucro)
+function _dashRankingDia(vendasDia){
+  const map = new Map();
+  vendasDia.forEach(p=>{
+    const v = p.vendedor || '—';
+    const cur = map.get(v) || {nome:v, qtd:0, fat:0, custo:0};
+    cur.qtd++; cur.fat += _num(p.valorSaida); cur.custo += _num(p.valorCompra);
+    map.set(v, cur);
+  });
+  const arr = [...map.values()].map(v=>({...v, lucro: v.fat - v.custo}));
+  return arr.sort((a,b)=> b.fat - a.fat || b.qtd - a.qtd);
+}
+
+// Timeline: últimos eventos do dia (vendas + entradas), ordenado por horário se disponível, senão por criadoEm desc
+function _dashTimelineDia(vendasDia, comprasDia, entradasEGDia){
+  const eventos = [];
+  vendasDia.forEach(p=>{
+    eventos.push({
+      tipo:'venda', ico:'✅', hora: (p.criadoEm||'').slice(11,16) || '',
+      desc: `Vendeu ${p.modelo||''} ${p.gb||''} · ${p.vendedor||'—'}`,
+      valor: _num(p.valorSaida), sinal:'+', criadoEm: p.criadoEm||p.dataVenda
+    });
+  });
+  comprasDia.forEach(p=>{
+    eventos.push({
+      tipo:'compra', ico:'📦', hora: (p.criadoEm||'').slice(11,16) || '',
+      desc: `Entrou ${p.modelo||''} ${p.gb||''} · ${p.responsavel||''} (Estoque)`,
+      valor: _num(p.valorCompra), sinal:'-', criadoEm: p.criadoEm||p.dataCompraEntrada
+    });
+  });
+  // v7: entradaGeralDia foi removida do timeline — análises só do estoque
+  return eventos.sort((a,b)=> String(b.criadoEm||'').localeCompare(String(a.criadoEm||''))).slice(0,8);
+}
+
+// Aparelhos parados por faixa (só quem está EM ESTOQUE)
+function _dashParados(famFiltro){
+  const hoje2 = new Date();
+  const emEst = (window.produtos||[]).filter(p=>{
+    if(p.status !== 'emEstoque') return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    if(!p.dataCompraEntrada) return false;
+    return true;
+  });
+  const buckets = {'0-30':0, '31-60':0, '61-90':0, '90+':0};
+  const listaComDias = emEst.map(p=>{
+    const dt = new Date(p.dataCompraEntrada);
+    const dias = Math.floor((hoje2 - dt)/86400000);
+    return {p, dias};
+  }).filter(x=> x.dias >= 0);
+  listaComDias.forEach(x=>{
+    if(x.dias <= 30) buckets['0-30']++;
+    else if(x.dias <= 60) buckets['31-60']++;
+    else if(x.dias <= 90) buckets['61-90']++;
+    else buckets['90+']++;
+  });
+  const top = listaComDias.sort((a,b)=> b.dias - a.dias).slice(0,3);
+  return {total: emEst.length, buckets, top};
+}
+
+// Análise da equipe do mês
+function _dashEquipeMes(mesStr, famFiltro){
+  const vendasMes = (window.produtos||[]).filter(p=>{
+    if(!p.dataVenda) return false;
+    if(!String(p.dataVenda).startsWith(mesStr)) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  const map = new Map();
+  vendasMes.forEach(p=>{
+    const v = (p.vendedor||'—').toUpperCase();
+    const cur = map.get(v) || {nome:v, qtd:0, fat:0, custo:0, comValor:0};
+    cur.qtd++;
+    const vs = _num(p.valorSaida), vc = _num(p.valorCompra);
+    if(vs>0){ cur.fat += vs; cur.comValor++; }
+    if(vc>0) cur.custo += vc;
+    map.set(v, cur);
+  });
+  const linhas = [...map.values()].map(v=>{
+    const lucro = v.fat - v.custo;
+    const margem = v.fat > 0 ? (lucro/v.fat)*100 : 0;
+    const ticket = v.comValor > 0 ? v.fat/v.comValor : 0;
+    // Metas v7: {fat: X, qtd: N}. Retrocompat: se meta for número, é meta de faturamento antiga
+    const metaRaw = (window.metasRevend && window.metasRevend[mesStr] && window.metasRevend[mesStr][v.nome]);
+    const metaFat = typeof metaRaw === 'object' ? _num(metaRaw.fat) : _num(metaRaw);
+    const metaQtd = typeof metaRaw === 'object' ? _num(metaRaw.qtd) : 0;
+    const progressoFat = metaFat > 0 ? (v.fat/metaFat)*100 : null;
+    const progressoQtd = metaQtd > 0 ? (v.qtd/metaQtd)*100 : null;
+    return {...v, lucro, margem, ticket, metaFat, metaQtd, progressoFat, progressoQtd};
+  }).sort((a,b)=> b.qtd - a.qtd || b.fat - a.fat);  // v7: prioriza qtd (meta mais importante)
+  return linhas;
+}
+
+// ═════ RENDER PRINCIPAL ═════
+function renderDash(){
+  // Só admin vê o dashboard (guard não-destrutivo — não mexe no HTML se não é admin)
+  if(!isAdmin()){
+    console.warn('[Dashboard] renderDash ignorado — usuário não é admin');
+    return;
+  }
+  const mes = document.getElementById('dashMes').value || new Date().toISOString().slice(0,7);
+  const fam = document.getElementById('dashFam').value || '';
+  const [ano, m] = mes.split('-');
+  const nomeMes = D_MESES[parseInt(m)-1] + ' ' + ano;
+
+  // ─── FECHAMENTO DO DIA ───
+  const dHoje = hoje();
+  const dm = _dashMetricasDia(dHoje, fam);
+  const dtBr = fmtD(dHoje);
+  document.getElementById('dashHojePeriodo').textContent = 'Hoje · ' + dtBr;
+
+  const ticketDia = dm.vendas.length ? dm.fat/dm.vendas.length : 0;
+  const margemPctDia = dm.fat > 0 ? (dm.lucro/dm.fat)*100 : 0;
+  document.getElementById('dashHojeCards').innerHTML = `
+    <div class="card card-v">
+      <div class="ci">💰</div>
+      <div class="cn">${_fmtR(dm.fat)}</div>
+      <div class="cl">Faturamento</div>
+      <div class="cs">${dm.vendas.length} venda${dm.vendas.length!==1?'s':''}${ticketDia?' · ticket '+_fmtR(ticketDia):''}</div>
+    </div>
+    <div class="card card-g">
+      <div class="ci">📈</div>
+      <div class="cn">${_fmtR(dm.lucro)}</div>
+      <div class="cl">Lucro bruto</div>
+      <div class="cs" style="color:#1a7a3a">${dm.fat>0?'margem '+margemPctDia.toFixed(1)+'%':'—'}</div>
+    </div>
+    <div class="card card-r">
+      <div class="ci">💸</div>
+      <div class="cn">${_fmtR(dm.valorGasto)}</div>
+      <div class="cl">Valor gasto</div>
+      <div class="cs">${dm.compras.length} aparelho${dm.compras.length!==1?'s':''} adquirido${dm.compras.length!==1?'s':''}</div>
+    </div>
+    <div class="card card-b">
+      <div class="ci">📥</div>
+      <div class="cn">${dm.compras.length}</div>
+      <div class="cl">Entradas no estoque</div>
+      <div class="cs" style="color:var(--azul)">aparelhos que entraram hoje</div>
+    </div>
+    <div class="card card-p">
+      <div class="ci">✅</div>
+      <div class="cn">${dm.vendas.length}</div>
+      <div class="cl">Vendidos hoje</div>
+      <div class="cs" style="color:var(--roxo)">${dm.nfEmitidas} NF emitida${dm.nfEmitidas!==1?'s':''} · ${dm.vendas.length-dm.nfEmitidas} pendente${(dm.vendas.length-dm.nfEmitidas)!==1?'s':''}</div>
+    </div>
+    <div class="card card-a">
+      <div class="ci">🎯</div>
+      <div class="cn">${dm.vendas.length}</div>
+      <div class="cl">Aparelhos vendidos</div>
+      <div class="cs" style="color:var(--amarelo)">unidade da meta</div>
+    </div>
+  `;
+
+  // Ranking vendedor do dia (v7: mostra QTD + FAT + LUCRO)
+  const rank = _dashRankingDia(dm.vendas);
+  const rankMaxFat = rank.length ? Math.max(...rank.map(r=>r.fat)) : 1;
+  const rankHtml = rank.length ? rank.slice(0,5).map((v,i)=>{
+    const medalhas = ['gold','silver','bronze'];
+    const pct = rankMaxFat > 0 ? Math.round((v.fat/rankMaxFat)*100) : 0;
+    const lucroCor = v.lucro > 0 ? '#1a7a3a' : (v.lucro < 0 ? 'var(--red)' : 'var(--txt2)');
+    return `<div class="d-bar-row" style="grid-template-columns:130px 1fr 110px 90px">
+      <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span>${esc(v.nome)}</div>
+      <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(pct,15)}%">${v.qtd} venda${v.qtd!==1?'s':''}</div></div>
+      <div class="d-bar-val" title="Faturamento">${_fmtR(v.fat)}</div>
+      <div class="d-bar-val" style="color:${lucroCor}" title="Lucro">${v.lucro?(_fmtR(v.lucro)):'—'}</div>
+    </div>`;
+  }).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhuma venda registrada hoje</div>';
+  document.getElementById('dashHojeVendedor').innerHTML = (rank.length?'<div style="display:grid;grid-template-columns:130px 1fr 110px 90px;gap:12px;font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--brd);letter-spacing:.4px"><div>Vendedor</div><div>Qtd</div><div style="text-align:right">Fat</div><div style="text-align:right">Lucro</div></div>':'') + rankHtml;
+
+  // Timeline (v7: só do estoque)
+  const tl = _dashTimelineDia(dm.vendas, dm.compras, []);
+  const tlHtml = tl.length ? tl.map(e=>`
+    <div class="d-tl-item">
+      <span class="d-tl-hora">${e.hora || '—'}</span>
+      <span class="d-tl-ico">${e.ico}</span>
+      <span class="d-tl-desc">${esc(e.desc)}</span>
+      <span class="d-tl-val ${e.sinal==='-'?'saida':(e.valor?'':'neutro')}">${e.valor?(e.sinal+_fmtR(e.valor)):'—'}</span>
+    </div>
+  `).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhum movimento registrado hoje</div>';
+  document.getElementById('dashHojeTimeline').innerHTML = tlHtml;
+
+  // ─── FATURAMENTO E MARGEM DO MÊS ───
+  const mAtual = _dashMetricasMes(mes, fam);
+  // Mês anterior
+  const dtAnt = new Date(parseInt(ano), parseInt(m)-2, 1);
+  const mesAntStr = dtAnt.toISOString().slice(0,7);
+  const mAnterior = _dashMetricasMes(mesAntStr, fam);
+  // Projeção (dias corridos no mês atual)
+  const hojeDate = new Date();
+  const dtIni = new Date(parseInt(ano), parseInt(m)-1, 1);
+  const dtFim = new Date(parseInt(ano), parseInt(m), 0);
+  const diasNoMes = dtFim.getDate();
+  const diasCorridos = hojeDate.getFullYear()===parseInt(ano) && (hojeDate.getMonth()+1)===parseInt(m) ? hojeDate.getDate() : diasNoMes;
+  const projecao = diasCorridos > 0 ? (mAtual.fat / diasCorridos) * diasNoMes : mAtual.fat;
+
+  document.getElementById('dashMesLabel').textContent = nomeMes + ' · ' + diasCorridos + ' de ' + diasNoMes + ' dias';
+  document.getElementById('dashFatN').textContent = Math.round(mAtual.fat).toLocaleString('pt-BR');
+  document.getElementById('dashLucN').textContent = Math.round(mAtual.lucro).toLocaleString('pt-BR');
+
+  const varFat = mAnterior.fat > 0 ? ((mAtual.fat - mAnterior.fat)/mAnterior.fat)*100 : (mAtual.fat > 0 ? 100 : 0);
+  const varLuc = mAnterior.lucro > 0 ? ((mAtual.lucro - mAnterior.lucro)/mAnterior.lucro)*100 : (mAtual.lucro > 0 ? 100 : 0);
+  const nomeMesAnt = D_MESES_SHORT[dtAnt.getMonth()];
+  document.getElementById('dashFatCmp').innerHTML = `
+    <span class="d-delta ${varFat>0?'up':varFat<0?'down':'flat'}">${varFat>0?'↑':varFat<0?'↓':'—'} ${Math.abs(varFat).toFixed(1)}%</span>
+    <span style="margin-left:6px">vs. ${nomeMesAnt} (${_fmtR(mAnterior.fat)}) · projeção mês: <strong>${_fmtR(projecao)}</strong></span>`;
+  document.getElementById('dashLucCmp').innerHTML = `
+    <span class="d-delta ${varLuc>0?'up':varLuc<0?'down':'flat'}">${varLuc>0?'↑':varLuc<0?'↓':'—'} ${Math.abs(varLuc).toFixed(1)}%</span>
+    <span style="margin-left:6px">vs. ${nomeMesAnt} (${_fmtR(mAnterior.lucro)}) · margem: <strong style="color:#1a7a3a">${mAtual.margem.toFixed(1)}%</strong> (${nomeMesAnt} ${mAnterior.margem.toFixed(1)}%)</span>`;
+
+  // ─── COMPARATIVO MÊS VS MÊS ───
+  document.getElementById('dashCmpLabel').textContent = D_MESES_SHORT[parseInt(m)-1] + ' vs. ' + nomeMesAnt;
+  document.getElementById('dashCmpSub').textContent = `${nomeMes} (${diasCorridos} dias) vs. ${nomeMesAnt} ${dtAnt.getFullYear()} (fechado)`;
+  const mkCmp = (nome, subtitulo, valA, valB, formato, sufixo='') => {
+    const maxV = Math.max(valA, valB, 1);
+    const pctA = Math.max(3, Math.round((valA/maxV)*100));
+    const pctB = Math.max(3, Math.round((valB/maxV)*100));
+    const varPct = valB > 0 ? ((valA-valB)/valB)*100 : (valA>0?100:0);
+    return `<div class="d-cmp">
+      <div class="d-cmp-name">${nome}<span>${subtitulo}</span></div>
+      <div class="d-cmp-bars">
+        <div class="d-cmp-line"><span class="d-cmp-lbl">${D_MESES_SHORT[parseInt(m)-1]}</span><div class="d-cmp-track"><div class="d-cmp-fill now" style="width:${pctA}%"></div></div><span class="d-cmp-val">${formato(valA)}${sufixo}</span></div>
+        <div class="d-cmp-line"><span class="d-cmp-lbl">${nomeMesAnt}</span><div class="d-cmp-track"><div class="d-cmp-fill prev" style="width:${pctB}%"></div></div><span class="d-cmp-val">${formato(valB)}${sufixo}</span></div>
+      </div>
+      <div style="text-align:right"><span class="d-delta ${varPct>0?'up':varPct<0?'down':'flat'}">${varPct>0?'↑':varPct<0?'↓':'—'} ${Math.abs(varPct).toFixed(1)}%</span></div>
+    </div>`;
+  };
+  document.getElementById('dashCmpGrid').innerHTML = [
+    mkCmp('Faturamento', 'vendas totais', mAtual.fat, mAnterior.fat, _fmtR),
+    mkCmp('Lucro bruto', 'valorSaida − valorCompra', mAtual.lucro, mAnterior.lucro, _fmtR),
+    mkCmp('Nº de vendas', 'aparelhos baixados', mAtual.vendas, mAnterior.vendas, n=>String(n), ' vendas'),
+    mkCmp('Ticket médio', 'valor médio por venda', mAtual.ticket, mAnterior.ticket, _fmtR),
+    mkCmp('Margem %', 'lucro ÷ faturamento', mAtual.margem, mAnterior.margem, n=>n.toFixed(1), '%'),
+  ].join('');
+
+  // ─── APARELHOS PARADOS ───
+  const par = _dashParados(fam);
+  document.getElementById('dashParadosTotal').textContent = par.total + ' em estoque';
+  document.getElementById('dashBuckets').innerHTML = `
+    <div class="d-bucket d-bucket-verde" onclick="dashFiltrarParados(0,30)">
+      <div class="d-bucket-lbl">🟢 Novos</div>
+      <div class="d-bucket-n">${par.buckets['0-30']}</div>
+      <div class="d-bucket-sub">0–30 dias</div>
+    </div>
+    <div class="d-bucket d-bucket-amarelo" onclick="dashFiltrarParados(31,60)">
+      <div class="d-bucket-lbl">🟡 Atenção</div>
+      <div class="d-bucket-n">${par.buckets['31-60']}</div>
+      <div class="d-bucket-sub">31–60 dias</div>
+    </div>
+    <div class="d-bucket d-bucket-laranja" onclick="dashFiltrarParados(61,90)">
+      <div class="d-bucket-lbl">🟠 Alerta</div>
+      <div class="d-bucket-n">${par.buckets['61-90']}</div>
+      <div class="d-bucket-sub">61–90 dias</div>
+    </div>
+    <div class="d-bucket d-bucket-vermelho" onclick="dashFiltrarParados(91,9999)">
+      <div class="d-bucket-lbl">🔴 Crítico</div>
+      <div class="d-bucket-n">${par.buckets['90+']}</div>
+      <div class="d-bucket-sub">+90 dias</div>
+    </div>
+  `;
+  if(par.top.length){
+    const topDesc = par.top.map(x=>`${x.p.modelo||''} ${x.p.gb||''} (${x.dias}d)`).join(' · ');
+    document.getElementById('dashParadosTop').innerHTML = `
+      <div style="padding:12px 16px;background:rgba(200,16,46,.06);border-left:3px solid var(--red);border-radius:8px;font-size:11px;font-weight:700;color:var(--red-dark)">
+        🔴 Top ${par.top.length} mais parados: ${esc(topDesc)}
+      </div>`;
+  } else document.getElementById('dashParadosTop').innerHTML = '';
+
+  // ─── ANÁLISE DA EQUIPE + METAS ───
+  document.getElementById('dashEquipeMes').textContent = nomeMes;
+  const equipe = _dashEquipeMes(mes, fam);
+  document.getElementById('dashEquipeTotal').textContent = equipe.reduce((s,v)=>s+v.qtd,0) + ' vendas totais';
+
+  const tbl = document.getElementById('dashEquipeTbl');
+  if(equipe.length === 0){
+    tbl.innerHTML = '<tr><td style="padding:40px;text-align:center;color:var(--txt2);font-weight:700">Nenhuma venda no período</td></tr>';
+  } else {
+    const medalhas = ['🥇','🥈','🥉'];
+    const _mkMeta = (atual, meta, pct, formato) => {
+      if(!meta || meta <= 0) return `<span style="color:var(--txt2);font-size:10px">— sem meta —</span>`;
+      const p = Math.min(100, pct);
+      const cls = pct >= 90 ? 'ok' : pct >= 60 ? 'warn' : 'crit';
+      const falta = meta - atual;
+      return `<div style="min-width:150px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800"><span>${formato(atual)} / ${formato(meta)}</span><span style="color:var(--txt2)">${pct.toFixed(0)}%</span></div>
+        <div class="d-meta-bar"><div class="d-meta-fill ${cls}" style="width:${p}%"></div></div>
+        <div style="font-size:9px;font-weight:700;color:var(--txt2);margin-top:3px">${falta > 0 ? 'Faltam '+formato(falta) : '✓ Bateu!'}</div>
+      </div>`;
+    };
+    tbl.innerHTML = `
+      <thead><tr>
+        <th>Vendedor</th>
+        <th class="r">Nº Vendas</th>
+        <th class="r">Faturamento</th>
+        <th class="r">Lucro bruto</th>
+        <th class="r">Margem %</th>
+        <th class="r">Ticket médio</th>
+        <th>🎯 Meta Qtd</th>
+        <th>💰 Meta R$</th>
+      </tr></thead>
+      <tbody>
+        ${equipe.map((v,i)=>{
+          return `<tr>
+            <td class="nome"><span class="d-medalha">${medalhas[i]||''}</span>${esc(v.nome)}</td>
+            <td class="r">${v.qtd}</td>
+            <td class="r">${_fmtR(v.fat)}</td>
+            <td class="r ${v.lucro>0?'ok':''}">${_fmtR(v.lucro)}</td>
+            <td class="r ${v.margem>=20?'ok':v.margem>=10?'warn':''}">${v.margem.toFixed(1)}%</td>
+            <td class="r">${_fmtR(v.ticket)}</td>
+            <td>${_mkMeta(v.qtd, v.metaQtd, v.progressoQtd, n=>String(Math.round(n))+' un')}</td>
+            <td>${_mkMeta(v.fat, v.metaFat, v.progressoFat, _fmtR)}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>`;
+  }
+
+  // Insights automáticos (v7: sem NF por vendedor)
+  const ins = [];
+  if(equipe.length){
+    const topQtd = [...equipe].sort((a,b)=>b.qtd-a.qtd)[0];
+    const topLucro = [...equipe].sort((a,b)=>b.lucro-a.lucro)[0];
+    ins.push(`<strong style="color:#1a7a3a">${esc(topQtd.nome)}</strong> lidera em quantidade (${topQtd.qtd} aparelhos)`);
+    if(topLucro && topLucro.nome !== topQtd.nome) ins.push(`<strong style="color:#1a7a3a">${esc(topLucro.nome)}</strong> lidera em lucro (${_fmtR(topLucro.lucro)})`);
+    const batendoQtd = equipe.filter(v=>v.metaQtd > 0 && v.progressoQtd >= 100).length;
+    if(batendoQtd) ins.push(`<strong style="color:#1a7a3a">${batendoQtd} vendedor${batendoQtd>1?'es':''} bateu meta de qtd</strong>`);
+    const semMeta = equipe.filter(v=>!v.metaQtd && !v.metaFat && v.qtd > 0);
+    if(semMeta.length) ins.push(`<strong style="color:var(--txt2)">${semMeta.length} sem meta</strong> — defina em <button onclick="abrirMetas()" style="background:none;border:none;color:var(--azul);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:800;padding:0">🎯 Metas mensais</button>`);
+  }
+  document.getElementById('dashInsights').innerHTML = ins.length ? '💡 ' + ins.join(' · ') : '';
+}
+
+// Filtrar produtos parados por faixa (abre estoque com filtro)
+function dashFiltrarParados(diasMin, diasMax){
+  irPara('estoque', null);
+  filtrarSt('emEstoque', null);
+  // sugestão: pra ver os parados, o usuário rola a lista já ordenada
+  toast(`Filtrado: em estoque (${diasMin}-${diasMax===9999?'∞':diasMax}d)`);
+}
+
+// ═════════════════════════════════════════════════════════════
+//  METAS MENSAIS
+// ═════════════════════════════════════════════════════════════
+
+function abrirMetas(){
+  if(!isAdmin()){ toast('🔐 Somente admin.'); return; }
+  const mes = document.getElementById('dashMes').value || new Date().toISOString().slice(0,7);
+  const [ano,m] = mes.split('-');
+  document.getElementById('metasMesLabel').textContent = D_MESES[parseInt(m)-1] + ' ' + ano;
+  document.getElementById('metasMesInput').value = mes;
+  metasRender();
+  document.getElementById('mMetas').classList.add('on');
+}
+function metasRender(){
+  const mes = document.getElementById('metasMesInput').value;
+  const metasDoMes = (window.metasRevend && window.metasRevend[mes]) || {};
+  const vendedoresSugeridos = ['STEPHANIE','FELIPE DIAS','JULIA','RUBENS','YASMIN','FELIPE TAVARES','ATACADO - FELIPE','ATACADO - MARCOS','NATASCHA','BEATRIZ','ANGÉLICA','LARISSA SALLES','LUCAS SOUZA','MIRIÃ','SITE','SAC'];
+  const vendedoresDosProdutos = [...new Set((window.produtos||[]).map(p=>String(p.vendedor||'').toUpperCase()).filter(Boolean))];
+  const lista = [...new Set([...vendedoresSugeridos, ...vendedoresDosProdutos, ...Object.keys(metasDoMes)])].sort();
+  const tbl = document.getElementById('metasTbl');
+  tbl.innerHTML = `
+    <thead><tr>
+      <th>Vendedor</th>
+      <th style="width:160px" class="r">🎯 Meta Qtd (aparelhos)</th>
+      <th style="width:180px" class="r">💰 Meta Faturamento (R$)</th>
+    </tr></thead>
+    <tbody>
+      ${lista.map(v=>{
+        const raw = metasDoMes[v];
+        // Retrocompat: se raw é número (versão antiga), tratar como meta de faturamento
+        const metaFat = typeof raw === 'object' ? (raw.fat||0) : (raw||0);
+        const metaQtd = typeof raw === 'object' ? (raw.qtd||0) : 0;
+        return `<tr>
+          <td style="font-weight:800">${esc(v)}</td>
+          <td><input type="text" inputmode="numeric" placeholder="0" value="${metaQtd||''}" data-vend="${esc(v)}" data-tipo="qtd"></td>
+          <td><input type="text" inputmode="decimal" placeholder="0" value="${metaFat?String(metaFat).replace('.',','):''}" data-vend="${esc(v)}" data-tipo="fat"></td>
+        </tr>`;
+      }).join('')}
+    </tbody>`;
+}
+function metasSalvar(){
+  if(!isAdmin()){ toast('🔐 Somente admin.'); return; }
+  const mes = document.getElementById('metasMesInput').value;
+  if(!mes){ alert('Selecione um mês'); return; }
+  const inputs = document.querySelectorAll('#metasTbl input[data-vend]');
+  const metasDoMes = {};
+  inputs.forEach(inp=>{
+    const v = inp.getAttribute('data-vend');
+    const tipo = inp.getAttribute('data-tipo');
+    const num = parseValor(inp.value.trim());
+    if(!metasDoMes[v]) metasDoMes[v] = {fat:0, qtd:0};
+    if(tipo === 'qtd' && num > 0) metasDoMes[v].qtd = Math.round(num);
+    if(tipo === 'fat' && num > 0) metasDoMes[v].fat = num;
+  });
+  // Remove entradas totalmente vazias
+  Object.keys(metasDoMes).forEach(k=>{
+    if(!metasDoMes[k].fat && !metasDoMes[k].qtd) delete metasDoMes[k];
+  });
+  if(!window.metasRevend) window.metasRevend = {};
+  window.metasRevend[mes] = metasDoMes;
+  metasSalvarFirebase();
+  fM('mMetas');
+  toast('🎯 Metas salvas!');
+  if(document.getElementById('pgDashboard').style.display !== 'none') renderDash();
+}
+
+// ═════════════════════════════════════════════════════════════
+//  PDF do fechamento (usa window.print numa nova janela)
+// ═════════════════════════════════════════════════════════════
+
+function gerarPdfFechamento(){
+  if(!isAdmin()){ toast('🔐 Somente admin.'); return; }
+  const fam = document.getElementById('dashFam').value || '';
+  const dHoje = hoje();
+  const dtBr = fmtD(dHoje);
+  const dm = _dashMetricasDia(dHoje, fam);
+  const rank = _dashRankingDia(dm.vendas);
+  const tl = _dashTimelineDia(dm.vendas, dm.compras, []);
+  const ticketDia = dm.vendas.length ? dm.fat/dm.vendas.length : 0;
+  const margemPctDia = dm.fat > 0 ? (dm.lucro/dm.fat)*100 : 0;
+  const nfPct = dm.vendas.length ? (dm.nfEmitidas/dm.vendas.length)*100 : 0;
+
+  const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Fechamento Revend · ${dtBr}</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,'Segoe UI',Arial,sans-serif;color:#111;padding:20px;background:#fff;font-size:11px}
+    .hdr{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:2px solid #c8102e;margin-bottom:16px}
+    .logo{font-size:26px;font-weight:900;color:#c8102e;letter-spacing:-1px}
+    .subt{font-size:11px;color:#666;font-weight:700;margin-top:2px}
+    .data-hdr{text-align:right;font-size:13px;font-weight:800}
+    h2{font-size:13px;font-weight:900;margin:18px 0 8px;color:#c8102e;text-transform:uppercase;letter-spacing:.5px}
+    .kpi-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .kpi{border:1px solid #ddd;border-radius:6px;padding:10px 12px}
+    .kpi.hi{background:#c8102e;color:#fff;border-color:#c8102e}
+    .kpi.gr{background:#1a7a3a;color:#fff;border-color:#1a7a3a}
+    .kpi-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;opacity:.85}
+    .kpi-n{font-size:20px;font-weight:900;margin-top:3px}
+    .kpi-s{font-size:9px;font-weight:600;margin-top:2px;opacity:.85}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th{text-align:left;padding:6px 8px;background:#f5f5f5;font-size:9px;font-weight:800;text-transform:uppercase}
+    td{padding:6px 8px;border-top:1px solid #eee;font-weight:600}
+    .r{text-align:right;font-variant-numeric:tabular-nums}
+    .ok{color:#1a7a3a;font-weight:800}
+    .foot{margin-top:24px;padding-top:12px;border-top:1px solid #ddd;text-align:center;font-size:9px;color:#888}
+    @media print{body{padding:0}}
+  </style></head><body>
+  <div class="hdr">
+    <div><div class="logo">Revend</div><div class="subt">Fechamento diário · Linha Apple completa</div></div>
+    <div class="data-hdr">${dtBr}<div style="font-size:9px;color:#666;font-weight:700">${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div></div>
+  </div>
+
+  <h2>💰 Resultado do dia</h2>
+  <div class="kpi-g">
+    <div class="kpi gr"><div class="kpi-l">Faturamento</div><div class="kpi-n">${_fmtR(dm.fat)}</div><div class="kpi-s">${dm.vendas.length} venda${dm.vendas.length!==1?'s':''}${ticketDia?' · ticket '+_fmtR(ticketDia):''}</div></div>
+    <div class="kpi gr"><div class="kpi-l">Lucro bruto</div><div class="kpi-n">${_fmtR(dm.lucro)}</div><div class="kpi-s">${dm.fat>0?'margem '+margemPctDia.toFixed(1)+'%':'—'}</div></div>
+    <div class="kpi hi"><div class="kpi-l">Valor gasto</div><div class="kpi-n">${_fmtR(dm.valorGasto)}</div><div class="kpi-s">${dm.compras.length} aparelho${dm.compras.length!==1?'s':''} adquirido${dm.compras.length!==1?'s':''}</div></div>
+  </div>
+  <div class="kpi-g" style="margin-top:8px">
+    <div class="kpi"><div class="kpi-l">Entradas no estoque</div><div class="kpi-n">${dm.compras.length}</div><div class="kpi-s">aparelhos que entraram hoje</div></div>
+    <div class="kpi"><div class="kpi-l">Vendidos hoje</div><div class="kpi-n">${dm.vendas.length}</div><div class="kpi-s">aparelhos baixados</div></div>
+    <div class="kpi"><div class="kpi-l">NF emitida</div><div class="kpi-n">${dm.nfEmitidas} <span style="font-size:12px;color:#666">/ ${dm.vendas.length}</span></div><div class="kpi-s">${nfPct.toFixed(0)}% do dia</div></div>
+  </div>
+
+  <h2>💰 Vendas por vendedor</h2>
+  ${rank.length ? `<table><thead><tr><th>#</th><th>Vendedor</th><th class="r">Nº Vendas</th><th class="r">Faturamento</th><th class="r">Lucro bruto</th></tr></thead><tbody>
+    ${rank.map((v,i)=>`<tr><td>${i+1}</td><td>${esc(v.nome)}</td><td class="r">${v.qtd}</td><td class="r ok">${_fmtR(v.fat)}</td><td class="r">${_fmtR(v.lucro)}</td></tr>`).join('')}
+  </tbody></table>` : '<div style="padding:16px;color:#888;font-size:11px;text-align:center">Nenhuma venda registrada hoje</div>'}
+
+  <h2>🕐 Movimento do dia</h2>
+  ${tl.length ? `<table><thead><tr><th>Hora</th><th>Evento</th><th class="r">Valor</th></tr></thead><tbody>
+    ${tl.map(e=>`<tr><td>${e.hora||'—'}</td><td>${e.ico} ${esc(e.desc)}</td><td class="r">${e.valor?(e.sinal+_fmtR(e.valor)):'—'}</td></tr>`).join('')}
+  </tbody></table>` : '<div style="padding:16px;color:#888;font-size:11px;text-align:center">Nenhum movimento registrado hoje</div>'}
+
+  <div class="foot">Revend · fechamento gerado em ${new Date().toLocaleString('pt-BR')} · use Ctrl+P (⌘+P) para salvar como PDF e enviar no WhatsApp</div>
+  </body></html>`;
+
+  const win = window.open('','_blank','width=900,height=700');
+  if(!win){ toast('⚠️ Pop-up bloqueado. Permita pop-ups pra gerar o PDF.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{ win.print(); }, 400);
+  toast('📄 PDF gerado! Use Ctrl+P (ou ⌘P) pra salvar.');
+}
+
+
 
 // ══════════════════════════════
 //  FILTROS / SORT / NAV
@@ -2919,7 +3808,11 @@ function irPara(pag,btn){
   if(alvo) alvo.style.display='';
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
-  if(pag==='dashboard'){if(!document.getElementById('dashMes').value)document.getElementById('dashMes').value=new Date().toISOString().slice(0,7);renderDash();}
+  if(pag==='dashboard'){
+    if(!isAdmin()){ toast('🔐 Dashboard restrito a administradores'); irPara('estoque', document.querySelector('.nav-btn')); return; }
+    if(!document.getElementById('dashMes').value) document.getElementById('dashMes').value=new Date().toISOString().slice(0,7);
+    renderDash();
+  }
   if(pag==='catalogo') renderCatalogo();
   if(pag==='entradaGeral' && typeof egRender==='function') egRender();
   set('top-titulo',{estoque:'Estoque',catalogo:'Catálogo de Produtos',dashboard:'Dashboard',entradaGeral:'🔧 Entrada Geral'}[pag]||pag);
@@ -3237,8 +4130,8 @@ function egRender(){
     const btnLib = podeLiberar
       ? `<button title="Liberar pro Estoque" onclick="event.stopPropagation();egAbrirLiberar(${idx})" style="background:var(--verde);color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">✅ Liberar</button>`
       : (r.codProduto ? `<span style="font-size:10px;color:var(--verde);font-weight:800" title="Cód. Produto ${esc(r.codProduto)}">✓ liberado</span>` : '');
-    const btnE = isAdmin()?`<button class="btn-e" onclick="event.stopPropagation();egEditar(${idx})" title="Editar">✏️</button>`:'';
-    const btnDel = isAdmin()?`<button class="btn-d" onclick="event.stopPropagation();egDeletar(${idx})" title="Excluir">🗑</button>`:'';
+    const btnE = podeEntrada()?`<button class="btn-e" onclick="event.stopPropagation();egEditar(${idx})" title="Editar">✏️</button>`:'';
+    const btnDel = podeEntrada()?`<button class="btn-d" onclick="event.stopPropagation();egDeletar(${idx})" title="Excluir">🗑</button>`:'';
     // IMEI é clicável para copiar (com stopPropagation para NÃO abrir o modal de detalhe)
     const imeiCell = r.imei
       ? `<span onclick="event.stopPropagation();egCopiarImei(this)" data-imei="${esc(r.imei)}" title="Clique para copiar IMEI" style="cursor:pointer;display:inline-flex;align-items:center;gap:4px">${esc(r.imei)}<span style="font-size:10px;opacity:.45">📋</span></span>`
@@ -3277,7 +4170,7 @@ function egBuscar(q){ egBusca=q; egRender(); }
 
 // Modal NOVA
 function egAbrirNova(){
-  if(!isAdmin()){ toast('🔐 Apenas administradores podem cadastrar entradas.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   ['egImei','egNVenda','egNOS','egModelo','egCor','egValor','egBateria','egObs'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('egData').value = hoje();
   document.getElementById('egTipo').value = 'P. PAGAMENTO';
@@ -3290,7 +4183,7 @@ function egAbrirNova(){
   document.getElementById('mEgNova').classList.add('on');
 }
 function egSalvarNova(){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   const _gv=(id)=>{const el=document.getElementById(id);return el?el.value.trim():'';};
   const imei = _gv('egImei');
   const modelo = _gv('egModelo');
@@ -3325,7 +4218,7 @@ function egSalvarNova(){
 
 // Modal EDITAR
 function egEditar(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   egIdxEdit = idx;
   const r = window.entradaGeral[idx];
   if(!r) return;
@@ -3352,7 +4245,7 @@ function egEditar(idx){
   document.getElementById('mEgEditar').classList.add('on');
 }
 function egSalvarEdicao(){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   const r = window.entradaGeral[egIdxEdit];
   if(!r) return;
   const _gv=(id)=>{const el=document.getElementById(id);return el?el.value.trim():'';};
@@ -3385,7 +4278,7 @@ function egSalvarEdicao(){
   toast('💾 Entrada atualizada!');
 }
 function egDeletar(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   const r = window.entradaGeral[idx];
   if(!r) return;
   if(!confirm(`Excluir entrada "${r.modelo||'sem modelo'}" (IMEI ${r.imei||'—'})?\n\nEsta ação não pode ser desfeita.`)) return;
@@ -3413,7 +4306,7 @@ function egVerDetalhe(idx){
     <div class="fg">
       <div class="dg"><div class="dg-l">Status <span style="font-size:9px;color:var(--txt2)">(altere direto aqui)</span></div>
         <div class="dg-v">
-          ${isAdmin() ? `<select onchange="egAlterarStatus(${idx}, this.value)" style="padding:6px 12px;border-radius:10px;border:1.5px solid var(--brd);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;background:var(--bg);cursor:pointer;outline:none;color:${meta.color}">${statusOptions}</select>`
+          ${podeEntrada() ? `<select onchange="egAlterarStatus(${idx}, this.value)" style="padding:6px 12px;border-radius:10px;border:1.5px solid var(--brd);font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;background:var(--bg);cursor:pointer;outline:none;color:${meta.color}">${statusOptions}</select>`
                        : `<span class="badge ${meta.cls}" style="font-size:10px">${meta.ico} ${esc(st)}</span>`}
         </div>
       </div>
@@ -3433,7 +4326,7 @@ function egVerDetalhe(idx){
   const podeLiberar = !['LIBERADO PARA ESTOQUE','DEVOLVIDO AO FORNECEDOR','CANCELADO'].includes(st);
   document.getElementById('egDetalheFooter').innerHTML = `
     <button class="btn-x" onclick="fM('mEgDetalhe')">Fechar</button>
-    ${isAdmin()?`<button class="btn-s" onclick="fM('mEgDetalhe');egEditar(${idx})" style="background:var(--azul);color:#fff">✏️ Editar</button>`:''}
+    ${podeEntrada()?`<button class="btn-s" onclick="fM('mEgDetalhe');egEditar(${idx})" style="background:var(--azul);color:#fff">✏️ Editar</button>`:''}
     ${podeLiberar?`<button class="btn-s" style="background:var(--verde);color:#fff" onclick="fM('mEgDetalhe');egAbrirLiberar(${idx})">✅ Liberar pro Estoque</button>`:''}
   `;
   document.getElementById('mEgDetalhe').classList.add('on');
@@ -3441,7 +4334,7 @@ function egVerDetalhe(idx){
 
 // Modal LIBERAR (só código)
 function egAbrirLiberar(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   const r = window.entradaGeral[idx];
   if(!r) return;
   egIdxLiberar = idx;
@@ -3500,7 +4393,7 @@ function _egLibSelecionar(c){
     </div>`;
 }
 function egConfirmarLiberacao(){
-  if(!isAdmin()){ toast('🔐 Sem permissão.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão.'); return; }
   const r = window.entradaGeral[egIdxLiberar];
   if(!r){ toast('Erro: entrada não encontrada.'); return; }
   const c = egLibProdSelecionado;
@@ -3584,7 +4477,7 @@ function _propagarNCompraParaEstoque(entradaGeralId, novoNCompra){
 
 // Altera status direto do modal de detalhe (com regras auto pra data final e liberação)
 function egAlterarStatus(idx, novoStatus){
-  if(!isAdmin()){ toast('🔐 Sem permissão para alterar status.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão para alterar status.'); return; }
   const r = window.entradaGeral[idx];
   if(!r) return;
   const statusAntes = r.statusTriagem;
@@ -3613,7 +4506,7 @@ function egAlterarStatus(idx, novoStatus){
 
 // Toggle NF diretamente na linha (não abre modal)
 function egToggleNF(idx){
-  if(!isAdmin()){ toast('🔐 Sem permissão para alterar NF.'); return; }
+  if(!podeEntrada()){ toast('🔐 Sem permissão para alterar NF.'); return; }
   const r = window.entradaGeral[idx];
   if(!r) return;
   r.notaFiscalEmitida = !r.notaFiscalEmitida;
@@ -3812,6 +4705,8 @@ window.popularDLPagamento=popularDLPagamento;
 window.copiarLinha=copiarLinha;
 window.toggleNFProduto=toggleNFProduto;
 window.filtrarPorImei=filtrarPorImei;
+window.abrirVendaAtacado=abrirVendaAtacado;
+window.salvarECopiarVendaAtacado=salvarECopiarVendaAtacado;
 // Entrada Geral
 window.egRender=egRender;
 window.egFiltrarSt=egFiltrarSt;
@@ -3836,6 +4731,13 @@ window.egAtualizarDLModelos=egAtualizarDLModelos;
 window.egAutoVincular=egAutoVincular;
 window._propagarNCompraParaEntrada=_propagarNCompraParaEntrada;
 window._propagarNCompraParaEstoque=_propagarNCompraParaEstoque;
+// Dashboard v6
+window.renderDash=renderDash;
+window.dashFiltrarParados=dashFiltrarParados;
+window.gerarPdfFechamento=gerarPdfFechamento;
+window.abrirMetas=abrirMetas;
+window.metasRender=metasRender;
+window.metasSalvar=metasSalvar;
 </script>
 
 <!-- DADOS -->
@@ -3960,6 +4862,28 @@ if(db) {
     },
     error => {
       console.error('Firebase catálogo error:', error);
+    }
+  );
+
+  // Listener de METAS mensais (nó separado; formato: { "2026-08": { STEPHANIE: 100000, ... } })
+  onValue(
+    ref(db,'metas_revend'),
+    snap => {
+      const v = snap.val();
+      if(v && typeof v === 'object') {
+        window.metasRevend = v;
+        window._fbLoadedMetas = true;
+        // Re-render dashboard se estiver aberto
+        const pg = document.getElementById('pgDashboard');
+        if(pg && pg.style.display !== 'none' && typeof renderDash === 'function') renderDash();
+      } else {
+        window.metasRevend = {};
+        window._fbLoadedMetas = true;
+      }
+    },
+    error => {
+      if(error.code !== 'PERMISSION_DENIED') console.warn('Metas load:', error);
+      window._fbLoadedMetas = true; // permite gravar mesmo com erro de load (primeira gravação)
     }
   );
 
