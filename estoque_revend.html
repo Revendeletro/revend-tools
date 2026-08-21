@@ -61,7 +61,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--preto)
 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--verde);animation:pulse 2s infinite}
 .sb-user{padding:10px 14px;border-bottom:1px solid var(--brd);display:flex;align-items:center;gap:10px}
 .sb-user-ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-.sb-user-ico.admin{background:var(--red-dim);color:var(--red)}.sb-user-ico.op{background:rgba(0,122,255,.12);color:var(--azul)}
+.sb-user-ico.admin{background:var(--red-dim);color:var(--red)}.sb-user-ico.op{background:rgba(0,122,255,.12);color:var(--azul)}.sb-user-ico.fin{background:rgba(52,199,89,.14);color:#1a7a3a}
 .sb-user-info{flex:1;min-width:0}
 .sb-user-nome{font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sb-user-perfil{font-size:10px;font-weight:600;color:var(--txt2)}
@@ -452,6 +452,7 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
     <div class="login-sub">Gestão de Estoque · Linha Apple</div>
     <div class="perfil-row">
       <div class="perfil-chip on" id="chip-admin" onclick="selPerfil('admin')">🔐 Admin</div>
+      <div class="perfil-chip" id="chip-fin" onclick="selPerfil('financeiro')">💼 Financeiro</div>
       <div class="perfil-chip" id="chip-op" onclick="selPerfil('operador')">👤 Operador</div>
     </div>
     <label class="lbl">Senha</label>
@@ -687,14 +688,31 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           <button class="tb-btn b" onclick="abrirMetas()" style="padding:9px 16px">🎯 Metas mensais</button>
         </div>
 
+        <!-- ═════ PROGRESSO DA LOJA (mês) ═════ v10 -->
+        <div class="d-sec" style="background:linear-gradient(135deg,#fff,#fafaf7);border:1.5px solid var(--brd)">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">🏪 Progresso da loja · <span id="dashLojaMesLbl"></span></h3>
+              <div class="d-sub">Desempenho geral vs meta total (soma das metas de todos os vendedores)</div>
+            </div>
+            <div class="d-per" id="dashLojaProjecao">—</div>
+          </div>
+          <div id="dashLojaProgresso" style="min-height:120px"></div>
+        </div>
+
         <!-- ═════ FECHAMENTO DO DIA ═════ -->
         <div class="d-sec">
           <div class="d-hdr">
             <div>
               <h3 class="d-tit">📅 Fechamento do dia</h3>
-              <div class="d-sub">Movimento das últimas 24h</div>
+              <div class="d-sub">Movimento consolidado — selecione a data</div>
             </div>
-            <div class="d-per" id="dashHojePeriodo">Hoje</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <label style="font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px">Data</label>
+              <input type="date" id="dashDia" onchange="renderDash()" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:12px;font-weight:800;outline:none;background:#fff">
+              <button onclick="dashDiaHoje()" style="padding:7px 12px;border:none;background:var(--red);color:#fff;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;cursor:pointer">Hoje</button>
+              <div class="d-per" id="dashHojePeriodo">Hoje</div>
+            </div>
           </div>
           <div class="cards-g" style="margin-bottom:20px" id="dashHojeCards"></div>
           <div class="d-split">
@@ -755,6 +773,27 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           </div>
           <div class="d-buckets" id="dashBuckets"></div>
           <div id="dashParadosTop" style="margin-top:16px"></div>
+        </div>
+
+        <!-- ═════ TOP PRODUTOS + FORNECEDORES ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">📱 Top produtos vendidos & 🏪 Top fornecedores</h3>
+              <div class="d-sub">Baseado nos produtos do estoque no mês</div>
+            </div>
+            <div class="d-per" id="dashTopMes"></div>
+          </div>
+          <div class="d-split">
+            <div>
+              <div class="d-mini-tit">📱 Produtos mais vendidos</div>
+              <div id="dashTopProds" style="min-height:60px"></div>
+            </div>
+            <div>
+              <div class="d-mini-tit">🏪 Fornecedores que mais compramos</div>
+              <div id="dashTopForns" style="min-height:60px"></div>
+            </div>
+          </div>
         </div>
 
         <!-- ═════ ANÁLISE DA EQUIPE + METAS ═════ -->
@@ -829,20 +868,20 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           </div>
           <div class="tbl-scr">
             <table>
-              <thead><tr>
-                <th>Data</th>
-                <th>IMEI / Série</th>
-                <th>Nº Venda</th>
-                <th>Modelo</th>
-                <th>GB</th>
-                <th>Cor</th>
-                <th>Tipo</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Responsável</th>
-                <th>Dt. Final</th>
-                <th>Nº Compra</th>
-                <th>NF</th>
+              <thead><tr id="egThead">
+                <th style="cursor:pointer;user-select:none" onclick="egSort('dataEntrada')">Data <span class="eg-sarr" data-c="dataEntrada"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('imei')">IMEI / Série <span class="eg-sarr" data-c="imei"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('nVenda')">Nº Venda <span class="eg-sarr" data-c="nVenda"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('modelo')">Modelo <span class="eg-sarr" data-c="modelo"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('gb')">GB <span class="eg-sarr" data-c="gb"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('cor')">Cor <span class="eg-sarr" data-c="cor"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('tipoEntrada')">Tipo <span class="eg-sarr" data-c="tipoEntrada"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('valorEntrada')">Valor <span class="eg-sarr" data-c="valorEntrada"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('statusTriagem')">Status <span class="eg-sarr" data-c="statusTriagem"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('responsavel')">Responsável <span class="eg-sarr" data-c="responsavel"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('dataFinal')">Dt. Final <span class="eg-sarr" data-c="dataFinal"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('nCompra')">Nº Compra <span class="eg-sarr" data-c="nCompra"></span></th>
+                <th style="cursor:pointer;user-select:none" onclick="egSort('notaFiscalEmitida')">NF <span class="eg-sarr" data-c="notaFiscalEmitida"></span></th>
                 <th>Ações</th>
               </tr></thead>
               <tbody id="egTbody"></tbody>
@@ -1620,14 +1659,15 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
 // ══════════════════════════════
 //  AUTENTICAÇÃO
 // ══════════════════════════════
-const SENHAS = {admin:'Revend@2026', operador:'Revend@adm'};
+const SENHAS = {admin:'Revend@2026', operador:'Revend@adm', financeiro:'Revend@fin'};
 let perfilAtual = 'admin';
 let usuarioLogado = null;
 
 function selPerfil(p){
   perfilAtual=p;
-  document.getElementById('chip-admin').classList.toggle('on',p==='admin');
-  document.getElementById('chip-op').classList.toggle('on',p==='operador');
+  const cA=document.getElementById('chip-admin'); if(cA) cA.classList.toggle('on',p==='admin');
+  const cF=document.getElementById('chip-fin'); if(cF) cF.classList.toggle('on',p==='financeiro');
+  const cO=document.getElementById('chip-op'); if(cO) cO.classList.toggle('on',p==='operador');
 }
 function login(){
   const s=document.getElementById('loginSenha').value;
@@ -1636,7 +1676,7 @@ function login(){
     document.getElementById('loginScreen').classList.add('gone');
     aplicarUI();
     render();
-    toast('✅ Bem-vindo, '+(perfilAtual==='admin'?'Admin':'Operador')+'!');
+    toast('✅ Bem-vindo, '+(perfilAtual==='admin'?'Admin':(perfilAtual==='financeiro'?'Financeiro':'Operador'))+'!');
   } else {
     const el=document.getElementById('loginErr');
     el.style.display='block';
@@ -1664,21 +1704,25 @@ function aplicarUI(){
 }
 function isAdmin(){return usuarioLogado?.perfil==='admin';}
 function isOp(){return usuarioLogado?.perfil==='operador';}
-// Entrada Geral: liberado pra admin E operador (permissões diferentes do Estoque, onde operador é só leitura + compra/venda)
-function podeEntrada(){return isAdmin() || isOp();}
+function isFin(){return usuarioLogado?.perfil==='financeiro';}
+// Entrada Geral: liberado pra admin, operador E financeiro
+function podeEntrada(){return isAdmin() || isOp() || isFin();}
+// Dashboard/Fechamento: admin E financeiro (não operador)
+function podeDashboard(){return isAdmin() || isFin();}
 
 function aplicarUI(){
   const a=isAdmin();
+  const f=isFin();
   const ico=document.getElementById('sbIco');
-  ico.className='sb-user-ico '+(a?'admin':'op');
-  ico.textContent=a?'🔐':'👤';
-  document.getElementById('sbNome').textContent=a?'Administrador':'Operador';
-  document.getElementById('sbPerfil').textContent=a?'Acesso total':'Compra · Venda · Status';
+  ico.className='sb-user-ico '+(a?'admin':(f?'fin':'op'));
+  ico.textContent=a?'🔐':(f?'💼':'👤');
+  document.getElementById('sbNome').textContent=a?'Administrador':(f?'Financeiro':'Operador');
+  document.getElementById('sbPerfil').textContent=a?'Acesso total':(f?'Financeiro · Dashboard':'Compra · Venda · Status');
   // Novo Produto: só admin
   document.querySelectorAll('#sb-btn-novo,#btn-novo').forEach(el=>el.style.display=a?'flex':'none');
-  // Dashboard: só admin vê
+  // Dashboard: admin E financeiro
   const nbDash = document.getElementById('nav-btn-dashboard');
-  if(nbDash) nbDash.style.display = a ? '' : 'none';
+  if(nbDash) nbDash.style.display = podeDashboard() ? '' : 'none';
   // Catálogo - botão cadastrar: só admin
   const btnCat=document.getElementById('btn-cadastrar-prod');
   if(btnCat) btnCat.style.display=a?'':'none';
@@ -3044,7 +3088,8 @@ function _toggleAtacadoBlock(){
 function salvarVenda(){
   const nv=document.getElementById('vNV').value.trim();
   const vd=document.getElementById('vVend').value.trim();
-  if(!nv){alert('Informe o Nº da Venda.');return;}
+  // v9: admin pode salvar SEM nº venda (operador preenche depois). Operador continua obrigatório.
+  if(!nv && !isAdmin()){alert('Informe o Nº da Venda.');return;}
   if(!vd){alert('Informe o vendedor.');return;}
   const _vv=document.getElementById('vValor');
   const _valorV = _vv ? parseValor(_vv.value.trim()) : '';
@@ -3410,7 +3455,7 @@ function _dashMetricasMes(mesStr, famFiltro){
 
 // Métricas do DIA (usa data local do usuário)
 function _dashMetricasDia(dataStr, famFiltro){
-  // v7: só usa produtos do ESTOQUE (não a Entrada Geral)
+  // v9: só usa produtos do ESTOQUE (nada da Entrada Geral)
   const vendas = (window.produtos||[]).filter(p=>{
     if(p.dataVenda !== dataStr) return false;
     if(famFiltro && p.familia !== famFiltro) return false;
@@ -3421,13 +3466,22 @@ function _dashMetricasDia(dataStr, famFiltro){
     if(famFiltro && p.familia !== famFiltro) return false;
     return true;
   });
-  let fat=0, custo=0, custoDosVendidos=0;
+  let fat=0, custoDosVendidos=0;
   vendas.forEach(p=>{ fat += _num(p.valorSaida); custoDosVendidos += _num(p.valorCompra); });
   const lucro = fat - custoDosVendidos;
-  // Valor gasto = soma do valorCompra dos aparelhos QUE ENTRARAM hoje no estoque
   const valorGasto = compras.reduce((s,p)=> s + _num(p.valorCompra), 0);
   const nfEmitidas = vendas.filter(p=>p.notaFiscalEmitida).length;
   return { vendas, compras, fat, custo:custoDosVendidos, lucro, valorGasto, nfEmitidas };
+}
+// Helper: meta total da loja no mês (soma das metas de fat de todos os vendedores)
+function _dashMetaTotalLoja(mesStr){
+  const metas = (window.metasRevend && window.metasRevend[mesStr]) || {};
+  let totalFat = 0, totalQtd = 0;
+  Object.values(metas).forEach(m=>{
+    if(typeof m === 'object'){ totalFat += _num(m.fat); totalQtd += _num(m.qtd); }
+    else { totalFat += _num(m); }
+  });
+  return { totalFat, totalQtd };
 }
 
 // Ranking do dia por vendedor (com lucro)
@@ -3444,24 +3498,51 @@ function _dashRankingDia(vendasDia){
 }
 
 // Timeline: últimos eventos do dia (vendas + entradas), ordenado por horário se disponível, senão por criadoEm desc
-function _dashTimelineDia(vendasDia, comprasDia, entradasEGDia){
+// v9: eventos consolidados do dia SEM horário — apenas na ordem que aconteceram/foram concluídos
+// Inclui: vendas realizadas, entradas no estoque, liberações da entrada geral (data final)
+function _dashTimelineDia(dataStr, famFiltro){
   const eventos = [];
-  vendasDia.forEach(p=>{
-    eventos.push({
-      tipo:'venda', ico:'✅', hora: (p.criadoEm||'').slice(11,16) || '',
-      desc: `Vendeu ${p.modelo||''} ${p.gb||''} · ${p.vendedor||'—'}`,
-      valor: _num(p.valorSaida), sinal:'+', criadoEm: p.criadoEm||p.dataVenda
-    });
+  const seen = new Set(); // v10: dedup — mesma ação no mesmo produto conta 1x
+  const push = (ev, dedupKey)=>{
+    if(dedupKey && seen.has(dedupKey)) return;
+    if(dedupKey) seen.add(dedupKey);
+    eventos.push(ev);
+  };
+  // Vendas concluídas nesta data
+  (window.produtos||[]).forEach(p=>{
+    if(p.dataVenda === dataStr && (!famFiltro || p.familia===famFiltro)){
+      push({
+        tipo:'venda', ico:'✅',
+        desc: `Vendeu ${p.modelo||''} ${p.gb||''} · ${p.vendedor||'—'}`,
+        valor: _num(p.valorSaida), sinal:'+', ordem: p.criadoEm||p.dataVenda
+      }, 'venda|'+(p.imei||p.nVenda||p.codProduto||p.modelo));
+    }
+    if(p.dataCompraEntrada === dataStr && (!famFiltro || p.familia===famFiltro)){
+      push({
+        tipo:'compra', ico:'📦',
+        desc: `Entrou no estoque ${p.modelo||''} ${p.gb||''}${p.fornecedor?' · '+p.fornecedor:''}`,
+        valor: _num(p.valorCompra), sinal:'-', ordem: p.criadoEm||p.dataCompraEntrada
+      }, 'compra|'+(p.imei||p.codProduto||p.modelo));
+    }
   });
-  comprasDia.forEach(p=>{
-    eventos.push({
-      tipo:'compra', ico:'📦', hora: (p.criadoEm||'').slice(11,16) || '',
-      desc: `Entrou ${p.modelo||''} ${p.gb||''} · ${p.responsavel||''} (Estoque)`,
-      valor: _num(p.valorCompra), sinal:'-', criadoEm: p.criadoEm||p.dataCompraEntrada
-    });
+  // Liberações/devoluções/cancelamentos da Entrada Geral com dataFinal = data selecionada
+  (window.entradaGeral||[]).forEach(r=>{
+    if(r.dataFinal === dataStr){
+      const ico = r.statusTriagem === 'LIBERADO PARA ESTOQUE' ? '🔧'
+                : r.statusTriagem === 'DEVOLVIDO AO FORNECEDOR' ? '↩️'
+                : r.statusTriagem === 'CANCELADO' ? '❌' : '📝';
+      // Se a liberação virou entrada no estoque na mesma data, o evento "compra" já cobre.
+      // Deduplica pelo IMEI: se já registramos compra desse IMEI hoje, pula a liberação.
+      const dedupKey = (r.statusTriagem||'')+'|'+(r.imei||r.modelo);
+      if(r.statusTriagem === 'LIBERADO PARA ESTOQUE' && seen.has('compra|'+(r.imei||r.modelo))) return;
+      push({
+        tipo:'entradaGeral', ico,
+        desc: `${r.statusTriagem}: ${r.modelo||''} ${r.gb||''}${r.responsavel?' · '+r.responsavel:''}`,
+        valor: 0, sinal:'', ordem: r.dataFinal + (r.criadoEm||'')
+      }, dedupKey);
+    }
   });
-  // v7: entradaGeralDia foi removida do timeline — análises só do estoque
-  return eventos.sort((a,b)=> String(b.criadoEm||'').localeCompare(String(a.criadoEm||''))).slice(0,8);
+  return eventos.sort((a,b)=> String(b.ordem||'').localeCompare(String(a.ordem||''))).slice(0,12);
 }
 
 // Aparelhos parados por faixa (só quem está EM ESTOQUE)
@@ -3524,9 +3605,9 @@ function _dashEquipeMes(mesStr, famFiltro){
 
 // ═════ RENDER PRINCIPAL ═════
 function renderDash(){
-  // Só admin vê o dashboard (guard não-destrutivo — não mexe no HTML se não é admin)
-  if(!isAdmin()){
-    console.warn('[Dashboard] renderDash ignorado — usuário não é admin');
+  // Dashboard: admin E financeiro (guard não-destrutivo)
+  if(!podeDashboard()){
+    console.warn('[Dashboard] renderDash ignorado — sem permissão');
     return;
   }
   const mes = document.getElementById('dashMes').value || new Date().toISOString().slice(0,7);
@@ -3534,11 +3615,67 @@ function renderDash(){
   const [ano, m] = mes.split('-');
   const nomeMes = D_MESES[parseInt(m)-1] + ' ' + ano;
 
-  // ─── FECHAMENTO DO DIA ───
-  const dHoje = hoje();
+  // ─── v10: PROGRESSO DA LOJA (mês) ───
+  (function(){
+    const el = document.getElementById('dashLojaProgresso');
+    const lbl = document.getElementById('dashLojaMesLbl');
+    const proj = document.getElementById('dashLojaProjecao');
+    if(!el) return;
+    if(lbl) lbl.textContent = nomeMes;
+    const pl = _dashProgressoLoja(mes, fam);
+    const pctFat = pl.metaFat > 0 ? Math.round((pl.fatReal/pl.metaFat)*100) : null;
+    const pctQtd = pl.metaQtd > 0 ? Math.round((pl.qtdReal/pl.metaQtd)*100) : null;
+    const _corPct = (v)=> v===null?'var(--txt2)': v>=100?'#1a7a3a': v>=70?'#c47500':'var(--red)';
+    if(proj){
+      if(pl.isMesAtual && (pl.metaFat > 0 || pl.metaQtd > 0)){
+        const projPct = pl.metaFat > 0 ? Math.round((pl.projFat/pl.metaFat)*100) : Math.round((pl.projQtd/pl.metaQtd)*100);
+        proj.textContent = `Projeção: ${projPct}% da meta`;
+      } else if(!pl.isMesAtual){
+        proj.textContent = `Mês fechado`;
+      } else {
+        proj.textContent = 'defina metas';
+      }
+    }
+    if(pl.metaFat === 0 && pl.metaQtd === 0){
+      el.innerHTML = `<div style="padding:24px;text-align:center;color:var(--txt2);font-size:12px">
+        Sem metas definidas para este mês. Clique em <strong>🎯 Metas mensais</strong> para configurar.
+      </div>
+      <div class="cards-g" style="margin-top:12px">
+        <div class="card card-v"><div class="ci">💰</div><div class="cn">${_fmtR(pl.fatReal)}</div><div class="cl">Faturamento realizado</div><div class="cs">${pl.qtdReal} venda${pl.qtdReal!==1?'s':''}</div></div>
+        <div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>
+      </div>`;
+      return;
+    }
+    // Duas barras (Faturamento e Quantidade) + KPIs
+    el.innerHTML = `
+      <div class="cards-g" style="margin-bottom:14px">
+        <div class="card card-v"><div class="ci">💰</div><div class="cn">${_fmtR(pl.fatReal)}</div><div class="cl">Faturamento realizado</div><div class="cs">${pl.qtdReal} venda${pl.qtdReal!==1?'s':''}${pl.metaFat>0?' · meta '+_fmtR(pl.metaFat):''}</div></div>
+        <div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>
+        <div class="card ${pctFat!==null&&pctFat>=100?'card-v':(pctFat!==null&&pctFat<70?'card-a':'card-b')}"><div class="ci">🎯</div><div class="cn" style="color:${_corPct(pctFat)}">${pctFat!==null?pctFat+'%':'—'}</div><div class="cl">% da meta (fat)</div><div class="cs" style="color:${_corPct(pctFat)}">${pl.metaFat>0?'de '+_fmtR(pl.metaFat):''}</div></div>
+        <div class="card ${pctQtd!==null&&pctQtd>=100?'card-v':(pctQtd!==null&&pctQtd<70?'card-a':'card-b')}"><div class="ci">📱</div><div class="cn" style="color:${_corPct(pctQtd)}">${pctQtd!==null?pctQtd+'%':'—'}</div><div class="cl">% da meta (qtd)</div><div class="cs" style="color:${_corPct(pctQtd)}">${pl.metaQtd>0?pl.qtdReal+' de '+pl.metaQtd:''}</div></div>
+      </div>
+      ${pl.metaFat>0?`<div style="margin:12px 0 8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px"><span>💰 Faturamento</span><span>${_fmtR(pl.fatReal)} / ${_fmtR(pl.metaFat)}</span></div>
+        <div class="d-meta-bar" style="height:14px"><div class="d-meta-fill ${pctFat>=100?'ok':pctFat>=70?'':'crit'}" style="width:${Math.min(100,pctFat||0)}%"></div></div>
+      </div>`:''}
+      ${pl.metaQtd>0?`<div style="margin:12px 0 8px">
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px"><span>📱 Quantidade</span><span>${pl.qtdReal} / ${pl.metaQtd} aparelhos</span></div>
+        <div class="d-meta-bar" style="height:14px"><div class="d-meta-fill ${pctQtd>=100?'ok':pctQtd>=70?'':'crit'}" style="width:${Math.min(100,pctQtd||0)}%"></div></div>
+      </div>`:''}
+      ${pl.isMesAtual && pl.metaFat>0 ? `<div style="margin-top:10px;font-size:11px;color:var(--txt2);font-weight:700">
+        📊 Projeção no ritmo atual: <strong style="color:${_corPct(Math.round((pl.projFat/pl.metaFat)*100))}">${_fmtR(pl.projFat)}</strong> (${Math.round((pl.projFat/pl.metaFat)*100)}% da meta) · faltam ${pl.diasNoMes-pl.diasCorridos} dia${(pl.diasNoMes-pl.diasCorridos)!==1?'s':''}
+      </div>`:''}
+    `;
+  })();
+
+  // ─── FECHAMENTO DO DIA (data selecionável) ───
+  const dashDiaEl = document.getElementById('dashDia');
+  if(dashDiaEl && !dashDiaEl.value) dashDiaEl.value = hoje();
+  const dHoje = dashDiaEl ? (dashDiaEl.value || hoje()) : hoje();
   const dm = _dashMetricasDia(dHoje, fam);
   const dtBr = fmtD(dHoje);
-  document.getElementById('dashHojePeriodo').textContent = 'Hoje · ' + dtBr;
+  const _isHoje = dHoje === hoje();
+  document.getElementById('dashHojePeriodo').textContent = (_isHoje?'Hoje · ':'') + dtBr;
 
   const ticketDia = dm.vendas.length ? dm.fat/dm.vendas.length : 0;
   const margemPctDia = dm.fat > 0 ? (dm.lucro/dm.fat)*100 : 0;
@@ -3573,12 +3710,24 @@ function renderDash(){
       <div class="cl">Vendidos hoje</div>
       <div class="cs" style="color:var(--roxo)">${dm.nfEmitidas} NF emitida${dm.nfEmitidas!==1?'s':''} · ${dm.vendas.length-dm.nfEmitidas} pendente${(dm.vendas.length-dm.nfEmitidas)!==1?'s':''}</div>
     </div>
-    <div class="card card-a">
-      <div class="ci">🎯</div>
-      <div class="cn">${dm.vendas.length}</div>
-      <div class="cl">Aparelhos vendidos</div>
-      <div class="cs" style="color:var(--amarelo)">unidade da meta</div>
-    </div>
+    ${(function(){
+      // Card Meta da Loja HOJE (meta mensal / dias no mês)
+      const mt = _dashMetaTotalLoja(mes);
+      const dtIni2 = new Date(parseInt(ano), parseInt(m)-1, 1);
+      const dtFim2 = new Date(parseInt(ano), parseInt(m), 0);
+      const diasNoMes2 = dtFim2.getDate();
+      const metaDiaFat = mt.totalFat > 0 ? mt.totalFat/diasNoMes2 : 0;
+      const metaDiaQtd = mt.totalQtd > 0 ? mt.totalQtd/diasNoMes2 : 0;
+      const pctFat = metaDiaFat > 0 ? Math.round((dm.fat/metaDiaFat)*100) : null;
+      const pctQtd = metaDiaQtd > 0 ? Math.round((dm.vendas.length/metaDiaQtd)*100) : null;
+      const corPct = (pctFat === null && pctQtd === null) ? 'var(--txt2)' : ((pctFat||0) >= 100 || (pctQtd||0) >= 100 ? '#1a7a3a' : (pctFat||0) >= 60 || (pctQtd||0) >= 60 ? 'var(--amarelo)' : 'var(--red)');
+      return `<div class="card card-a">
+        <div class="ci">🎯</div>
+        <div class="cn" style="font-size:16px;line-height:1.2">${metaDiaQtd>0?Math.round(metaDiaQtd)+' un/dia':'—'}${metaDiaFat>0?'<br>'+_fmtR(metaDiaFat)+' /dia':''}</div>
+        <div class="cl">Meta da loja · dia</div>
+        <div class="cs" style="color:${corPct}">${pctQtd!==null?'📱 '+pctQtd+'%':''}${pctQtd!==null&&pctFat!==null?' · ':''}${pctFat!==null?'💰 '+pctFat+'%':''}${(pctQtd===null&&pctFat===null)?'defina em 🎯 Metas':''}</div>
+      </div>`;
+    })()}
   `;
 
   // Ranking vendedor do dia (v7: mostra QTD + FAT + LUCRO)
@@ -3597,16 +3746,16 @@ function renderDash(){
   }).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhuma venda registrada hoje</div>';
   document.getElementById('dashHojeVendedor').innerHTML = (rank.length?'<div style="display:grid;grid-template-columns:130px 1fr 110px 90px;gap:12px;font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--brd);letter-spacing:.4px"><div>Vendedor</div><div>Qtd</div><div style="text-align:right">Fat</div><div style="text-align:right">Lucro</div></div>':'') + rankHtml;
 
-  // Timeline (v7: só do estoque)
-  const tl = _dashTimelineDia(dm.vendas, dm.compras, []);
-  const tlHtml = tl.length ? tl.map(e=>`
-    <div class="d-tl-item">
-      <span class="d-tl-hora">${e.hora || '—'}</span>
+  // Timeline v9: eventos consolidados sem hora — vendas, entradas, liberações, cancelamentos
+  const tl = _dashTimelineDia(dHoje, fam);
+  const tlHtml = tl.length ? tl.map((e,i)=>`
+    <div class="d-tl-item" style="grid-template-columns:24px 30px 1fr auto">
+      <span class="d-tl-hora" style="text-align:center">${i+1}</span>
       <span class="d-tl-ico">${e.ico}</span>
       <span class="d-tl-desc">${esc(e.desc)}</span>
       <span class="d-tl-val ${e.sinal==='-'?'saida':(e.valor?'':'neutro')}">${e.valor?(e.sinal+_fmtR(e.valor)):'—'}</span>
     </div>
-  `).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhum movimento registrado hoje</div>';
+  `).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhum evento registrado nesta data</div>';
   document.getElementById('dashHojeTimeline').innerHTML = tlHtml;
 
   // ─── FATURAMENTO E MARGEM DO MÊS ───
@@ -3695,6 +3844,31 @@ function renderDash(){
       </div>`;
   } else document.getElementById('dashParadosTop').innerHTML = '';
 
+  // ─── TOP PRODUTOS + FORNECEDORES ───
+  document.getElementById('dashTopMes').textContent = nomeMes;
+  const topProds = _dashTopProdutosMes(mes, fam);
+  const topForns = _dashTopFornecedoresMes(mes, fam);
+  const maxProds = topProds.length ? topProds[0].qtd : 1;
+  const maxForns = topForns.length ? topForns[0].qtd : 1;
+  document.getElementById('dashTopProds').innerHTML = topProds.length ? topProds.map((it,i)=>{
+    const medalhas = ['gold','silver','bronze'];
+    return `<div class="d-bar-row" style="grid-template-columns:30px 1fr 60px 100px">
+      <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span></div>
+      <div class="d-bar-lbl" style="min-width:0;overflow:hidden;text-overflow:ellipsis" title="${esc(it.nome)}">${esc(it.nome)}</div>
+      <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(15,Math.round(it.qtd/maxProds*100))}%">${it.qtd}</div></div>
+      <div class="d-bar-val">${_fmtR(it.fat)}</div>
+    </div>`;
+  }).join('') : '<div style="padding:16px;text-align:center;color:var(--txt2);font-size:12px">Nenhuma venda no período</div>';
+  document.getElementById('dashTopForns').innerHTML = topForns.length ? topForns.map((it,i)=>{
+    const medalhas = ['gold','silver','bronze'];
+    return `<div class="d-bar-row" style="grid-template-columns:30px 1fr 60px 100px">
+      <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span></div>
+      <div class="d-bar-lbl" style="min-width:0;overflow:hidden;text-overflow:ellipsis" title="${esc(it.nome)}">${esc(it.nome)}</div>
+      <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(15,Math.round(it.qtd/maxForns*100))}%">${it.qtd}</div></div>
+      <div class="d-bar-val">${_fmtR(it.valor)}</div>
+    </div>`;
+  }).join('') : '<div style="padding:16px;text-align:center;color:var(--txt2);font-size:12px">Nenhum fornecedor com compras (preencha o campo Fornecedor nos produtos)</div>';
+
   // ─── ANÁLISE DA EQUIPE + METAS ───
   document.getElementById('dashEquipeMes').textContent = nomeMes;
   const equipe = _dashEquipeMes(mes, fam);
@@ -3756,6 +3930,67 @@ function renderDash(){
     if(semMeta.length) ins.push(`<strong style="color:var(--txt2)">${semMeta.length} sem meta</strong> — defina em <button onclick="abrirMetas()" style="background:none;border:none;color:var(--azul);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:800;padding:0">🎯 Metas mensais</button>`);
   }
   document.getElementById('dashInsights').innerHTML = ins.length ? '💡 ' + ins.join(' · ') : '';
+}
+
+// Botão "Hoje" no fechamento — volta o input date para hoje e re-renderiza
+function dashDiaHoje(){
+  const el = document.getElementById('dashDia');
+  if(el){ el.value = hoje(); renderDash(); }
+}
+// v10: Progresso GERAL da loja no mês (meta total × realizado)
+function _dashProgressoLoja(mesStr, famFiltro){
+  const vendasMes = (window.produtos||[]).filter(p=>{
+    if(!p.dataVenda) return false;
+    if(!String(p.dataVenda).startsWith(mesStr)) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  const fatReal = vendasMes.reduce((s,p)=> s + _num(p.valorSaida), 0);
+  const qtdReal = vendasMes.length;
+  const custoReal = vendasMes.reduce((s,p)=> s + _num(p.valorCompra), 0);
+  const lucroReal = fatReal - custoReal;
+  const mt = _dashMetaTotalLoja(mesStr);
+  // Projeção linear (fat/dia_corrido × dias_no_mês)
+  const hj = new Date();
+  const [ano, m] = mesStr.split('-').map(x=>parseInt(x));
+  const dtIni = new Date(ano, m-1, 1);
+  const dtFim = new Date(ano, m, 0);
+  const diasNoMes = dtFim.getDate();
+  const isMesAtual = hj >= dtIni && hj <= dtFim;
+  const diasCorridos = isMesAtual ? Math.max(1, Math.min(hj.getDate(), diasNoMes)) : diasNoMes;
+  const projFat = diasCorridos > 0 ? (fatReal / diasCorridos) * diasNoMes : 0;
+  const projQtd = diasCorridos > 0 ? (qtdReal / diasCorridos) * diasNoMes : 0;
+  return {fatReal, qtdReal, lucroReal, custoReal, metaFat: mt.totalFat, metaQtd: mt.totalQtd, projFat, projQtd, diasCorridos, diasNoMes, isMesAtual};
+}
+
+// Top produtos vendidos no mês (por modelo+gb)
+function _dashTopProdutosMes(mesStr, famFiltro){
+  const map = new Map();
+  (window.produtos||[]).forEach(p=>{
+    if(!p.dataVenda) return;
+    if(!String(p.dataVenda).startsWith(mesStr)) return;
+    if(famFiltro && p.familia!==famFiltro) return;
+    const key = ((p.modelo||'') + ' ' + (p.gb||p.tamanho||'')).trim() || '(sem modelo)';
+    const cur = map.get(key) || {nome:key, qtd:0, fat:0};
+    cur.qtd++; cur.fat += _num(p.valorSaida);
+    map.set(key, cur);
+  });
+  return [...map.values()].sort((a,b)=>b.qtd-a.qtd || b.fat-a.fat).slice(0,8);
+}
+// Top fornecedores por qtd e valor de compra no mês (baseado em dataCompraEntrada)
+function _dashTopFornecedoresMes(mesStr, famFiltro){
+  const map = new Map();
+  (window.produtos||[]).forEach(p=>{
+    if(!p.dataCompraEntrada) return;
+    if(!String(p.dataCompraEntrada).startsWith(mesStr)) return;
+    if(famFiltro && p.familia!==famFiltro) return;
+    const key = (p.fornecedor||'').trim().toUpperCase();
+    if(!key) return;
+    const cur = map.get(key) || {nome:key, qtd:0, valor:0};
+    cur.qtd++; cur.valor += _num(p.valorCompra);
+    map.set(key, cur);
+  });
+  return [...map.values()].sort((a,b)=>b.qtd-a.qtd || b.valor-a.valor).slice(0,8);
 }
 
 // Filtrar produtos parados por faixa (abre estoque com filtro)
@@ -3852,13 +4087,16 @@ function metasSalvar(){
 // ═════════════════════════════════════════════════════════════
 
 function gerarPdfFechamento(){
-  if(!isAdmin()){ toast('🔐 Somente admin.'); return; }
+  // v10: admin E financeiro podem gerar
+  if(!podeDashboard()){ toast('🔐 Sem permissão pra fechamento.'); return; }
   const fam = document.getElementById('dashFam').value || '';
-  const dHoje = hoje();
+  // v9: usa a data selecionada no seletor "Fechamento do dia" (não sempre hoje)
+  const dashDiaEl = document.getElementById('dashDia');
+  const dHoje = dashDiaEl ? (dashDiaEl.value || hoje()) : hoje();
   const dtBr = fmtD(dHoje);
   const dm = _dashMetricasDia(dHoje, fam);
   const rank = _dashRankingDia(dm.vendas);
-  const tl = _dashTimelineDia(dm.vendas, dm.compras, []);
+  const tl = _dashTimelineDia(dHoje, fam);
   const ticketDia = dm.vendas.length ? dm.fat/dm.vendas.length : 0;
   const margemPctDia = dm.fat > 0 ? (dm.lucro/dm.fat)*100 : 0;
   const nfPct = dm.vendas.length ? (dm.nfEmitidas/dm.vendas.length)*100 : 0;
@@ -3910,9 +4148,9 @@ function gerarPdfFechamento(){
     ${rank.map((v,i)=>`<tr><td>${i+1}</td><td>${esc(v.nome)}</td><td class="r">${v.qtd}</td><td class="r ok">${_fmtR(v.fat)}</td><td class="r">${_fmtR(v.lucro)}</td></tr>`).join('')}
   </tbody></table>` : '<div style="padding:16px;color:#888;font-size:11px;text-align:center">Nenhuma venda registrada hoje</div>'}
 
-  <h2>🕐 Movimento do dia</h2>
-  ${tl.length ? `<table><thead><tr><th>Hora</th><th>Evento</th><th class="r">Valor</th></tr></thead><tbody>
-    ${tl.map(e=>`<tr><td>${e.hora||'—'}</td><td>${e.ico} ${esc(e.desc)}</td><td class="r">${e.valor?(e.sinal+_fmtR(e.valor)):'—'}</td></tr>`).join('')}
+  <h2>📋 Movimento do dia (ordem cronológica)</h2>
+  ${tl.length ? `<table><thead><tr><th style="width:32px">#</th><th>Evento</th><th class="r">Valor</th></tr></thead><tbody>
+    ${tl.map((e,i)=>`<tr><td>${i+1}</td><td>${e.ico} ${esc(e.desc)}</td><td class="r">${e.valor?(e.sinal+_fmtR(e.valor)):'—'}</td></tr>`).join('')}
   </tbody></table>` : '<div style="padding:16px;color:#888;font-size:11px;text-align:center">Nenhum movimento registrado hoje</div>'}
 
   <div class="foot">Revend · fechamento gerado em ${new Date().toLocaleString('pt-BR')} · use Ctrl+P (⌘+P) para salvar como PDF e enviar no WhatsApp</div>
@@ -3939,7 +4177,7 @@ function irPara(pag,btn){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
   if(btn) btn.classList.add('on');
   if(pag==='dashboard'){
-    if(!isAdmin()){ toast('🔐 Dashboard restrito a administradores'); irPara('estoque', document.querySelector('.nav-btn')); return; }
+    if(!podeDashboard()){ toast('🔐 Dashboard restrito'); irPara('estoque', document.querySelector('.nav-btn')); return; }
     if(!document.getElementById('dashMes').value) document.getElementById('dashMes').value=new Date().toISOString().slice(0,7);
     renderDash();
   }
@@ -4158,6 +4396,7 @@ const EG_TIPO_META = {
 // Estado global
 window.entradaGeral = window.entradaGeral || [];
 let egStFiltro='todos', egTipoFiltro='', egBusca='';
+let egSortCol='dataEntrada', egSortDir=-1; // v10: coluna clicável (-1 desc, 1 asc)
 let egIdxEdit=-1, egIdxLiberar=-1, egLibProdSelecionado=null;
 
 // Gera um id estável para o registro (imei + criadoEm)
@@ -4210,7 +4449,7 @@ function egContagem(){
 // Filtro consolidado
 function egFiltrar(){
   const q = (egBusca||'').toLowerCase().trim();
-  return (window.entradaGeral||[]).filter(r=>{
+  const arr = (window.entradaGeral||[]).filter(r=>{
     if(egStFiltro && egStFiltro!=='todos'){
       const s = String(r.statusTriagem||'RECEBIDO');
       if(egStFiltro==='LAB'){ if(!s.startsWith('LAB')) return false; }
@@ -4222,7 +4461,46 @@ function egFiltrar(){
       if(!h.includes(q)) return false;
     }
     return true;
-  }).sort((a,b)=> String(b.dataEntrada||'').localeCompare(String(a.dataEntrada||'')));
+  });
+  // v10: ordenação por coluna clicável — colunas numéricas, texto e "vazio primeiro"
+  const col = egSortCol || 'dataEntrada';
+  const dir = egSortDir || -1;
+  const _numCols = ['valorEntrada','notaFiscalEmitida'];
+  const _valorCol = (r)=>{
+    if(col === 'nVenda') return r.nVendaOrigem||'';
+    if(col === 'notaFiscalEmitida') return r.notaFiscalEmitida ? 1 : 0;
+    return r[col];
+  };
+  arr.sort((a,b)=>{
+    const va = _valorCol(a), vb = _valorCol(b);
+    // Trata vazios: em ASC os vazios ficam no fim, em DESC no início
+    const aE = va==='' || va==null;
+    const bE = vb==='' || vb==null;
+    if(aE && !bE) return 1;
+    if(!aE && bE) return -1;
+    if(aE && bE) return 0;
+    if(_numCols.includes(col)){
+      return (_num(va) - _num(vb)) * dir;
+    }
+    return String(va).localeCompare(String(vb), 'pt-BR', {numeric:true}) * dir;
+  });
+  return arr;
+}
+// v10: alterna ordenação ao clicar no header da Entrada Geral
+function egSort(col){
+  if(egSortCol === col){ egSortDir = -egSortDir; }
+  else { egSortCol = col; egSortDir = -1; }
+  egRender();
+  _egAtualizarSetas();
+}
+function _egAtualizarSetas(){
+  document.querySelectorAll('#egThead .eg-sarr').forEach(el=>{
+    const c = el.getAttribute('data-c');
+    el.textContent = (c === egSortCol) ? (egSortDir < 0 ? '▾' : '▴') : '';
+    el.style.color = (c === egSortCol) ? 'var(--red)' : 'var(--txt2)';
+    el.style.fontSize = '10px';
+    el.style.marginLeft = '3px';
+  });
 }
 
 // Render principal
@@ -4283,6 +4561,8 @@ function egRender(){
       <td class="td-acts" onclick="event.stopPropagation()">${btnLib}${btnE}${btnDel}</td>
     </tr>`;
   }).join('');
+  // v10: atualiza as setinhas de ordenação
+  if(typeof _egAtualizarSetas==='function') _egAtualizarSetas();
 }
 
 // Filtros
@@ -4530,6 +4810,18 @@ function egConfirmarLiberacao(){
   if(!c){ alert('Selecione um código do catálogo antes de confirmar.'); return; }
   // Gera id de link
   const idEntradaGeral = egGerarId(r);
+  // v9: regras de forma de pagamento e valor conforme tipo de entrada
+  // - P. PAGAMENTO → formaPagamento = 'APARELHO PARTE PAGAMENTO', mantém valor da entrada
+  // - GARANTIA (qualquer) → formaPagamento = 'GARANTIA', valor = 0
+  const tipoEnt = String(r.tipoEntrada||'').toUpperCase();
+  let _valorCompraLib = r.valorEntrada || '';
+  let _formaPagLib = '';
+  if(tipoEnt === 'P. PAGAMENTO'){
+    _formaPagLib = 'APARELHO PARTE PAGAMENTO';
+  } else if(tipoEnt.includes('GARANTIA')){
+    _formaPagLib = 'GARANTIA';
+    _valorCompraLib = 0;
+  }
   // Cria produto no estoque_revend (herda modelo/GB/cor/IMEI da entrada + condição/família do catálogo)
   const novoProduto = {
     familia: c.familia || r.familia || 'iPhones',
@@ -4547,8 +4839,8 @@ function egConfirmarLiberacao(){
     responsavel: r.responsavel || '',
     valorEntrada: '',
     fornecedor: '',
-    valorCompra: r.valorEntrada || '',
-    formaPagamento: '',
+    valorCompra: _valorCompraLib,
+    formaPagamento: _formaPagLib,
     detalhePagamento: '',
     status: r.nCompra ? 'emEstoque' : 'aguardando',
     // v5: observação já inclui como o aparelho entrou (tipo de entrada) + bateria + obs originais
@@ -4842,6 +5134,8 @@ window.egRender=egRender;
 window.egFiltrarSt=egFiltrarSt;
 window.egFiltrarTipo=egFiltrarTipo;
 window.egBuscar=egBuscar;
+window.egSort=egSort;
+window._egAtualizarSetas=_egAtualizarSetas;
 window.egAbrirNova=egAbrirNova;
 window.egSalvarNova=egSalvarNova;
 window.egEditar=egEditar;
@@ -4865,7 +5159,10 @@ window._propagarNCompraParaEstoque=_propagarNCompraParaEstoque;
 window.renderDash=renderDash;
 window.dashFiltrarParados=dashFiltrarParados;
 window.gerarPdfFechamento=gerarPdfFechamento;
+window.dashDiaHoje=dashDiaHoje;
 window.abrirMetas=abrirMetas;
+window.isFin=isFin;
+window.podeDashboard=podeDashboard;
 window.metasRender=metasRender;
 window.metasSalvar=metasSalvar;
 window.metasAdicionarVendedor=metasAdicionarVendedor;
