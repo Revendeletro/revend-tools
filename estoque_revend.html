@@ -3502,11 +3502,23 @@ function _dashRankingDia(vendasDia){
 // Inclui: vendas realizadas, entradas no estoque, liberações da entrada geral (data final)
 function _dashTimelineDia(dataStr, famFiltro){
   const eventos = [];
-  const seen = new Set(); // v10: dedup — mesma ação no mesmo produto conta 1x
+  const seen = new Set(); // v10.1: dedup — mesma ação no mesmo produto conta 1x
   const push = (ev, dedupKey)=>{
     if(dedupKey && seen.has(dedupKey)) return;
     if(dedupKey) seen.add(dedupKey);
     eventos.push(ev);
+  };
+  // v10.1: chave robusta — se tem IMEI, usa IMEI (dois IMEIs diferentes = 2 eventos).
+  // Sem IMEI, agrupa por (modelo+gb+cor+responsavel+valor) — evita "aparecer 2x visualmente igual".
+  const _keyProd = (p)=>{
+    const imei = (p.imei||'').trim();
+    if(imei) return imei;
+    return [p.modelo||'', p.gb||'', p.cor||'', p.tamanho||''].join('|').toUpperCase();
+  };
+  const _keyEG = (r)=>{
+    const imei = (r.imei||'').trim();
+    if(imei) return imei;
+    return [r.modelo||'', r.gb||'', r.cor||'', r.responsavel||'', r.valorEntrada||''].join('|').toUpperCase();
   };
   // Vendas concluídas nesta data
   (window.produtos||[]).forEach(p=>{
@@ -3515,14 +3527,14 @@ function _dashTimelineDia(dataStr, famFiltro){
         tipo:'venda', ico:'✅',
         desc: `Vendeu ${p.modelo||''} ${p.gb||''} · ${p.vendedor||'—'}`,
         valor: _num(p.valorSaida), sinal:'+', ordem: p.criadoEm||p.dataVenda
-      }, 'venda|'+(p.imei||p.nVenda||p.codProduto||p.modelo));
+      }, 'venda|'+_keyProd(p)+'|'+(p.nVenda||p.codProduto||p.vendedor||''));
     }
     if(p.dataCompraEntrada === dataStr && (!famFiltro || p.familia===famFiltro)){
       push({
         tipo:'compra', ico:'📦',
         desc: `Entrou no estoque ${p.modelo||''} ${p.gb||''}${p.fornecedor?' · '+p.fornecedor:''}`,
         valor: _num(p.valorCompra), sinal:'-', ordem: p.criadoEm||p.dataCompraEntrada
-      }, 'compra|'+(p.imei||p.codProduto||p.modelo));
+      }, 'compra|'+_keyProd(p)+'|'+(p.codProduto||p.fornecedor||''));
     }
   });
   // Liberações/devoluções/cancelamentos da Entrada Geral com dataFinal = data selecionada
@@ -3531,10 +3543,15 @@ function _dashTimelineDia(dataStr, famFiltro){
       const ico = r.statusTriagem === 'LIBERADO PARA ESTOQUE' ? '🔧'
                 : r.statusTriagem === 'DEVOLVIDO AO FORNECEDOR' ? '↩️'
                 : r.statusTriagem === 'CANCELADO' ? '❌' : '📝';
-      // Se a liberação virou entrada no estoque na mesma data, o evento "compra" já cobre.
-      // Deduplica pelo IMEI: se já registramos compra desse IMEI hoje, pula a liberação.
-      const dedupKey = (r.statusTriagem||'')+'|'+(r.imei||r.modelo);
-      if(r.statusTriagem === 'LIBERADO PARA ESTOQUE' && seen.has('compra|'+(r.imei||r.modelo))) return;
+      const kProd = _keyEG(r);
+      // Se a liberação virou entrada no estoque hoje, o evento "compra" já cobre (dedup cruzado).
+      if(r.statusTriagem === 'LIBERADO PARA ESTOQUE'){
+        // Sem IMEI: procura qualquer chave que começa por "compra|<kProd>|" (ignora sufixo cod/fornecedor)
+        let jaTemCompra = false;
+        seen.forEach(k => { if(k.startsWith('compra|'+kProd+'|')) jaTemCompra = true; });
+        if(jaTemCompra) return;
+      }
+      const dedupKey = (r.statusTriagem||'')+'|'+kProd;
       push({
         tipo:'entradaGeral', ico,
         desc: `${r.statusTriagem}: ${r.modelo||''} ${r.gb||''}${r.responsavel?' · '+r.responsavel:''}`,
