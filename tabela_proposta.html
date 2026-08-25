@@ -487,6 +487,11 @@
         }
         .modal-novo-body input:focus, .modal-novo-body select:focus { border-color: var(--red); }
         .modal-novo-info { font-size: 11px; color: #888; background: #f9fafb; padding: 8px 12px; border-radius: 6px; border-left: 3px solid var(--red); }
+
+        /* ── PAINEL EXTRAÇÃO ── */
+        #extractPanel { animation: slideUpExtract 0.25s ease; }
+        @keyframes slideUpExtract { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
+        #extractOutput { font-size: 12px !important; line-height: 1.6 !important; color: #1a1a1a; }
     </style>
 </head>
 <body>
@@ -579,6 +584,7 @@
             <button class="filter-chip" onclick="setFilter('vazio',this)">⚠️ Sem preço</button>
             <div class="toolbar-sep"></div>
             <button id="gestorBtn" onclick="abrirModal()">🔐 Gestor</button>
+            <button id="extractBtn" onclick="abrirExtractPanel()" style="padding:7px 14px; background:#059669; color:white; border:none; border-radius:6px; cursor:pointer; font-size:11px; font-weight:700; transition:all 0.2s; white-space:nowrap; display:none;">📋 Extrair Tabela</button>
             <span class="last-upd" id="lastUpd">—</span>
         </div>
     </div>
@@ -590,6 +596,38 @@
         <div class="sum-card"><h3>💰 Com Preço</h3><p id="cComPreco">—</p></div>
         <div class="sum-card"><h3>⚠️ Sem Preço</h3><p id="cSemPreco">—</p></div>
         <div class="sum-card"><h3>✏️ Modo</h3><p id="cModo" style="font-size:13px;padding-top:4px;">Vendedor</p></div>
+    </div>
+</div>
+
+<!-- PAINEL EXTRAÇÃO DE TABELAS -->
+<div id="extractPanel" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:3500; background:white; border-top:3px solid #c8102e; max-height:60vh; overflow-y:auto; box-shadow:0 -8px 32px rgba(0,0,0,0.2);">
+    <div style="padding:16px 20px; background:#c8102e; color:white; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:1;">
+        <h3 style="margin:0; font-size:14px; font-weight:800;">📋 Extração de Tabela de Preços</h3>
+        <button onclick="fecharExtractPanel()" style="background:rgba(255,255,255,0.2); border:none; color:white; width:28px; height:28px; border-radius:50%; cursor:pointer; font-size:16px; font-weight:700;">✕</button>
+    </div>
+    <div style="padding:16px 20px;">
+        <div style="margin-bottom:12px;">
+            <label style="font-size:11px; font-weight:800; color:#666; display:block; margin-bottom:6px;">📂 CATEGORIA</label>
+            <select id="extractCategory" style="width:100%; padding:8px 12px; border:2px solid #e0e0e0; border-radius:6px; font-size:13px; font-weight:700;">
+                <option value="">— Selecione uma categoria —</option>
+            </select>
+        </div>
+        <div style="margin-bottom:12px;">
+            <label style="font-size:11px; font-weight:800; color:#666; display:block; margin-bottom:6px;">📅 DATA DA TABELA</label>
+            <input type="date" id="extractDate" style="padding:8px 12px; border:2px solid #e0e0e0; border-radius:6px; font-size:13px; font-weight:700;">
+        </div>
+        <div style="margin-bottom:12px;">
+            <label style="font-size:11px; font-weight:800; color:#666; display:block; margin-bottom:6px;">📊 TIPO DE TABELA</label>
+            <select id="extractType" style="width:100%; padding:8px 12px; border:2px solid #e0e0e0; border-radius:6px; font-size:13px; font-weight:700;">
+                <option value="completa">Tabela Completa (Todos os Produtos)</option>
+                <option value="atualizada">Apenas Produtos com Alteração de Preço</option>
+            </select>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button onclick="gerarExtracao()" style="flex:1; background:#c8102e; color:white; border:none; padding:10px; border-radius:6px; font-size:13px; font-weight:800; cursor:pointer;">🔍 Gerar Extração</button>
+            <button onclick="copiarExtracao()" style="flex:1; background:#2a2a2a; color:white; border:none; padding:10px; border-radius:6px; font-size:13px; font-weight:800; cursor:pointer;">📋 Copiar Texto</button>
+        </div>
+        <div id="extractOutput" style="margin-top:16px; padding:14px; background:#f9f9f9; border:1px solid #e0e0e0; border-radius:6px; font-family:'Courier New',monospace; font-size:12px; color:#1a1a1a; line-height:1.5; white-space:pre-wrap; word-break:break-word; max-height:400px; overflow-y:auto; display:none;"></div>
     </div>
 </div>
 
@@ -1246,6 +1284,107 @@ let _prodStatus = {};   // { KEY: 'desativado' | 'excluido' }
 let _prodNovos  = {};   // { KEY: { tabId, grupoIdx, nome, criadoEm } }
 let _promocoes  = {};   // { KEY: { produto: true, cores: { NomeCor: true } } }
 
+// ════════════════════════════════════════════
+// HISTÓRICO DE PREÇOS
+// ════════════════════════════════════════════
+let _historicoPrecosAnterior = {};  // { "KEY": { avista, credito, data } }
+
+function carregarHistorico() {
+    try {
+        const saved = localStorage.getItem('historicoPrecosRevend');
+        if (saved) _historicoPrecosAnterior = JSON.parse(saved);
+    } catch(e) {
+        console.log('Erro ao carregar histórico:', e);
+    }
+}
+
+function salvarHistorico() {
+    try {
+        const snapshot = {};
+
+        // Salvar preços base
+        Object.entries(_precos).forEach(([key, p]) => {
+            if (p.avista || p.credito) {
+                snapshot[key] = {
+                    avista: p.avista || null,
+                    credito: p.credito || null,
+                    data: new Date().toLocaleDateString('pt-BR')
+                };
+            }
+        });
+
+        // Salvar preços de cores
+        Object.entries(_cores).forEach(([key, cores]) => {
+            Object.entries(cores).forEach(([nomeCor, dadosCor]) => {
+                if (dadosCor.avista) {
+                    const chaveCorHistorico = key + '_COR_' + nomeCor;
+                    snapshot[chaveCorHistorico] = {
+                        avista: dadosCor.avista || null,
+                        credito: dadosCor.credito || null,
+                        data: new Date().toLocaleDateString('pt-BR'),
+                        cor: nomeCor
+                    };
+                }
+            });
+        });
+
+        localStorage.setItem('historicoPrecosRevend', JSON.stringify(snapshot));
+    } catch(e) {
+        console.log('Erro ao salvar histórico:', e);
+    }
+}
+
+function detectarAlteracoes() {
+    const alteracoes = {};
+
+    // Detectar alterações em preços base (qualquer mudança)
+    Object.entries(_precos).forEach(([key, p]) => {
+        const anterior = _historicoPrecosAnterior[key];
+        if (!anterior) return;
+
+        const avistaAnterior = anterior.avista || 0;
+        const avistaAtual = p.avista || 0;
+        const diferenca = avistaAtual - avistaAnterior;
+
+        // Registra qualquer alteração (subida ou descida)
+        if (Math.abs(diferenca) > 0) {
+            alteracoes[key] = {
+                tipo: 'avista',
+                anterior: avistaAnterior,
+                atual: avistaAtual,
+                diferenca: diferenca,
+                nome: p.nome || ''
+            };
+        }
+    });
+
+    // Detectar alterações em preços de cores (qualquer mudança)
+    Object.entries(_cores).forEach(([key, cores]) => {
+        Object.entries(cores).forEach(([nomeCor, dadosCor]) => {
+            const chaveCorHistorico = key + '_COR_' + nomeCor;
+            const anterior = _historicoPrecosAnterior[chaveCorHistorico];
+            if (!anterior) return;
+
+            const avistaAnterior = anterior.avista || 0;
+            const avistaAtual = dadosCor.avista || 0;
+            const diferenca = avistaAtual - avistaAnterior;
+
+            // Registra qualquer alteração (subida ou descida)
+            if (Math.abs(diferenca) > 0) {
+                alteracoes[chaveCorHistorico] = {
+                    tipo: 'cor',
+                    anterior: avistaAnterior,
+                    atual: avistaAtual,
+                    diferenca: diferenca,
+                    nome: nomeCor
+                };
+            }
+        });
+    });
+
+    return alteracoes;
+}
+
 // ── Ordenação natural para inserir novos produtos no lugar certo ──
 // Trata números (incluindo TB→GB), variantes (PRO MAX > PRO > PLUS > AIR > regular)
 // e legacy iPhone X/XR/XS de modo que o produto novo seja inserido em ordem.
@@ -1762,6 +1901,10 @@ async function salvarItem(key) {
             obs:     ob,
             updAt:   now
         });
+
+        // Salvar histórico após sucesso
+        salvarHistorico();
+
         const btn = document.getElementById('sav_'+key);
         if (btn) { btn.textContent = '✅ Salvo!'; btn.classList.add('saved'); btn.style.background='#059669'; }
         showBanner('✅ Preço salvo!', 'ok');
@@ -1900,6 +2043,11 @@ async function salvarCores(key) {
     try {
         if (!window._fbSalvarCores) throw new Error('Firebase não inicializado');
         await window._fbSalvarCores(key, snap);
+
+        // Salvar histórico após sucesso
+        salvarHistorico();
+
+        showBanner('✅ Cores salvas!', 'ok');
     } catch(e) {
         showBanner('❌ Erro ao salvar cores.', 'err');
     }
@@ -2004,6 +2152,7 @@ function entrarGestor() {
     document.getElementById('gestorBtn').textContent = '🔓 Sair do Gestor';
     document.getElementById('modeBar').textContent = '✏️ MODO GESTOR — edição de preços ativada';
     document.getElementById('cModo').textContent = 'Gestor';
+    document.getElementById('extractBtn').style.display = 'inline-block';  // Mostra botão
 }
 
 function sairGestor() {
@@ -2013,6 +2162,8 @@ function sairGestor() {
     document.getElementById('gestorBtn').textContent = '🔐 Gestor';
     document.getElementById('modeBar').textContent = '👁️ MODO VENDEDOR — somente visualização';
     document.getElementById('cModo').textContent = 'Vendedor';
+    document.getElementById('extractBtn').style.display = 'none';  // Esconde botão
+    fecharExtractPanel();  // Fecha painel se aberto
 }
 
 // ════════════════════════════════════════════
@@ -2951,6 +3102,309 @@ function updateTimestamp() {
         '🕐 ' + new Date().toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
 }
 
+// ════════════════════════════════════════════
+// EXTRAÇÃO DE TABELAS — PAINEL
+// ════════════════════════════════════════════
+function abrirExtractPanel() {
+    document.getElementById('extractPanel').style.display = 'block';
+    if (!document.getElementById('extractDate').value) {
+        document.getElementById('extractDate').value = new Date().toISOString().split('T')[0];
+    }
+
+    // Preencher dropdown de categorias
+    const selectCat = document.getElementById('extractCategory');
+    if (!selectCat.querySelector('option[value="iphone17"]')) {
+        catalog.forEach(sec => {
+            const opt = document.createElement('option');
+            opt.value = sec.id;
+            opt.textContent = sec.tab;
+            selectCat.appendChild(opt);
+        });
+        // Seleciona a aba ativa por padrão
+        selectCat.value = activeTab;
+    }
+}
+window.abrirExtractPanel = abrirExtractPanel;
+
+function fecharExtractPanel() {
+    document.getElementById('extractPanel').style.display = 'none';
+}
+window.fecharExtractPanel = fecharExtractPanel;
+
+function gerarExtracao() {
+    const categoriaSelecionada = document.getElementById('extractCategory').value;
+    const data = document.getElementById('extractDate').value;
+    const tipo = document.getElementById('extractType').value;
+    const output = document.getElementById('extractOutput');
+
+    if (!categoriaSelecionada) {
+        showBanner('⚠️ Selecione uma categoria primeiro', 'err');
+        return;
+    }
+
+    const dataBR = data ? new Date(data + 'T00:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
+
+    let txt = '';
+
+    // Cabeçalho
+    txt += `🥇 *Revend Eletro* | _Varejo_\n`;
+    txt += `\n`;
+    txt += `🇧🇷_${dataBR}_ 🇧🇷\n`;
+    txt += `\n`;
+
+    // Detectar alterações
+    const alteracoes = tipo === 'atualizada' ? detectarAlteracoes() : {};
+
+    const efetivo = catalogoEfetivo();
+    let tabelaVazia = true;
+    let promoDetectadas = [];
+
+    // Encontrar seção da categoria selecionada
+    const section = efetivo.find(s => s.id === categoriaSelecionada);
+    if (!section) {
+        showBanner('❌ Categoria não encontrada', 'err');
+        return;
+    }
+
+    // Renderizar título da categoria
+    txt += `———${section.tab}———\n\n`;
+
+    // Percorrer grupos da categoria
+    section.groups.forEach((group, grupoIdx) => {
+        let temProdutosComPreco = false;
+        let blocoGrupo = '';
+
+        group.items.forEach(itemName => {
+            const key = itemKey(section.id, itemName);
+
+            // Ignorar produtos desativados ou excluídos
+            const prodStatus = _prodStatus[key];
+            if (prodStatus === 'desativado' || prodStatus === 'excluido') {
+                return;
+            }
+
+            const p = _precos[key] || {};
+            const av = p.avista;
+
+            // Verificar se tem cores ativas
+            const cores = coresAtivas(key);
+
+            // Se tem cores, usar cores; se não, usar preço base
+            let temPrecos = false;
+            if (cores.length > 0) {
+                temPrecos = true;
+            } else if (av) {
+                temPrecos = true;
+            }
+
+            // Filtrar conforme tipo de extração
+            if (!temPrecos) return;  // Ignora produtos sem preço
+
+            // Para tipo 'atualizada', verificar se o produto ou alguma cor tem alteração (DESCIDA >= 100)
+            if (tipo === 'atualizada') {
+                let temAlteracaoNoProduto = false;
+
+                // Verifica preço base - apenas DESCIDAS
+                if (alteracoes[key] && alteracoes[key].diferenca <= -100) {
+                    temAlteracaoNoProduto = true;
+                }
+
+                // Verifica cores - apenas DESCIDAS
+                if (!temAlteracaoNoProduto && cores.length > 0) {
+                    for (let i = 0; i < cores.length; i++) {
+                        const nomeCor = cores[i].nome;
+                        const chaveAlteracao = key + '_COR_' + nomeCor;
+                        if (alteracoes[chaveAlteracao] && alteracoes[chaveAlteracao].diferenca <= -100) {
+                            temAlteracaoNoProduto = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Se não tem alteração de descida, pula este produto
+                if (!temAlteracaoNoProduto) return;
+            }
+
+            temProdutosComPreco = true;
+            tabelaVazia = false;
+
+            // Renderizar nome do item
+            const nomeDisplay = itemName;
+            blocoGrupo += `\n◼️ *${nomeDisplay.toUpperCase()}*\n`;
+
+            // Se tem cores, mostrar todas ordenadas por preço
+            if (cores.length > 0) {
+                // Se cores não têm preços individuais mas produto tem preço base, usar preço base para todas
+                const coresComPreco = cores.map(c => ({
+                    ...c,
+                    avista: c.avista || av  // Se cor não tem preço, usa preço base do produto
+                }));
+
+                // Ordenar cores por preço (do mais barato para o mais caro)
+                const coresOrdenadas = [...coresComPreco].sort((a, b) => (a.avista || 0) - (b.avista || 0));
+
+                // Verificar se todas as cores têm o mesmo preço
+                const precosCores = coresOrdenadas.map(c => c.avista || 0);
+                const todosIguais = precosCores.every(p => p === precosCores[0]);
+
+                if (todosIguais && precosCores[0] > 0) {
+                    // Se todas têm o mesmo preço, listar cores e preço uma vez
+                    coresOrdenadas.forEach(cor => {
+                        blocoGrupo += `- ${cor.nome}\n`;
+                    });
+                    const formatoPreco = precosCores[0].toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                    blocoGrupo += `· 💰 R$ ${formatoPreco}\n`;
+                } else {
+                    // Se têm preços diferentes, mostrar cada cor com seu preço
+                    coresOrdenadas.forEach(cor => {
+                        const precoCor = cor.avista || 0;
+                        const nomeCor = cor.nome;
+                        const chaveAlteracao = key + '_COR_' + nomeCor;
+                        const alterCor = alteracoes[chaveAlteracao];
+
+                        let sinalCor = '';
+                        // Mostrar sinal de alteração
+                        if (alterCor) {
+                            if (tipo === 'completa') {
+                                // Na tabela completa, mostrar QUALQUER alteração
+                                if (Math.abs(alterCor.diferenca) > 0) {
+                                    const sinal = alterCor.diferenca > 0 ? '+' : '-';
+                                    sinalCor = ' ⚠️ ' + sinal + 'R$' + Math.abs(alterCor.diferenca).toFixed(0);
+                                }
+                            } else if (tipo === 'atualizada' && alterCor.diferenca <= -100) {
+                                // Na extração de alterações, mostrar só descidas >= 100 (PROMO)
+                                sinalCor = ' ⚠️ -R$' + Math.abs(alterCor.diferenca).toFixed(0);
+                                promoDetectadas.push({
+                                    nome: nomeDisplay,
+                                    cor: nomeCor,
+                                    diferenca: alterCor.diferenca
+                                });
+                            }
+                        }
+
+                        const formatoPrecoCor = precoCor.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                        blocoGrupo += `• ${nomeCor} · 💰 R$ ${formatoPrecoCor}${sinalCor}\n`;
+                    });
+                }
+            } else if (av) {
+                // Se não tem cores, mostrar preço base
+                const alter = alteracoes[key];
+                let sinal = '';
+
+                // Mostrar sinal de alteração
+                if (alter) {
+                    if (tipo === 'completa') {
+                        // Na tabela completa, mostrar QUALQUER alteração
+                        if (Math.abs(alter.diferenca) > 0) {
+                            const sinalTemp = alter.diferenca > 0 ? '+' : '-';
+                            sinal = ' ⚠️ ' + sinalTemp + 'R$' + Math.abs(alter.diferenca).toFixed(0);
+                        }
+                    } else if (tipo === 'atualizada' && alter.diferenca <= -100) {
+                        // Na extração de alterações, mostrar só descidas >= 100 (PROMO)
+                        sinal = ' ⚠️ -R$' + Math.abs(alter.diferenca).toFixed(0);
+                        promoDetectadas.push({
+                            nome: nomeDisplay,
+                            cor: null,
+                            diferenca: alter.diferenca
+                        });
+                    }
+                }
+
+                const valor = `💰 R$ ${av.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}${sinal}`;
+                blocoGrupo += `• ${valor}\n`;
+            }
+        });
+
+        if (temProdutosComPreco && blocoGrupo) {
+            txt += `\n*${group.title}*\n`;
+            txt += blocoGrupo;
+        }
+    });
+
+    // Resumo de alterações
+    if (tipo === 'atualizada') {
+        // Coletar TODAS as alterações para o resumo
+        let todasAlteracoes = [];
+
+        // Alterações em preços base
+        Object.entries(alteracoes).forEach(([key, alter]) => {
+            if (!key.includes('_COR_')) {
+                todasAlteracoes.push({
+                    chave: key,
+                    tipo: 'base',
+                    nome: alter.nome || key,
+                    cor: null,
+                    diferenca: alter.diferenca,
+                    isPromo: alter.diferenca <= -100
+                });
+            }
+        });
+
+        // Alterações em cores
+        Object.entries(alteracoes).forEach(([key, alter]) => {
+            if (key.includes('_COR_')) {
+                const partes = key.split('_COR_');
+                const nomeCor = partes[1];
+                const keyBase = partes[0];
+                const itemName = Object.entries(_precos).find(([k]) => k === keyBase)?.[1]?.nome || keyBase;
+
+                todasAlteracoes.push({
+                    chave: key,
+                    tipo: 'cor',
+                    nome: itemName || keyBase,
+                    cor: nomeCor,
+                    diferenca: alter.diferenca,
+                    isPromo: alter.diferenca <= -100
+                });
+            }
+        });
+
+        // Se tem alterações, mostrar resumo
+        if (todasAlteracoes.length > 0) {
+            txt += `\n═══════════════════════════\n`;
+            txt += `📊 RESUMO DE ALTERAÇÕES\n`;
+            txt += `═══════════════════════════\n\n`;
+
+            todasAlteracoes.forEach(alt => {
+                const corInfo = alt.cor ? ` - ${alt.cor}` : '';
+                const valor = Math.abs(alt.diferenca).toFixed(0);
+                const sinal = alt.diferenca > 0 ? '+' : '-';
+
+                if (alt.isPromo) {
+                    // Destacar com PROMO apenas descidas >= 100
+                    txt += `🚨 *PROMO* 🚨 ${alt.nome}${corInfo}: \`-R$${valor}\`\n`;
+                } else {
+                    // Outras alterações sem destaque especial
+                    txt += `⚠️ ${alt.nome}${corInfo}: \`${sinal}R$${valor}\`\n`;
+                }
+            });
+        }
+    }
+
+    if (tabelaVazia) {
+        txt = `❌ Nenhum produto com preço encontrado nesta categoria.\n\nDica: Certifique-se de que os produtos têm preços informados.`;
+    }
+
+    output.textContent = txt;
+    output.style.display = 'block';
+    showBanner('✅ Extração gerada com sucesso!', 'ok');
+}
+window.gerarExtracao = gerarExtracao;
+
+function copiarExtracao() {
+    const output = document.getElementById('extractOutput');
+    if (!output.textContent) {
+        showBanner('⚠️ Gere uma extração primeiro', 'err');
+        return;
+    }
+    navigator.clipboard.writeText(output.textContent).then(() => {
+        showBanner('✅ Texto copiado para a área de transferência!', 'ok');
+    }).catch(() => {
+        showBanner('❌ Erro ao copiar', 'err');
+    });
+}
+window.copiarExtracao = copiarExtracao;
+
 // Fecha modal clicando fora
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modalSenha').addEventListener('click', e => {
@@ -2959,6 +3413,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modalNovoProduto').addEventListener('click', e => {
         if (e.target === document.getElementById('modalNovoProduto')) fecharModalNovo();
     });
+
+    // Carrega histórico de preços
+    carregarHistorico();
+
     // Init sem Firebase (mostra dados default enquanto Firebase carrega)
     showBanner('Conectando ao Firebase...', 'loading');
     renderTabs();
@@ -3009,6 +3467,12 @@ window._fbSalvarPromocaoCor = async (key, nomeCor, ativo) => {
 onValue(ref(_db, 'precos'), snap => {
     const firebaseData = snap.val() || {};
     _precos = { ...DEFAULT_PRECOS, ...firebaseData };
+
+    // Se é primeira vez que carrega (histórico vazio), registra os preços atuais
+    if (Object.keys(_historicoPrecosAnterior).length === 0) {
+        salvarHistorico();
+    }
+
     renderAll();
     updateTimestamp();
     document.getElementById('syncStatus').textContent = '🔥 Firebase · online · atualizado em tempo real';
