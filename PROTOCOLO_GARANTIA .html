@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revend Eletro — Protocolo de Garantia</title>
+<meta name="description" content="Ferramenta interna Revend Eletro: preencha os pontos da avaliação e veja o protocolo a seguir.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #C0272D;
+    --red-dark: #9B1F24;
+    --red-light: #E8383F;
+    --bg: #F4F5F7;
+    --bg-white: #FFFFFF;
+    --bg-dark: #1A1D23;
+    --text-primary: #111318;
+    --text-secondary: #4A5568;
+    --text-muted: #8A94A6;
+    --border: #E2E8F0;
+    --border-dark: #CBD5E0;
+    --green: #16A34A;
+    --green-bg: #F0FDF4;
+    --amber: #D97706;
+    --amber-bg: #FFFBEB;
+    --blue: #1D4ED8;
+    --blue-bg: #EFF6FF;
+    --purple: #7C3AED;
+    --purple-bg: #F5F3FF;
+    --teal: #0F766E;
+    --teal-bg: #F0FDFA;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+    --radius-sm: 6px;
+    --radius: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--red);
+    color: white;
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(192,39,45,0.4);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left { display: flex; align-items: center; gap: 20px; }
+  .logo-area { display: flex; align-items: center; gap: 10px; }
+  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; line-height: 1; }
+  .logo-sub { font-size: 11px; opacity: 0.75; font-weight: 400; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
+  .header-title { font-size: 15px; font-weight: 600; }
+  .header-subtitle { font-size: 12px; opacity: 0.7; }
+  .header-tags { display: flex; gap: 6px; }
+  .h-tag { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 4px; color: white; text-decoration: none; transition: background 0.15s; }
+  .h-tag:hover { background: rgba(0,0,0,0.35); }
+  .h-tag.active { background: rgba(0,0,0,0.4); border-color: rgba(255,255,255,0.3); }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+  .page-header {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .page-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+  .page-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* GRID */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
+  @media (max-width: 960px) { .grid { grid-template-columns: 1fr; } }
+
+  /* CARDS */
+  .card {
+    background: var(--bg-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.15s;
+  }
+  .card:hover { box-shadow: var(--shadow); }
+  .card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 4px; }
+  .card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); margin-bottom: 12px; }
+  .card-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .card-header-row .card-title { margin-bottom: 0; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 99px; letter-spacing: 0.01em; }
+  .badge-blue { background: var(--blue-bg); color: var(--blue); }
+  .badge-green { background: var(--green-bg); color: var(--green); }
+  .badge-amber { background: var(--amber-bg); color: var(--amber); }
+  .badge-red { background: #FEF2F2; color: #DC2626; }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); }
+  .badge-teal { background: var(--teal-bg); color: var(--teal); }
+  .badge-dark { background: #F1F5F9; color: #334155; }
+
+  /* Protocol code — usa a cor da marca */
+  .protocol-code {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+    color: white;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
+    box-shadow: 0 2px 4px rgba(192,39,45,0.25);
+  }
+  .protocol-code.mini { padding: 3px 10px; font-size: 11px; }
+
+  /* FORM ELEMENTS */
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.04em; }
+  .radio-group { display: flex; gap: 8px; }
+  .radio-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    background: var(--bg-white);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .radio-btn:hover { border-color: var(--red); color: var(--red); }
+  .radio-btn.selected { background: var(--red); color: white; border-color: var(--red); box-shadow: 0 2px 4px rgba(192,39,45,0.25); }
+  .radio-btn input { display: none; }
+
+  select, input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    background: var(--bg-white);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  select:focus, input:focus, textarea:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(192,39,45,0.15);
+  }
+  select { cursor: pointer; }
+  textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+
+  /* Switch (toggle) */
+  .switch-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-white);
+    transition: all 0.15s;
+  }
+  .switch-card:hover { border-color: var(--border-dark); }
+  .switch-card.on { border-color: var(--red); background: #FEF2F2; }
+  .switch-card .sw-label { font-size: 13px; font-weight: 500; color: var(--text-primary); }
+  .switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .switch .slider { position: absolute; inset: 0; background: #CBD5E0; border-radius: 999px; transition: 0.15s; cursor: pointer; }
+  .switch .slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 2px; top: 2px; background: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: 0.15s; }
+  .switch input:checked + .slider { background: var(--red); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border-dark);
+    background: var(--bg-white);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .btn:hover { background: #F1F5F9; border-color: #94A3B8; color: var(--text-primary); }
+  .btn-primary { background: var(--red); color: white; border-color: var(--red); }
+  .btn-primary:hover { background: var(--red-dark); border-color: var(--red-dark); color: white; }
+  .btn-dark { background: var(--bg-dark); color: white; border-color: var(--bg-dark); }
+  .btn-dark:hover { background: #2D3142; border-color: #2D3142; color: white; }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-full { width: 100%; }
+
+  /* Protocol result card */
+  .protocol-card { position: sticky; top: 76px; }
+  .protocol-title { font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 6px 0 8px; line-height: 1.3; }
+  .protocol-desc { font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 14px; }
+  .steps-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 8px; }
+  ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 0; }
+  ol.steps li {
+    counter-increment: step;
+    position: relative;
+    padding: 10px 12px 10px 44px;
+    background: #F8FAFC;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-primary);
+  }
+  ol.steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--red);
+    color: white;
+    font-weight: 700;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dicas-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--teal-bg);
+    color: var(--teal);
+    border: 1px solid #99F6E4;
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dicas-btn:hover { background: #CCFBF1; }
+
+  /* Modal (Dicas & login) */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,19,24,0.65);
+    backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 200;
+    animation: fadeIn 0.15s ease-out;
+  }
+  .modal-backdrop.open { display: flex; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    max-width: 560px;
+    width: 100%;
+    max-height: 88vh;
+    overflow: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.2s ease-out;
+    position: relative;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-head {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #FEF2F2 0%, #FFFFFF 100%);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .modal-close:hover { background: #F1F5F9; color: var(--text-primary); }
+  .modal-title { font-size: 17px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+  .modal-subtitle { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+  .modal-body { padding: 16px 24px 24px; }
+
+  .dicas-section { margin-top: 18px; }
+  .dicas-section:first-child { margin-top: 0; }
+  .dicas-section h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 99px; }
+  .dicas-section.comoFalar h4 { background: var(--blue-bg); color: var(--blue); }
+  .dicas-section.duvidasComuns h4 { background: var(--purple-bg); color: var(--purple); }
+  .dicas-section.evitarProblemas h4 { background: var(--amber-bg); color: var(--amber); }
+  .dicas-section.empatia h4 { background: var(--teal-bg); color: var(--teal); }
+  .dicas-list { list-style: none; padding: 0; margin: 0; }
+  .dicas-list li {
+    position: relative;
+    padding: 8px 12px 8px 30px;
+    background: #F8FAFC;
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-primary);
+  }
+  .dicas-list li::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 15px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+
+  /* Admin */
+  .admin-actions { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .admin-card { margin-bottom: 14px; }
+  .admin-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .admin-card-head .code-badge {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, #2D3142 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .admin-card-head .code-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .dicas-editor {
+    border: 1px dashed var(--border-dark);
+    border-radius: var(--radius);
+    padding: 14px;
+    background: #FAFBFC;
+    margin-top: 10px;
+  }
+  .dicas-editor-title { font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+  .lock-icon-large { font-size: 40px; text-align: center; margin-bottom: 12px; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-dark);
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 300;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .toast.show { opacity: 1; }
+  .toast.success { background: var(--green); }
+  .toast.error { background: var(--red); }
+
+  /* Empty state / result footer */
+  .protocol-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 40px 20px;
+    font-size: 13px;
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .header-tags .h-tag:not(.admin-link) { display: none; }
+    .container { padding: 12px; }
+    .protocol-card { position: static; }
+    .site-header { padding: 0 14px; }
+    .logo-sub, .header-subtitle { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-left">
+    <div class="logo-area">
+      <div>
+        <div class="logo-text">revend</div>
+        <div class="logo-sub">Eletro</div>
+      </div>
+    </div>
+    <div class="header-divider"></div>
+    <div>
+      <div class="header-title" id="hdrTitle">Protocolo de Garantia</div>
+      <div class="header-subtitle" id="hdrSubtitle">Triagem inteligente · Atendimento consistente</div>
+    </div>
+  </div>
+  <div class="header-tags">
+    <span class="h-tag" id="tagHome" onclick="setView('home')">🏠 Início</span>
+    <span class="h-tag admin-link" id="tagAdmin" onclick="handleAdminClick()">🔒 Admin</span>
+  </div>
+</header>
+
+<div class="container" id="app"></div>
+
+<!-- Modal container -->
+<div class="modal-backdrop" id="modalRoot"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================================
+   Revend Eletro — Protocolo de Garantia (versão standalone)
+   Ferramenta interna de triagem — dados e regras isoladas neste único arquivo.
+   ========================================================================= */
+
+/* Senha admin armazenada como hash SHA-256 (não em texto claro). */
+const ADMIN_PASSWORD_HASH = "a3110a0b327fe1b0a61b178e51eadfaf4062a1614d9364a358ee72c150da989a";
+const ADMIN_SESSION_KEY = "revend.admin.session.v1";
+const OVERRIDES_KEY = "revend.protocolos.overrides.v1";
+
+async function sha256Hex(str) {
+  const buf = new TextEncoder().encode(str);
+  const hash = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+
+const DICAS_LABELS = {
+  comoFalar: "Como falar com o cliente",
+  duvidasComuns: "Dúvidas mais comuns",
+  evitarProblemas: "Como evitar problemas",
+  empatia: "Empatia e tom de voz"
+};
+const DICAS_ICON = {
+  comoFalar: "💬",
+  duvidasComuns: "❓",
+  evitarProblemas: "⚠️",
+  empatia: "🤝"
+};
+
+const DEFAULT_PROTOCOLS = {
+  APPLE: {
+    codigo: "APPLE",
+    titulo: "Garantia Apple — novo <1 ano",
+    descricao: "Aparelho novo dentro de 12 meses da compra. Atendimento via Apple.",
+    passos: [
+      "Informar o cliente sobre o envio para a Apple.",
+      "Coletar todos os dados do cliente.",
+      "Oferecer aparelho emprestado durante o reparo.",
+      "Ligar para a Apple e abrir o chamado."
+    ],
+    dicas: {
+      comoFalar: [
+        "Comece confirmando a boa notícia: o aparelho está dentro da garantia oficial Apple.",
+        "Explique que a Revend Eletro faz a ponte com a Apple — o cliente não precisa resolver sozinho.",
+        "Fale sempre em prazos aproximados dados pela Apple, nunca prometa data exata."
+      ],
+      duvidasComuns: [
+        '"Vou ficar sem celular?" → Não, oferecemos aparelho emprestado durante o reparo.',
+        '"Vou pagar algo?" → Dentro da garantia Apple, o reparo coberto não tem custo.',
+        '"Quanto tempo demora?" → Depende da Apple; passamos o prazo assim que o chamado for aberto.',
+        '"Perco meus dados?" → Oriente a fazer backup no iCloud antes de entregar o aparelho.'
+      ],
+      evitarProblemas: [
+        "Confira nota fiscal e data de compra antes de prometer a garantia Apple.",
+        "Registre o estado físico do aparelho na entrada (fotos) para evitar discussão depois.",
+        "Deixe claro por escrito as condições do aparelho emprestado."
+      ],
+      empatia: [
+        'Reconheça o incômodo: "Entendo, ninguém espera ter problema com um aparelho novo."',
+        'Mostre que você assume a condução do caso: "Pode deixar comigo que eu abro o chamado."'
+      ]
+    }
+  },
+  B1: {
+    codigo: "B1",
+    titulo: "Garantia Revend Eletro — novo 1–2 anos / seminovo >3 meses",
+    descricao: "Aparelho com garantia Revend Eletro ativa, sem nada que desclassifique para vitalícia.",
+    passos: [
+      "Confirmar tempo de compra e nota fiscal.",
+      "Abrir garantia padrão Revend Eletro para o defeito relatado.",
+      "Encaminhar ao setor técnico para diagnóstico e reparo/troca."
+    ],
+    dicas: {
+      comoFalar: [
+        "Reforce que a garantia Revend Eletro continua ativa mesmo depois da garantia Apple.",
+        "Explique o caminho: triagem → diagnóstico → resolução. O diagnóstico define o reparo.",
+        "Não antecipe o resultado do laudo técnico; fale em possibilidades."
+      ],
+      duvidasComuns: [
+        '"Não é a Apple que resolve?" → Fora dos 12 meses, quem cobre é a garantia Revend Eletro.',
+        '"Tem custo?" → Dentro da cobertura, não. Se o laudo apontar mau uso, informamos antes de qualquer cobrança.',
+        '"Quanto tempo?" → Passe o prazo médio da triagem e avise que confirmamos após o diagnóstico.'
+      ],
+      evitarProblemas: [
+        "Sempre registre o estado do aparelho na entrada.",
+        "Explique desde já o que descaracteriza a garantia (dano físico, película trincada, etc.).",
+        "Nunca prometa troca antes do diagnóstico."
+      ],
+      empatia: [
+        'Valide a frustração: "Sei que é chato passar por isso, vamos resolver juntos."',
+        'Use "nós" em vez de "você tem que": passa parceria, não cobrança.'
+      ]
+    }
+  },
+  S1: {
+    codigo: "S1",
+    titulo: "Seminovo recente (<10 dias) — celeridade",
+    descricao: "Compra muito recente. Resolução prioritária independente de película ou tipo de defeito.",
+    passos: [
+      "Verificar estoque de aparelho idêntico → trocar de imediato.",
+      "Se houver aparelho parecido → oferecer com diferença de valor.",
+      "Se não houver → solicitar outro e encaminhar o atual ao setor técnico (cliente pode seguir usando se for algo simples)."
+    ],
+    dicas: {
+      comoFalar: [
+        "Tom rápido e resolutivo: compra recente merece agilidade, deixe isso explícito.",
+        "Ofereça as opções na ordem: troca idêntica → similar com diferença → pedido de outro aparelho.",
+        "Se for algo simples, sugira que o cliente siga usando enquanto o outro não chega."
+      ],
+      duvidasComuns: [
+        '"Posso pedir o dinheiro de volta?" → Priorize a troca; direito de arrependimento só até 7 dias em compra online.',
+        '"O aparelho similar é pior?" → Explique diferenças e o valor exato da diferença, sem enrolar.',
+        '"Vou ficar sem celular?" → Não, é isso que estamos evitando com a troca imediata.'
+      ],
+      evitarProblemas: [
+        "Confira o estoque ANTES de prometer troca imediata.",
+        "Registre por escrito o modelo entregue e o devolvido, com IMEI.",
+        "Nunca fale valores de diferença 'por cima' — confirme o preço atual."
+      ],
+      empatia: [
+        '"Comprou faz poucos dias, então isso a gente resolve rápido."',
+        "Agradeça a confiança: cliente novo com problema é o momento mais sensível da relação."
+      ]
+    }
+  },
+  S2: {
+    codigo: "S2",
+    titulo: "Seminovo 10–30 dias — celeridade com checagem de estoque",
+    descricao: "Mesma lógica do <10 dias, mas com checagem interna do tempo de compra junto ao fornecedor antes de prometer troca.",
+    passos: [
+      "Se houver modelo idêntico em estoque → oferecer troca imediata.",
+      "Checar internamente (NÃO expor ao cliente) há quanto tempo compramos esse aparelho do fornecedor.",
+      "Se compramos do fornecedor há menos de 30 dias → informar o cliente que será solicitado outro aparelho para troca.",
+      "Se compramos do fornecedor há mais de 30 dias → informar o cliente que seguirá o procedimento padrão: triagem → diagnóstico → resolução."
+    ],
+    dicas: {
+      comoFalar: [
+        "Nunca mencione fornecedor, prazo de compra interna ou custos da loja — isso é informação interna.",
+        "Peça um instante para 'verificar a disponibilidade' enquanto faz a checagem interna.",
+        "Só prometa troca depois de confirmar estoque ou o prazo com o fornecedor."
+      ],
+      duvidasComuns: [
+        '"Vocês vão trocar ou consertar?" → Depende da disponibilidade; explique que verifica e retorna.',
+        '"Por que não é na hora?" → Se não houver modelo idêntico, explique o fluxo de triagem sem detalhes internos.',
+        '"Quanto tempo leva a triagem?" → Dê o prazo padrão da loja e confirme por WhatsApp depois.'
+      ],
+      evitarProblemas: [
+        "Não diga 'vou pedir outro' antes de checar o prazo com o fornecedor.",
+        "Registre estado físico e IMEI na entrada.",
+        "Combine um canal e um horário de retorno — silêncio gera reclamação."
+      ],
+      empatia: [
+        '"Vou verificar aqui a melhor forma de resolver isso pra você o mais rápido possível."',
+        "Evite jargão técnico; explique o processo em passos simples."
+      ]
+    }
+  },
+  ATV: {
+    codigo: "ATV",
+    titulo: "Assistência Técnica Vitalícia",
+    descricao: "Garantia padrão não se aplica. Cliente é encaminhado ao benefício de Assistência Técnica Vitalícia Revend Eletro.",
+    passos: [
+      "Relembrar o cliente do benefício de Assistência Técnica Vitalícia.",
+      "Informar que o aparelho irá para os técnicos e, se for algo simples, pode nem ter custo.",
+      "Já adiantar custo e prazo do reparo mais provável."
+    ],
+    dicas: {
+      comoFalar: [
+        "Nunca comece com 'a garantia não cobre'. Comece pelo benefício: assistência técnica vitalícia.",
+        "Explique com naturalidade por que o caso saiu da garantia (dano físico, película trincada, tempo de compra).",
+        "Adiante custo estimado e prazo do reparo mais provável — clareza evita frustração depois."
+      ],
+      duvidasComuns: [
+        '"Mas eu tenho garantia!" → Explique que dano físico/impacto descaracteriza a cobertura, e apresente a vitalícia.',
+        '"Vou pagar quanto?" → Dê a faixa do reparo mais provável e diga que o valor final vem no orçamento.',
+        '"E se eu não quiser consertar?" → Devolvemos o aparelho sem custo de diagnóstico.',
+        '"Isso é vitalício mesmo?" → Sim, é benefício de quem comprou conosco, para sempre.'
+      ],
+      evitarProblemas: [
+        "Mostre a evidência do dano ao cliente (tela, traseira, lateral) com calma, sem tom acusatório.",
+        "Nunca aprove reparo sem o cliente confirmar o orçamento.",
+        "Registre tudo por escrito: estado do aparelho, valor estimado, prazo."
+      ],
+      empatia: [
+        '"Sei que não é a resposta que você esperava, mas você tem um benefício que poucos têm."',
+        "Evite culpar o cliente. Fale do dano, não de quem causou.",
+        "Ofereça alternativa: reparo, avaliação para troca ou orçamento sem compromisso."
+      ]
+    }
+  },
+  INDEFINIDO: {
+    codigo: "—",
+    titulo: "Caso ainda não mapeado",
+    descricao: "Esta combinação de respostas ainda não tem protocolo definido. Encaminhar para revisão manual.",
+    passos: [
+      "Registrar o caso e enviar para o supervisor mapear a regra."
+    ],
+    dicas: {
+      comoFalar: [
+        "Não invente resposta. Diga que vai confirmar o procedimento e retorna com uma posição."
+      ],
+      duvidasComuns: [
+        '"Vocês não sabem?" → "Quero te dar a resposta certa, por isso vou confirmar internamente."'
+      ],
+      evitarProblemas: [
+        "Nunca prometa troca, prazo ou isenção antes da confirmação do supervisor.",
+        "Registre todos os dados do caso para o mapeamento da regra."
+      ],
+      empatia: [
+        "Combine um prazo curto de retorno e cumpra."
+      ]
+    }
+  }
+};
+
+const CAMPO_LABELS = {
+  condicao: "Condição na compra",
+  tempoNovo: "Tempo de compra",
+  tempoSeminovo: "Tempo de compra",
+  telaQuebrada: "Tela quebrada?",
+  traseiraQuebrada: "Traseira quebrada?",
+  impactoLaterais: "Impacto nas laterais?",
+  peliculaTrincada: "Película trincada/quebrada?",
+  defeitoTela: "Defeito relacionado à tela?",
+  cameraDanificada: "Câmera tremendo / danificada?"
+};
+
+const OPCOES_PELICULA = [
+  { value: "nao",    label: "Não" },
+  { value: "pequeno", label: "Trincado pequeno" },
+  { value: "grande",  label: "Trincado grande / quebrado" }
+];
+const OPCOES_TEMPO_NOVO = [
+  { value: "<1ano",   label: "Menos de 1 ano" },
+  { value: "1-2anos", label: "Entre 1 e 2 anos" },
+  { value: ">2anos",  label: "Mais de 2 anos" }
+];
+const OPCOES_TEMPO_SEMINOVO = [
+  { value: "<10dias",   label: "Menos de 10 dias" },
+  { value: "10-30dias", label: "Entre 10 e 30 dias" },
+  { value: "1-3meses",  label: "Entre 1 e 3 meses" },
+  { value: "3-12meses", label: "Entre 3 e 12 meses" },
+  { value: ">1ano",     label: "Mais de 1 ano" }
+];
+
+/* Overrides via localStorage */
+function readOverrides() {
+  try { const raw = localStorage.getItem(OVERRIDES_KEY); return raw ? JSON.parse(raw) : {}; }
+  catch { return {}; }
+}
+function saveOverrides(obj) { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(obj)); }
+function clearOverrides() { localStorage.removeItem(OVERRIDES_KEY); }
+function getProtocols() { return { ...DEFAULT_PROTOCOLS, ...readOverrides() }; }
+
+/* Decisão (portada do bundle original) */
+function decideProtocol(state) {
+  const P = getProtocols();
+  const impactoFisico = state.telaQuebrada || state.traseiraQuebrada || state.impactoLaterais;
+  const peliculaComProblema = state.peliculaTrincada !== "nao";
+
+  if (impactoFisico) return P.ATV;
+
+  if (state.condicao === "novo") {
+    const t = state.tempoNovo;
+    if (t === ">2anos") return P.ATV;
+    if (t === "<1ano")  return P.APPLE;
+    if (t === "1-2anos") {
+      if (peliculaComProblema || state.cameraDanificada || state.defeitoTela) return P.ATV;
+      return P.B1;
+    }
+    return P.INDEFINIDO;
+  }
+
+  const t = state.tempoSeminovo;
+  if (t === ">1ano")   return P.ATV;
+  if (t === "<10dias") return P.S1;
+  if (t === "10-30dias") {
+    if (state.peliculaTrincada === "grande" && (state.defeitoTela || state.cameraDanificada)) return P.ATV;
+    return P.S2;
+  }
+  if (t === "1-3meses")  return P.S2;
+  if (t === "3-12meses") {
+    if (peliculaComProblema || state.cameraDanificada || state.defeitoTela) return P.ATV;
+    return P.B1;
+  }
+  return P.INDEFINIDO;
+}
+
+/* Helpers */
+function el(tag, attrs = {}, children = []) {
+  const n = document.createElement(tag);
+  for (const k in attrs) {
+    const v = attrs[k];
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2).toLowerCase(), v);
+    else if (v !== undefined && v !== null && v !== false) n.setAttribute(k, v);
+  }
+  (Array.isArray(children) ? children : [children]).forEach(c => {
+    if (c == null || c === false) return;
+    n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  });
+  return n;
+}
+function toast(msg, kind) {
+  const t = document.getElementById("toast");
+  t.className = "toast" + (kind ? " " + kind : "");
+  t.textContent = msg;
+  requestAnimationFrame(() => t.classList.add("show"));
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+function deepClone(o) { return JSON.parse(JSON.stringify(o)); }
+
+/* Rota — usa estado em memória + hash opcional (#admin).
+   Sem pushState: funciona em qualquer subpath (GitHub Pages, subdiretório, file://). */
+let currentView = "home"; // 'home' | 'admin'
+
+function readHash() { return location.hash === "#admin" ? "admin" : "home"; }
+function setView(view, syncHash = true) {
+  currentView = view;
+  if (syncHash) {
+    const desired = view === "admin" ? "#admin" : "";
+    if ((location.hash || "") !== desired) {
+      const url = location.pathname + location.search + desired;
+      history.replaceState(null, "", url);
+    }
+  }
+  render();
+}
+window.addEventListener("hashchange", () => {
+  const target = readHash();
+  if (target === "admin" && !isAuthed()) { showLogin(() => setView("admin")); return; }
+  setView(target, false);
+});
+
+/* Header state */
+function updateHeader() {
+  const isAdmin = currentView === "admin";
+  document.getElementById("hdrTitle").textContent = isAdmin ? "Administração" : "Protocolo de Garantia";
+  document.getElementById("hdrSubtitle").textContent = isAdmin ? "Edite os protocolos e as dicas de atendimento" : "Triagem inteligente · Atendimento consistente";
+  document.getElementById("tagHome").classList.toggle("active", !isAdmin);
+  document.getElementById("tagAdmin").classList.toggle("active", isAdmin);
+  document.getElementById("tagAdmin").innerHTML = isAdmin ? "🔒 Admin (ativo)" : "🔒 Admin";
+}
+
+/* Login / auth */
+function isAuthed() { return sessionStorage.getItem(ADMIN_SESSION_KEY) === "ok"; }
+function logout() { sessionStorage.removeItem(ADMIN_SESSION_KEY); setView("home"); toast("Sessão de admin encerrada"); }
+
+function handleAdminClick() {
+  if (currentView === "admin") { setView("home"); return; }
+  if (isAuthed()) { setView("admin"); return; }
+  showLogin(() => setView("admin"));
+}
+
+function showLogin(onSuccess) {
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = "";
+  const modal = el("div", { class: "modal", style: "max-width:400px" });
+  modal.appendChild(el("button", { class: "modal-close", onclick: closeModal, "aria-label": "Fechar" }, "×"));
+  const head = el("div", { class: "modal-head" }, [
+    el("div", { class: "lock-icon-large" }, "🔒"),
+    el("div", { class: "modal-title", style: "justify-content:center; text-align:center; display:block" }, "Área Administrativa"),
+    el("div", { class: "modal-subtitle", style: "text-align:center" }, "Informe a senha para continuar")
+  ]);
+  modal.appendChild(head);
+
+  const body = el("div", { class: "modal-body" });
+  const err = el("div", { class: "badge badge-red", style: "display:none; margin-bottom:10px" }, "Senha incorreta");
+  const input = el("input", { type: "password", placeholder: "Senha", autofocus: true });
+  const submit = async () => {
+    const hash = await sha256Hex(input.value);
+    if (hash === ADMIN_PASSWORD_HASH) {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, "ok");
+      closeModal();
+      toast("Acesso liberado", "success");
+      onSuccess && onSuccess();
+    } else {
+      err.style.display = "inline-flex";
+      input.value = "";
+      input.focus();
+      toast("Senha incorreta", "error");
+    }
+  };
+  input.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+  body.appendChild(err);
+  body.appendChild(el("div", { class: "field" }, [
+    el("label", { class: "field-label" }, "Senha"),
+    input
+  ]));
+  body.appendChild(el("div", { style: "display:flex; gap:8px; margin-top:12px" }, [
+    el("button", { class: "btn btn-full", onclick: closeModal }, "Cancelar"),
+    el("button", { class: "btn btn-primary btn-full", onclick: submit }, "Entrar")
+  ]));
+  modal.appendChild(body);
+  root.appendChild(modal);
+  root.classList.add("open");
+  setTimeout(() => input.focus(), 100);
+}
+
+function closeModal() {
+  const root = document.getElementById("modalRoot");
+  root.classList.remove("open");
+  root.innerHTML = "";
+}
+document.getElementById("modalRoot").addEventListener("click", e => {
+  if (e.target.id === "modalRoot") closeModal();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/* Estado do formulário */
+const initialForm = {
+  condicao: "novo",
+  tempoNovo: "<1ano",
+  tempoSeminovo: "<10dias",
+  peliculaTrincada: "nao",
+  telaQuebrada: false,
+  traseiraQuebrada: false,
+  impactoLaterais: false,
+  defeitoTela: false,
+  cameraDanificada: false
+};
+let form = { ...initialForm };
+
+/* ============== Home ============== */
+function renderHome(root) {
+  root.appendChild(el("div", { class: "page-header" }, [
+    el("div", {}, [
+      el("div", { class: "page-title" }, "🛡️ Triagem de Garantia"),
+      el("div", { class: "page-desc" }, "Preencha os pontos da avaliação. O protocolo aparece em tempo real ao lado.")
+    ]),
+    el("span", { class: "badge badge-red" }, "Uso interno")
+  ]));
+
+  const grid = el("div", { class: "grid" });
+  root.appendChild(grid);
+
+  // ------- Coluna esquerda: avaliação -------
+  const formCard = el("div", { class: "card" });
+  grid.appendChild(formCard);
+  formCard.appendChild(el("div", { class: "card-header-row" }, [
+    el("div", {}, [
+      el("div", { class: "card-label" }, "Etapa 1"),
+      el("div", { class: "card-title" }, "📋 Avaliação do aparelho")
+    ]),
+    el("button", { class: "btn btn-sm", onclick: () => { form = { ...initialForm }; render(); toast("Formulário limpo"); } }, "↺ Limpar")
+  ]));
+
+  // Condição na compra (radio-buttons)
+  formCard.appendChild(el("div", { class: "field" }, [
+    el("label", { class: "field-label" }, CAMPO_LABELS.condicao),
+    el("div", { class: "radio-group" }, [
+      radioBtn("condicao", "novo", "✨ Novo"),
+      radioBtn("condicao", "seminovo", "♻️ Seminovo")
+    ])
+  ]));
+
+  // Tempo (depende da condição)
+  const tempoField = el("div", { class: "field" });
+  formCard.appendChild(tempoField);
+  function renderTempoField() {
+    tempoField.innerHTML = "";
+    const isNovo = form.condicao === "novo";
+    const key = isNovo ? "tempoNovo" : "tempoSeminovo";
+    const opts = isNovo ? OPCOES_TEMPO_NOVO : OPCOES_TEMPO_SEMINOVO;
+    tempoField.appendChild(el("label", { class: "field-label", for: "sel-" + key }, "⏱ " + CAMPO_LABELS[key]));
+    tempoField.appendChild(selectField("sel-" + key, key, opts));
+  }
+  renderTempoField();
+
+  // Película
+  formCard.appendChild(el("div", { class: "field" }, [
+    el("label", { class: "field-label", for: "sel-pelicula" }, "🛡 " + CAMPO_LABELS.peliculaTrincada),
+    selectField("sel-pelicula", "peliculaTrincada", OPCOES_PELICULA)
+  ]));
+
+  // Bloco de danos (switches)
+  formCard.appendChild(el("div", { class: "card-label", style: "margin-top:14px" }, "Checagem de danos"));
+  const switchWrap = el("div", { style: "display:flex; flex-direction:column; gap:8px" });
+  formCard.appendChild(switchWrap);
+  ["telaQuebrada","traseiraQuebrada","impactoLaterais","defeitoTela","cameraDanificada"].forEach(k => {
+    switchWrap.appendChild(switchField(k, CAMPO_LABELS[k]));
+  });
+
+  // ------- Coluna direita: protocolo -------
+  const protoWrap = el("div");
+  grid.appendChild(protoWrap);
+  const protoCard = el("div", { class: "card protocol-card" });
+  protoWrap.appendChild(protoCard);
+  renderProtocol(protoCard);
+}
+
+function radioBtn(name, value, label) {
+  const selected = form[name] === value;
+  const btn = el("label", { class: "radio-btn" + (selected ? " selected" : "") }, [
+    el("input", { type: "radio", name, value, checked: selected }),
+    el("span", {}, label)
+  ]);
+  btn.addEventListener("click", (e) => {
+    e.preventDefault();
+    form[name] = value;
+    render();
+  });
+  return btn;
+}
+
+function selectField(id, key, options) {
+  const sel = el("select", { id, onchange: e => { form[key] = e.target.value; renderProtocolOnly(); } });
+  options.forEach(o => sel.appendChild(el("option", { value: o.value, selected: form[key] === o.value }, o.label)));
+  return sel;
+}
+
+function switchField(key, label) {
+  const on = !!form[key];
+  const wrap = el("div", { class: "switch-card" + (on ? " on" : "") });
+  wrap.appendChild(el("span", { class: "sw-label" }, label));
+  const sw = el("label", { class: "switch" });
+  const input = el("input", { type: "checkbox", checked: on });
+  sw.appendChild(input);
+  sw.appendChild(el("span", { class: "slider" }));
+  wrap.appendChild(sw);
+  input.addEventListener("change", () => {
+    form[key] = input.checked;
+    renderProtocolOnly();
+    wrap.classList.toggle("on", input.checked);
+  });
+  return wrap;
+}
+
+function renderProtocolOnly() {
+  const card = document.querySelector(".protocol-card");
+  if (card) renderProtocol(card);
+}
+
+/* Cor do badge conforme o protocolo (Apple = azul, Revend = vermelho, S1/S2 = âmbar, ATV = roxo escuro, indefinido = cinza) */
+function badgeClassFor(codigo) {
+  switch (codigo) {
+    case "APPLE": return "badge badge-blue";
+    case "B1":    return "badge badge-red";
+    case "S1":    return "badge badge-amber";
+    case "S2":    return "badge badge-amber";
+    case "ATV":   return "badge badge-purple";
+    default:      return "badge badge-dark";
+  }
+}
+
+function renderProtocol(card) {
+  card.innerHTML = "";
+  const p = decideProtocol(form);
+
+  card.appendChild(el("div", { class: "card-header-row" }, [
+    el("div", {}, [
+      el("div", { class: "card-label" }, "Resultado da triagem"),
+      el("div", { class: "card-title" }, "🎯 Protocolo indicado")
+    ]),
+    el("div", { style: "display:flex; gap:8px; align-items:center" }, [
+      el("button", { class: "dicas-btn", onclick: () => openDicas(p) }, [
+        el("span", {}, "💡"), el("span", {}, "Dicas")
+      ]),
+      el("span", { class: "protocol-code" }, p.codigo)
+    ])
+  ]));
+
+  card.appendChild(el("div", { class: badgeClassFor(p.codigo), style: "margin-bottom:8px" }, "PROTOCOLO " + p.codigo));
+  card.appendChild(el("h2", { class: "protocol-title" }, p.titulo));
+  card.appendChild(el("p", { class: "protocol-desc" }, p.descricao));
+
+  card.appendChild(el("div", { class: "steps-title" }, "📌 Passos a seguir"));
+  const ol = el("ol", { class: "steps" });
+  p.passos.forEach(step => ol.appendChild(el("li", {}, step)));
+  card.appendChild(ol);
+}
+
+/* ============== Dicas Modal ============== */
+function openDicas(p) {
+  const root = document.getElementById("modalRoot");
+  root.innerHTML = "";
+  const modal = el("div", { class: "modal" });
+  modal.appendChild(el("button", { class: "modal-close", onclick: closeModal, "aria-label": "Fechar" }, "×"));
+
+  const head = el("div", { class: "modal-head" }, [
+    el("div", { class: "modal-title" }, [
+      el("span", {}, "💡"),
+      el("span", {}, "Dicas de atendimento")
+    ]),
+    el("div", { style: "display:flex; align-items:center; gap:8px; margin-top:6px" }, [
+      el("span", { class: "protocol-code mini" }, p.codigo),
+      el("span", { class: "modal-subtitle", style: "margin:0" }, p.titulo)
+    ])
+  ]);
+  modal.appendChild(head);
+
+  const body = el("div", { class: "modal-body" });
+  Object.keys(DICAS_LABELS).forEach(k => {
+    const items = (p.dicas && p.dicas[k]) || [];
+    if (!items.length) return;
+    const section = el("div", { class: "dicas-section " + k });
+    section.appendChild(el("h4", {}, [
+      el("span", {}, DICAS_ICON[k]),
+      el("span", {}, DICAS_LABELS[k])
+    ]));
+    const ul = el("ul", { class: "dicas-list" });
+    items.forEach(i => ul.appendChild(el("li", {}, i)));
+    section.appendChild(ul);
+    body.appendChild(section);
+  });
+  modal.appendChild(body);
+  root.appendChild(modal);
+  root.classList.add("open");
+}
+
+/* ============== Admin ============== */
+function renderAdmin(root) {
+  if (!isAuthed()) {
+    root.appendChild(el("div", { class: "page-header" }, [
+      el("div", {}, [
+        el("div", { class: "page-title" }, "🔒 Acesso restrito"),
+        el("div", { class: "page-desc" }, "Área administrativa protegida por senha.")
+      ])
+    ]));
+    const card = el("div", { class: "card", style: "text-align:center; padding: 40px" });
+    card.appendChild(el("div", { class: "lock-icon-large" }, "🔒"));
+    card.appendChild(el("h3", { style: "font-size:16px; margin-bottom:8px" }, "Você precisa fazer login para acessar esta área"));
+    card.appendChild(el("p", { style: "color: var(--text-muted); font-size:13px; margin-bottom:16px" }, "Somente supervisores autorizados."));
+    card.appendChild(el("button", { class: "btn btn-primary", onclick: () => showLogin(() => render()) }, "Fazer login"));
+    root.appendChild(card);
+    return;
+  }
+
+  const overrides = readOverrides();
+  const editing = {};
+  Object.keys(DEFAULT_PROTOCOLS).forEach(k => {
+    editing[k] = deepClone({ ...DEFAULT_PROTOCOLS[k], ...(overrides[k] || {}) });
+  });
+
+  root.appendChild(el("div", { class: "page-header" }, [
+    el("div", {}, [
+      el("div", { class: "page-title" }, "⚙️ Admin — Protocolos"),
+      el("div", { class: "page-desc" }, "Edite título, descrição, passos e dicas. Alterações ficam salvas neste navegador.")
+    ]),
+    el("span", { class: "badge badge-green" }, "🔓 Autenticado")
+  ]));
+
+  root.appendChild(el("div", { class: "admin-actions" }, [
+    el("button", { class: "btn btn-primary", onclick: () => {
+      const out = {};
+      Object.keys(editing).forEach(k => {
+        if (JSON.stringify(editing[k]) !== JSON.stringify(DEFAULT_PROTOCOLS[k])) out[k] = editing[k];
+      });
+      saveOverrides(out);
+      toast("Alterações salvas", "success");
+    }}, "💾 Salvar alterações"),
+    el("button", { class: "btn", onclick: () => {
+      if (confirm("Restaurar todos os protocolos ao padrão? Isto apaga suas edições.")) {
+        clearOverrides();
+        render();
+        toast("Padrão restaurado", "success");
+      }
+    }}, "↻ Restaurar padrão"),
+    el("button", { class: "btn btn-dark", onclick: logout }, "🚪 Sair")
+  ]));
+
+  Object.keys(editing).forEach(key => {
+    const p = editing[key];
+    const card = el("div", { class: "card admin-card" });
+    root.appendChild(card);
+
+    card.appendChild(el("div", { class: "admin-card-head" }, [
+      el("span", { class: "code-badge" }, key),
+      el("span", { class: "code-title" }, p.titulo || key)
+    ]));
+
+    card.appendChild(fieldText("Código exibido", p.codigo, v => p.codigo = v));
+    card.appendChild(fieldText("Título", p.titulo, v => p.titulo = v));
+    card.appendChild(fieldArea("Descrição", p.descricao, v => p.descricao = v));
+    card.appendChild(fieldLines("Passos (um por linha)", p.passos, v => p.passos = v));
+
+    const dicasBlock = el("div", { class: "dicas-editor" });
+    dicasBlock.appendChild(el("div", { class: "dicas-editor-title" }, "💡 Dicas de atendimento (uma por linha)"));
+    Object.keys(DICAS_LABELS).forEach(dk => {
+      dicasBlock.appendChild(fieldLines(DICAS_LABELS[dk], p.dicas[dk] || [], v => { p.dicas[dk] = v; }));
+    });
+    card.appendChild(dicasBlock);
+  });
+}
+function fieldText(label, value, onChange) {
+  return el("div", { class: "field" }, [
+    el("label", { class: "field-label" }, label),
+    el("input", { type: "text", value: value || "", oninput: e => onChange(e.target.value) })
+  ]);
+}
+function fieldArea(label, value, onChange) {
+  const ta = el("textarea", { rows: 2, oninput: e => onChange(e.target.value) });
+  ta.value = value || "";
+  return el("div", { class: "field" }, [ el("label", { class: "field-label" }, label), ta ]);
+}
+function fieldLines(label, arr, onChange) {
+  const ta = el("textarea", { rows: Math.max(3, (arr || []).length + 1), oninput: e => onChange(e.target.value.split(/\r?\n/).filter(Boolean)) });
+  ta.value = (arr || []).join("\n");
+  return el("div", { class: "field" }, [ el("label", { class: "field-label" }, label), ta ]);
+}
+
+/* Render principal */
+function render() {
+  const root = document.getElementById("app");
+  root.innerHTML = "";
+  updateHeader();
+  if (currentView === "admin") renderAdmin(root);
+  else renderHome(root);
+}
+
+/* Boot: se abriu com #admin já autenticado, vai direto; senão volta pra home */
+if (readHash() === "admin" && isAuthed()) currentView = "admin";
+render();
+</script>
+</body>
+</html>
