@@ -1,1700 +1,2569 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Script de Atendimento — Revend Eletro</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revend Coach Pro - Sistema Inteligente de Vendas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red: #C0272D;
+      --red-dark: #9B1F24;
+      --bg: #F4F5F7;
+      --bg-white: #FFFFFF;
+      --text-primary: #111318;
+      --text-secondary: #4A5568;
+      --text-muted: #8A94A6;
+      --border: #E2E8F0;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --blue: #1D4ED8;
+      --blue-bg: #EFF6FF;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+    }
 
-  :root {
-    --red: #C0272D;
-    --red-dark: #9B1F24;
-    --red-light: #E8383F;
-    --bg: #F4F5F7;
-    --bg-white: #FFFFFF;
-    --bg-dark: #1A1D23;
-    --text-primary: #111318;
-    --text-secondary: #4A5568;
-    --text-muted: #8A94A6;
-    --border: #E2E8F0;
-    --border-dark: #CBD5E0;
-    --green: #16A34A;
-    --green-bg: #F0FDF4;
-    --amber: #D97706;
-    --amber-bg: #FFFBEB;
-    --blue: #1D4ED8;
-    --blue-bg: #EFF6FF;
-    --purple: #7C3AED;
-    --purple-bg: #F5F3FF;
-    --teal: #0F766E;
-    --teal-bg: #F0FDFA;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
-    --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
-    --radius-sm: 6px;
-    --radius: 8px;
-    --radius-lg: 12px;
-    --radius-xl: 16px;
-  }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      overflow: hidden;
+    }
 
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: var(--bg);
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.5;
-    min-height: 100vh;
-  }
+    .container { display: flex; height: 100vh; flex-direction: column; }
 
-  /* HEADER */
-  .site-header {
-    background: var(--red);
-    color: white;
-    padding: 0 24px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 2px 8px rgba(192,39,45,0.4);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .header-left { display: flex; align-items: center; gap: 20px; }
-  .logo-area { display: flex; align-items: center; gap: 10px; }
-  .logo-text { font-size: 18px; font-weight: 700; letter-spacing: -0.3px; }
-  .logo-sub { font-size: 11px; opacity: 0.75; font-weight: 400; }
-  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.2); }
-  .header-title { font-size: 15px; font-weight: 600; }
-  .header-subtitle { font-size: 12px; opacity: 0.7; }
-  .header-tags { display: flex; gap: 6px; }
-  .h-tag { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.15); border-radius: 99px; padding: 3px 10px; font-size: 11px; font-weight: 500; cursor: default; display: flex; align-items: center; gap: 4px; }
-
-  /* LAYOUT */
-  .app-body { display: flex; min-height: calc(100vh - 56px); }
-
-  /* SIDEBAR */
-  .sidebar {
-    width: 220px;
-    min-width: 220px;
-    background: var(--bg-dark);
-    padding: 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .sidebar-label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #4A5568;
-    padding: 10px 10px 6px;
-  }
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: var(--radius);
-    cursor: pointer;
-    color: #94A3B8;
-    font-size: 13px;
-    font-weight: 500;
-    transition: all 0.15s;
-    border: none;
-    background: none;
-    text-align: left;
-    width: 100%;
-  }
-  .nav-item:hover { background: rgba(255,255,255,0.06); color: #E2E8F0; }
-  .nav-item.active { background: var(--red); color: #fff; }
-  .nav-item.active .nav-num { background: rgba(255,255,255,0.2); color: #fff; }
-  .nav-num {
-    font-size: 10px;
-    font-weight: 700;
-    background: rgba(255,255,255,0.08);
-    color: #64748B;
-    border-radius: 4px;
-    padding: 2px 5px;
-    min-width: 20px;
-    text-align: center;
-  }
-  .nav-icon { font-size: 14px; width: 18px; text-align: center; }
-
-  /* MAIN */
-  .main { flex: 1; overflow-y: auto; padding: 24px; }
-
-  .page-header {
-    background: var(--bg-white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 16px 20px;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: var(--shadow-sm);
-  }
-  .page-title { font-size: 16px; font-weight: 700; color: var(--text-primary); }
-  .page-desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
-  .stage-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 99px;
-    letter-spacing: 0.02em;
-  }
-
-  /* SECTION */
-  .section { display: none; }
-  .section.active { display: block; }
-
-  /* CARDS */
-  .card {
-    background: var(--bg-white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    margin-bottom: 12px;
-    box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.15s;
-  }
-  .card:hover { box-shadow: var(--shadow); }
-
-  .card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-  .card-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-  }
-  .card-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
-  .card-body { font-size: 13px; color: var(--text-secondary); line-height: 1.65; }
-
-  /* BADGES */
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    padding: 3px 9px;
-    border-radius: 99px;
-    letter-spacing: 0.01em;
-  }
-  .badge-blue { background: var(--blue-bg); color: var(--blue); }
-  .badge-green { background: var(--green-bg); color: var(--green); }
-  .badge-amber { background: var(--amber-bg); color: var(--amber); }
-  .badge-red { background: #FEF2F2; color: #DC2626; }
-  .badge-purple { background: var(--purple-bg); color: var(--purple); }
-  .badge-teal { background: var(--teal-bg); color: var(--teal); }
-  .badge-dark { background: #F1F5F9; color: #334155; }
-
-  /* MESSAGE BOX */
-  .msg-wrap { margin: 12px 0 8px; }
-  .msg-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
-  .msg-box {
-    background: #F8FAFC;
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--red);
-    border-radius: 0 var(--radius) var(--radius) 0;
-    padding: 12px 15px;
-    font-size: 13px;
-    color: var(--text-primary);
-    line-height: 1.7;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-  .msg-box.blue-border { border-left-color: var(--blue); }
-  .msg-box.green-border { border-left-color: var(--green); }
-  .msg-box.amber-border { border-left-color: var(--amber); }
-  .msg-box.purple-border { border-left-color: var(--purple); }
-
-  .copy-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 8px;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 5px 12px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border-dark);
-    background: var(--bg-white);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-  .copy-btn:hover { background: #F1F5F9; border-color: #94A3B8; }
-  .copy-btn.copied { color: var(--green); border-color: #86EFAC; background: var(--green-bg); }
-
-  /* TIP / ALERT */
-  .tip {
-    display: flex;
-    gap: 8px;
-    background: #FFFBEB;
-    border: 1px solid #FDE68A;
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    font-size: 12px;
-    color: #92400E;
-    line-height: 1.5;
-    margin: 10px 0;
-  }
-  .tip-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-
-  .alert-red {
-    display: flex;
-    gap: 8px;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    font-size: 12px;
-    color: #7F1D1D;
-    line-height: 1.5;
-    margin: 10px 0;
-  }
-
-  .alert-green {
-    display: flex;
-    gap: 8px;
-    background: var(--green-bg);
-    border: 1px solid #86EFAC;
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    font-size: 12px;
-    color: #14532D;
-    line-height: 1.5;
-    margin: 10px 0;
-  }
-
-  .alert-blue {
-    display: flex;
-    gap: 8px;
-    background: var(--blue-bg);
-    border: 1px solid #BFDBFE;
-    border-radius: var(--radius);
-    padding: 10px 13px;
-    font-size: 12px;
-    color: #1E3A8A;
-    line-height: 1.5;
-    margin: 10px 0;
-  }
-
-  /* GRID */
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
-  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 10px 0; }
-  .grid-cell {
-    background: #F8FAFC;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px;
-  }
-  .grid-cell-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-  .grid-cell-body { font-size: 13px; color: var(--text-primary); line-height: 1.5; }
-
-  /* FUNNEL TIMELINE */
-  .timeline { margin: 10px 0; }
-  .tl-item { display: flex; gap: 12px; margin-bottom: 10px; }
-  .tl-left { display: flex; flex-direction: column; align-items: center; }
-  .tl-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-  .tl-line { width: 2px; background: var(--border); flex: 1; margin: 2px auto; min-height: 16px; }
-  .tl-content { flex: 1; padding-bottom: 6px; }
-  .tl-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-  .tl-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
-
-  /* OBJECTION DECISION TREE */
-  .decision-box {
-    background: linear-gradient(135deg, #1A1D23 0%, #2D3142 100%);
-    border-radius: var(--radius-lg);
-    padding: 16px 18px;
-    margin: 10px 0;
-    color: white;
-  }
-  .decision-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; color: #F1F5F9; }
-  .decision-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px; }
-  .decision-key { background: var(--red); color: white; border-radius: 4px; padding: 2px 8px; font-weight: 700; font-size: 11px; white-space: nowrap; flex-shrink: 0; margin-top: 1px; height: fit-content; }
-  .decision-val { color: #CBD5E0; line-height: 1.5; }
-
-  /* STATS ROW */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .stat-card {
-    background: var(--bg-white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: 12px 15px;
-    box-shadow: var(--shadow-sm);
-  }
-  .stat-label { font-size: 10px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-  .stat-val { font-size: 22px; font-weight: 700; line-height: 1; }
-  .stat-val.red { color: var(--red); }
-  .stat-val.green { color: var(--green); }
-  .stat-val.amber { color: var(--amber); }
-  .stat-val.blue { color: var(--blue); }
-
-  /* DIVIDER */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
-
-  /* URGENCY BANNER */
-  .urgency-banner {
-    background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
-    border-radius: var(--radius-lg);
-    padding: 14px 18px;
-    color: white;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .urgency-icon { font-size: 22px; }
-  .urgency-title { font-size: 13px; font-weight: 700; }
-  .urgency-desc { font-size: 12px; opacity: 0.85; margin-top: 2px; line-height: 1.4; }
-
-  /* MOBILE */
-  @media (max-width: 768px) {
-    .sidebar { display: none; }
-    .main { padding: 12px; }
-    .grid2, .grid3 { grid-template-columns: 1fr; }
-    .stats-row { grid-template-columns: 1fr 1fr; }
-    .header-tags { display: none; }
-    .mobile-tabs {
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+      color: white;
+      padding: 16px 24px;
       display: flex;
-      overflow-x: auto;
-      gap: 6px;
-      padding: 10px 12px;
-      background: var(--bg-white);
-      border-bottom: 1px solid var(--border);
-      -webkit-overflow-scrolling: touch;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(192,39,45,0.3);
+      z-index: 100;
     }
-    .mobile-tab {
-      flex-shrink: 0;
-      padding: 6px 12px;
-      border-radius: 99px;
-      border: 1px solid var(--border);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      background: white;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-    .mobile-tab.active { background: var(--red); color: white; border-color: var(--red); }
-  }
-  @media (min-width: 769px) {
-    .mobile-tabs { display: none; }
-  }
 
-  /* Highlight keywords */
-  .kw { font-weight: 600; color: var(--text-primary); }
-  .kw-red { font-weight: 600; color: var(--red); }
-  .kw-green { font-weight: 600; color: var(--green); }
-</style>
+    .logo { font-size: 20px; font-weight: 800; }
+    .logo-sub { font-size: 11px; opacity: 0.8; }
+
+    .tabs-header {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .tab-btn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      border: 2px solid transparent;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: white;
+      color: var(--red);
+      border-color: white;
+    }
+
+    .mode-toggle {
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.15);
+      padding: 6px;
+      border-radius: 99px;
+    }
+
+    .mode-btn {
+      padding: 8px 16px;
+      border: none;
+      background: transparent;
+      color: rgba(255,255,255,0.7);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 99px;
+      transition: all 0.2s;
+    }
+
+    .mode-btn.active {
+      background: white;
+      color: var(--red);
+    }
+
+    .timer-display {
+      background: rgba(0,0,0,0.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-family: monospace;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    /* TABS CONTENT */
+    .tabs-container { display: flex; flex: 1; overflow: hidden; }
+    .tab-content { display: none; flex: 1; overflow: hidden; }
+    .tab-content.active { display: flex; }
+
+    /* MAIN COACH */
+    .main { display: flex; flex: 1; overflow: hidden; gap: 12px; padding: 12px; }
+
+    .sidebar-left {
+      width: 280px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      letter-spacing: 0.05em;
+    }
+
+    .stages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .stage-btn {
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .stage-btn:hover {
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .stage-btn.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red-dark);
+    }
+
+    /* CENTER */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .content-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .content-title { font-size: 16px; font-weight: 700; }
+    .content-desc { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    .content-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .scenarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .scenario-btn {
+      padding: 12px;
+      border: 2px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--text-primary);
+      transition: all 0.2s;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    .scenario-btn:hover {
+      border-color: var(--red);
+      background: #FEF2F2;
+    }
+
+    .scenario-btn.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red-dark);
+    }
+
+    .guidance-card {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--red);
+    }
+
+    .guidance-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .guidance-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      margin-bottom: 10px;
+    }
+
+    .copy-btn {
+      padding: 8px 14px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--green-bg);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .checklist {
+      background: var(--blue-bg);
+      border: 1px solid #BFDBFE;
+      border-radius: 10px;
+      padding: 14px;
+      margin-top: 16px;
+    }
+
+    .checklist-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .checklist-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .checklist-item input {
+      cursor: pointer;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* SIDEBAR RIGHT */
+    .sidebar-right {
+      width: 300px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .tip-card {
+      background: var(--amber-bg);
+      border: 1px solid #FDE68A;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #92400E;
+    }
+
+    .tip-card strong { color: #B45309; }
+
+    .alert-card {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #7F1D1D;
+      border-left: 3px solid var(--red);
+    }
+
+    .alert-card strong { color: #991B1B; }
+
+    /* GALERIA STYLES */
+    .gallery-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .gallery-header {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      border: 1px solid var(--border);
+    }
+
+    .gallery-header .content-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .gallery-header .content-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .gallery-main {
+      display: flex;
+      flex: 1;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .gallery-categories {
+      width: 200px;
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid var(--border);
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .category-btn {
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      text-align: left;
+    }
+
+    .category-btn:hover {
+      background: var(--blue-bg);
+      color: var(--blue);
+    }
+
+    .category-btn.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red-dark);
+    }
+
+    .gallery-grid {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+
+    @media (max-width: 1400px) {
+      #galleryGrid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 1000px) {
+      #galleryGrid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      #galleryGrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .product-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      height: fit-content;
+    }
+
+    .product-card:hover {
+      border-color: var(--red);
+      box-shadow: 0 4px 12px rgba(192,39,45,0.1);
+    }
+
+    .product-content {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 4px;
+      position: relative;
+      height: fit-content;
+    }
+
+    .product-image {
+      width: 160px;
+      min-width: 160px;
+      height: 160px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .product-image-nav {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      transform: translateY(-50%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 8px;
+      background: rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .product-card:hover .product-image-nav {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .product-image-nav button {
+      background: rgba(255,255,255,0.9);
+      border: none;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 16px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .product-image-nav button:hover {
+      background: white;
+      transform: scale(1.1);
+    }
+
+    .product-photo-count {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .product-thumbnails {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      overflow-y: auto;
+      max-height: 160px;
+      padding: 3px;
+      background: var(--bg-secondary);
+      border-radius: 4px;
+    }
+
+    .product-thumbnail {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border: 1px solid transparent;
+      border-radius: 3px;
+      transition: all 0.2s;
+      opacity: 0.7;
+    }
+
+    .product-thumbnail:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
+
+    .product-thumbnail.active {
+      border-color: var(--red);
+      opacity: 1;
+      box-shadow: 0 2px 8px rgba(192,39,45,0.3);
+    }
+
+    .product-info {
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      min-width: 0;
+      gap: 4px;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 12px;
+      margin: 0;
+      word-break: break-word;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      color: var(--text-primary);
+    }
+
+    .product-option {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 0;
+      word-break: break-word;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+
+    .product-copy-btn {
+      width: 100%;
+      padding: 7px 6px;
+      background: var(--green-bg);
+      border: 1px solid var(--green);
+      border-radius: 4px;
+      color: var(--green);
+      font-weight: 600;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .product-copy-btn:hover {
+      background: var(--green);
+      color: white;
+    }
+
+    .empty-gallery {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .empty-gallery-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    /* LOGIN MODAL */
+    .login-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-modal.active {
+      display: flex;
+    }
+
+    .login-modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .login-modal-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--red);
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .login-modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .login-modal-input {
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s;
+    }
+
+    .login-modal-input:focus {
+      outline: none;
+      border-color: var(--red);
+    }
+
+    .login-modal-btn {
+      padding: 12px 16px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .login-modal-btn:hover {
+      background: var(--red-dark);
+    }
+
+    .login-modal-error {
+      color: #DC2626;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 8px;
+      display: none;
+    }
+
+    .login-modal-error.show {
+      display: block;
+    }
+
+    /* ADMIN PANEL */
+    .admin-container { display: flex; gap: 12px; padding: 16px; flex: 1; overflow: hidden; }
+
+    .admin-sidebar {
+      width: 280px;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .admin-content {
+      flex: 1;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .form-group textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--red);
+      color: white;
+      width: 100%;
+      margin-top: 12px;
+    }
+
+    .btn-primary:hover { background: var(--red-dark); }
+
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+
+    .stage-option {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin-bottom: 4px;
+      cursor: pointer;
+      background: var(--bg);
+      text-align: left;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .stage-option:hover, .stage-option.active {
+      background: var(--red);
+      color: white;
+      border-color: var(--red-dark);
+    }
+
+    .success-msg {
+      background: var(--green-bg);
+      border: 1px solid #86EFAC;
+      color: #14532D;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      font-size: 12px;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      width: 100%;
+    }
+
+    .file-input-wrapper input[type=file] {
+      position: absolute;
+      left: -9999px;
+    }
+
+    .file-input-label {
+      display: block;
+      padding: 10px 12px;
+      background: var(--blue-bg);
+      border: 2px dashed var(--blue);
+      border-radius: 6px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--blue);
+      transition: all 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .file-input-label:hover {
+      background: var(--blue);
+      color: white;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--green);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      z-index: 10000;
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -60%);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .sidebar-right { width: 250px; }
+    }
+
+    @media (max-width: 768px) {
+      .main { flex-direction: column; }
+      .sidebar-left, .sidebar-right { width: 100%; max-height: 180px; }
+      .scenarios-grid { grid-template-columns: repeat(2, 1fr); }
+      .gallery-main { flex-direction: column; }
+      .gallery-categories { width: 100%; max-height: 120px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="site-header">
-  <div class="header-left">
-    <div class="logo-area">
-      <div>
-        <div class="logo-text">revend</div>
-        <div class="logo-sub">Eletro</div>
-      </div>
+<!-- LOGIN MODAL -->
+<div class="login-modal" id="loginModal">
+  <div class="login-modal-content">
+    <div class="login-modal-title">🔐 ADMIN</div>
+    <div class="login-modal-form">
+      <input type="password" id="passwordInput" class="login-modal-input" placeholder="Digite a senha" onkeypress="if(event.key === 'Enter') checkPassword()">
+      <button class="login-modal-btn" onclick="checkPassword()">Entrar</button>
+      <div class="login-modal-error" id="loginError">Senha incorreta!</div>
     </div>
-    <div class="header-divider"></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="header">
     <div>
-      <div class="header-title">Script de Atendimento</div>
-      <div class="header-subtitle">Guia de vendas · Funil completo · 🟢 Versão 3.0</div>
+      <div class="logo">🎯 REVEND COACH PRO</div>
+      <div class="logo-sub">Sistema Inteligente de Vendas</div>
+    </div>
+    <div class="tabs-header">
+      <div class="mode-toggle" id="modeToggleHeader">
+        <button class="mode-btn active" onclick="setMode('online')">💻 ONLINE</button>
+        <button class="mode-btn" onclick="setMode('presencial')">🏪 PRESENCIAL</button>
+      </div>
+      <div class="timer-display" id="timerDisplay">00:00:00</div>
+      <button class="tab-btn active" onclick="switchTab('coach')">🎓 COACH</button>
+      <button class="tab-btn" onclick="switchTab('galeria')">🖼️ GALERIA</button>
+      <button class="tab-btn" onclick="switchTab('admin')">⚙️ ADMIN</button>
     </div>
   </div>
-  <div class="header-tags">
-    <div class="h-tag">📱 iPhone</div>
-    <div class="h-tag">💻 MacBook</div>
-    <div class="h-tag">⌚ Apple Watch</div>
-    <div class="h-tag">🎯 Conversão</div>
+
+  <div class="tabs-container">
+    <!-- TAB: COACH -->
+    <div class="tab-content active" id="tab-coach">
+      <div class="main">
+        <div class="sidebar-left">
+          <div>
+            <div class="section-title">📍 Etapas</div>
+            <div class="stages-list" id="stagesList"></div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="content-header">
+            <div>
+              <div class="content-title" id="stageTitle">Selecione uma etapa</div>
+              <div class="content-desc" id="stageDesc">Clique em uma etapa para começar</div>
+            </div>
+          </div>
+          <div class="content-body" id="contentArea">
+            <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+              <div style="font-size: 48px; margin-bottom: 12px;">🚀</div>
+              <div>Clique em uma etapa para ver as orientações</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar-right">
+          <div class="section-title">⚡ Dicas Rápidas</div>
+          <div class="tip-card" id="tipArea">
+            <strong>🎯 Bem-vindo!</strong><br>
+            Clique em uma etapa para ver as orientações e dicas de venda.
+          </div>
+          <div class="alert-card" id="alertArea">
+            <strong>⚠️ Regra de Ouro:</strong><br>
+            Responda em até 20 minutos - velocidade = conversão!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: GALERIA -->
+    <div class="tab-content" id="tab-galeria">
+      <div class="gallery-wrapper">
+        <div class="gallery-header">
+          <div class="content-title">🖼️ Galeria de Modelos</div>
+          <div class="content-desc">Fotos de produtos organizadas por categoria</div>
+        </div>
+
+        <div class="gallery-main">
+          <div class="gallery-categories" id="categoriesList">
+            <div style="text-align: center; color: var(--text-muted); font-size: 12px;">
+              Nenhuma categoria
+            </div>
+          </div>
+          <div class="gallery-grid" id="galleryGrid">
+            <div class="empty-gallery">
+              <div class="empty-gallery-icon">📸</div>
+              <div>Nenhum produto adicionado ainda</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: ADMIN -->
+    <div class="tab-content" id="tab-admin">
+      <div class="admin-container">
+        <div class="admin-sidebar">
+          <div>
+            <label>Seção</label>
+            <select class="form-group" id="adminSection" onchange="switchAdminSection()" style="width: 100%; padding: 10px;">
+              <option value="dados">Dados de Vendas</option>
+              <option value="galeria">Galeria de Fotos</option>
+            </select>
+          </div>
+
+          <div id="modeContainer" style="display: none; margin-top: 16px;">
+            <label>Modo</label>
+            <select class="form-group" id="adminMode" onchange="renderAdminDataSection()" style="width: 100%; padding: 10px;">
+              <option value="online">💻 Online</option>
+              <option value="presencial">🏪 Presencial</option>
+            </select>
+          </div>
+
+          <div id="adminMenuItems"></div>
+        </div>
+
+        <div class="admin-content">
+          <div id="successMsg" class="success-msg" style="display:none;"></div>
+          <div id="adminForm"></div>
+        </div>
+      </div>
+    </div>
   </div>
-</header>
-
-<!-- MOBILE TABS -->
-<div class="mobile-tabs" id="mobileTabs">
-  <button class="mobile-tab active" onclick="show('recepcao', this)">1. Recepção</button>
-  <button class="mobile-tab" onclick="show('qualificacao', this)">2. Qualificação</button>
-  <button class="mobile-tab" onclick="show('proposta', this)">3. Proposta</button>
-  <button class="mobile-tab" onclick="show('objecoes', this)">4. Objeções</button>
-  <button class="mobile-tab" onclick="show('fechamento', this)">5. Fechamento</button>
-  <button class="mobile-tab" onclick="show('followup', this)">6. Follow-up & Rmkt</button>
-  <button class="mobile-tab" onclick="show('entrega', this)">7. Entrega</button>
-  <button class="mobile-tab" onclick="show('posvenda', this)">8. Pós-venda</button>
-  <button class="mobile-tab" onclick="show('compra', this)">9. Compra/Troca</button>
-  <button class="mobile-tab" onclick="show('comprou-agendou', this)">10. Comprou/Agendou</button>
 </div>
 
-<div class="app-body">
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar">
-    <div class="sidebar-label">Funil de Vendas</div>
-    <button class="nav-item active" onclick="show('recepcao', this)"><span class="nav-icon">👋</span><span class="nav-num">1</span> Recepção</button>
-    <button class="nav-item" onclick="show('qualificacao', this)"><span class="nav-icon">🔍</span><span class="nav-num">2</span> Qualificação</button>
-    <button class="nav-item" onclick="show('proposta', this)"><span class="nav-icon">📋</span><span class="nav-num">3</span> Proposta</button>
-    <button class="nav-item" onclick="show('objecoes', this)"><span class="nav-icon">🛡️</span><span class="nav-num">4</span> Objeções</button>
-    <button class="nav-item" onclick="show('fechamento', this)"><span class="nav-icon">🔒</span><span class="nav-num">5</span> Fechamento</button>
-    <button class="nav-item" onclick="show('followup', this)"><span class="nav-icon">🔁</span><span class="nav-num">6</span> Follow-up & Remarketing</button>
-    <button class="nav-item" onclick="show('entrega', this)"><span class="nav-icon">🚀</span><span class="nav-num">7</span> Entrega</button>
-    <button class="nav-item" onclick="show('posvenda', this)"><span class="nav-icon">⭐</span><span class="nav-num">8</span> Pós-venda</button>
-    <button class="nav-item" onclick="show('compra', this)"><span class="nav-icon">♻️</span><span class="nav-num">9</span> Compra/Troca</button>
-    <button class="nav-item" onclick="show('comprou-agendou', this)"><span class="nav-icon">✅</span><span class="nav-num">10</span> Comprou/Agendou</button>
-  </nav>
-
-  <!-- MAIN CONTENT -->
-  <main class="main">
-
-    <!-- STATS ROW (always visible) -->
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">1ª Resposta</div>
-        <div class="stat-val amber">20min</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Meta: &gt;90% dos leads</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Durante atend.</div>
-        <div class="stat-val blue">10min</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Meta: &gt;80% das msgs</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Sem resposta</div>
-        <div class="stat-val red">0 dia</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Lead não dorme sem contato</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Sinal Reserva</div>
-        <div class="stat-val green">R$100</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Abater na compra</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Rmkt Final</div>
-        <div class="stat-val red">D+6</div>
-        <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">Lead perdido se sem resp.</div>
-      </div>
-    </div>
-
-    <!-- ======================== RECEPÇÃO ======================== -->
-    <div id="recepcao" class="section active">
-      <div class="page-header">
-        <div>
-          <div class="page-title">👋 Etapa 1 — Recepção</div>
-          <div class="page-desc">Primeiro contato e abertura do atendimento</div>
-        </div>
-        <span class="badge badge-blue">⏱ Máx. 20 min para responder</span>
-      </div>
-
-      <div class="urgency-banner">
-        <div class="urgency-icon">🚨</div>
-        <div>
-          <div class="urgency-title">REGRA DE OURO — Lead que não recebe resposta em 20min vai embora para o concorrente</div>
-          <div class="urgency-desc">Velocidade na resposta = conversão. Não espere. Ative notificações. Priorize sempre.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Fluxo Kommo — Entrada de lead</div>
-        <div class="card-title">📲 Protocolo de entrada via Insta / WhatsApp</div>
-        <div class="alert-blue"><span>🔵</span><span><strong>Kommo CRM:</strong> Todo lead que chega pelo Instagram ou WhatsApp deve ser processado conforme este fluxo antes de qualquer mensagem.</span></div>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">1</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">📥 Recebe o lead no Kommo</div>
-              <div class="tl-desc">Lead entra via Insta ou WhatsApp. Abre imediatamente. Tempo máximo: <strong>20 minutos</strong> para 1ª resposta.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">2</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">📋 Preenche o cabeçalho (RmkT)</div>
-              <div class="tl-desc">Antes de responder, preencha no Kommo: nome, canal de origem, produto de interesse, situação (novo / upgrade / troca). Isso alimenta o remarketing automático.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#E8383F;color:white;">3</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">🔍 Entender o cliente — 3 cenários</div>
-              <div class="tl-desc">Identifique em qual dos 3 cenários o cliente está (ver card abaixo) e siga o caminho correspondente.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">3 Cenários do cliente — Etapa crítica</div>
-        <div class="card-title">🎯 Como identificar onde o cliente está no processo</div>
-        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Sempre identifique o cenário antes de enviar a tabela ou fazer proposta.</strong> Cada cenário pede uma abordagem diferente.</div>
-        <div class="grid3">
-          <div class="grid-cell" style="border-left: 3px solid var(--green);">
-            <div class="grid-cell-title" style="color:var(--green);">✅ Cenário 1 — Falou o que quer</div>
-            <div class="grid-cell-body">Cliente já veio com modelo específico em mente. <strong>Não envie tabela.</strong> Vá direto para a proposta personalizada do modelo desejado.</div>
-          </div>
-          <div class="grid-cell" style="border-left: 3px solid var(--amber);">
-            <div class="grid-cell-title" style="color:var(--amber);">🔎 Cenário 2 — Acessou a tabela</div>
-            <div class="grid-cell-body">Cliente já viu os preços. Pergunta qual modelo específico chamou atenção. Foque em comparar as opções e qualificar orçamento/pagamento.</div>
-          </div>
-          <div class="grid-cell" style="border-left: 3px solid var(--blue);">
-            <div class="grid-cell-title" style="color:var(--blue);">📤 Cenário 3 — Não acessou ainda</div>
-            <div class="grid-cell-body">Cliente não conhece os preços. <strong>Envie a tabela + mensagem de abertura.</strong> Aguarde retorno antes de qualificar.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Mensagem de abertura</div>
-        <div class="card-title">✨ Boas-vindas e abertura de atendimento</div>
-        <div class="tip"><span class="tip-icon">💡</span> Envie imediatamente ao receber o lead. Personalize com seu nome no lugar de [Felipe].</div>
-        <div class="msg-wrap">
-          <div class="msg-box">✨ Olá, tudo bem? Seja muito bem-vindo(a) à Revend! ✨
-
-Eu sou o *Felipe* e estou aqui para proporcionar a melhor experiência na sua busca pelos produtos Apple 🍎
-
-Para iniciar seu atendimento, poderia me informar:
-📝 Qual é o seu nome?
-📱 Você já tem algum modelo em mente?
-
-Fico no aguardo! 😊
-
-🔗 Nossa tabela atualizada: https://revendeletro.com.br/tabela-de-valores/</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'boas-vindas')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Lead sem resposta inicial — Reativação rápida</div>
-        <div class="card-title">⚡ Cliente não respondeu após 2h — Reativação</div>
-        <div class="alert-red"><span>🔴</span><span>Não deixe o lead esfriar. Se não houve resposta em 2h, dispare esta mensagem.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">Oi! 😊 Vi que você entrou em contato com a Revend. Quero garantir que você seja bem atendido(a) pessoalmente por mim!
-
-Tenho ótimas opções disponíveis agora — qual produto você estava pesquisando? 🍎
-
-Me conta que faço questão de te ajudar a encontrar o melhor negócio!</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'reativacao')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Fora do horário</div>
-        <div class="card-title">🌙 Mensagem de ausência automática</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">Olá! Este é o setor de Vendas da Revend. Não estamos em horário de atendimento no momento, mas você já está na fila prioritária! ⏰
-
-🕐 Horários: Seg–Sex 10h às 18h | Sábado: 10h às 16h
-
-Sua mensagem foi recebida ✅ Por favor, informe seu *nome* e o *produto de interesse* para agilizarmos assim que abrirmos.
-
-🔗 Tabela atualizada: https://revendeletro.com.br/tabela-de-valores/</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'ausencia')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== QUALIFICAÇÃO ======================== -->
-    <div id="qualificacao" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🔍 Etapa 2 — Qualificação</div>
-          <div class="page-desc">Entenda o perfil, necessidade e poder de compra do cliente</div>
-        </div>
-        <span class="badge badge-purple">Máx. 3 perguntas</span>
-      </div>
-
-      <div class="urgency-banner">
-        <div class="urgency-icon">🎯</div>
-        <div>
-          <div class="urgency-title">Qualifique ANTES de apresentar preço. Quem mostra preço cedo, perde poder de negociação.</div>
-          <div class="urgency-desc">Entenda o que o cliente quer, por que quer e como quer pagar. Só então construa sua proposta.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Perguntas estratégicas de triagem</div>
-        <div class="card-title">🔑 As 3 perguntas que definem tudo</div>
-        <div class="grid3">
-          <div class="grid-cell">
-            <div class="grid-cell-title">🛍️ Tipo de produto</div>
-            <div class="grid-cell-body">Você prefere aparelho <strong>lacrado</strong>, <strong>sem caixa</strong> (igual a novo) ou <strong>seminovo</strong>? Cada um tem uma relação custo-benefício diferente!</div>
-          </div>
-          <div class="grid-cell">
-            <div class="grid-cell-title">💰 Forma de pagamento</div>
-            <div class="grid-cell-body">Pretende pagar à vista no <strong>Pix</strong> (melhor preço) ou parcelado no <strong>cartão</strong>? Assim já te mostro a melhor opção.</div>
-          </div>
-          <div class="grid-cell">
-            <div class="grid-cell-title">♻️ Tem aparelho para dar</div>
-            <div class="grid-cell-body">Você tem algum iPhone ou dispositivo Apple que gostaria de usar como parte do pagamento? Pode reduzir bastante o valor final!</div>
-          </div>
-        </div>
-        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Regra dos 2:</strong> Nunca ofereça mais de 2 opções ao mesmo tempo. O cliente se perde e abandona a conversa.</div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Perguntas-chave para entender a necessidade real</div>
-        <div class="card-title">📱 Qual modelo? Já possui algum?</div>
-        <div class="alert-blue"><span>🧠</span><span>Essas duas perguntas definem se é primeira compra, upgrade ou troca — e mudam toda a estratégia de proposta.</span></div>
-        <div class="grid2">
-          <div class="grid-cell">
-            <div class="grid-cell-title">📱 Qual modelo você tem interesse?</div>
-            <div class="grid-cell-body">Identifique se o cliente já sabe o que quer ou se precisa de orientação. Se não souber, oriente com base no orçamento e uso (câmera, bateria, performance).</div>
-          </div>
-          <div class="grid-cell">
-            <div class="grid-cell-title">🔄 Já possui algum Apple?</div>
-            <div class="grid-cell-body">Se <strong>sim</strong>: abra caminho para upgrade/troca. Se <strong>não</strong>: é primeira compra, enfatize a facilidade de migração, garantia e suporte Revend.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Entender o que o cliente achou + próximo passo</div>
-        <div class="card-title">💬 Após enviar tabela / proposta — Entender reação</div>
-        <div class="tip"><span class="tip-icon">💡</span> Após enviar a tabela ou proposta, <strong>sempre pergunte o que ele achou e para quando precisa</strong>. Isso revela urgência real.</div>
-        <div class="msg-wrap">
-          <div class="msg-box green-border">[Nome], o que você achou das opções? Alguma chamou mais atenção? 😊
-
-E me diz: você está precisando para quando? Assim consigo verificar a disponibilidade certa para você!</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'entender-reacao')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Categorias explicadas para o cliente</div>
-        <div class="card-title">📦 Como explicar os tipos de produto</div>
-        <div class="grid2">
-          <div class="grid-cell">
-            <div><span class="badge badge-dark">♻️ Seminovo</span></div>
-            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Aparelho usado em boas condições. Garantia <strong>90 dias Revend</strong>. Melhor preço.</div>
-          </div>
-          <div class="grid-cell">
-            <div><span class="badge badge-blue">📦 Sem caixa</span></div>
-            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Funciona como novo. Bateria <strong>87–100%</strong>. Garantia 90 dias. Custo-benefício excelente.</div>
-          </div>
-          <div class="grid-cell">
-            <div><span class="badge badge-purple">📬 Open Box</span></div>
-            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">Completo na caixa. Garantia <strong>6 meses Revend</strong> + cabo + fonte turbo.</div>
-          </div>
-          <div class="grid-cell">
-            <div><span class="badge badge-green">🍎 Lacrado Apple</span></div>
-            <div style="margin-top:8px;font-size:13px;color:var(--text-secondary);">100% novo. Garantia <strong>1 ano Apple</strong>. Máxima segurança e tranquilidade.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Quando o cliente está "apenas pesquisando"</div>
-        <div class="card-title">🧐 Técnica de Ancoragem de Valor</div>
-        <div class="card-body">Use esta abordagem para transformar um pesquisador em comprador:</div>
-        <div class="msg-wrap">
-          <div class="msg-box green-border">[Nome], entendo que você está pesquisando — isso é inteligente! 
-
-Mas posso te adiantar uma coisa: nosso estoque gira *muito* rápido, especialmente os modelos mais procurados. 
-
-Semana passada, 3 clientes que disseram "vou pesquisar mais" voltaram no dia seguinte... e o modelo já tinha esgotado 😅
-
-Te faço uma proposta: me diz o modelo exato que você quer e eu verifico agora se ainda temos disponível. Assim você já sabe se vale a pena pesquisar ou se é melhor garantir o seu antes que suma!</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'ancoragem')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== PROPOSTA ======================== -->
-    <div id="proposta" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">📋 Etapa 3 — Proposta</div>
-          <div class="page-desc">Apresentação, geração de desejo e urgência</div>
-        </div>
-        <span class="badge badge-blue">Sempre 2 opções</span>
-      </div>
-
-      <div class="urgency-banner">
-        <div class="urgency-icon">🎬</div>
-        <div>
-          <div class="urgency-title">SEMPRE envie um vídeo curto do produto após a proposta</div>
-          <div class="urgency-desc">Vídeo de 15–30 segundos mostrando o aparelho gera confiança imediata e aumenta conversão em até 40%. Grave mostrando o produto ligado, com bateria e número de série visível.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Modelo de proposta padrão</div>
-        <div class="card-title">📱 Proposta com 2 opções (iPhone como exemplo)</div>
-        <div class="msg-wrap">
-          <div class="msg-box">Oi, *[Nome]*! Separei as melhores opções para você 📱
-
-*◼️ iPhone [modelo] [GB] — Sem Caixa*
-💰 R$ [valor] — Garantia Revend 10 meses ✅
-
-*◽️ iPhone [modelo] [GB] — Lacrado Apple*
-💰 R$ [valor] — Garantia 1 ano Apple ✅
-
-Ambos com *nota fiscal*, *pronta entrega* e *bateria acima de 90%*!
-
-Qual te interessa mais? Já envio o vídeo do aparelho para você 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'proposta')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Após apresentar proposta — Gerar urgência + desejo</div>
-        <div class="card-title">🔥 Técnica de Escassez + Prova Social</div>
-        <div class="tip"><span class="tip-icon">🧠</span> Envie esta mensagem JUNTO com o vídeo do produto. A combinação é devastadora para conversão.</div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">*[Nome]*, acabei de verificar o estoque agora e é o seguinte:
-
-Esse modelo está com alta procura esta semana — saíram *[X] unidades* nos últimos 2 dias 🔥
-
-Consigo *garantir o seu* até hoje, mas precisaria de uma confirmação da sua parte. 
-
-Se você vier buscar pessoalmente aqui na loja, ainda consigo te incluir um *brinde exclusivo* 🎁
-
-Quer que eu reserve esse modelo para você agora?</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'desejo')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Prova Social — Usar quando cliente hesita</div>
-        <div class="card-title">👥 Mensagem de Prova Social</div>
-        <div class="msg-wrap">
-          <div class="msg-box purple-border">Olha, vou te ser *100% transparente*, [Nome]:
-
-Esse modelo que te mostrei é um dos mais pedidos aqui. Só esta semana vendemos [X] unidades desse iPhone.
-
-Nossa avaliação no Google é *4.9 ⭐ com mais de [X] avaliações* — você pode conferir agora mesmo antes de decidir.
-
-Muitos dos nossos clientes compraram na Revend depois de pesquisar em outros lugares e perceberam que o conjunto (preço + garantia + NF + atendimento) é imbatível.
-
-Te mando o link das avaliações se quiser ver 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'prova-social')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Formas de pagamento</div>
-        <div class="card-title">💳 Mensagem de pagamento</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">💰 *Formas de Pagamento Revend:*
-
-✅ Dinheiro (melhor condição!)
-✅ Pix (desconto especial à vista)
-✅ Cartão de débito (+2% de taxa)
-✅ Cartão de crédito em até *18x*
-❌ Boleto bancário não aceitamos
-
-📦 *Entrega via motoboy ou Correios:*
-Sinal de 10% + frete antecipado.
-
-Posso enviar a simulação de parcelamento para você agora?</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'pagamento')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== OBJEÇÕES ======================== -->
-    <div id="objecoes" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🛡️ Etapa 4 — Tratamento de Objeções</div>
-          <div class="page-desc">Nunca encerre sem entender e contornar a objeção</div>
-        </div>
-        <span class="badge badge-amber">⚠️ Nunca desista na primeira objeção</span>
-      </div>
-
-      <div class="decision-box">
-        <div class="decision-title">🧭 ÁRVORE DE DECISÃO — Quando encerrar o atendimento?</div>
-        <div class="decision-item">
-          <div class="decision-key">ENCERRA ✓</div>
-          <div class="decision-val">Cliente confirma que <strong>não tem o dinheiro</strong> agora e não tem previsão. Não force. Agradeça e deixe a porta aberta.</div>
-        </div>
-        <div class="decision-item">
-          <div class="decision-key">ENCERRA ✓</div>
-          <div class="decision-val">Cliente diz que <strong>está apenas pesquisando</strong>, você já fez 2 tentativas de qualificar e ele não engajou.</div>
-        </div>
-        <div class="decision-item">
-          <div class="decision-key">CONTINUA 🔁</div>
-          <div class="decision-val"><strong>Qualquer outro motivo</strong>: preço alto, garantia, modelo, cor, bateria, prazo, desconfiança — há solução para tudo.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 1 — Preço</div>
-        <div class="card-title">💸 "Achei caro" / "Vi mais barato em outro lugar"</div>
-        <span class="badge badge-amber">Preço</span>
-        <div class="alert-blue"><span>🧠</span><span><strong>Técnica:</strong> Reframe + Quebra de Crença + Âncora de Valor. Não entre em guerra de preço. Eleve o valor percebido.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], entendo muito bem — e é ótimo que você esteja comparando! 
-
-Mas deixa eu te perguntar uma coisa: esse preço mais baixo que você viu vem com *nota fiscal, garantia documentada e atendimento pós-venda*? 
-
-Porque na Revend você compra com *segurança total*: aparelho 100% original, NF-e, garantia real e nosso SAC disponível se precisar.
-
-Muitos clientes que compraram "mais barato" em outros lugares voltaram para nós depois de ter dor de cabeça. Com a Revend, isso não acontece.
-
-O que te faria fechar hoje mesmo? Posso ver se consigo melhorar alguma condição para você 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-preco')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 2 — Bateria</div>
-        <div class="card-title">🔋 "Quero bateria 100%"</div>
-        <span class="badge badge-amber">Bateria</span>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], excelente que você presta atenção nisso — mostra que você entende de produto!
-
-Vou ser direto: bateria *100%* em aparelhos "sem caixa" é raro, porque já foram ativados. Mas 90–97% é *exatamente igual* na prática do dia a dia — você vai usar o aparelho por 1–2 anos e a diferença não vai aparecer.
-
-O que realmente importa é ser *bateria original Apple*, e todos os nossos aparelhos têm isso garantido.
-
-Na hora de separar o seu, verifico os modelos disponíveis e escolho o de *maior saúde de bateria* para você! Combinado? 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-bateria')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 3 — Upgrade / valor de troca baixo</div>
-        <div class="card-title">🔄 "O valor de troca está baixo"</div>
-        <span class="badge badge-amber">Upgrade</span>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], entendo a sua preocupação — e você tem razão de questionar!
-
-Vou verificar agora se consigo melhorar o valor da avaliação do seu aparelho. Me confirma: está sem detalhes na tela e carcaça, certo?
-
-Independente disso, pensa assim: o que importa é o *valor líquido que você vai desembolsar* para sair com o novo. Com a troca, você já reduz esse custo de forma significativa.
-
-Me dá um minuto que eu já consulto internamente para ver o *máximo que consigo liberar* para o seu aparelho 💪</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-troca')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 4 — Garantia</div>
-        <div class="card-title">🔒 "E se der problema? E a garantia?"</div>
-        <span class="badge badge-amber">Garantia</span>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], essa é uma das melhores perguntas que um comprador pode fazer — e temos muito orgulho da nossa resposta!
-
-✅ Aparelhos Lacrados: *1 ano de garantia direta com a Apple*
-✅ Sem Caixa / Open Box: *Garantia Revend* com SAC exclusivo
-✅ Em caso de qualquer problema: WhatsApp direto *(11) 94025-1866*
-
-Atendemos de seg a sex 10h30–17h30 e nossa equipe resolve. Temos *mais de [X] clientes atendidos* sem problemas na garantia.
-
-Isso te dá a tranquilidade que você precisava? 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-garantia')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 5 — Indecisão</div>
-        <div class="card-title">🤔 "Vou pensar" / "Vou pesquisar mais"</div>
-        <span class="badge badge-amber">Indecisão</span>
-        <div class="alert-red"><span>🚨</span><span>"Vou pensar" é código para "não me convenceu ainda". Descubra o motivo real.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">Claro, [Nome]! Pensar é importante em uma compra como essa 😊
-
-Mas me ajuda com uma coisa: o que especificamente ainda te deixa com dúvida? É o *preço*, a *forma de pagamento*, o *modelo*, ou tem alguma outra questão?
-
-Pergunto porque muitas vezes consigo resolver na hora — seja ajustando uma condição, explicando melhor algum detalhe ou encontrando uma opção que se encaixa melhor na sua realidade.
-
-O que seria o ideal para você fechar hoje? Me conta! 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-pesquisa')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 6 — Desconfiança / nunca comprou online</div>
-        <div class="card-title">😰 "Tenho medo de golpe" / "Nunca comprei assim"</div>
-        <span class="badge badge-red">Confiança</span>
-        <div class="msg-wrap">
-          <div class="msg-box purple-border">[Nome], sua preocupação é completamente válida — e parabéns por ser cauteloso!
-
-Deixa eu te mostrar que a Revend é uma empresa real e séria:
-🏢 Somos CNPJ *28.724.816/0001-87* — você pode consultar agora na Receita Federal
-📍 Loja física: R. Tuiuti, 1951, Tatuapé — SP
-⭐ [X]+ avaliações no Google com nota [X.X]
-📋 Emitimos Nota Fiscal Eletrônica em toda venda
-
-Você pode vir pessoalmente conhecer a loja antes de decidir. É aqui em São Paulo, no Tatuapé! 
-
-Prefere passar pessoalmente ou quer que eu te envie mais informações de segurança primeiro? 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-confianca')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 7 — Concorrência (outro fornecedor)</div>
-        <div class="card-title">🏪 "Vi igual em outro lugar" / "Outro vendedor me ofereceu"</div>
-        <span class="badge badge-red">Concorrência</span>
-        <div class="alert-blue"><span>🧠</span><span><strong>Técnica:</strong> Não ataque o concorrente. Compare valor, não preço. Negocie condições para fechar.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">[Nome], ótimo que você está pesquisando — isso só confirma que você é um comprador inteligente!
-
-Me conta: essa outra oferta vem com *nota fiscal, garantia documentada e atendimento pós-venda garantido*?
-
-Na Revend, além do preço competitivo, você tem:
-✅ NF-e em toda venda
-✅ Garantia real (não é promessa de boca)
-✅ SAC com atendimento humano
-✅ Loja física para você visitar antes de decidir
-
-Posso ver o que consigo fazer para igualar ou superar essa condição. Me passa o valor que você viu e verifico aqui 💪</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-concorrencia')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 8 — Valor alto / Up de produto</div>
-        <div class="card-title">💰 "Tá caro" / "Quero descontar mais" / Taxa alta no cartão</div>
-        <span class="badge badge-amber">Taxa / Negociação</span>
-        <div class="tip"><span class="tip-icon">🧠</span> Reduza a taxa, ofereça up de produto com melhor custo-benefício, ou negocie brinde. Use as 3 alavancas em sequência, nunca de uma vez.</div>
-        <div class="grid3">
-          <div class="grid-cell" style="border-left:3px solid var(--red);">
-            <div class="grid-cell-title" style="color:var(--red);">💳 Taxa → Reduzir</div>
-            <div class="grid-cell-body">Ofereça migração para Pix/débito. Mostre que a economia na taxa cobre a diferença que ele pede.</div>
-          </div>
-          <div class="grid-cell" style="border-left:3px solid var(--amber);">
-            <div class="grid-cell-title" style="color:var(--amber);">📦 Up produto → Negociar</div>
-            <div class="grid-cell-body">Apresente uma versão ligeiramente superior que entrega mais valor pelo mesmo delta de preço. "Por só R$X a mais você leva o [modelo melhor]."</div>
-          </div>
-          <div class="grid-cell" style="border-left:3px solid var(--green);">
-            <div class="grid-cell-title" style="color:var(--green);">🎁 Desc. / Brinde</div>
-            <div class="grid-cell-body">Solicite autorização interna para desconto ou inclua brinde (case, cabo, película). Cria sensação de ganho sem mexer no preço principal.</div>
-          </div>
-        </div>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], entendo! Deixa eu verificar aqui o que consigo fazer por você.
-
-Duas opções que posso explorar agora:
-1️⃣ Se você conseguir pagar no *Pix ou débito*, consigo uma condição melhor na hora
-2️⃣ Posso verificar se há margem para incluir um *brinde* sem alterar o preço
-
-Qual dessas faz mais sentido para você? Assim já aciono internamente 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'obj-negociacao')">📋 Copiar resposta</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Objeção 9 — Psicológica / Sem resposta</div>
-        <div class="card-title">🧠 Cliente indeciso, pesquisando ou simplesmente sumiu</div>
-        <span class="badge badge-purple">Psicológico</span>
-        <div class="alert-red"><span>🚨</span><span>Quando o cliente some sem dar objeção clara, acione o remarketing estruturado (D+1, D+2, D+3, D+6). Não deixe o lead esfriar sem ação.</span></div>
-        <div class="decision-box">
-          <div class="decision-title">🧭 Como identificar e agir em cada caso psicológico</div>
-          <div class="decision-item">
-            <div class="decision-key">INDECISO</div>
-            <div class="decision-val">Diz que vai pensar, pede mais tempo. → Descubra o motivo real: "O que especificamente ainda te deixa em dúvida?" Resolva na hora.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">PESQUISANDO</div>
-            <div class="decision-val">Compara com outros lugares. → Use prova social + urgência de estoque. Mostre risco de perder o modelo.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">SEM RESP.</div>
-            <div class="decision-val">Sumiu sem razão. → Ative remarketing D+1 → D+2 → D+3 → D+6. Verifique status até o final do dia antes de arquivar.</div>
-          </div>
-        </div>
-        <div class="tip"><span class="tip-icon">📌</span> Verifique status de leads sem resposta <strong>até o final do dia</strong>. Nenhum lead dorme sem pelo menos uma tentativa de contato.</div>
-      </div>
-    </div>
-
-    <!-- ======================== FECHAMENTO ======================== -->
-    <div id="fechamento" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🔒 Etapa 5 — Fechamento</div>
-          <div class="page-desc">Técnicas de fechamento e reserva do produto</div>
-        </div>
-        <span class="badge badge-green">Conversão</span>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Técnica 1 — Fechamento por escolha</div>
-        <div class="card-title">🎯 Pergunta de fechamento alternativo</div>
-        <div class="card-body">Em vez de perguntar "quer comprar?", dê duas opções que assumem a compra:</div>
-        <div class="msg-wrap">
-          <div class="msg-box green-border">*[Nome]*, já vejo que você gostou do modelo! 
-
-Me diz: você prefere *passar na loja* para verificar pessoalmente ou prefere que eu *organize a entrega* via motoboy para você?
-
-Para qualquer uma das opções, vou reservar o modelo agora mesmo no seu nome — só preciso de qual é melhor para você! 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'fechamento-alternativo')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Técnica 2 — Escassez real</div>
-        <div class="card-title">⚡ Fechamento com urgência de estoque</div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">*[Nome]*, acabo de verificar e temos *apenas [X] unidade(s)* desse modelo disponível agora.
-
-Considerando que recebo consultas constantemente e o estoque gira rápido, não consigo garantir disponibilidade para amanhã sem uma reserva confirmada.
-
-Para *garantir o seu hoje*, só preciso de *R$ 100,00 de sinal via Pix* — que é descontado na compra. 
-
-Você consegue fazer isso agora? O modelo fica bloqueado no seu nome por 48h ⏳</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'fechamento-escassez')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Solicitação de sinal / reserva</div>
-        <div class="card-title">💰 Mensagem de reserva oficial</div>
-        <div class="tip"><span class="tip-icon">📌</span> iPad e MacBook: sinal obrigatório de 10%. Demais: mínimo R$ 100. Sem exceção.</div>
-        <div class="msg-wrap">
-          <div class="msg-box">*Ótima escolha, [Nome]!* 🎉
-
-Para garantir o aparelho no seu nome com *atendimento prioritário*, nossa reserva é de:
-
-💸 *R$ 100,00 via Pix*
-CNPJ: 28.724.816/0001-87 *(Revend Comércio Varejista)*
-*(O valor é 100% abatido na compra)*
-
-Após o comprovante, já bloqueo o produto para você e confirmo o agendamento!
-
-Qual o melhor dia e horário para você? 🗓️</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'reserva')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Formulário de agendamento</div>
-        <div class="card-title">📅 Modelo para enviar no grupo interno</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">📅 *AGENDAMENTO*
-● Código:
-● Data:
-● Horário:
-● Nome completo:
-● Telefone:
-● Produto (modelo | capacidade | cor):
-● Valor:
-● Forma de pagamento:
-● Sinal confirmado: ✅ / ❌
-● Observações:</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'agendamento')">📋 Copiar modelo</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Cliente recusa sinal</div>
-        <div class="card-title">🤝 Quando o cliente não quer dar sinal</div>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome]! 😊 Sem problema — você pode vir sem reserva.
-
-Só preciso ser transparente: sem sinal, o modelo *permanece na linha de venda* até você chegar. Se outro cliente confirmar antes, o modelo pode ser vendido.
-
-Para evitar que você venha e não encontre o produto, *recomendo fortemente* pelo menos o sinal de R$ 100. 
-
-Você consegue enviar agora? Prometo que vale a garantia de ter o produto esperando por você! 💪</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'sem-sinal')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== FOLLOW-UP & REMARKETING ======================== -->
-    <div id="followup" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🔁 Etapa 6 — Follow-up & Remarketing</div>
-          <div class="page-desc">Sequência unificada para leads que pararam de responder</div>
-        </div>
-        <span class="badge badge-red">D+1 → D+2 → D+3 → D+6</span>
-      </div>
-
-      <div class="urgency-banner">
-        <div class="urgency-icon">📊</div>
-        <div>
-          <div class="urgency-title">Não interprete silêncio como "não quero" — siga a sequência até o D+6</div>
-          <div class="urgency-desc">Cada dia tem uma alavanca diferente: entender → desconto/bônus → urgência/NF → encerramento. Não queime etapas.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Quando usar Follow-up vs Remarketing</div>
-        <div class="card-title">🧭 Qual contexto se aplica?</div>
-        <div class="grid2">
-          <div class="grid-cell" style="border-left:3px solid var(--blue);">
-            <div class="grid-cell-title" style="color:var(--blue);">🔁 Follow-up — Mesmo vendedor</div>
-            <div class="grid-cell-body">Lead sumiu durante o atendimento ativo. <strong>Você mesmo</strong> continua tentando o contato na sequência D+1 → D+6.</div>
-          </div>
-          <div class="grid-cell" style="border-left:3px solid var(--purple);">
-            <div class="grid-cell-title" style="color:var(--purple);">📡 Remarketing — Vendedor Rmkt</div>
-            <div class="grid-cell-body">Lead frio ou atendimento encerrado sem venda. <strong>Transferir no Kommo</strong> para o vendedor de Remarketing antes de iniciar a sequência.</div>
-          </div>
-        </div>
-        <div class="alert-blue" style="margin-top:10px;"><span>🔵</span><span><strong>Kommo (Remarketing):</strong> Preencha o cabeçalho e transfira o lead para o vendedor de Rmkt antes de disparar qualquer mensagem.</span></div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Visão geral da sequência</div>
-        <div class="card-title">📆 Cadência D+1 → D+2 → D+3 → D+6</div>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#DBEAFE;color:#1D4ED8;">H+2</div><div class="tl-line"></div></div>
-            <div class="tl-content"><div class="tl-title">Reativação leve</div><div class="tl-desc">Cliente viu mas não respondeu. Tom casual — apenas verificar se recebeu.</div></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#FEF3C7;color:#D97706;">D+1</div><div class="tl-line"></div></div>
-            <div class="tl-content"><div class="tl-title">Entender o cliente</div><div class="tl-desc">Descobrir o motivo real da não-compra. Não tente vender — pergunte primeiro.</div></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#FCE7F3;color:#9D174D;">D+2</div><div class="tl-line"></div></div>
-            <div class="tl-content"><div class="tl-title">Desconto ou bônus especial</div><div class="tl-desc">Adicionar valor: brinde, desconto pontual ou parcelamento melhor.</div></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#D1FAE5;color:#065F46;">D+3</div><div class="tl-line"></div></div>
-            <div class="tl-content"><div class="tl-title">Garantia + Urgência (NF / Escassez)</div><div class="tl-desc">"Últimas unidades" + nota fiscal garantida. Use escassez <strong>real</strong> — verifique o estoque antes.</div></div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:#FEE2E2;color:#991B1B;">D+6</div></div>
-            <div class="tl-content"><div class="tl-title">Último contato — Lead Perdido</div><div class="tl-desc">Encerramento. Arquivar no WhatsApp + mover para "Lead Perdido" no Kommo.</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">H+2 — Reativação rápida</div>
-        <div class="card-title">⏱️ Cliente viu a mensagem mas não respondeu</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">Oi, [Nome]! 😊 Só passando para ver se você recebeu as informações que te mandei!
-
-Qualquer dúvida sobre o [produto], estou aqui para ajudar. Me chama!
-
-Abraço 👋</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'followup-h2')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">D+1 — Entender o cliente</div>
-        <div class="card-title">🔍 Primeiro dia — Descobrir o motivo real</div>
-        <div class="tip"><span class="tip-icon">💡</span> Não tente vender aqui. Foque em <strong>entender</strong> o que travou. A resposta te dá a alavanca certa para D+2 e D+3.</div>
-        <div class="msg-wrap">
-          <div class="msg-box purple-border">Oi, *[Nome]*! 😊 Tudo bem?
-
-Conversamos sobre o [produto] e queria entender melhor: teve alguma dúvida que ficou sem resposta ou alguma condição que não te agradou?
-
-Pergunto porque muitas vezes consigo resolver na hora — seja no preço, na forma de pagamento ou em algum detalhe do produto.
-
-Me conta! 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'remark-d1')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">D+2 — Desconto ou bônus especial</div>
-        <div class="card-title">🎁 Segundo dia — Adicionar valor</div>
-        <div class="msg-wrap">
-          <div class="msg-box amber-border">Oi, *[Nome]*! Tudo bem?
-
-Tenho uma condição especial hoje que não consigo garantir para amanhã:
-
-🎁 *Para quem fechar até hoje*, consigo incluir um *[brinde/acessório]* sem custo adicional.
-
-Ou se preferir, posso verificar uma *condição de parcelamento especial* para você.
-
-Vale a pena aproveitar! O que você acha? 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'remark-d2')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">D+3 — Garantia + Urgência</div>
-        <div class="card-title">⚡ Terceiro dia — Escassez real + NF</div>
-        <div class="tip"><span class="tip-icon">⚠️</span> Verifique o estoque antes de enviar. <strong>Nunca invente escassez</strong> — prejudica a credibilidade.</div>
-        <div class="msg-wrap">
-          <div class="msg-box">*[Nome]*, preciso te contar:
-
-Estamos com a *última unidade* do [modelo] que você estava vendo. Essa semana saíram [X] unidades desse modelo.
-
-Se sair essa última, o próximo lote já vem com valor diferente — e sem garantia de prazo de chegada.
-
-Consigo *reservar por hoje* se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome, com *nota fiscal garantida* ✅
-
-O que me diz? ⏳</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'remark-d3')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">D+6 — Último contato</div>
-        <div class="card-title">🚪 Técnica do encerramento</div>
-        <div class="alert-red"><span>🔴</span><span>Último contato antes de mover para "Lead Perdido". Funciona porque cria senso de perda — muitos respondem exatamente aqui.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], como não recebi retorno, vou presumir que você encontrou outra opção ou não tem interesse no momento.
-
-Estarei *encerrando* o atendimento por aqui — mas fica à vontade para nos contatar quando quiser. Sempre teremos ótimas opções para você! 😊
-
-Foi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'remark-d6')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Após D+6 → Encerramento no Kommo</div>
-        <div class="card-title">❌ Ações de encerramento definitivo</div>
-        <div class="decision-box">
-          <div class="decision-title">🧭 Checklist de encerramento</div>
-          <div class="decision-item">
-            <div class="decision-key">WhatsApp</div>
-            <div class="decision-val">Arquivar a conversa. Não deletar — pode ser reativado no futuro.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">Kommo</div>
-            <div class="decision-val">Mover para <strong>"Lead Perdido"</strong>. Registrar motivo: sem resposta / concorrência / sem dinheiro.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">Feedback</div>
-            <div class="decision-val">Analisem semanalmente os motivos mais recorrentes para ajustar abordagem.</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Remarketing de produto específico — Lead frio</div>
-        <div class="card-title">📦 Notificar cliente sobre produto que ele queria</div>
-        <div class="tip"><span class="tip-icon">💡</span> Use quando chegar um produto que o cliente havia perguntado anteriormente. Personalização máxima — ele vai lembrar da conversa.</div>
-        <div class="msg-wrap">
-          <div class="msg-box purple-border">*[Nome]*, lembra que você estava procurando o [produto específico]?
-
-Acabou de chegar uma unidade aqui e *lembrei de você imediatamente*!
-
-Disponível com nota fiscal, garantia e no valor que conversamos (ou melhor!).
-
-Posso reservar no seu nome agora? São pouquíssimas unidades 😊⏳</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'remark3')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== ENTREGA ======================== -->
-    <div id="entrega" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">🚀 Etapa 7 — Entrega</div>
-          <div class="page-desc">Logística e confirmação de entrega ou visita</div>
-        </div>
-        <span class="badge badge-blue">Motoboy · Correios · Loja</span>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Entrega por motoboy</div>
-        <div class="card-title">🏍️ Informações de entrega</div>
-        <div class="tip"><span class="tip-icon">⚠️</span> <strong>Atenção total a pedidos suspeitos.</strong> Confirme documento e endereço antes de liberar qualquer entrega.</div>
-        <div class="msg-wrap">
-          <div class="msg-box">Olá! 😊 Realizamos entrega via *Motoboy*, com custo de *R$ 2,00/km*.
-
-A entrega é feita mediante pagamento total antecipado ou *entrada de 10% + frete*.
-
-📋 Para agendar, precisamos:
-● Selfie segurando seu *RG ou CNH*
-● *Comprovante de residência*
-
-Também fazemos envio via *Correios* — me manda seu CEP que calculo o frete na hora! 📦</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'motoboy')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Localização das lojas</div>
-        <div class="card-title">📍 Endereço e horários</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">📍 *Revend Eletro — Unidade Tatuapé:*
-R. Tuiuti, 1951 — Conj. 10, Tatuapé, São Paulo
-
-🕐 Horário: Seg–Sex 10h15–18h45 | Sáb 9h30–16h30
-📞 Tel: (11) 2667-8827
-
-🏢 Também temos unidades em *São José dos Campos* e *Sorocaba*!
-
-⚠️ Obrigatório apresentar *documento de identidade* para acessar o local.</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'endereco')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== PÓS-VENDA ======================== -->
-    <div id="posvenda" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">⭐ Etapa 8 — Pós-venda</div>
-          <div class="page-desc">Fidelização, avaliação e gestão de satisfação</div>
-        </div>
-        <span class="badge badge-teal">Fidelização</span>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Pós-compra — Mensagem de satisfação</div>
-        <div class="card-title">💙 Follow-up 24–48h após a venda</div>
-        <div class="msg-wrap">
-          <div class="msg-box green-border">Olá, *[Nome]*! Esperamos que esteja aproveitando ao máximo seu novo [produto]! 😊
-
-Gostaríamos de saber: como foi sua experiência de compra na Revend?
-
-Seu feedback é muito importante para continuarmos sendo a melhor opção em Apple do Brasil 🍎
-
-Se quiser nos avaliar no Google, seria incrível — ajuda muito outros clientes a nos encontrar! ⭐
-
-Qualquer dúvida ou necessidade, estou aqui. Abraço, [Seu nome]! 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'posvenda')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Cliente insatisfeito</div>
-        <div class="card-title">🆘 Gestão de crise — Cliente com problema</div>
-        <div class="alert-red"><span>🔴</span><span>Responda em no máximo 30 minutos. Velocidade é a chave para reverter insatisfação.</span></div>
-        <div class="msg-wrap">
-          <div class="msg-box">[Nome], recebi sua mensagem e já estou priorizando sua situação pessoalmente 🙏
-
-Lamento muito pela experiência e quero resolver isso para você da melhor forma possível.
-
-Me conta exatamente o que aconteceu para que eu possa acionar a solução mais rápida.
-
-A Revend existe para garantir que você fique 100% satisfeito — e vamos chegar lá juntos! 💙</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'insatisfeito')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Encaminhamento para SAC</div>
-        <div class="card-title">🔧 Problema técnico — Direcionar para SAC</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">Olá! Para garantir o melhor atendimento para o seu caso, vou direcionar você ao nosso SAC especializado:
-
-📱 WhatsApp SAC: *(11) 94025-1866*
-🕐 Seg–Sex: 10h30 às 17h30
-*(Não atendemos sábados e feriados)*
-
-Atendimento por ordem de chegada. Mencione que é cliente da unidade [local] para agilizar!
-
-Estou à disposição se precisar de mais alguma coisa 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'sac')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== COMPRA / TROCA ======================== -->
-    <div id="compra" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">♻️ Etapa 10 — Compra / Troca</div>
-          <div class="page-desc">Avaliação de aparelhos usados e propostas de upgrade</div>
-        </div>
-        <span class="badge badge-teal">Upgrade</span>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Abertura de compra</div>
-        <div class="card-title">🛒 Cliente quer vender ou fazer upgrade</div>
-        <div class="msg-wrap">
-          <div class="msg-box green-border">Compramos sim, [Nome]! 😊
-
-Me conta: você prefere:
-1️⃣ *Vender* o seu aparelho (recebe o valor em dinheiro/Pix)
-2️⃣ *Upgrade* — trocar por um modelo superior pagando a diferença
-3️⃣ *Downgrade* — trocar por modelo inferior + receber o saldo de volta
-
-Qual faz mais sentido para você agora?</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'compra-intro')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Formulário de avaliação</div>
-        <div class="card-title">📋 Pré-avaliação do aparelho</div>
-        <div class="msg-wrap">
-          <div class="msg-box">♻️ *Para fazer a pré-avaliação, me informa:*
-
-● Modelo, capacidade e cor:
-● Marcas de uso na carcaça ou tela? R:
-● Algum reparo realizado anteriormente? R:
-● Algo quebrado ou defeituoso? R:
-● Desbloqueado para todas as operadoras? R:
-● Digital ou Face ID funcionando 100%? R:
-● % saúde da bateria? *(Ajustes > Bateria > Saúde)* R:
-● Ainda na garantia Apple? R:
-
-📸 *Envie fotos* das laterais, frente e traseira (com tela ligada).
-
-⚠️ Valor estimado pode variar na avaliação presencial.</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'avaliacao-iphone')">📋 Copiar formulário</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Proposta de upgrade</div>
-        <div class="card-title">📈 Modelo de proposta com troca</div>
-        <div class="msg-wrap">
-          <div class="msg-box purple-border">Oi, *[Nome]*! 😊 Montei uma proposta personalizada para o seu upgrade:
-
-📱 *iPhone [novo modelo] — Opções:*
-◼️ Lacrado: R$ [valor] *(garantia 1 ano Apple)*
-◽️ Sem Caixa: R$ [valor] *(garantia 10 meses Revend)*
-
-♻️ *Seu [aparelho atual]* com [X]% de bateria:
-→ Avaliado em *R$ [valor de troca]*
-
-💰 *Valor líquido que você pagaria:*
-◼️ Lacrado: *R$ [valor final]*
-◽️ Sem Caixa: *R$ [valor final]*
-
-Quer a simulação no cartão em até 18x? 😉</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'proposta-upgrade')">📋 Copiar modelo</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Orientação antes da visita</div>
-        <div class="card-title">💾 Backup e preparação do aparelho</div>
-        <div class="msg-wrap">
-          <div class="msg-box blue-border">*[Nome]*, para agilizar ao máximo quando você chegar, recomendo fazer o backup agora:
-
-💾 *iCloud:* Ajustes → [Seu Nome] → iCloud → Backup → Fazer Backup Agora
-
-💻 *iTunes/Finder:* Conecte ao computador e clique em "Fazer Backup Agora"
-
-⚠️ *Importante:*
-O aparelho precisa estar *desbloqueado* e com o *iCloud removido* (Ajustes > [Seu Nome] > Sair) antes de entregar.
-
-Nossa equipe também pode auxiliar presencialmente se precisar! 😊</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'backup')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-    <!-- ======================== COMPROU / AGENDOU ======================== -->
-    <div id="comprou-agendou" class="section">
-      <div class="page-header">
-        <div>
-          <div class="page-title">✅ Etapa 11 — Comprou / Agendou</div>
-          <div class="page-desc">Fluxo pós-decisão: confirmação, não-resposta e encerramento</div>
-        </div>
-        <span class="badge badge-green">Pós-decisão</span>
-      </div>
-
-      <div class="urgency-banner">
-        <div class="urgency-icon">🎯</div>
-        <div>
-          <div class="urgency-title">Toda decisão do cliente — compra ou agendamento — precisa de ação imediata sua</div>
-          <div class="urgency-desc">Registre no Kommo, confirme com o cliente e atualize o status do lead. Lead ganho = mover para "Comprou". Lead perdido = fechar no Kommo.</div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Resultado: COMPROU</div>
-        <div class="card-title">🏆 Cliente fechou — Fluxo pós-venda</div>
-        <div class="alert-green"><span>✅</span><span><strong>Kommo:</strong> Mover lead para "Lead Ganho". Registrar valor, produto, forma de pagamento e vendedor.</span></div>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">1</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">💾 Registro no Kommo → "Lead Ganho"</div>
-              <div class="tl-desc">Mova o lead imediatamente. Preencha todos os campos: produto, valor, forma de pagamento, vendedor.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">2</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">📦 Pós-venda 24–48h</div>
-              <div class="tl-desc">Envie a mensagem de pós-venda perguntando sobre a experiência. Solicite avaliação no Google.</div>
-            </div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-left"><div class="tl-dot" style="background:var(--green);color:white;">3</div><div class="tl-line"></div></div>
-            <div class="tl-content">
-              <div class="tl-title">⭐ Feedback do cliente</div>
-              <div class="tl-desc">Colete feedback (positivo ou negativo). Avaliações positivas = peça Google Review. Negativas = escale para SAC.</div>
-            </div>
-          </div>
-        </div>
-        <div class="msg-wrap">
-          <div class="msg-label">Mensagem de pós-venda (24–48h após)</div>
-          <div class="msg-box green-border">Olá, *[Nome]*! 😊 Esperamos que esteja curtindo muito o novo [produto]!
-
-Queria saber: como foi sua experiência de compra na Revend?
-
-Seu feedback é muito importante para a gente 🍎
-
-Se quiser nos avaliar no Google, seria incrível — ajuda outros clientes a nos encontrar! ⭐
-
-Qualquer dúvida, estou aqui. Abraço! 🙏</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'posvenda')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Resultado: AGENDOU</div>
-        <div class="card-title">📅 Cliente agendou visita — Confirmação e acompanhamento</div>
-        <div class="grid2">
-          <div class="grid-cell" style="border-left:3px solid var(--blue);">
-            <div class="grid-cell-title" style="color:var(--blue);">🤖 Confirmação Automática (Kommo)</div>
-            <div class="grid-cell-body">Configure mensagem automática de confirmação no Kommo para disparar após o agendamento ser registrado. Inclui: data, horário, endereço e o que trazer.</div>
-          </div>
-          <div class="grid-cell" style="border-left:3px solid var(--amber);">
-            <div class="grid-cell-title" style="color:var(--amber);">✍️ Confirmação Manual</div>
-            <div class="grid-cell-body">Se automático não disparar: envie a mensagem de confirmação manual com todos os dados do agendamento. Confirme também no dia anterior.</div>
-          </div>
-        </div>
-        <div class="msg-wrap">
-          <div class="msg-label">Confirmação de agendamento</div>
-          <div class="msg-box blue-border">*[Nome]*, tudo certo! Seu agendamento está confirmado ✅
-
-📅 *Data:* [data]
-🕐 *Horário:* [horário]
-📍 *Local:* R. Tuiuti, 1951 — Conj. 10, Tatuapé, SP
-📱 *Produto reservado:* [modelo]
-
-⚠️ *Importante:* Traga documento de identidade (RG ou CNH).
-Se precisar reagendar, me avisa com antecedência, tá? 😊
-
-Te esperamos! 🍎</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'confirmacao-agendamento')">📋 Copiar mensagem</button>
-      </div>
-
-      <div class="card">
-        <div class="card-label">Resultado: NÃO RESPONDEU após agendamento</div>
-        <div class="card-title">🔕 Cliente agendou mas sumiu ou não apareceu</div>
-        <div class="alert-red"><span>🔴</span><span>Se o cliente não confirmar em 2h ou não aparecer no horário marcado, siga o protocolo abaixo antes de encerrar.</span></div>
-        <div class="decision-box">
-          <div class="decision-title">🧭 Protocolo para não-resposta pós-agendamento</div>
-          <div class="decision-item">
-            <div class="decision-key">WhatsApp</div>
-            <div class="decision-val">Tentou contato e não houve resposta → <strong>Arquivar a conversa no WhatsApp</strong>. Não delete — pode voltar.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">Kommo</div>
-            <div class="decision-val">Após arquivar no WhatsApp → <strong>Fechar o contato no Kommo</strong> como "Sem contato". Libera a unidade para venda.</div>
-          </div>
-          <div class="decision-item">
-            <div class="decision-key">Produto</div>
-            <div class="decision-val">Se havia reserva → <strong>Liberar o produto para venda</strong> após 48h sem confirmação.</div>
-          </div>
-        </div>
-        <div class="msg-wrap">
-          <div class="msg-label">Última tentativa antes de arquivar</div>
-          <div class="msg-box amber-border">[Nome], tudo bem? Notei que não tivemos resposta desde o nosso agendamento.
-
-Só quero confirmar: ainda tem interesse no [produto]? Estou aqui para ajudar!
-
-Se não puder mais nesse horário, me avisa que reagendo sem problema 😊
-
-(Caso não haja retorno, vou liberar a reserva para outros clientes na fila.)</div>
-        </div>
-        <button class="copy-btn" onclick="copyMsg(this, 'nao-respondeu-agendamento')">📋 Copiar mensagem</button>
-      </div>
-    </div>
-
-  </main>
-</div>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
-// Navigation
-function show(id, el) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(id);
-  if (target) target.classList.add('active');
+  // ===== CLOUDINARY CONFIG =====
+  const CLOUDINARY_CLOUD_NAME = 'dhzraeboz'; // ✅ Cloud Name configurado
+  const CLOUDINARY_UPLOAD_PRESET = 'revend_coach_pro'; // ← Preset dedicado (fotos separadas)
 
-  // Remove active from all nav items and mobile tabs
-  document.querySelectorAll('.sidebar .nav-item').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.mobile-tab').forEach(b => b.classList.remove('active'));
+  // ===== FIREBASE CONFIG =====
+  // ✅ Firebase configurado para Coach Vendas Revend (Realtime Database apenas)
+  const firebaseConfig = {
+    apiKey: "AIzaSyAWCrMGUIQyZ0TZSa0jxb_oIefcvoaeKok",
+    authDomain: "coach-vendas-revend.firebaseapp.com",
+    databaseURL: "https://coach-vendas-revend-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "coach-vendas-revend",
+    messagingSenderId: "1094242152892",
+    appId: "1:1094242152892:web:bec009fc779ee2ced83bb9"
+  };
 
-  // Activate all buttons that point to this section id
-  document.querySelectorAll(`[onclick*="'${id}'"]`).forEach(b => b.classList.add('active'));
+  // Inicializar Firebase
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
 
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // Flag para controlar sincronização
+  let isSyncingFromFirebase = false;
 
-// Messages dictionary
-const msgs = {
-  'boas-vindas': '✨ Olá, tudo bem? Seja muito bem-vindo(a) à Revend! ✨\n\nEu sou o Felipe e estou aqui para proporcionar a melhor experiência na sua busca pelos produtos Apple 🍎\n\nPara iniciar seu atendimento, poderia me informar:\n📝 Qual é o seu nome?\n📱 Você já tem algum modelo em mente?\n\nFico no aguardo! 😊\n\n🔗 Nossa tabela atualizada: https://revendeletro.com.br/tabela-de-valores/',
-  'reativacao': 'Oi! 😊 Vi que você entrou em contato com a Revend. Quero garantir que você seja bem atendido(a) pessoalmente por mim!\n\nTenho ótimas opções disponíveis agora — qual produto você estava pesquisando? 🍎\n\nMe conta que faço questão de te ajudar a encontrar o melhor negócio!',
-  'ausencia': 'Olá! Este é o setor de Vendas da Revend. Não estamos em horário de atendimento no momento, mas você já está na fila prioritária! ⏰\n\n🕐 Horários: Seg–Sex 10h às 18h | Sábado: 10h às 16h\n\nSua mensagem foi recebida ✅ Por favor, informe seu nome e o produto de interesse para agilizarmos assim que abrirmos.\n\n🔗 Tabela atualizada: https://revendeletro.com.br/tabela-de-valores/',
-  'ancoragem': '[Nome], entendo que você está pesquisando — isso é inteligente!\n\nMas posso te adiantar uma coisa: nosso estoque gira muito rápido, especialmente os modelos mais procurados.\n\nSemana passada, 3 clientes que disseram "vou pesquisar mais" voltaram no dia seguinte... e o modelo já tinha esgotado 😅\n\nTe faço uma proposta: me diz o modelo exato que você quer e eu verifico agora se ainda temos disponível. Assim você já sabe se vale a pena pesquisar ou se é melhor garantir o seu antes que suma!',
-  'proposta': 'Oi, [Nome]! Separei as melhores opções para você 📱\n\n◼️ iPhone [modelo] [GB] — Sem Caixa\n💰 R$ [valor] — Garantia Revend 10 meses ✅\n\n◽️ iPhone [modelo] [GB] — Lacrado Apple\n💰 R$ [valor] — Garantia 1 ano Apple ✅\n\nAmbos com nota fiscal, pronta entrega e bateria acima de 90%!\n\nQual te interessa mais? Já envio o vídeo do aparelho para você 😊',
-  'desejo': '[Nome], acabei de verificar o estoque agora e é o seguinte:\n\nEsse modelo está com alta procura esta semana — saíram [X] unidades nos últimos 2 dias 🔥\n\nConsigo garantir o seu até hoje, mas precisaria de uma confirmação da sua parte.\n\nSe você vier buscar pessoalmente aqui na loja, ainda consigo te incluir um brinde exclusivo 🎁\n\nQuer que eu reserve esse modelo para você agora?',
-  'prova-social': 'Olha, vou te ser 100% transparente, [Nome]:\n\nEsse modelo que te mostrei é um dos mais pedidos aqui. Só esta semana vendemos [X] unidades desse iPhone.\n\nNossa avaliação no Google é 4.9 ⭐ com mais de [X] avaliações — você pode conferir agora mesmo antes de decidir.\n\nMuitos dos nossos clientes compraram na Revend depois de pesquisar em outros lugares e perceberam que o conjunto (preço + garantia + NF + atendimento) é imbatível.\n\nTe mando o link das avaliações se quiser ver 😊',
-  'pagamento': '💰 Formas de Pagamento Revend:\n\n✅ Dinheiro (melhor condição!)\n✅ Pix (desconto especial à vista)\n✅ Cartão de débito (+2% de taxa)\n✅ Cartão de crédito em até 18x\n❌ Boleto bancário não aceitamos\n\n📦 Entrega via motoboy ou Correios:\nSinal de 10% + frete antecipado.\n\nPosso enviar a simulação de parcelamento para você agora?',
-  'obj-preco': '[Nome], entendo muito bem — e é ótimo que você esteja comparando!\n\nMas deixa eu te perguntar uma coisa: esse preço mais baixo que você viu vem com nota fiscal, garantia documentada e atendimento pós-venda?\n\nPorque na Revend você compra com segurança total: aparelho 100% original, NF-e, garantia real e nosso SAC disponível se precisar.\n\nMuitos clientes que compraram "mais barato" em outros lugares voltaram para nós depois de ter dor de cabeça. Com a Revend, isso não acontece.\n\nO que te faria fechar hoje mesmo? Posso ver se consigo melhorar alguma condição para você 🙏',
-  'obj-bateria': '[Nome], excelente que você presta atenção nisso — mostra que você entende de produto!\n\nVou ser direto: bateria 100% em aparelhos "sem caixa" é raro, porque já foram ativados. Mas 90–97% é exatamente igual na prática do dia a dia — você vai usar o aparelho por 1–2 anos e a diferença não vai aparecer.\n\nO que realmente importa é ser bateria original Apple, e todos os nossos aparelhos têm isso garantido.\n\nNa hora de separar o seu, verifico os modelos disponíveis e escolho o de maior saúde de bateria para você! Combinado? 😊',
-  'obj-troca': '[Nome], entendo a sua preocupação — e você tem razão de questionar!\n\nVou verificar agora se consigo melhorar o valor da avaliação do seu aparelho. Me confirma: está sem detalhes na tela e carcaça, certo?\n\nIndependente disso, pensa assim: o que importa é o valor líquido que você vai desembolsar para sair com o novo. Com a troca, você já reduz esse custo de forma significativa.\n\nMe dá um minuto que eu já consulto internamente para ver o máximo que consigo liberar para o seu aparelho 💪',
-  'obj-garantia': '[Nome], essa é uma das melhores perguntas que um comprador pode fazer — e temos muito orgulho da nossa resposta!\n\n✅ Aparelhos Lacrados: 1 ano de garantia direta com a Apple\n✅ Sem Caixa / Open Box: Garantia Revend com SAC exclusivo\n✅ Em caso de qualquer problema: WhatsApp direto (11) 94025-1866\n\nAtendemos de seg a sex 10h30–17h30 e nossa equipe resolve. Temos mais de [X] clientes atendidos sem problemas na garantia.\n\nIsso te dá a tranquilidade que você precisava? 😊',
-  'obj-pesquisa': 'Claro, [Nome]! Pensar é importante em uma compra como essa 😊\n\nMas me ajuda com uma coisa: o que especificamente ainda te deixa com dúvida? É o preço, a forma de pagamento, o modelo, ou tem alguma outra questão?\n\nPergunto porque muitas vezes consigo resolver na hora — seja ajustando uma condição, explicando melhor algum detalhe ou encontrando uma opção que se encaixa melhor na sua realidade.\n\nO que seria o ideal para você fechar hoje? Me conta! 🙏',
-  'obj-confianca': '[Nome], sua preocupação é completamente válida — e parabéns por ser cauteloso!\n\nDeixa eu te mostrar que a Revend é uma empresa real e séria:\n🏢 Somos CNPJ 28.724.816/0001-87 — você pode consultar agora na Receita Federal\n📍 Loja física: R. Tuiuti, 1951, Tatuapé — SP\n⭐ [X]+ avaliações no Google com nota [X.X]\n📋 Emitimos Nota Fiscal Eletrônica em toda venda\n\nVocê pode vir pessoalmente conhecer a loja antes de decidir. É aqui em São Paulo, no Tatuapé!\n\nPrefere passar pessoalmente ou quer que eu te envie mais informações de segurança primeiro? 😊',
-  'fechamento-alternativo': '[Nome], já vejo que você gostou do modelo!\n\nMe diz: você prefere passar na loja para verificar pessoalmente ou prefere que eu organize a entrega via motoboy para você?\n\nPara qualquer uma das opções, vou reservar o modelo agora mesmo no seu nome — só preciso de qual é melhor para você! 😊',
-  'fechamento-escassez': '[Nome], acabo de verificar e temos apenas [X] unidade(s) desse modelo disponível agora.\n\nConsiderando que recebo consultas constantemente e o estoque gira rápido, não consigo garantir disponibilidade para amanhã sem uma reserva confirmada.\n\nPara garantir o seu hoje, só preciso de R$ 100,00 de sinal via Pix — que é descontado na compra.\n\nVocê consegue fazer isso agora? O modelo fica bloqueado no seu nome por 48h ⏳',
-  'reserva': 'Ótima escolha, [Nome]! 🎉\n\nPara garantir o aparelho no seu nome com atendimento prioritário, nossa reserva é de:\n\n💸 R$ 100,00 via Pix\nCNPJ: 28.724.816/0001-87 (Revend Comércio Varejista)\n(O valor é 100% abatido na compra)\n\nApós o comprovante, já bloqueo o produto para você e confirmo o agendamento!\n\nQual o melhor dia e horário para você? 🗓️',
-  'agendamento': '📅 AGENDAMENTO\n● Código:\n● Data:\n● Horário:\n● Nome completo:\n● Telefone:\n● Produto (modelo | capacidade | cor):\n● Valor:\n● Forma de pagamento:\n● Sinal confirmado: ✅ / ❌\n● Observações:',
-  'sem-sinal': '[Nome]! 😊 Sem problema — você pode vir sem reserva.\n\nSó preciso ser transparente: sem sinal, o modelo permanece na linha de venda até você chegar. Se outro cliente confirmar antes, o modelo pode ser vendido.\n\nPara evitar que você venha e não encontre o produto, recomendo fortemente pelo menos o sinal de R$ 100.\n\nVocê consegue enviar agora? Prometo que vale a garantia de ter o produto esperando por você! 💪',
-  'followup-h2': 'Oi, [Nome]! 😊 Só passando para ver se você recebeu as informações que te mandei!\n\nQualquer dúvida sobre o [produto], estou aqui para ajudar. Me chama!\n\nAbraço 👋',
-  'followup-d1': 'Boa tarde, [Nome]!\n\nAinda tenho disponível o [produto] que conversamos — mas nosso estoque está girando bastante esta semana.\n\nSó quero garantir que você não perca a oportunidade, porque o modelo no valor que te passei pode não estar disponível por muito mais tempo.\n\nAinda tem interesse? Posso te ajudar com alguma outra condição? 😊',
-  'followup-d2': 'Oi, [Nome]! Tudo bem?\n\nOlha, estou com uma condição especial hoje que não consigo garantir para amanhã:\n\n🎁 Para quem fechar hoje, consigo incluir um [brinde/acessório] no seu pedido sem custo adicional.\n\nOu se preferir, posso verificar uma condição de parcelamento especial para você.\n\nVale a pena aproveitar! O que você acha? 😊',
-  'followup-d3': '[Nome], preciso te contar:\n\nEstamos com a última unidade do [modelo] que você estava vendo. A gente vendeu [X] unidades dessa versão essa semana.\n\nSe sair essa última, o próximo lote já vem com valor diferente.\n\nConsigo reservar por hoje se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome ✅\n\nO que me diz? ⏳',
-  'followup-d5': 'Olá, [Nome]! 👋\n\nPensando no que conversamos, tenho uma alternativa que pode ser mais interessante para você:\n\nEm vez do [modelo anterior], o [modelo alternativo] cabe no mesmo orçamento e tem [vantagem específica].\n\nVocê toparia eu te mandar as informações dessa opção? Pode ser o match perfeito! 😊',
-  'followup-d7': '[Nome], como não recebi retorno, vou presumir que você encontrou outro produto ou não tem mais interesse no momento.\n\nEstarei encerrando o atendimento por aqui — mas fica à vontade para nos contatar quando quiser, sempre teremos ótimas opções para você! 😊\n\nFoi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏',
-  'motoboy': 'Olá! 😊 Realizamos entrega via Motoboy, com custo de R$ 2,00/km.\n\nA entrega é feita mediante pagamento total antecipado ou entrada de 10% + frete.\n\n📋 Para agendar, precisamos:\n● Selfie segurando seu RG ou CNH\n● Comprovante de residência\n\nTambém fazemos envio via Correios — me manda seu CEP que calculo o frete na hora! 📦',
-  'endereco': '📍 Revend Eletro — Unidade Tatuapé:\nR. Tuiuti, 1951 — Conj. 10, Tatuapé, São Paulo\n\n🕐 Horário: Seg–Sex 10h15–18h45 | Sáb 9h30–16h30\n📞 Tel: (11) 2667-8827\n\n🏢 Também temos unidades em São José dos Campos e Sorocaba!\n\n⚠️ Obrigatório apresentar documento de identidade para acessar o local.',
-  'posvenda': 'Olá, [Nome]! Esperamos que esteja aproveitando ao máximo seu novo [produto]! 😊\n\nGostaríamos de saber: como foi sua experiência de compra na Revend?\n\nSeu feedback é muito importante para continuarmos sendo a melhor opção em Apple do Brasil 🍎\n\nSe quiser nos avaliar no Google, seria incrível — ajuda muito outros clientes a nos encontrar! ⭐\n\nQualquer dúvida ou necessidade, estou aqui. Abraço, [Seu nome]! 🙏',
-  'insatisfeito': '[Nome], recebi sua mensagem e já estou priorizando sua situação pessoalmente 🙏\n\nLamento muito pela experiência e quero resolver isso para você da melhor forma possível.\n\nMe conta exatamente o que aconteceu para que eu possa acionar a solução mais rápida.\n\nA Revend existe para garantir que você fique 100% satisfeito — e vamos chegar lá juntos! 💙',
-  'sac': 'Olá! Para garantir o melhor atendimento para o seu caso, vou direcionar você ao nosso SAC especializado:\n\n📱 WhatsApp SAC: (11) 94025-1866\n🕐 Seg–Sex: 10h30 às 17h30\n(Não atendemos sábados e feriados)\n\nAtendimento por ordem de chegada. Mencione que é cliente da unidade [local] para agilizar!\n\nEstou à disposição se precisar de mais alguma coisa 😊',
-  'remark1': 'Oi, [Nome]! Tudo bem? 😊\n\nPassaram alguns dias desde que conversamos sobre o [produto] — como está a sua pesquisa?\n\nTenho uma novidade que pode te interessar: chegou um novo lote e estamos com condições especiais essa semana.\n\nSe quiser que eu monte uma proposta atualizada para você, é só falar! 🍎',
-  'remark-d1': 'Oi, [Nome]! 😊 Tudo bem?\n\nPassamos a conversar ontem sobre o [produto] e queria entender melhor: teve alguma dúvida que ficou sem resposta ou alguma condição que não te agradou?\n\nPergunto porque muitas vezes consigo resolver na hora — seja no preço, na forma de pagamento ou em algum detalhe do produto.\n\nMe conta! 🙏',
-  'remark-d2': 'Oi, [Nome]! Tudo bem?\n\nTenho uma condição especial hoje que não consigo garantir para amanhã:\n\n🎁 Para quem fechar até hoje, consigo incluir um [brinde/acessório] sem custo adicional.\n\nOu se preferir, posso verificar uma condição de parcelamento especial para você.\n\nVale a pena aproveitar! O que você acha? 😊',
-  'remark-d3': '[Nome], preciso te contar:\n\nEstamos com a última unidade do [modelo] que você estava vendo. Essa semana saíram [X] unidades desse modelo.\n\nSe sair essa última, o próximo lote já vem com valor diferente — e sem garantia de prazo de chegada.\n\nConsigo reservar por hoje se você confirmar agora. Apenas R$ 100 de sinal e o produto fica no seu nome, com nota fiscal garantida ✅\n\nO que me diz? ⏳',
-  'remark-d6': '[Nome], como não recebi retorno, vou presumir que você encontrou outra opção ou não tem interesse no momento.\n\nEstarei encerrando o atendimento por aqui — mas fica à vontade para nos contatar quando quiser. Sempre teremos ótimas opções para você! 😊\n\nFoi um prazer te atender. Qualquer coisa, sabe onde me encontrar. Abraço! 🙏',
-  'entender-reacao': '[Nome], o que você achou das opções? Alguma chamou mais atenção? 😊\n\nE me diz: você está precisando para quando? Assim consigo verificar a disponibilidade certa para você!',
-  'obj-concorrencia': '[Nome], ótimo que você está pesquisando — isso só confirma que você é um comprador inteligente!\n\nMe conta: essa outra oferta vem com nota fiscal, garantia documentada e atendimento pós-venda garantido?\n\nNa Revend, além do preço competitivo, você tem:\n✅ NF-e em toda venda\n✅ Garantia real (não é promessa de boca)\n✅ SAC com atendimento humano\n✅ Loja física para você visitar antes de decidir\n\nPosso ver o que consigo fazer para igualar ou superar essa condição. Me passa o valor que você viu e verifico aqui 💪',
-  'obj-negociacao': '[Nome], entendo! Deixa eu verificar aqui o que consigo fazer por você.\n\nDuas opções que posso explorar agora:\n1️⃣ Se você conseguir pagar no Pix ou débito, consigo uma condição melhor na hora\n2️⃣ Posso verificar se há margem para incluir um brinde sem alterar o preço\n\nQual dessas faz mais sentido para você? Assim já aciono internamente 🙏',
-  'confirmacao-agendamento': '[Nome], tudo certo! Seu agendamento está confirmado ✅\n\n📅 Data: [data]\n🕐 Horário: [horário]\n📍 Local: R. Tuiuti, 1951 — Conj. 10, Tatuapé, SP\n📱 Produto reservado: [modelo]\n\n⚠️ Importante: Traga documento de identidade (RG ou CNH).\nSe precisar reagendar, me avisa com antecedência, tá? 😊\n\nTe esperamos! 🍎',
-  'nao-respondeu-agendamento': '[Nome], tudo bem? Notei que não tivemos resposta desde o nosso agendamento.\n\nSó quero confirmar: ainda tem interesse no [produto]? Estou aqui para ajudar!\n\nSe não puder mais nesse horário, me avisa que reagendo sem problema 😊\n\n(Caso não haja retorno, vou liberar a reserva para outros clientes na fila.)',
-  'remark3': '[Nome], lembra que você estava procurando o [produto específico]?\n\nAcabou de chegar uma unidade aqui e lembrei de você imediatamente!\n\nDisponível com nota fiscal, garantia e no valor que conversamos (ou melhor!).\n\nPosso reservar no seu nome agora? São pouquíssimas unidades 😊⏳',
-  'sem-interesse': '[Nome], agradeço muito pela oportunidade de te atender! 🥰\n\nEntendo que não foi o momento certo — e isso é completamente válido.\n\nQuando você estiver pronto(a) para dar o próximo passo, a Revend estará aqui com as melhores opções Apple do mercado.\n\nBoa sorte na sua pesquisa! Abraço 💙',
-  'compra-intro': 'Compramos sim, [Nome]! 😊\n\nMe conta: você prefere:\n1️⃣ Vender o seu aparelho (recebe o valor em dinheiro/Pix)\n2️⃣ Upgrade — trocar por um modelo superior pagando a diferença\n3️⃣ Downgrade — trocar por modelo inferior + receber o saldo de volta\n\nQual faz mais sentido para você agora?',
-  'avaliacao-iphone': '♻️ Para fazer a pré-avaliação, me informa:\n\n● Modelo, capacidade e cor:\n● Marcas de uso na carcaça ou tela? R:\n● Algum reparo realizado anteriormente? R:\n● Algo quebrado ou defeituoso? R:\n● Desbloqueado para todas as operadoras? R:\n● Digital ou Face ID funcionando 100%? R:\n● % saúde da bateria? (Ajustes > Bateria > Saúde) R:\n● Ainda na garantia Apple? R:\n\n📸 Envie fotos das laterais, frente e traseira (com tela ligada).\n\n⚠️ Valor estimado pode variar na avaliação presencial.',
-  'proposta-upgrade': 'Oi, [Nome]! 😊 Montei uma proposta personalizada para o seu upgrade:\n\n📱 iPhone [novo modelo] — Opções:\n◼️ Lacrado: R$ [valor] (garantia 1 ano Apple)\n◽️ Sem Caixa: R$ [valor] (garantia 10 meses Revend)\n\n♻️ Seu [aparelho atual] com [X]% de bateria:\n→ Avaliado em R$ [valor de troca]\n\n💰 Valor líquido que você pagaria:\n◼️ Lacrado: R$ [valor final]\n◽️ Sem Caixa: R$ [valor final]\n\nQuer a simulação no cartão em até 18x? 😉',
-  'backup': '[Nome], para agilizar ao máximo quando você chegar, recomendo fazer o backup agora:\n\n💾 iCloud: Ajustes → [Seu Nome] → iCloud → Backup → Fazer Backup Agora\n\n💻 iTunes/Finder: Conecte ao computador e clique em "Fazer Backup Agora"\n\n⚠️ Importante:\nO aparelho precisa estar desbloqueado e com o iCloud removido (Ajustes > [Seu Nome] > Sair) antes de entregar.\n\nNossa equipe também pode auxiliar presencialmente se precisar! 😊'
-};
+  // ===== DATA STRUCTURE =====
+  const defaultData = {
+    online: {
+      1: {
+        title: '👋 Recepção',
+        desc: 'Primeiro contato com lead',
+        scenarios: {
+          'lead-chegou': {
+            name: '📥 Lead Chegando',
+            substeps: {
+              'falou-o-que-quer': {
+                name: '✅ Falou exatamente o que quer',
+                content: 'Cliente já informou modelo e especificações.\n\n✅ Ação:\n1. Abra o Kommo AGORA\n2. Preencha: nome, canal, produto específico\n3. Confirme disponibilidade\n4. Envie proposta IMEDIATA\n5. Agende demonstração\n\n⚡ REGRA: Responder em 20 min = 3x mais conversão',
+                message: ['✨ Ótimo! Achei exatamente o que você quer! 📱\n\nSou [SEU NOME] da Revend.\n\nConfirmei que temos o iPhone [MODELO] em estoque com [ESPECIFICAÇÕES].\n\nQual é o melhor horário pra você conversar?\n\n🔗 Tabela: https://revendeletro.com.br/tabela'],
+                checks: ['Abriu Kommo', 'Preencheu nome/canal/produto', 'Confirmou estoque', 'Enviou proposta']
+              },
+              'acessou-tabela': {
+                name: '🔍 Acessou tabela mas não decidiu',
+                content: 'Cliente visualizou tabela mas não respondeu sobre modelo.\n\n✅ Ação:\n1. Abra o Kommo\n2. Qualifique com 3 perguntas:\n   - Qual modelo interessou?\n   - Tipo: lacrado, sem caixa, seminovo?\n   - Pagamento: à vista ou parcelado?\n3. NÃO ultrapasse 3 perguntas\n4. Qualifique RÁPIDO',
+                message: ['Oi! 👋 Vi que você acessou nossa tabela!\n\nQual modelo chamou mais sua atenção? 🍎\n\nPra te ajudar melhor, me manda essas 3 info:\n1️⃣ Qual iPhone?\n2️⃣ Lacrado, sem caixa ou seminovo?\n3️⃣ Pix à vista ou cartão parcelado?\n\nAjudo você agora!'],
+                checks: ['Visualizou tabela', 'Fez 3 perguntas de qualificação', 'Não ultrapassou 3 perguntas']
+              },
+              'nao-acessou-nada': {
+                name: '❌ Não acessou nada (lead frio)',
+                content: 'Cliente chegou mas não clicou em nada.\n\n✅ Ação:\n1. Lead está muito frio\n2. Use abordagem CONSULTIVA\n3. Descubra NECESSIDADE real\n4. Primeiro: PERGUNTE, não venda\n5. Envie tabela de forma PESSOAL\n\n⚡ REGRA: Qualifique antes de vender',
+                message: ['Oi! 👋 Tudo bem?\n\nSou [SEU NOME] da Revend 🍎\n\nPrimeiro, deixa eu entender sua necessidade:\n\n📱 Qual é teu iPhone agora?\n🤔 O que você não gosta nele?\n💭 Se pudesse escolher qualquer um, qual seria?\n\nDepois te envio nossas melhores opções!'],
+                checks: ['Qualificou necessidade', 'Fez perguntas abertas', 'Enviou tabela personalizada']
+              }
+            }
+          },
+          'sem-resposta': {
+            name: '⚡ Lead Esfriando (Sem resposta)',
+            substeps: {
+              'apos-2h': {
+                name: 'Após 2h sem resposta',
+                content: 'REATIVE COM URGÊNCIA AGORA!\n\nO lead está perdendo interesse.\n\n✅ Ação:\n1. Nova tentativa DIFERENTE\n2. Use criatividade (emoji, pergunta)\n3. Crie urgência mencionando estoque\n4. Ofereça facilidade (video call, etc)',
+                message: ['Oi! 😊 Vi seu contato com a Revend. Quero te atender pessoalmente!\n\nTenho opções INCRÍVEIS agora — qual produto você buscava? 🍎\n\nMe conta rapidinho que te ajudo!'],
+                checks: ['Ativou lead', 'Enviou mensagem urgente', 'Criou senso de oportunidade']
+              },
+              'apos-4h': {
+                name: 'Após 4h sem resposta (Última tentativa)',
+                content: 'ÚLTIMA TENTATIVA (use abordagem diferente)\n\n✅ Mude a estratégia:\n1. Faça uma pergunta específica\n2. Limite o tempo ("Só hoje!")\n3. Ofereça algo exclusivo\n4. Se não responder = próxima tentativa D+1',
+                message: ['[Nome], tudo bem?\n\nVi que você pesquisou nossos produtos mas não voltou 😅\n\nTemos uma PROMOÇÃO exclusiva só hoje:\n🎁 Frete GRÁTIS em qualquer pedido\n💰 10% OFF em modelos selecionados\n\nAinda interessa? Qual modelo queria?'],
+                checks: ['Tentou abordagem diferente', 'Criou urgência com promoção', 'Fez pergunta específica']
+              }
+            }
+          }
+        },
+        tips: 'Responda RÁPIDO - quanto mais rápido, mais chance de venda!',
+        alerts: 'Nunca deixe lead sem resposta por mais de 20 minutos'
+      },
 
-function copyMsg(btn, key) {
-  const text = msgs[key] || '';
-  navigator.clipboard.writeText(text).then(() => {
-    const original = btn.textContent;
-    btn.textContent = '✅ Copiado!';
-    btn.classList.add('copied');
+      2: {
+        title: '🔍 Qualificação',
+        desc: 'Entender necessidade do cliente',
+        scenarios: {
+          'nao-sabe-modelo': {
+            name: '❓ Cliente não sabe o modelo',
+            substeps: {
+              'qualificar': {
+                name: 'Fazer 3 perguntas de qualificação',
+                content: 'QUALIFIQUE COM 3 PERGUNTAS (nesta ordem):\n\n1️⃣ TIPO\n"Lacrado, sem caixa ou seminovo?"\n\n2️⃣ PAGAMENTO  \n"Pix à vista ou cartão/parcelado?"\n\n3️⃣ TROCA\n"Tem aparelho antigo para dar?"\n\n⚠️ NUNCA ultrapasse 3 perguntas!\n⚠️ NUNCA ofereça mais de 2 opções',
+                message: ['Claro, [Nome]! 😊\n\nVou fazer 3 perguntas rápidas pra te oferecer o MELHOR:\n\n1️⃣ Você prefere: Lacrado (novo, com caixa) | Sem Caixa (novo, usado 1x) | Seminovo?\n\n2️⃣ Como quer pagar: Pix à vista | Cartão parcelado?\n\n3️⃣ Tem iPhone antigo pra dar? Faz desconto!\n\nMe manda essas 3 respostas!'],
+                checks: ['Perguntou tipo', 'Perguntou pagamento', 'Perguntou troca', 'Não ultrapassou 3 perguntas']
+              }
+            }
+          }
+        },
+        tips: 'Máximo 3 perguntas qualificadoras - cliente respondendo = está comprando!',
+        alerts: 'Nunca ofereça mais de 2 opções - mais opcões = mais indecisão'
+      },
+
+      3: {
+        title: '📋 Proposta',
+        desc: 'Apresentar as melhores opções',
+        scenarios: {
+          'apresentar-proposta': {
+            name: '📱 Apresentar Proposta',
+            substeps: {
+              'duas-opcoes': {
+                name: 'Apresentar 2 opções',
+                content: 'REGRA DE OURO: SEMPRE 2 OPÇÕES\n\n✅ Estrutura:\nOption A: Sem caixa (mais barato, mesma garantia)\nOption B: Lacrado (novo, mais caro, garantia Apple)\n\n✅ Elementos:\n- Modelo específico\n- Preço claro\n- Garantia destacada  \n- Foto/vídeo\n- Prazo de entrega\n\n⚠️ Nunca 3 opções - paralisa decisão!',
+                message: ['Oi [Nome]! Separei as 2 melhores pra você! 📱\n\n*◼️ iPhone 14 128GB - Sem Caixa*\n💰 R$ 2.450\n✅ Garantia Revend 10 meses\n📹 Vídeo: [link]\n\n*◽️ iPhone 14 128GB - Lacrado*\n💰 R$ 2.899\n✅ Garantia Apple 1 ano\n📹 Vídeo: [link]\n\nAmbos: Nota fiscal + Frete grátis + Bateria 90%+\n\nQual te interessa? 😊'],
+                checks: ['Apresentou exatamente 2 opções', 'Mostrou preço claro', 'Destacou garantia', 'Enviou vídeo/foto']
+              },
+              'gerar-urgencia': {
+                name: 'Gerar urgência + desejo',
+                content: 'ESCASSEZ + PROVA SOCIAL = CONVERSÃO!\n\n✅ Tática 1 - Escassez:\n"Acabei de verificar: esse modelo saiu 8 unidades em 2 dias!"\n\n✅ Tática 2 - Prova Social:\n"5 clientes querendo esse mesmo modelo"\n\n✅ Tática 3 - Incentivo:\n"Vindo hoje: levo brinde exclusivo pra você"\n\n✅ Call to Action:\n"Preciso confirmar agora pra garantir seu pedido"',
+                message: ['*[Nome]*, acabei de conferir!\n\nEsse iPhone 14 SAIU 8 unidades em apenas 2 DIAS! 🔥\n\n5 clientes querendo o mesmo modelo.\n\nConsigo GARANTIR o seu até hoje, mas preciso de confirmação AGORA.\n\nVindo na loja: ganho um case + película GRÁTIS pra você 🎁\n\nVem confirmar?'],
+                checks: ['Usou escassez real', 'Mencionou prova social', 'Ofereceu brinde exclusivo', 'Criou urgência real']
+              }
+            }
+          }
+        },
+        tips: 'Duas opções = conversão. Três opções = confusão. Sempre duas!',
+        alerts: 'Envie SEMPRE foto/vídeo do produto - aumenta conversão em 40%'
+      },
+
+      4: {
+        title: '🛡️ Objeções',
+        desc: 'Tratamento de objeções',
+        scenarios: {
+          'pesquisar-pensar': {
+            name: '🔎 "Vou pesquisar" / "Vou pensar"',
+            substeps: {
+              'resposta': {
+                name: 'Usar ancoragem de valor',
+                content: 'Use ANCORAGEM DE VALOR:\n\nNão deixe cliente sair sem compromisso!\n\n✅ Diga:\n- Nosso estoque gira RÁPIDO\n- Semana passada 3 clientes que iam pesquisar VOLTARAM e o modelo tinha esgotado\n- Estoques limitados = urgência real\n\n✅ Ofereça:\n- Reservar com sinal mínimo (R$ 100)\n- Video call mostrando o produto',
+                message: ['[Nome], entendo! Mas sabe... nosso estoque gira MUITO rápido.\n\nSemana passada, 3 clientes que falaram "vou pesquisar" voltaram e o modelo tinha ESGOTADO 😅\n\nMe manda o modelo exato que você quer. Verifico AGORA se temos.\n\nAssim você decide se pesquisa ou GARANTE o seu! 📱'],
+                checks: ['Usou ancoragem de valor', 'Criou urgência', 'Pediu modelo específico']
+              }
+            }
+          }
+        },
+        tips: 'Toda objeção é na verdade uma pergunta disfarçada. Encontre o motivo real!',
+        alerts: 'Nunca discuta preço - reframe para VALOR'
+      },
+
+      5: {
+        title: '🔒 Fechamento',
+        desc: 'Técnicas de fechamento',
+        scenarios: {
+          'fechar-venda': {
+            name: '✅ Fechar a Venda',
+            substeps: {
+              'pergunta-alternativa': {
+                name: 'Pergunta alternativa (Assume compra)',
+                content: 'ASSUME A COMPRA = Mais efetivo!\n\n✅ Estrutura:\n"[Nome], vejo que gostou!\n\nPrefere:\n🏪 Vir na loja verificar pessoalmente\n📦 Fazer entrega via motoboy\n\nVou reservar no seu nome agora! Qual é melhor?"\n\n⚡ IMPORTANTE:\n- Não pergunta "Quer comprar?"\n- Pergunta COMO vai comprar\n- Assume que VAI comprar',
+                message: ['*[Nome]*, vejo que gostou! 😊\n\nAgora só falta definir:\n\n🏪 Você prefere:\n   A) Vir aqui buscar pessoalmente\n   B) Motoboy faz entrega\n\nVou reservar no seu nome agora!\nQual é melhor pra você? 🎁'],
+                checks: ['Fez pergunta alternativa', 'Assumiu a venda', 'Pediu ação específica']
+              }
+            }
+          }
+        },
+        tips: 'Pergunta alternativa = cliente escolhe COMO comprar, não SE quer comprar',
+        alerts: 'Sinal em 48h = compromisso real e bloqueia cliente'
+      },
+
+      6: {
+        title: '⭐ Pós-venda',
+        desc: 'Fidelização e follow-up',
+        scenarios: {
+          'retencao': {
+            name: '🎯 Reter Cliente',
+            substeps: {
+              'follow-up-d1': {
+                name: 'Follow-up D+1',
+                content: 'MANUTENÇÃO DO RELACIONAMENTO\n\n✅ Quando:\nApenas logo após cliente receber\n\n✅ O quê perguntar:\n"Chegou bem?"\n"Tá funcionando normal?"\n"Tem dúvida em algo?"\n\n✅ Objetivo:\n- Garantir satisfação\n- Resolver problemas RÁPIDO\n- Criar relacionamento',
+                message: ['Oi [Nome]! 😊\n\nChegou bem o seu iPhone? Como está funcionando?\n\nTem dúvida em algo? Tô aqui pra ajudar! 📱\n\nPs: Uma avaliação sua no Google ajuda MUITO a gente 🌟'],
+                checks: ['Enviou D+1', 'Perguntou satisfação', 'Resolveu dúvidas']
+              }
+            }
+          }
+        },
+        tips: 'Cliente satisfeito = 10x mais indicações. Invista em pós-venda!',
+        alerts: 'D+1: Já resolveu problema? D+3: Pede avaliação Google. D+6: Remarketing'
+      }
+    },
+
+    presencial: {
+      1: {
+        title: '👔 Apresentação Pessoal',
+        desc: 'Uniforme, postura e aparência',
+        scenarios: {
+          'primeira-impressao': {
+            name: '✨ Primeira Impressão (0-30 seg)',
+            content: 'PRIMEIROS 30 SEGUNDOS SÃO TUDO!\n\n✅ Checklist Pessoal:\n- Uniforme Revend limpo e bem ajustado\n- Postura reta (peito aberto, ombros para trás)\n- Sorriso genuíno\n- Contato visual\n- Tom de voz amigável\n\n✅ Objetivo:\n"Esse vendedor conhece o que faz"\n"Posso confiar"\n"Quer me ajudar de verdade"',
+            message: 'Bem-vindo à Revend! 🎉\n\nSou [NOME], tudo bem com você?\n\nEu tô aqui pra ajudar em qualquer dúvida sobre nossos produtos!',
+            checks: ['Uniforme ok', 'Postura profissional', 'Sorriso genuíno', 'Contato visual']
+          }
+        },
+        tips: 'Primeira impressão = 7 segundos. Depois disso, cliente já decidiu se confia em você.',
+        alerts: 'Uniforme sujo = perde 80% das vendas'
+      }
+    }
+  };
+
+  // Gallery Data
+  let galleryData = {
+    categories: {},
+    products: {}
+  };
+
+  // Load data (seguro - sem erro se localStorage vazio)
+  let data = localStorage.getItem('revendCoachData') ? JSON.parse(localStorage.getItem('revendCoachData')) : JSON.parse(JSON.stringify(defaultData));
+  let galleyData = localStorage.getItem('revendGalleryData') ? JSON.parse(localStorage.getItem('revendGalleryData')) : { categories: {}, products: {} };
+
+  // DEBUG - MENSAGENS IMPORTANTES
+  console.log('🚀 APP INICIANDO...');
+  console.log('✅ defaultData carregado:', !!defaultData);
+  console.log('✅ data carregado:', !!data);
+  console.log('✅ data.online existe:', !!(data && data.online));
+  console.log('✅ Número de etapas ONLINE:', data && data.online ? Object.keys(data.online).length : 0);
+
+  if (!data || !data.online || Object.keys(data.online).length === 0) {
+    console.error('❌ ERRO CRÍTICO: Dados não carregados corretamente!');
+    console.log('Forçando uso de defaultData...');
+    data = JSON.parse(JSON.stringify(defaultData));
+  }
+
+  let currentMode = 'online';
+  let currentStage = null;
+  let currentScenario = null;
+  let selectedCategory = null;
+
+  // Timer
+  let timerRunning = false;
+  let timerSeconds = 0;
+
+  setInterval(() => {
+    if (timerRunning) {
+      timerSeconds++;
+      const h = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+      const m = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+      const s = String(timerSeconds % 60).padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${h}:${m}:${s}`;
+    }
+  }, 1000);
+
+  function setMode(mode) {
+    currentMode = mode;
+    currentStage = null;
+    currentScenario = null;
+    timerRunning = false;
+    timerSeconds = 0;
+    document.getElementById('timerDisplay').textContent = '00:00:00';
+    renderCoach();
+    document.querySelectorAll('#modeToggleHeader .mode-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+  }
+
+  function switchTab(tab) {
+    if (tab === 'admin') {
+      // Mostrar modal de login
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('passwordInput').value = '';
+      document.getElementById('loginError').classList.remove('show');
+      document.getElementById('passwordInput').focus();
+      return;
+    }
+
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+
+    document.querySelectorAll('.tabs-header .tab-btn').forEach(b => b.classList.remove('active'));
+    event.target.classList.add('active');
+
+    if (tab === 'galeria') {
+      renderGallery();
+    }
+  }
+
+  function checkPassword() {
+    const password = document.getElementById('passwordInput').value;
+    const correctPassword = 'Revend@2026';
+
+    if (password === correctPassword) {
+      // Senha correta - acessar admin
+      document.getElementById('loginModal').classList.remove('active');
+
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-admin').classList.add('active');
+
+      document.querySelectorAll('.tabs-header .tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tabs-header .tab-btn')[2].classList.add('active'); // ADMIN é o 3º botão
+
+      renderAdminPanel();
+    } else {
+      // Senha incorreta
+      document.getElementById('loginError').classList.add('show');
+      document.getElementById('passwordInput').value = '';
+    }
+  }
+
+  function renderCoach() {
+    console.log('🔄 renderCoach() chamado - modo:', currentMode);
+    console.log('📊 data existe?', !!data);
+    console.log('📊 data[currentMode] existe?', !!(data && data[currentMode]));
+
+    if (!data || !data[currentMode]) {
+      console.error('❌ ERRO em renderCoach: dados não existem!');
+      console.log('Usando defaultData como fallback...');
+      data = JSON.parse(JSON.stringify(defaultData));
+    }
+
+    const stages = data[currentMode];
+    const list = document.getElementById('stagesList');
+
+    if (!list) {
+      console.error('❌ ERRO: elemento #stagesList não encontrado no DOM!');
+      return;
+    }
+
+    list.innerHTML = '';
+
+    if (!stages || Object.keys(stages).length === 0) {
+      console.warn('⚠️ AVISO: Nenhuma etapa encontrada para o modo ' + currentMode);
+      list.innerHTML = '<p style="color: var(--text-muted);">Nenhuma etapa disponível</p>';
+      return;
+    }
+
+    console.log('✅ Renderizando', Object.keys(stages).length, 'etapas');
+
+    Object.entries(stages).forEach(([id, stage]) => {
+      // ⚠️ IMPORTANTE: Pular elementos null/undefined
+      if (!stage || !stage.title) {
+        console.warn('⚠️ Etapa', id, 'está nula ou sem título, pulando...');
+        return;
+      }
+
+      const btn = document.createElement('button');
+      btn.className = `stage-btn ${currentStage == id ? 'active' : ''}`;
+      btn.textContent = stage.title;
+      btn.onclick = () => selectStage(id, stage);
+      list.appendChild(btn);
+    });
+  }
+
+  function selectStage(id, stage) {
+    currentStage = id;
+    currentScenario = null;
+    renderCoach();
+
+    document.getElementById('stageTitle').textContent = stage.title;
+    document.getElementById('stageDesc').textContent = stage.desc;
+
+    let html = '<div class="scenarios-grid">';
+    Object.entries(stage.scenarios).forEach(([key, scenario]) => {
+      html += `<button class="scenario-btn" onclick="selectScenario('${id}', '${key}')">
+        ${scenario.name}
+      </button>`;
+    });
+    html += '</div><div id="scenarioContent"></div>';
+
+    document.getElementById('contentArea').innerHTML = html;
+
+    const tips = Array.isArray(stage.tips) ? stage.tips : [stage.tips];
+    const tipsHtml = tips.map(tip => `<div class="tip-card">${tip}</div>`).join('');
+
+    const alerts = Array.isArray(stage.alerts) ? stage.alerts : [stage.alerts];
+    const alertsHtml = alerts.map(alert => `<div class="alert-card">${alert}</div>`).join('');
+
+    const sidebarRight = document.querySelector('.sidebar-right');
+    sidebarRight.innerHTML = `
+      <div class="section-title">💡 Dicas Rápidas</div>
+      ${tipsHtml}
+      ${alerts && alerts.length > 0 && alerts[0] ? `
+        <div class="section-title" style="margin-top: 16px;">⚠️ Alertas & Regras</div>
+        ${alertsHtml}
+      ` : ''}
+    `;
+  }
+
+  function selectScenario(stageId, scenarioKey) {
+    const scenario = data[currentMode][stageId].scenarios[scenarioKey];
+    currentScenario = scenarioKey;
+
+    if (scenario.substeps && Object.keys(scenario.substeps).length > 0) {
+      let html = `
+        <div class="guidance-card">
+          <div class="guidance-title">${scenario.name}</div>
+          <div class="guidance-content" style="margin-bottom: 16px;">Escolha uma situação:</div>
+          <div class="scenarios-grid">
+      `;
+
+      Object.entries(scenario.substeps).forEach(([substepKey, substep]) => {
+        html += `<button class="scenario-btn" onclick="selectSubstep('${stageId}', '${scenarioKey}', '${substepKey}')">
+          ${substep.name}
+        </button>`;
+      });
+
+      html += `</div></div>`;
+      document.getElementById('scenarioContent').innerHTML = html;
+    } else {
+      renderScenarioContent(stageId, scenarioKey, scenario);
+    }
+  }
+
+  function selectSubstep(stageId, scenarioKey, substepKey) {
+    const scenario = data[currentMode][stageId].scenarios[scenarioKey];
+    const substep = scenario.substeps[substepKey];
+    renderScenarioContent(stageId, scenarioKey, substep, true);
+  }
+
+  function renderScenarioContent(stageId, scenarioKey, contentObj, isSubstep = false) {
+    let html = `<div class="guidance-card">
+      <div class="guidance-title">${contentObj.name}</div>
+      <div class="guidance-content">${contentObj.content}</div>`;
+
+    const messages = Array.isArray(contentObj.message) ? contentObj.message : (contentObj.message ? [contentObj.message] : []);
+
+    if (messages.length > 0) {
+      messages.forEach((msg, idx) => {
+        const escapedMsg = msg.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        const msgLabel = messages.length > 1 ? ` ${idx + 1}` : '';
+        html += `
+          <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 8px; padding: 12px; margin-top: 12px;">
+            <div style="font-size: 11px; font-weight: 700; color: var(--blue); margin-bottom: 8px; text-transform: uppercase;">💬 Mensagem${msgLabel}</div>
+            <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; white-space: pre-wrap; margin-bottom: 10px; background: white; padding: 10px; border-radius: 6px; border: 1px solid #BFDBFE;">${msg}</div>
+            <button class="copy-btn" onclick="copyText('${escapedMsg}')">📋 Copiar</button>
+          </div>
+        `;
+      });
+    }
+    html += '</div>';
+
+    if (contentObj.checks && contentObj.checks.length > 0) {
+      html += '<div class="checklist"><div class="checklist-title">✅ Checklist</div>';
+      contentObj.checks.forEach((check, idx) => {
+        html += `<div class="checklist-item"><input type="checkbox"><label>${check}</label></div>`;
+      });
+      html += '</div>';
+    }
+
+    document.getElementById('scenarioContent').innerHTML = html;
+  }
+
+  function copyText(text) {
+    const decodedText = text.replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\');
+    navigator.clipboard.writeText(decodedText);
+    showToast('✅ Copiado para a área de transferência!');
+  }
+
+  // ===== GALERIA =====
+  function renderGallery() {
+    renderCategoriesList();
+  }
+
+  function renderCategoriesList() {
+    const container = document.getElementById('categoriesList');
+    if (!galleyData.categories) galleyData.categories = {};
+
+    if (Object.keys(galleyData.categories).length === 0) {
+      container.innerHTML = '<div style="text-align: center; color: var(--text-muted); font-size: 12px;">Nenhuma categoria criada</div>';
+      renderProductsGrid([]);
+      return;
+    }
+
+    container.innerHTML = '';
+    Object.entries(galleyData.categories).forEach(([catId, category]) => {
+      const productCount = Object.values(galleyData.products || {}).filter(p => p.categoryId === catId).length;
+      const btn = document.createElement('button');
+      btn.className = `category-btn ${selectedCategory === catId ? 'active' : ''}`;
+      btn.innerHTML = `<div>${category.name}</div><div style="font-size: 10px; opacity: 0.7;">${productCount} produtos</div>`;
+      btn.onclick = () => {
+        selectedCategory = catId;
+        renderCategoriesList();
+        renderProductsGrid();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  function renderProductsGrid() {
+    const container = document.getElementById('galleryGrid');
+    if (!galleyData.products) galleyData.products = {};
+
+    const products = Object.entries(galleyData.products).filter(([_, p]) => !selectedCategory || p.categoryId === selectedCategory);
+
+    if (products.length === 0) {
+      container.innerHTML = `<div class="empty-gallery"><div class="empty-gallery-icon">📸</div><div>Nenhum produto nesta categoria</div></div>`;
+      return;
+    }
+
+    container.innerHTML = '';
+    products.forEach(([prodId, product]) => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+
+      // Suporta tanto array de imageUrls quanto imageUrl antigo
+      const imageUrls = Array.isArray(product.imageUrls) ? product.imageUrls : (product.imageUrl ? [product.imageUrl] : []);
+      const currentImageIndex = product.currentImageIndex || 0;
+      const currentImage = imageUrls[currentImageIndex] || null;
+      const hasMultipleImages = imageUrls.length > 1;
+
+      let imageHtml = currentImage ? `<img src="${currentImage}" alt="${product.name}">` : '📱';
+
+      let navHtml = '';
+      if (hasMultipleImages) {
+        navHtml = `
+          <div class="product-image-nav">
+            <button onclick="cycleProductImage('${prodId}', -1)">◀</button>
+            <button onclick="cycleProductImage('${prodId}', 1)">▶</button>
+          </div>
+          <div class="product-photo-count">${currentImageIndex + 1}/${imageUrls.length}</div>
+        `;
+      }
+
+      // Gerar HTML das thumbnails se houver múltiplas imagens
+      let thumbnailsHtml = '';
+      if (hasMultipleImages) {
+        const thumbs = imageUrls.map((url, idx) => `
+          <img class="product-thumbnail ${idx === currentImageIndex ? 'active' : ''}"
+               src="${url}"
+               alt="Foto ${idx + 1}"
+               onclick="switchProductImage('${prodId}', ${idx})"
+               style="cursor: pointer;">
+        `).join('');
+
+        thumbnailsHtml = `
+          <div class="product-thumbnails">
+            ${thumbs}
+          </div>
+        `;
+      }
+
+      card.innerHTML = `
+        <div class="product-content">
+          <div class="product-image">
+            ${imageHtml}
+            ${navHtml}
+          </div>
+          ${thumbnailsHtml}
+        </div>
+        <div class="product-info">
+          <div class="product-name">${product.name}</div>
+          <div class="product-option">${product.option || ''}</div>
+          <button class="product-copy-btn" onclick="copyPhotoUrl('${(currentImage || '').replace(/'/g, "\\'")}')">📸 Copiar</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function cycleProductImage(productId, direction) {
+    const product = galleyData.products[productId];
+    if (!product) return;
+
+    const imageUrls = Array.isArray(product.imageUrls) ? product.imageUrls : (product.imageUrl ? [product.imageUrl] : []);
+    if (imageUrls.length <= 1) return;
+
+    let currentIndex = product.currentImageIndex || 0;
+    currentIndex += direction;
+
+    if (currentIndex < 0) currentIndex = imageUrls.length - 1;
+    if (currentIndex >= imageUrls.length) currentIndex = 0;
+
+    product.currentImageIndex = currentIndex;
+    renderProductsGrid();
+  }
+
+  function switchProductImage(productId, index) {
+    const product = galleyData.products[productId];
+    if (!product) return;
+
+    product.currentImageIndex = index;
+    renderProductsGrid();
+  }
+
+  async function copyPhotoUrl(url) {
+    if (!url) {
+      showToast('❌ Foto não disponível');
+      return;
+    }
+
+    try {
+      // Carrega a imagem com canvas (contorna CORS melhor)
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+
+      img.onload = async () => {
+        try {
+          // Desenha a imagem em um canvas
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+
+          // Converte para PNG (suportado pelo Clipboard API)
+          canvas.toBlob(async (pngBlob) => {
+            try {
+              await navigator.clipboard.write([
+                new ClipboardItem({ 'image/png': pngBlob })
+              ]);
+              showToast('✅ Imagem copiada! Cole em qualquer app');
+            } catch (clipboardError) {
+              console.error('Erro ao copiar para clipboard:', clipboardError);
+
+              // Fallback: Download da imagem
+              const link = document.createElement('a');
+              link.href = canvas.toDataURL('image/png');
+              link.download = `foto_${Date.now()}.png`;
+              link.click();
+              showToast('💾 Imagem baixada (não conseguiu copiar)');
+            }
+          }, 'image/png', 0.95);
+        } catch (error) {
+          console.error('Erro ao processar imagem:', error);
+          showToast('❌ Erro ao processar imagem');
+        }
+      };
+
+      img.onerror = () => {
+        console.error('Erro ao carregar imagem');
+        showToast('❌ Erro ao carregar imagem');
+      };
+
+      // Usa URL com proxy para evitar CORS se necessário
+      img.src = url;
+    } catch (error) {
+      console.error('Erro ao copiar imagem:', error);
+      showToast('❌ Erro ao copiar imagem');
+    }
+  }
+
+  // ===== ADMIN PANEL (ORIGINAL) =====
+  function renderAdminPanel() {
+    const adminSection = document.getElementById('adminSection').value || 'dados';
+    const modeContainer = document.getElementById('modeContainer');
+
+    if (adminSection === 'galeria') {
+      modeContainer.style.display = 'none';
+      renderAdminGallerySection();
+    } else {
+      modeContainer.style.display = 'block';
+      renderAdminDataSection();
+    }
+  }
+
+  function switchAdminSection() {
+    const adminSection = document.getElementById('adminSection').value || 'dados';
+    const modeContainer = document.getElementById('modeContainer');
+
+    // Mostrar o seletor de modo apenas quando estiver em "Dados de Vendas"
+    if (adminSection === 'dados') {
+      modeContainer.style.display = 'block';
+    } else {
+      modeContainer.style.display = 'none';
+    }
+
+    renderAdminPanel();
+  }
+
+  function renderAdminDataSection() {
+    const mode = document.getElementById('adminMode')?.value || 'online';
+    currentMode = mode;
+
+    const stages = data[mode];
+    const list = document.getElementById('adminMenuItems');
+    list.innerHTML = '<label>Etapas</label>';
+
+    Object.entries(stages).forEach(([id, stage]) => {
+      const btn = document.createElement('button');
+      btn.className = 'stage-option';
+      btn.textContent = stage.title;
+      btn.onclick = () => { currentStage = id; renderAdminDataForm(mode, id); };
+      list.appendChild(btn);
+    });
+
+    if (!currentStage && Object.keys(stages).length > 0) {
+      currentStage = Object.keys(stages)[0];
+      renderAdminDataForm(mode, currentStage);
+    }
+  }
+
+  function renderAdminDataForm(mode, stageId) {
+    const stage = data[mode][stageId];
+    const tips = Array.isArray(stage.tips) ? stage.tips : [stage.tips];
+    const alerts = Array.isArray(stage.alerts) ? stage.alerts : [stage.alerts];
+
+    let html = `
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-primary" style="flex: 1; background: var(--green);" onclick="adminAddStage('${mode}')">➕ Adicionar Etapa</button>
+        <button class="btn btn-primary" style="flex: 1; background: #DC2626;" onclick="if(confirm('Tem certeza?')) { delete data['${mode}']['${stageId}']; currentStage = null; renderAdminDataSection(); }">❌ Remover Etapa</button>
+      </div>
+
+      <div class="form-group">
+        <label>Título da Etapa</label>
+        <input type="text" id="adminTitle" value="${stage.title}">
+      </div>
+
+      <div class="form-group">
+        <label>Descrição</label>
+        <input type="text" id="adminDesc" value="${stage.desc}">
+      </div>
+
+      <div class="form-group">
+        <label>Dicas Rápidas (uma por linha)</label>
+        <div id="tipsContainer">
+          ${tips.map((tip, idx) => `
+            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+              <textarea style="flex: 1; min-height: 50px;" onchange="const t = Array.isArray(data['${mode}']['${stageId}'].tips) ? data['${mode}']['${stageId}'].tips : [data['${mode}']['${stageId}'].tips]; t[${idx}] = this.value; data['${mode}']['${stageId}'].tips = t;">${tip}</textarea>
+              <button class="btn btn-small" onclick="const t = Array.isArray(data['${mode}']['${stageId}'].tips) ? data['${mode}']['${stageId}'].tips : [data['${mode}']['${stageId}'].tips]; t.splice(${idx}, 1); data['${mode}']['${stageId}'].tips = t; renderAdminDataForm('${mode}', '${stageId}');" style="background: #DC2626; color: white; height: fit-content;">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn" style="width: 100%; margin-top: 8px; background: var(--green); color: white;" onclick="const t = Array.isArray(data['${mode}']['${stageId}'].tips) ? data['${mode}']['${stageId}'].tips : [data['${mode}']['${stageId}'].tips]; t.push(''); data['${mode}']['${stageId}'].tips = t; renderAdminDataForm('${mode}', '${stageId}');">+ Adicionar Dica</button>
+      </div>
+
+      <div class="form-group">
+        <label>Alertas/Regras (uma por linha)</label>
+        <div id="alertsContainer">
+          ${alerts.map((alert, idx) => `
+            <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+              <textarea style="flex: 1; min-height: 50px;" onchange="const a = Array.isArray(data['${mode}']['${stageId}'].alerts) ? data['${mode}']['${stageId}'].alerts : [data['${mode}']['${stageId}'].alerts]; a[${idx}] = this.value; data['${mode}']['${stageId}'].alerts = a;">${alert}</textarea>
+              <button class="btn btn-small" onclick="const a = Array.isArray(data['${mode}']['${stageId}'].alerts) ? data['${mode}']['${stageId}'].alerts : [data['${mode}']['${stageId}'].alerts]; a.splice(${idx}, 1); data['${mode}']['${stageId}'].alerts = a; renderAdminDataForm('${mode}', '${stageId}');" style="background: #DC2626; color: white; height: fit-content;">✕</button>
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn" style="width: 100%; margin-top: 8px; background: var(--green); color: white;" onclick="const a = Array.isArray(data['${mode}']['${stageId}'].alerts) ? data['${mode}']['${stageId}'].alerts : [data['${mode}']['${stageId}'].alerts]; a.push(''); data['${mode}']['${stageId}'].alerts = a; renderAdminDataForm('${mode}', '${stageId}');">+ Adicionar Alerta</button>
+      </div>
+
+      <div style="border-top: 2px solid var(--border); padding-top: 16px; margin-top: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <strong style="font-size: 14px;">Cenários para esta etapa:</strong>
+        <button class="btn" style="background: var(--green); color: white; padding: 8px 16px;" onclick="adminAddScenario('${mode}', '${stageId}')">➕ Novo Cenário</button>
+      </div>
+    `;
+
+    Object.entries(stage.scenarios).forEach(([key, scenario]) => {
+      html += `
+        <div style="border-left: 4px solid var(--red); padding: 16px; margin-bottom: 20px; background: var(--bg); border-radius: 8px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+            <div style="flex: 1;">
+              <label style="margin-bottom: 6px;">Nome do Cenário</label>
+              <input type="text" value="${scenario.name}" onchange="data['${mode}']['${stageId}'].scenarios['${key}'].name = this.value" style="width: 100%;">
+            </div>
+            <button class="btn btn-small" onclick="if(confirm('Tem certeza que quer remover este cenário?')) { delete data['${mode}']['${stageId}'].scenarios['${key}']; renderAdminDataForm('${mode}', '${stageId}'); }" style="background: #DC2626; color: white; margin-top: 22px; margin-left: 12px;">❌ Remover</button>
+          </div>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+            <strong style="font-size: 12px; color: var(--text-secondary);">Subetapas/Situações:</strong>
+            <button class="btn" style="width: 100%; margin-top: 8px; background: var(--green); color: white;" onclick="adminAddSubstep('${mode}', '${stageId}', '${key}')">➕ Adicionar Subetapa</button>
+      `;
+
+      if (scenario.substeps && Object.keys(scenario.substeps).length > 0) {
+        Object.entries(scenario.substeps).forEach(([substepKey, substep]) => {
+          const messages = Array.isArray(substep.message) ? substep.message : (substep.message ? [substep.message] : []);
+
+          html += `
+            <div style="border: 1px solid #BFDBFE; background: white; padding: 12px; margin-top: 12px; border-radius: 6px;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div style="flex: 1;">
+                  <label style="margin-bottom: 4px; font-size: 11px;">Nome da Subetapa</label>
+                  <input type="text" value="${substep.name}" onchange="data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].name = this.value" style="width: 100%;">
+                </div>
+                <button class="btn btn-small" onclick="delete data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}']; renderAdminDataForm('${mode}', '${stageId}');" style="background: #DC2626; color: white; margin-top: 22px; margin-left: 8px;">✕</button>
+              </div>
+
+              <div class="form-group">
+                <label style="font-size: 11px;">Conteúdo/Orientação</label>
+                <textarea onchange="data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].content = this.value" style="min-height: 100px; font-size: 12px;">${substep.content}</textarea>
+              </div>
+
+              <label style="font-size: 11px; font-weight: 700;">Mensagens (uma por caixa)</label>
+              <div>
+                ${messages.map((msg, idx) => `
+                  <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+                    <textarea style="flex: 1; min-height: 50px; font-size: 12px;" onchange="const m = Array.isArray(data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message) ? data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message : [data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message]; m[${idx}] = this.value; data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message = m;">${msg}</textarea>
+                    <button class="btn btn-small" onclick="const m = data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message; m.splice(${idx}, 1); renderAdminDataForm('${mode}', '${stageId}');" style="background: #DC2626; color: white; height: fit-content;">✕</button>
+                  </div>
+                `).join('')}
+              </div>
+              <button class="btn" style="width: 100%; margin-top: 6px; background: var(--blue); color: white; font-size: 11px;" onclick="const m = data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message; if(!Array.isArray(m)) { data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].message = [m || '']; } else { m.push(''); } renderAdminDataForm('${mode}', '${stageId}');">+ Msg</button>
+
+              <label style="font-size: 11px; font-weight: 700; margin-top: 10px; display: block;">Checklist (um por caixa)</label>
+              <div>
+                ${(substep.checks || []).map((check, idx) => `
+                  <div style="display: flex; gap: 4px; margin-bottom: 4px;">
+                    <input type="text" value="${check}" style="flex: 1; font-size: 12px;" onchange="data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].checks[${idx}] = this.value">
+                    <button class="btn btn-small" onclick="data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].checks.splice(${idx}, 1); renderAdminDataForm('${mode}', '${stageId}');" style="background: #DC2626; color: white; font-size: 10px;">✕</button>
+                  </div>
+                `).join('')}
+              </div>
+              <button class="btn" style="width: 100%; margin-top: 6px; background: var(--blue); color: white; font-size: 11px;" onclick="if(!data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].checks) data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].checks = []; data['${mode}']['${stageId}'].scenarios['${key}'].substeps['${substepKey}'].checks.push(''); renderAdminDataForm('${mode}', '${stageId}');">+ Item</button>
+            </div>
+          `;
+        });
+      }
+
+      html += `</div></div>`;
+    });
+
+    html += `<button class="btn btn-primary" style="margin-top: 24px;" onclick="adminSave('${mode}', '${stageId}')">💾 Salvar Alterações</button>`;
+
+    document.getElementById('adminForm').innerHTML = html;
+  }
+
+  function adminAddStage(mode) {
+    const newId = Math.max(...Object.keys(data[mode]).map(Number)) + 1;
+    data[mode][newId] = {
+      title: '🆕 Nova Etapa',
+      desc: 'Descrição da nova etapa',
+      tips: ['Dica 1'],
+      alerts: ['Alerta 1'],
+      scenarios: {
+        'novo-cenario': {
+          name: '📌 Novo Cenário',
+          substeps: {
+            'novo-passo': {
+              name: 'Nova Situação',
+              content: 'Conteúdo aqui...',
+              message: ['Mensagem aqui...'],
+              checks: ['Item 1']
+            }
+          }
+        }
+      }
+    };
+    saveCoachDataToFirebase();
+    renderAdminDataSection();
+  }
+
+  function adminAddScenario(mode, stageId) {
+    const scenarioId = 'novo-cenario-' + Date.now();
+    data[mode][stageId].scenarios[scenarioId] = {
+      name: '📌 Novo Cenário',
+      substeps: {
+        'novo-passo': {
+          name: 'Nova Situação',
+          content: 'Escreva a orientação aqui...',
+          message: ['Mensagem pronta aqui...'],
+          checks: ['Item 1']
+        }
+      }
+    };
+    saveCoachDataToFirebase();
+    renderAdminDataForm(mode, stageId);
+  }
+
+  function adminAddSubstep(mode, stageId, scenarioKey) {
+    const substepId = 'novo-passo-' + Date.now();
+    if (!data[mode][stageId].scenarios[scenarioKey].substeps) {
+      data[mode][stageId].scenarios[scenarioKey].substeps = {};
+    }
+    data[mode][stageId].scenarios[scenarioKey].substeps[substepId] = {
+      name: '📌 Nova Situação',
+      content: 'Escreva a orientação aqui...',
+      message: ['Mensagem pronta aqui...'],
+      checks: ['Item 1']
+    };
+    saveCoachDataToFirebase();
+    renderAdminDataForm(mode, stageId);
+  }
+
+  function adminSave(mode, stageId) {
+    try {
+      saveCoachDataToFirebase();
+      showToast('✅ Salvo com sucesso!');
+    } catch (e) {
+      alert('❌ Erro ao salvar:\n' + e.message);
+    }
+  }
+
+  // ===== ADMIN GALERIA =====
+  function renderAdminGallerySection() {
+    const sidebar = document.getElementById('adminMenuItems');
+    sidebar.innerHTML = '<label>Ações</label>';
+
+    const btn1 = document.createElement('button');
+    btn1.className = 'stage-option';
+    btn1.textContent = '➕ Nova Categoria';
+    btn1.onclick = showAddCategoryForm;
+    sidebar.appendChild(btn1);
+
+    const btn2 = document.createElement('button');
+    btn2.className = 'stage-option';
+    btn2.textContent = '📱 Novo Produto';
+    btn2.onclick = showAddProductForm;
+    sidebar.appendChild(btn2);
+
+    const btn3 = document.createElement('button');
+    btn3.className = 'stage-option';
+    btn3.textContent = '📋 Listar Categorias';
+    btn3.onclick = showCategoriesList;
+    sidebar.appendChild(btn3);
+
+    const btn4 = document.createElement('button');
+    btn4.className = 'stage-option';
+    btn4.textContent = '📦 Gerenciar Produtos';
+    btn4.onclick = showManageProductsList;
+    sidebar.appendChild(btn4);
+
+    const form = document.getElementById('adminForm');
+    form.innerHTML = '<p style="color: var(--text-muted);">Selecione uma ação para gerenciar a galeria</p>';
+  }
+
+  function showAddCategoryForm() {
+    const form = document.getElementById('adminForm');
+    form.innerHTML = `
+      <h3 style="margin-bottom: 16px;">Nova Categoria</h3>
+      <div class="form-group">
+        <label>Nome da Categoria</label>
+        <input type="text" id="categoryName" placeholder="Ex: iPhone 17 Pro Max">
+      </div>
+      <button class="btn btn-primary" onclick="saveCategory()">Adicionar Categoria</button>
+    `;
+  }
+
+  function saveCategory() {
+    const name = document.getElementById('categoryName').value;
+    if (!name) {
+      alert('Digite o nome da categoria');
+      return;
+    }
+    if (!galleyData.categories) galleyData.categories = {};
+    const catId = Date.now().toString();
+    galleyData.categories[catId] = { name, id: catId };
+    saveGalleryDataToFirebase();
+    renderGallery();
+    showToast('✅ Categoria criada!');
+    renderAdminGallerySection();
+  }
+
+  function showAddProductForm() {
+    if (!galleyData.categories || Object.keys(galleyData.categories).length === 0) {
+      alert('Crie uma categoria primeiro!');
+      return;
+    }
+
+    let categoryOptions = '<option value="">Selecione uma categoria</option>';
+    Object.entries(galleyData.categories).forEach(([id, cat]) => {
+      categoryOptions += `<option value="${id}">${cat.name}</option>`;
+    });
+
+    const form = document.getElementById('adminForm');
+    form.innerHTML = `
+      <h3 style="margin-bottom: 16px;">Novo Produto</h3>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="productCategory">${categoryOptions}</select>
+      </div>
+      <div class="form-group">
+        <label>Nome do Produto</label>
+        <input type="text" id="productName" placeholder="Ex: iPhone 17 Pro Max 256GB">
+      </div>
+      <div class="form-group">
+        <label>Opção (Lacrado, Sem Caixa, etc)</label>
+        <input type="text" id="productOption" placeholder="Ex: Lacrado">
+      </div>
+      <div class="form-group">
+        <label>📸 Fotos do Produto (você pode adicionar múltiplas)</label>
+        <input type="file" id="productImage" accept="image/*" multiple onchange="uploadProductImages(this.files)">
+        <div id="imagePreview" style="margin-top: 12px;"></div>
+      </div>
+      <button class="btn btn-primary" id="saveProductBtn" onclick="saveProduct()">✅ Adicionar Produto</button>
+    `;
+  }
+
+  let cloudinaryUploadedUrl = null;
+  let cloudinaryUploadedUrls = [];  // Array para múltiplas fotos
+
+  async function uploadProductImage(file) {
+    if (!file) return;
+
+    const preview = document.getElementById('imagePreview');
+    preview.innerHTML = '<p style="color: var(--amber); font-weight: 600;">⏳ Enviando foto...</p>';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('folder', 'revend/fotos-produtos');
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.secure_url) {
+        cloudinaryUploadedUrl = data.secure_url;
+        preview.innerHTML = `
+          <div style="background: var(--green-bg); padding: 12px; border-radius: 8px; border: 2px solid var(--green);">
+            <img src="${cloudinaryUploadedUrl}" style="width: 100%; max-height: 200px; border-radius: 6px; margin-bottom: 10px;">
+            <p style="font-size: 12px; color: var(--green); font-weight: 600; margin: 0;">✅ Foto enviada com sucesso! Clique em "Adicionar Produto" para salvar.</p>
+          </div>
+        `;
+      } else {
+        preview.innerHTML = '<p style="color: #DC2626; font-weight: 600;">❌ Erro ao enviar foto</p>';
+        showToast('❌ Erro ao enviar foto');
+      }
+    } catch (error) {
+      console.error('Erro:', error);
+      preview.innerHTML = '<p style="color: #DC2626; font-weight: 600;">❌ Erro ao enviar foto</p>';
+      showToast('❌ Erro ao enviar foto');
+    }
+  }
+
+  async function uploadProductImages(files) {
+    if (!files || files.length === 0) return;
+
+    const preview = document.getElementById('imagePreview');
+    cloudinaryUploadedUrls = [];
+    let uploadedCount = 0;
+
+    preview.innerHTML = `<p style="color: var(--amber); font-weight: 600;">⏳ Enviando ${files.length} foto(s)...</p>`;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('folder', 'revend/fotos-produtos');
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+          cloudinaryUploadedUrls.push(data.secure_url);
+          uploadedCount++;
+          preview.innerHTML = `<p style="color: var(--amber); font-weight: 600;">⏳ ${uploadedCount}/${files.length} foto(s) enviada(s)...</p>`;
+        }
+      } catch (error) {
+        console.error('Erro ao enviar arquivo', i, ':', error);
+      }
+    }
+
+    if (cloudinaryUploadedUrls.length > 0) {
+      preview.innerHTML = `
+        <div style="background: var(--green-bg); padding: 12px; border-radius: 8px; border: 2px solid var(--green);">
+          <p style="font-size: 12px; color: var(--green); font-weight: 600; margin: 0;">✅ ${cloudinaryUploadedUrls.length} foto(s) enviada(s) com sucesso!</p>
+          <div style="margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px;">
+            ${cloudinaryUploadedUrls.map((url, idx) => `
+              <div style="position: relative; width: 80px; height: 80px;">
+                <img src="${url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                <button onclick="removeUploadedImage(${idx})" style="position: absolute; top: 0; right: 0; background: #DC2626; color: white; border: none; width: 20px; height: 20px; border-radius: 50%; cursor: pointer; font-size: 12px; padding: 0;">×</button>
+              </div>
+            `).join('')}
+          </div>
+          <p style="font-size: 11px; color: var(--green); margin: 8px 0 0 0;">Clique em "Adicionar Produto" para salvar.</p>
+        </div>
+      `;
+      showToast(`✅ ${cloudinaryUploadedUrls.length} foto(s) enviada(s)!`);
+    } else {
+      preview.innerHTML = '<p style="color: #DC2626; font-weight: 600;">❌ Erro ao enviar fotos</p>';
+      showToast('❌ Erro ao enviar fotos');
+    }
+  }
+
+  function removeUploadedImage(index) {
+    cloudinaryUploadedUrls.splice(index, 1);
+    const files = document.getElementById('productImage').files;
+    uploadProductImages(files);
+  }
+
+  function saveProduct() {
+    const categoryId = document.getElementById('productCategory').value;
+    const name = document.getElementById('productName').value;
+    const option = document.getElementById('productOption').value;
+
+    if (!categoryId || !name) {
+      alert('Preencha nome da categoria e nome do produto');
+      return;
+    }
+
+    if (!galleyData.products) galleyData.products = {};
+    const prodId = Date.now().toString();
+
+    galleyData.products[prodId] = {
+      id: prodId,
+      categoryId,
+      name,
+      option,
+      imageUrls: cloudinaryUploadedUrls || [],  // Array de múltiplas URLs
+      currentImageIndex: 0
+    };
+
+    saveGalleryDataToFirebase();
+    renderGallery();
+    showToast(cloudinaryUploadedUrls.length > 0 ? `✅ Produto adicionado com ${cloudinaryUploadedUrls.length} foto(s)!` : '✅ Produto adicionado (sem foto)');
+
+    cloudinaryUploadedUrls = [];
+    document.getElementById('productImage').value = '';
+    document.getElementById('imagePreview').innerHTML = '';
+    renderAdminGallerySection();
+  }
+
+  function deleteProduct(productId) {
+    if (!confirm('Tem certeza que quer apagar este produto?')) return;
+
+    if (galleyData.products && galleyData.products[productId]) {
+      delete galleyData.products[productId];
+      saveGalleryDataToFirebase();
+      renderGallery();
+      showToast('✅ Produto removido!');
+      renderAdminGallerySection();
+    }
+  }
+
+  function showManageProductsList() {
+    const form = document.getElementById('adminForm');
+    let html = '<h3 style="margin-bottom: 16px;">📦 Gerenciar Produtos</h3>';
+
+    if (!galleyData.products || Object.keys(galleyData.products).length === 0) {
+      html += '<p style="color: var(--text-muted);">Nenhum produto adicionado</p>';
+      form.innerHTML = html;
+      return;
+    }
+
+    html += '<div style="display: flex; flex-direction: column; gap: 12px;">';
+    Object.entries(galleyData.products).forEach(([prodId, product]) => {
+      const category = galleyData.categories[product.categoryId];
+      const categoryName = category ? category.name : 'Sem categoria';
+
+      html += `
+        <div style="background: var(--bg); padding: 12px; border-radius: 8px; border-left: 4px solid var(--red); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+          <div style="flex: 1;">
+            <div style="font-weight: 600; color: var(--text-primary);">${product.name}</div>
+            <div style="font-size: 12px; color: var(--text-muted);">
+              📂 ${categoryName} ${product.option ? '• ' + product.option : ''}
+            </div>
+            ${product.imageUrl ? `<div style="font-size: 12px; color: var(--green);">✅ Com foto</div>` : '<div style="font-size: 12px; color: var(--amber);">📸 Sem foto</div>'}
+          </div>
+          <div style="display: flex; gap: 6px; flex-shrink: 0;">
+            <button class="btn btn-small" style="background: var(--blue); color: white; padding: 6px 12px;" onclick="showEditProductForm('${prodId}')">✏️ Editar</button>
+            <button class="btn btn-small" style="background: #DC2626; color: white; padding: 6px 12px;" onclick="deleteProduct('${prodId}')">🗑️ Apagar</button>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+    form.innerHTML = html;
+  }
+
+  function showEditProductForm(productId) {
+    const product = galleyData.products[productId];
+    if (!product) return;
+
+    let categoryOptions = '';
+    Object.entries(galleyData.categories || {}).forEach(([id, cat]) => {
+      categoryOptions += `<option value="${id}" ${product.categoryId === id ? 'selected' : ''}>${cat.name}</option>`;
+    });
+
+    const form = document.getElementById('adminForm');
+    form.innerHTML = `
+      <h3 style="margin-bottom: 16px;">✏️ Editar Produto</h3>
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="editProductCategory">${categoryOptions}</select>
+      </div>
+      <div class="form-group">
+        <label>Nome do Produto</label>
+        <input type="text" id="editProductName" value="${product.name}">
+      </div>
+      <div class="form-group">
+        <label>Opção (Lacrado, Sem Caixa, etc)</label>
+        <input type="text" id="editProductOption" value="${product.option || ''}">
+      </div>
+      <div class="form-group">
+        <label>📸 Fotos do Produto</label>
+        <div id="productImageContainer" style="margin-bottom: 12px;">
+          ${(() => {
+            const urls = Array.isArray(product.imageUrls) ? product.imageUrls : (product.imageUrl ? [product.imageUrl] : []);
+            if (urls.length === 0) return '<p style="color: var(--text-muted); font-size: 12px;">Nenhuma foto</p>';
+            return '<div style="display: flex; gap: 8px; flex-wrap: wrap;">' + urls.map((url, idx) => `
+              <div style="position: relative; width: 80px; height: 80px; display: inline-block;">
+                <img src="${url}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; pointer-events: none; user-select: none;">
+                <button type="button" class="delete-image-btn" data-product-id="${productId}" data-image-index="${idx}" style="position: absolute; top: -6px; right: -6px; background: #DC2626; color: white; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0; line-height: 1; z-index: 9999; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">×</button>
+              </div>
+            `).join('') + '</div>';
+          })()}
+        </div>
+        <button type="button" class="btn" id="addMorePhotosBtn" data-product-id="${productId}" style="background: var(--blue); color: white; cursor: pointer; margin-bottom: 8px; width: 100%;">+ Adicionar Mais Fotos</button>
+        <div id="editImagePreview" style="margin-top: 12px;"></div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="btn btn-primary" style="flex: 1;" onclick="updateProduct('${productId}')">✅ Salvar Alterações</button>
+        <button class="btn" style="flex: 0.5; background: var(--text-muted); color: white;" onclick="showManageProductsList()">Cancelar</button>
+      </div>
+    `;
+
+    // Configurar event listeners APÓS renderizar o formulário
     setTimeout(() => {
-      btn.textContent = original;
-      btn.classList.remove('copied');
-    }, 2000);
-  }).catch(() => {
-    // fallback
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = '✅ Copiado!';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = '📋 Copiar mensagem'; btn.classList.remove('copied'); }, 2000);
-  });
-}
+      const addBtn = document.getElementById('addMorePhotosBtn');
+      const deleteButtons = document.querySelectorAll('.delete-image-btn');
+
+      if (addBtn) {
+        addBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('✅ Clique em Adicionar Mais Fotos');
+
+          // Criar input de arquivo dinamicamente
+          const fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = 'image/*';
+          fileInput.multiple = true;
+
+          fileInput.addEventListener('change', (evt) => {
+            console.log('📤 Arquivo selecionado:', evt.target.files.length);
+            uploadEditProductImages(evt.target.files, productId);
+          });
+
+          fileInput.click();
+        });
+      }
+
+      deleteButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          console.log('🔴 CLICK NO DELETE BUTTON DETECTADO!', e);
+          e.preventDefault();
+          e.stopPropagation();
+          const pid = e.target.dataset.productId;
+          const idx = parseInt(e.target.dataset.imageIndex);
+          console.log('❌ DELETANDO IMAGEM:', {pid, idx});
+          removeProductImage(pid, idx);
+        }, true); // Usar captura de evento (terceiro parâmetro = true)
+      });
+    }, 0);
+  }
+
+  async function uploadEditProductImage(file, productId) {
+    if (!file) return;
+
+    const preview = document.getElementById('editImagePreview');
+    preview.innerHTML = '<p style="color: var(--amber); font-weight: 600;">⏳ Enviando foto...</p>';
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    formData.append('folder', 'revend/fotos-produtos');
+
+    try {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.secure_url) {
+        galleyData.products[productId].imageUrl = data.secure_url;
+        preview.innerHTML = `
+          <div style="background: var(--green-bg); padding: 12px; border-radius: 8px; border: 2px solid var(--green);">
+            <img src="${data.secure_url}" style="width: 100%; max-height: 150px; border-radius: 6px; margin-bottom: 10px;">
+            <p style="font-size: 12px; color: var(--green); font-weight: 600; margin: 0;">✅ Foto atualizada!</p>
+          </div>
+        `;
+      }
+    } catch (error) {
+      preview.innerHTML = '<p style="color: #DC2626; font-weight: 600;">❌ Erro ao enviar foto</p>';
+    }
+  }
+
+  async function uploadEditProductImages(files, productId) {
+    if (!files || files.length === 0) return;
+
+    const preview = document.getElementById('editImagePreview');
+    const product = galleyData.products[productId];
+    if (!product.imageUrls) product.imageUrls = [];
+
+    let uploadedCount = 0;
+    preview.innerHTML = `<p style="color: var(--amber); font-weight: 600;">⏳ Enviando ${files.length} foto(s)...</p>`;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('folder', 'revend/fotos-produtos');
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.secure_url) {
+          product.imageUrls.push(data.secure_url);
+          uploadedCount++;
+          preview.innerHTML = `<p style="color: var(--amber); font-weight: 600;">⏳ ${uploadedCount}/${files.length} foto(s) enviada(s)...</p>`;
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+      }
+    }
+
+    if (uploadedCount > 0) {
+      preview.innerHTML = `
+        <div style="background: var(--green-bg); padding: 12px; border-radius: 8px; border: 2px solid var(--green);">
+          <p style="font-size: 12px; color: var(--green); font-weight: 600; margin: 0;">✅ ${uploadedCount} foto(s) adicionada(s)!</p>
+        </div>
+      `;
+      showToast(`✅ ${uploadedCount} foto(s) adicionada(s)!`);
+      // Limpar o input de arquivo
+      document.getElementById('editProductImage').value = '';
+      // Salvar as mudanças no Firebase
+      saveGalleryDataToFirebase();
+      // Atualizar preview do formulário
+      setTimeout(() => showEditProductForm(productId), 1000);
+    } else {
+      preview.innerHTML = '<p style="color: #DC2626; font-weight: 600;">❌ Erro ao enviar fotos</p>';
+    }
+  }
+
+  function removeProductImage(productId, imageIndex) {
+    console.log('🗑️ 🗑️ 🗑️ removeProductImage EXECUTANDO:', {productId, imageIndex});
+
+    const product = galleyData.products[productId];
+    if (!product) {
+      console.error('❌ Produto não encontrado:', productId);
+      return;
+    }
+    if (!product.imageUrls) {
+      console.error('❌ imageUrls não existe');
+      return;
+    }
+
+    console.log('📸 Antes da remoção:', product.imageUrls.length, 'fotos');
+
+    if (confirm('Tem certeza que quer remover esta foto?')) {
+      product.imageUrls.splice(imageIndex, 1);
+      console.log('✂️ Foto removida. Agora:', product.imageUrls.length, 'fotos');
+
+      if (product.currentImageIndex >= product.imageUrls.length) {
+        product.currentImageIndex = Math.max(0, product.imageUrls.length - 1);
+      }
+
+      // Salvar as mudanças no Firebase
+      saveGalleryDataToFirebase();
+      console.log('💾 Dados salvos no Firebase');
+
+      showEditProductForm(productId);
+      showToast('✅ Foto removida!');
+    } else {
+      console.log('⚠️ Usuário cancelou a exclusão');
+    }
+  }
+
+  function updateProduct(productId) {
+    const product = galleyData.products[productId];
+    product.categoryId = document.getElementById('editProductCategory').value;
+    product.name = document.getElementById('editProductName').value;
+    product.option = document.getElementById('editProductOption').value;
+
+    if (!product.name) {
+      alert('Digite o nome do produto');
+      return;
+    }
+
+    saveGalleryDataToFirebase();
+    renderGallery();
+    showToast('✅ Produto atualizado!');
+    showManageProductsList();
+  }
+
+  function showCategoriesList() {
+    let html = '<h3 style="margin-bottom: 16px;">Categorias</h3>';
+    if (!galleyData.categories || Object.keys(galleyData.categories).length === 0) {
+      html += '<p style="color: var(--text-muted);">Nenhuma categoria criada</p>';
+    } else {
+      html += '<div style="display: flex; flex-direction: column; gap: 8px;">';
+      Object.entries(galleyData.categories).forEach(([id, cat]) => {
+        const productCount = Object.values(galleyData.products || {}).filter(p => p.categoryId === id).length;
+        html += `
+          <div style="background: var(--bg); padding: 12px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${cat.name}</strong>
+              <div style="font-size: 11px; color: var(--text-muted);">${productCount} produtos</div>
+            </div>
+            <button class="btn btn-small" onclick="deleteCategory('${id}')" style="background: #DC2626; color: white;">Deletar</button>
+          </div>
+        `;
+      });
+      html += '</div>';
+    }
+    document.getElementById('adminForm').innerHTML = html;
+  }
+
+  function deleteCategory(catId) {
+    if (confirm('Tem certeza? Todos os produtos desta categoria serão deletados!')) {
+      delete galleyData.categories[catId];
+      if (galleyData.products) {
+        Object.keys(galleyData.products).forEach(prodId => {
+          if (galleyData.products[prodId].categoryId === catId) {
+            delete galleyData.products[prodId];
+          }
+        });
+      }
+      saveGalleryDataToFirebase();
+      renderGallery();
+      showToast('✅ Categoria deletada!');
+      showCategoriesList();
+    }
+  }
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // Listener global para debugar TODOS os clicks
+  document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-image-btn') || e.target.closest('.delete-image-btn')) {
+      console.log('🎯 CLIQUE NO DELETE BUTTON CAPTURADO (GLOBAL):', e.target);
+    }
+  }, true);
+
+  // ===== FIREBASE SYNC FUNCTIONS =====
+
+  // Salvar dados de coach no Firebase E localStorage
+  function saveCoachDataToFirebase() {
+    try {
+      localStorage.setItem('revendCoachData', JSON.stringify(data));
+      database.ref('coach-data').set(data);
+      console.log('✅ Dados salvos no Firebase');
+    } catch (error) {
+      console.error('Erro ao salvar dados:', error);
+      localStorage.setItem('revendCoachData', JSON.stringify(data));
+    }
+  }
+
+  // Salvar galeria no Firebase E localStorage
+  function saveGalleryDataToFirebase() {
+    try {
+      localStorage.setItem('revendGalleryData', JSON.stringify(galleyData));
+      database.ref('gallery-data').set(galleyData);
+      console.log('✅ Galeria salva no Firebase');
+    } catch (error) {
+      console.error('Erro ao salvar galeria:', error);
+      localStorage.setItem('revendGalleryData', JSON.stringify(galleyData));
+    }
+  }
+
+  // Carregar dados do Firebase quando abrir app (SEM SOBRESCREVER)
+  function loadDataFromFirebase() {
+    // Primeiro: carregar dados locais (backup seguro)
+    const localCoachData = localStorage.getItem('revendCoachData');
+    const localGalleryData = localStorage.getItem('revendGalleryData');
+
+    if (localCoachData) {
+      try {
+        data = JSON.parse(localCoachData);
+        console.log('✅ Dados locais carregados');
+      } catch (e) {
+        console.log('Erro ao carregar dados locais');
+        data = JSON.parse(JSON.stringify(defaultData)); // Fallback para defaultData
+      }
+    } else {
+      // Se não tiver dados locais, usa defaultData como base
+      data = JSON.parse(JSON.stringify(defaultData));
+      console.log('✅ Usando dados padrão');
+    }
+
+    if (localGalleryData) {
+      try {
+        galleyData = JSON.parse(localGalleryData);
+        console.log('✅ Galeria local carregada');
+      } catch (e) {
+        console.log('Erro ao carregar galeria local');
+        galleyData = { categories: {}, products: {} };
+      }
+    } else {
+      galleyData = { categories: {}, products: {} };
+      console.log('✅ Galeria inicializada vazia');
+    }
+
+    // Segundo: sincronizar com Firebase em tempo real (MAS SÓ se houver dados)
+    try {
+      database.ref('coach-data').on('value', (snapshot) => {
+        if (snapshot.exists() && snapshot.val()) {
+          const fbData = snapshot.val();
+          data = fbData;
+          localStorage.setItem('revendCoachData', JSON.stringify(data));
+          renderCoach();
+          console.log('✅ Dados sincronizados do Firebase');
+        }
+      });
+
+      database.ref('gallery-data').on('value', (snapshot) => {
+        if (snapshot.exists() && snapshot.val()) {
+          const fbGallery = snapshot.val();
+          galleyData = fbGallery;
+          localStorage.setItem('revendGalleryData', JSON.stringify(galleyData));
+          renderGallery();
+          console.log('✅ Galeria sincronizada do Firebase');
+        }
+      });
+    } catch (error) {
+      console.log('Firebase não disponível neste momento:', error);
+    }
+  }
+
+  // Initialize - SIMPLE AND SAFE
+  renderCoach();
+
+  // Firebase sync (assincronamente, sem bloquear)
+  setTimeout(() => {
+    try {
+      database.ref('coach-data').on('value', (snapshot) => {
+        if (snapshot.exists() && snapshot.val() && Object.keys(snapshot.val()).length > 0) {
+          const fbData = snapshot.val();
+          data = fbData;
+          localStorage.setItem('revendCoachData', JSON.stringify(data));
+          renderCoach();
+          console.log('✅ Dados sincronizados do Firebase');
+        }
+      });
+
+      database.ref('gallery-data').on('value', (snapshot) => {
+        if (snapshot.exists() && snapshot.val()) {
+          galleyData = snapshot.val();
+          localStorage.setItem('revendGalleryData', JSON.stringify(galleyData));
+          renderGallery();
+          console.log('✅ Galeria sincronizada do Firebase');
+        }
+      });
+    } catch (error) {
+      console.log('Firebase não disponível agora');
+    }
+  }, 1000);
 </script>
+
 </body>
 </html>
