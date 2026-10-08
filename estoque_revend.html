@@ -684,8 +684,8 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             </select>
           </div>
           <div style="flex:1"></div>
-          <button class="tb-btn r" onclick="gerarPdfFechamento()" style="padding:9px 16px">📄 PDF do fechamento</button>
-          <button class="tb-btn b" onclick="abrirMetas()" style="padding:9px 16px">🎯 Metas mensais</button>
+          <button class="tb-btn r" id="btn-pdf-fech" onclick="gerarPdfFechamento()" style="padding:9px 16px">📄 PDF do fechamento</button>
+          <button class="tb-btn b" id="btn-metas-mes" onclick="abrirMetas()" style="padding:9px 16px">🎯 Metas mensais</button>
         </div>
 
         <!-- ═════ PROGRESSO DA LOJA (mês) ═════ v10 -->
@@ -727,6 +727,19 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
           </div>
         </div>
 
+        <!-- ═════ FECHAMENTO SEMANAL (seg-dom) v11 ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">📆 Fechamento semanal</h3>
+              <div class="d-sub">Resumo da semana atual (segunda a domingo) · barras por dia</div>
+            </div>
+            <div class="d-per" id="dashSemanaPeriodo">Semana atual</div>
+          </div>
+          <div class="cards-g" id="dashSemanaCards" style="margin-bottom:16px"></div>
+          <div id="dashSemanaBarras" style="min-height:120px"></div>
+        </div>
+
         <!-- ═════ FATURAMENTO + MARGEM DO MÊS ═════ -->
         <div class="d-sec">
           <div class="d-hdr">
@@ -736,13 +749,13 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             </div>
             <div class="d-per" id="dashMesLabel"></div>
           </div>
-          <div class="d-hero-pair">
+          <div class="d-hero-pair" id="dashFatPair">
             <div class="d-hero">
               <div class="d-hero-lbl">💰 Faturamento acumulado</div>
               <div class="d-hero-n"><span class="d-cifrao">R$</span> <span id="dashFatN">0</span></div>
               <div class="d-hero-cmp" id="dashFatCmp"></div>
             </div>
-            <div class="d-hero">
+            <div class="d-hero" id="dashCardLucroMes">
               <div class="d-hero-lbl">📈 Lucro bruto acumulado</div>
               <div class="d-hero-n"><span class="d-cifrao">R$</span> <span id="dashLucN">0</span></div>
               <div class="d-hero-cmp" id="dashLucCmp"></div>
@@ -809,6 +822,47 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
             <table class="d-tbl-eq" id="dashEquipeTbl"></table>
           </div>
           <div id="dashInsights" style="margin-top:14px;font-size:10px;color:var(--txt2);font-weight:700"></div>
+        </div>
+
+        <!-- ═════ GRÁFICOS v11 ═════ -->
+        <div class="d-sec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">📊 Gráficos de desempenho</h3>
+              <div class="d-sub">Vendas diárias dos vendedores + desempenho geral da loja</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <select id="dashGraphRange" onchange="renderDash()" style="padding:7px 10px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;background:#fff;cursor:pointer;outline:none">
+                <option value="7">Últimos 7 dias</option>
+                <option value="30" selected>Mês atual</option>
+              </select>
+              <button id="dashCmpMesBtn" onclick="window._dashCmpMesAnt=!window._dashCmpMesAnt;renderDash()" style="padding:7px 12px;border:1.5px solid var(--brd);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;background:#fff;cursor:pointer;outline:none">⇄ Comparar mês anterior</button>
+            </div>
+          </div>
+          <div style="margin-bottom:20px">
+            <div class="d-mini-tit">🏪 Faturamento da loja — dia a dia</div>
+            <div id="dashGraphLoja" style="min-height:220px"></div>
+          </div>
+          <div>
+            <div class="d-mini-tit">👥 Vendas por vendedor — dia a dia</div>
+            <div id="dashGraphVendedores" style="min-height:260px"></div>
+          </div>
+        </div>
+
+        <!-- ═════ COMISSÃO MENSAL (v11) ═════ -->
+        <div class="d-sec" id="dashComissaoSec">
+          <div class="d-hdr">
+            <div>
+              <h3 class="d-tit">💰 Comissão do mês · <span id="dashComMesLbl"></span></h3>
+              <div class="d-sub">Faixa cheia por qtd de aparelhos · Open Box: +R$ <span id="dashComOBHdr">25</span>/un · atacado NÃO entra</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <div class="d-per" id="dashComTotal">R$ 0</div>
+              <button id="btn-com-config" onclick="abrirConfigComissao()" style="padding:7px 12px;border:none;background:var(--azul);color:#fff;border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;cursor:pointer">⚙️ Configurar</button>
+            </div>
+          </div>
+          <div id="dashComLista" style="min-height:60px"></div>
+          <div style="margin-top:10px;font-size:10px;color:var(--txt2);font-weight:700" id="dashComHelp"></div>
         </div>
       </div>
 
@@ -1279,6 +1333,40 @@ td{padding:10px 12px;font-size:12px;font-weight:600;vertical-align:middle}
   </div>
 </div>
 
+<!-- MODAL CONFIGURAÇÃO DE COMISSÃO v11 -->
+<div class="modal-ov" id="mComissao" onclick="fOv(event,'mComissao')">
+  <div class="modal-box" style="max-width:720px">
+    <div class="mh" style="background:linear-gradient(135deg,var(--verde),#0f5f2b);color:#fff">
+      <div><h3 style="color:#fff">💰 Regras de comissão</h3><p style="color:rgba(255,255,255,.85)">Faixas, Open Box e vendedores elegíveis — mudança aqui vale pra TODOS os meses</p></div>
+      <button class="m-x" onclick="fM('mComissao')" style="color:#fff">✕</button>
+    </div>
+    <div class="mb">
+      <div style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">📊 Tabela de faixas</div>
+      <table class="metas-tbl" id="comFaixasTbl"></table>
+      <div style="margin:10px 0 20px;display:flex;justify-content:center">
+        <button onclick="comissaoAdicionarFaixa()" style="padding:7px 14px;background:var(--bg);border:1.5px dashed var(--verde);border-radius:10px;font-family:'Montserrat',sans-serif;font-size:11px;font-weight:800;color:var(--verde);cursor:pointer">➕ Adicionar faixa</button>
+      </div>
+      <div style="padding:12px;background:var(--bg);border-radius:10px;margin-bottom:16px">
+        <label style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:6px">📦 Bônus Open Box (R$ por aparelho OpenBox vendido)</label>
+        <input type="number" id="comOpenBox" min="0" step="1" style="width:120px;padding:7px 10px;border:1.5px solid var(--brd);border-radius:8px;font-family:inherit;font-size:12px;font-weight:800">
+        <span style="font-size:10px;color:var(--txt2);margin-left:8px">Soma por cima da faixa normal</span>
+      </div>
+      <div style="padding:12px;background:var(--bg);border-radius:10px">
+        <div style="font-size:11px;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">👤 Vendedores elegíveis à comissão</div>
+        <div id="comVendList"></div>
+        <div style="margin-top:10px">
+          <button onclick="comissaoAdicionarVend()" style="padding:6px 12px;background:#fff;border:1.5px dashed var(--azul);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:10px;font-weight:800;color:var(--azul);cursor:pointer">➕ Adicionar vendedor</button>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--txt2);font-weight:700">💡 Vendas de quem está fora dessa lista aparecem na análise, mas comissão fica R$ 0.</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn-x" onclick="fM('mComissao')">Cancelar</button>
+      <button class="btn-s" style="background:var(--verde);color:#fff" onclick="comissaoSalvarConfig()">💾 Salvar regra</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL VENDA ATACADO -->
 <div class="modal-ov" id="mVendaAtc" onclick="fOv(event,'mVendaAtc')">
   <div class="modal-box">
@@ -1707,25 +1795,33 @@ function isOp(){return usuarioLogado?.perfil==='operador';}
 function isFin(){return usuarioLogado?.perfil==='financeiro';}
 // Entrada Geral: liberado pra admin, operador E financeiro
 function podeEntrada(){return isAdmin() || isOp() || isFin();}
-// Dashboard/Fechamento: admin E financeiro (não operador)
-function podeDashboard(){return isAdmin() || isFin();}
+// Dashboard: v11 — admin, financeiro E operador. Operador vê modo limitado (podeVerLucro() = false).
+function podeDashboard(){return isAdmin() || isFin() || isOp();}
+// Dados sensíveis (lucro, margem, custo, R$ parados em capital, comissão): só admin e financeiro
+function podeVerLucro(){return isAdmin() || isFin();}
 
 function aplicarUI(){
   const a=isAdmin();
   const f=isFin();
+  const o=isOp();
   const ico=document.getElementById('sbIco');
   ico.className='sb-user-ico '+(a?'admin':(f?'fin':'op'));
   ico.textContent=a?'🔐':(f?'💼':'👤');
   document.getElementById('sbNome').textContent=a?'Administrador':(f?'Financeiro':'Operador');
-  document.getElementById('sbPerfil').textContent=a?'Acesso total':(f?'Financeiro · Dashboard':'Compra · Venda · Status');
+  document.getElementById('sbPerfil').textContent=a?'Acesso total':(f?'Financeiro · Dashboard':'Dashboard (sem lucro)');
   // Novo Produto: só admin
   document.querySelectorAll('#sb-btn-novo,#btn-novo').forEach(el=>el.style.display=a?'flex':'none');
-  // Dashboard: admin E financeiro
+  // Dashboard: admin, financeiro E operador (operador tem dash limitada)
   const nbDash = document.getElementById('nav-btn-dashboard');
   if(nbDash) nbDash.style.display = podeDashboard() ? '' : 'none';
   // Catálogo - botão cadastrar: só admin
   const btnCat=document.getElementById('btn-cadastrar-prod');
   if(btnCat) btnCat.style.display=a?'':'none';
+  // v11: PDF e Metas no dashboard: só admin/financeiro
+  const btnPdfFech=document.getElementById('btn-pdf-fech');
+  if(btnPdfFech) btnPdfFech.style.display = podeVerLucro() ? '' : 'none';
+  const btnMetasMes=document.getElementById('btn-metas-mes');
+  if(btnMetasMes) btnMetasMes.style.display = (a||f) ? '' : 'none'; // operador vê progresso mas não edita metas
 }
 // ══════════════════════════════
 let produtos=[];
@@ -2109,7 +2205,7 @@ function renderTabela(){
       return `<span class="dias-badge ${cls}">${icoDias} ${dias}d</span>`;
     })();
     const btnC=st==='aguardando'?`<button class="btn-c" onclick="event.stopPropagation();abrirCompra(${idx})">🧾</button>`:'';
-    const btnV=p.status==='emEstoque'?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Registrar Venda" style="background:#1a7a3a;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 Vender</button>`:'';
+    const btnV=st==='emEstoque'?`<button class="btn-v" onclick="event.stopPropagation();abrirVenda(${idx})" title="Registrar Venda" style="background:#1a7a3a;color:#fff;border:none;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">💰 Vender</button>`:'';
     const btnE=isAdmin()?`<button class="btn-e" onclick="event.stopPropagation();editarP(${idx})">✏️</button>`:'';
     const btnD=isAdmin()?`<button class="btn-d" onclick="event.stopPropagation();deletarP(${idx})">🗑</button>`:'';
     const btnCopy=`<button class="btn-copy" onclick="event.stopPropagation();copiarLinha(${idx})" title="Copiar mensagem de COMPRA (WhatsApp)">💬</button>`;
@@ -3426,6 +3522,30 @@ async function metasSalvarFirebase(){
   catch(e){ console.warn('metas save:', e); }
 }
 
+// v11: estado de comissão (nó separado no Firebase: comissao_config_revend)
+// Formato: {tabela: [{min,max,valor}, ...], openBoxExtra: 25, vendedoresElegiveis: ['FELIPE DIAS','STEPHANIE']}
+window.comissaoConfig = window.comissaoConfig || {
+  tabela: [
+    {min:0,  max:10, valor:0},
+    {min:11, max:20, valor:30},
+    {min:21, max:30, valor:35},
+    {min:31, max:40, valor:45},
+    {min:41, max:50, valor:50},
+    {min:51, max:60, valor:55},
+    {min:61, max:70, valor:60},
+    {min:71, max:9999, valor:70},
+  ],
+  openBoxExtra: 25,
+  vendedoresElegiveis: ['FELIPE DIAS', 'STEPHANIE']
+};
+window._fbLoadedComissao = false;
+async function comissaoSalvarFirebase(){
+  if(!window._fbSalvarNodo) return;
+  if(!window._fbLoadedComissao){ console.warn('comissao: firebase não carregado'); return; }
+  try { await window._fbSalvarNodo('comissao_config_revend', window.comissaoConfig); }
+  catch(e){ console.warn('comissao save:', e); }
+}
+
 // Helper: valor numérico (parseValor já existe)
 function _num(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
 function _fmtR(n){ if(!n||isNaN(n)) return 'R$ 0'; return 'R$ ' + Math.round(n).toLocaleString('pt-BR'); }
@@ -3564,27 +3684,31 @@ function _dashTimelineDia(dataStr, famFiltro){
 
 // Aparelhos parados por faixa (só quem está EM ESTOQUE)
 function _dashParados(famFiltro){
+  // v11: também inclui window.produtos filtrado por "emEstoque OU vindo de Entrada Geral (st=emEstoque via statusAt)"
   const hoje2 = new Date();
   const emEst = (window.produtos||[]).filter(p=>{
-    if(p.status !== 'emEstoque') return false;
+    const st = (typeof statusAt==='function') ? statusAt(p) : p.status;
+    if(st !== 'emEstoque') return false;
     if(famFiltro && p.familia !== famFiltro) return false;
     if(!p.dataCompraEntrada) return false;
     return true;
   });
   const buckets = {'0-30':0, '31-60':0, '61-90':0, '90+':0};
+  const valorBuckets = {'0-30':0, '31-60':0, '61-90':0, '90+':0}; // v11: R$ parado por faixa
   const listaComDias = emEst.map(p=>{
     const dt = new Date(p.dataCompraEntrada);
     const dias = Math.floor((hoje2 - dt)/86400000);
-    return {p, dias};
+    return {p, dias, valor: _num(p.valorCompra)};
   }).filter(x=> x.dias >= 0);
   listaComDias.forEach(x=>{
-    if(x.dias <= 30) buckets['0-30']++;
-    else if(x.dias <= 60) buckets['31-60']++;
-    else if(x.dias <= 90) buckets['61-90']++;
-    else buckets['90+']++;
+    const faixa = x.dias <= 30 ? '0-30' : x.dias <= 60 ? '31-60' : x.dias <= 90 ? '61-90' : '90+';
+    buckets[faixa]++;
+    valorBuckets[faixa] += x.valor;
   });
   const top = listaComDias.sort((a,b)=> b.dias - a.dias).slice(0,3);
-  return {total: emEst.length, buckets, top};
+  const totalCapital = Object.values(valorBuckets).reduce((s,v)=>s+v,0);
+  const capitalParadoCritico = valorBuckets['61-90'] + valorBuckets['90+']; // >60 dias
+  return {total: emEst.length, buckets, valorBuckets, top, totalCapital, capitalParadoCritico};
 }
 
 // Análise da equipe do mês
@@ -3659,7 +3783,7 @@ function renderDash(){
       </div>
       <div class="cards-g" style="margin-top:12px">
         <div class="card card-v"><div class="ci">💰</div><div class="cn">${_fmtR(pl.fatReal)}</div><div class="cl">Faturamento realizado</div><div class="cs">${pl.qtdReal} venda${pl.qtdReal!==1?'s':''}</div></div>
-        <div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>
+        ${podeVerLucro()?`<div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>`:''}
       </div>`;
       return;
     }
@@ -3667,7 +3791,7 @@ function renderDash(){
     el.innerHTML = `
       <div class="cards-g" style="margin-bottom:14px">
         <div class="card card-v"><div class="ci">💰</div><div class="cn">${_fmtR(pl.fatReal)}</div><div class="cl">Faturamento realizado</div><div class="cs">${pl.qtdReal} venda${pl.qtdReal!==1?'s':''}${pl.metaFat>0?' · meta '+_fmtR(pl.metaFat):''}</div></div>
-        <div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>
+        ${podeVerLucro()?`<div class="card card-p"><div class="ci">📈</div><div class="cn">${_fmtR(pl.lucroReal)}</div><div class="cl">Lucro bruto</div><div class="cs">${pl.fatReal>0?Math.round((pl.lucroReal/pl.fatReal)*100)+'% margem':'—'}</div></div>`:''}
         <div class="card ${pctFat!==null&&pctFat>=100?'card-v':(pctFat!==null&&pctFat<70?'card-a':'card-b')}"><div class="ci">🎯</div><div class="cn" style="color:${_corPct(pctFat)}">${pctFat!==null?pctFat+'%':'—'}</div><div class="cl">% da meta (fat)</div><div class="cs" style="color:${_corPct(pctFat)}">${pl.metaFat>0?'de '+_fmtR(pl.metaFat):''}</div></div>
         <div class="card ${pctQtd!==null&&pctQtd>=100?'card-v':(pctQtd!==null&&pctQtd<70?'card-a':'card-b')}"><div class="ci">📱</div><div class="cn" style="color:${_corPct(pctQtd)}">${pctQtd!==null?pctQtd+'%':'—'}</div><div class="cl">% da meta (qtd)</div><div class="cs" style="color:${_corPct(pctQtd)}">${pl.metaQtd>0?pl.qtdReal+' de '+pl.metaQtd:''}</div></div>
       </div>
@@ -3703,7 +3827,7 @@ function renderDash(){
       <div class="cl">Faturamento</div>
       <div class="cs">${dm.vendas.length} venda${dm.vendas.length!==1?'s':''}${ticketDia?' · ticket '+_fmtR(ticketDia):''}</div>
     </div>
-    <div class="card card-g">
+    ${podeVerLucro()?`<div class="card card-g">
       <div class="ci">📈</div>
       <div class="cn">${_fmtR(dm.lucro)}</div>
       <div class="cl">Lucro bruto</div>
@@ -3714,7 +3838,7 @@ function renderDash(){
       <div class="cn">${_fmtR(dm.valorGasto)}</div>
       <div class="cl">Valor gasto</div>
       <div class="cs">${dm.compras.length} aparelho${dm.compras.length!==1?'s':''} adquirido${dm.compras.length!==1?'s':''}</div>
-    </div>
+    </div>`:''}
     <div class="card card-b">
       <div class="ci">📥</div>
       <div class="cn">${dm.compras.length}</div>
@@ -3750,18 +3874,21 @@ function renderDash(){
   // Ranking vendedor do dia (v7: mostra QTD + FAT + LUCRO)
   const rank = _dashRankingDia(dm.vendas);
   const rankMaxFat = rank.length ? Math.max(...rank.map(r=>r.fat)) : 1;
+  const _vl = podeVerLucro();
   const rankHtml = rank.length ? rank.slice(0,5).map((v,i)=>{
     const medalhas = ['gold','silver','bronze'];
     const pct = rankMaxFat > 0 ? Math.round((v.fat/rankMaxFat)*100) : 0;
     const lucroCor = v.lucro > 0 ? '#1a7a3a' : (v.lucro < 0 ? 'var(--red)' : 'var(--txt2)');
-    return `<div class="d-bar-row" style="grid-template-columns:130px 1fr 110px 90px">
+    const grid = _vl ? '130px 1fr 110px 90px' : '130px 1fr 110px';
+    return `<div class="d-bar-row" style="grid-template-columns:${grid}">
       <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span>${esc(v.nome)}</div>
       <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(pct,15)}%">${v.qtd} venda${v.qtd!==1?'s':''}</div></div>
       <div class="d-bar-val" title="Faturamento">${_fmtR(v.fat)}</div>
-      <div class="d-bar-val" style="color:${lucroCor}" title="Lucro">${v.lucro?(_fmtR(v.lucro)):'—'}</div>
+      ${_vl?`<div class="d-bar-val" style="color:${lucroCor}" title="Lucro">${v.lucro?(_fmtR(v.lucro)):'—'}</div>`:''}
     </div>`;
   }).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhuma venda registrada hoje</div>';
-  document.getElementById('dashHojeVendedor').innerHTML = (rank.length?'<div style="display:grid;grid-template-columns:130px 1fr 110px 90px;gap:12px;font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--brd);letter-spacing:.4px"><div>Vendedor</div><div>Qtd</div><div style="text-align:right">Fat</div><div style="text-align:right">Lucro</div></div>':'') + rankHtml;
+  const _hdrGrid = _vl ? '130px 1fr 110px 90px' : '130px 1fr 110px';
+  document.getElementById('dashHojeVendedor').innerHTML = (rank.length?`<div style="display:grid;grid-template-columns:${_hdrGrid};gap:12px;font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:0 0 6px;border-bottom:1px solid var(--brd);letter-spacing:.4px"><div>Vendedor</div><div>Qtd</div><div style="text-align:right">Fat</div>${_vl?'<div style="text-align:right">Lucro</div>':''}</div>`:'') + rankHtml;
 
   // Timeline v9: eventos consolidados sem hora — vendas, entradas, liberações, cancelamentos
   const tl = _dashTimelineDia(dHoje, fam);
@@ -3774,6 +3901,48 @@ function renderDash(){
     </div>
   `).join('') : '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhum evento registrado nesta data</div>';
   document.getElementById('dashHojeTimeline').innerHTML = tlHtml;
+
+  // ─── v11: FECHAMENTO SEMANAL (seg-dom) ───
+  (function(){
+    const sem = _dashMetricasSemana(dHoje, fam);
+    const semAnt = _dashMetricasSemanaAnterior(dHoje, fam);
+    const _vlS = podeVerLucro();
+    // Período no header
+    const _fD = (s)=>s ? s.split('-').reverse().join('/') : '';
+    const perEl = document.getElementById('dashSemanaPeriodo');
+    if(perEl) perEl.textContent = _fD(sem.segStr) + ' → ' + _fD(sem.domStr);
+    // Cards
+    const varFat = semAnt.fat > 0 ? ((sem.fat - semAnt.fat)/semAnt.fat)*100 : (sem.fat>0?100:0);
+    const varQtd = semAnt.vendas > 0 ? ((sem.vendas - semAnt.vendas)/semAnt.vendas)*100 : (sem.vendas>0?100:0);
+    const deltaC = (v)=> v>0?'up':v<0?'down':'flat';
+    const deltaS = (v)=> v>0?'↑':v<0?'↓':'—';
+    document.getElementById('dashSemanaCards').innerHTML = `
+      <div class="card card-v"><div class="ci">💰</div><div class="cn">${_fmtR(sem.fat)}</div><div class="cl">Faturamento semana</div><div class="cs"><span class="d-delta ${deltaC(varFat)}">${deltaS(varFat)} ${Math.abs(varFat).toFixed(0)}%</span> vs. semana anterior</div></div>
+      <div class="card card-p"><div class="ci">📱</div><div class="cn">${sem.vendas}</div><div class="cl">Vendas na semana</div><div class="cs"><span class="d-delta ${deltaC(varQtd)}">${deltaS(varQtd)} ${Math.abs(varQtd).toFixed(0)}%</span> vs. ${semAnt.vendas} aparelhos</div></div>
+      ${_vlS?`<div class="card card-g"><div class="ci">📈</div><div class="cn">${_fmtR(sem.lucro)}</div><div class="cl">Lucro semana</div><div class="cs" style="color:#1a7a3a">margem ${sem.fat>0?Math.round((sem.lucro/sem.fat)*100):0}%</div></div>`:''}
+      <div class="card card-b"><div class="ci">🏆</div><div class="cn" style="font-size:14px;line-height:1.2">${sem.topVend?esc(sem.topVend.nome):'—'}</div><div class="cl">Top vendedor</div><div class="cs" style="color:var(--azul)">${sem.topVend?sem.topVend.qtd+' vendas · '+_fmtR(sem.topVend.fat):'sem vendas'}</div></div>
+    `;
+    // Barras por dia (seg a dom)
+    const dias = Object.entries(sem.porDia).sort(([a],[b])=> a.localeCompare(b));
+    const maxFatDia = Math.max(1, ...dias.map(([_,v])=>v.fat));
+    const DIAS_LBL = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+    document.getElementById('dashSemanaBarras').innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;align-items:end;min-height:140px;padding:8px 4px 0">
+        ${dias.map(([data, v], i)=>{
+          const h = v.fat>0 ? Math.max(8, Math.round(v.fat/maxFatDia*100)) : 2;
+          const hoje = data === dHoje;
+          const _f = data.split('-').reverse().slice(0,2).join('/');
+          const corBar = hoje ? 'linear-gradient(180deg,var(--red),var(--red-dark))' : (v.fat>0 ? 'linear-gradient(180deg,#1a7a3a,#0f5f2b)' : '#e8e6e1');
+          return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px" title="${DIAS_LBL[i]} ${_f}: ${v.qtd} vendas · ${_fmtR(v.fat)}">
+            <div style="font-size:9px;font-weight:800;color:var(--txt2);height:14px">${v.qtd?v.qtd+'un':''}</div>
+            <div style="width:100%;height:${h}px;background:${corBar};border-radius:6px 6px 0 0;transition:height .4s;position:relative">${v.fat>0?`<div style="position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:800;color:${hoje?'var(--red)':'#1a7a3a'};white-space:nowrap">${_fmtR(v.fat)}</div>`:''}</div>
+            <div style="font-size:10px;font-weight:800;color:${hoje?'var(--red)':'var(--txt2)'};text-transform:uppercase">${DIAS_LBL[i]}</div>
+            <div style="font-size:9px;color:var(--txt2)">${_f}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+  })();
 
   // ─── FATURAMENTO E MARGEM DO MÊS ───
   const mAtual = _dashMetricasMes(mes, fam);
@@ -3792,6 +3961,11 @@ function renderDash(){
   document.getElementById('dashMesLabel').textContent = nomeMes + ' · ' + diasCorridos + ' de ' + diasNoMes + ' dias';
   document.getElementById('dashFatN').textContent = Math.round(mAtual.fat).toLocaleString('pt-BR');
   document.getElementById('dashLucN').textContent = Math.round(mAtual.lucro).toLocaleString('pt-BR');
+  // v11: esconde card Lucro pro operador
+  const _cardLucMes = document.getElementById('dashCardLucroMes');
+  const _fatPair = document.getElementById('dashFatPair');
+  if(_cardLucMes){ _cardLucMes.style.display = podeVerLucro() ? '' : 'none'; }
+  if(_fatPair){ _fatPair.style.gridTemplateColumns = podeVerLucro() ? '1fr 1fr' : '1fr'; }
 
   const varFat = mAnterior.fat > 0 ? ((mAtual.fat - mAnterior.fat)/mAnterior.fat)*100 : (mAtual.fat > 0 ? 100 : 0);
   const varLuc = mAnterior.lucro > 0 ? ((mAtual.lucro - mAnterior.lucro)/mAnterior.lucro)*100 : (mAtual.lucro > 0 ? 100 : 0);
@@ -3820,44 +3994,52 @@ function renderDash(){
       <div style="text-align:right"><span class="d-delta ${varPct>0?'up':varPct<0?'down':'flat'}">${varPct>0?'↑':varPct<0?'↓':'—'} ${Math.abs(varPct).toFixed(1)}%</span></div>
     </div>`;
   };
-  document.getElementById('dashCmpGrid').innerHTML = [
+  const _cmpLinhas = podeVerLucro() ? [
     mkCmp('Faturamento', 'vendas totais', mAtual.fat, mAnterior.fat, _fmtR),
     mkCmp('Lucro bruto', 'valorSaida − valorCompra', mAtual.lucro, mAnterior.lucro, _fmtR),
     mkCmp('Nº de vendas', 'aparelhos baixados', mAtual.vendas, mAnterior.vendas, n=>String(n), ' vendas'),
     mkCmp('Ticket médio', 'valor médio por venda', mAtual.ticket, mAnterior.ticket, _fmtR),
     mkCmp('Margem %', 'lucro ÷ faturamento', mAtual.margem, mAnterior.margem, n=>n.toFixed(1), '%'),
-  ].join('');
+  ] : [
+    mkCmp('Faturamento', 'vendas totais', mAtual.fat, mAnterior.fat, _fmtR),
+    mkCmp('Nº de vendas', 'aparelhos baixados', mAtual.vendas, mAnterior.vendas, n=>String(n), ' vendas'),
+    mkCmp('Ticket médio', 'valor médio por venda', mAtual.ticket, mAnterior.ticket, _fmtR),
+  ];
+  document.getElementById('dashCmpGrid').innerHTML = _cmpLinhas.join('');
 
   // ─── APARELHOS PARADOS ───
   const par = _dashParados(fam);
-  document.getElementById('dashParadosTotal').textContent = par.total + ' em estoque';
+  const _vlP = podeVerLucro();
+  // v11: Headline inclui capital parado total (admin/fin apenas)
+  document.getElementById('dashParadosTotal').textContent = par.total + ' em estoque' + (_vlP && par.totalCapital>0 ? ' · '+_fmtR(par.totalCapital)+' em capital' : '');
   document.getElementById('dashBuckets').innerHTML = `
     <div class="d-bucket d-bucket-verde" onclick="dashFiltrarParados(0,30)">
       <div class="d-bucket-lbl">🟢 Novos</div>
       <div class="d-bucket-n">${par.buckets['0-30']}</div>
-      <div class="d-bucket-sub">0–30 dias</div>
+      <div class="d-bucket-sub">0–30 dias${_vlP&&par.valorBuckets['0-30']>0?'<br><strong style="color:#1a7a3a">'+_fmtR(par.valorBuckets['0-30'])+'</strong>':''}</div>
     </div>
     <div class="d-bucket d-bucket-amarelo" onclick="dashFiltrarParados(31,60)">
       <div class="d-bucket-lbl">🟡 Atenção</div>
       <div class="d-bucket-n">${par.buckets['31-60']}</div>
-      <div class="d-bucket-sub">31–60 dias</div>
+      <div class="d-bucket-sub">31–60 dias${_vlP&&par.valorBuckets['31-60']>0?'<br><strong style="color:#c47500">'+_fmtR(par.valorBuckets['31-60'])+'</strong>':''}</div>
     </div>
     <div class="d-bucket d-bucket-laranja" onclick="dashFiltrarParados(61,90)">
       <div class="d-bucket-lbl">🟠 Alerta</div>
       <div class="d-bucket-n">${par.buckets['61-90']}</div>
-      <div class="d-bucket-sub">61–90 dias</div>
+      <div class="d-bucket-sub">61–90 dias${_vlP&&par.valorBuckets['61-90']>0?'<br><strong style="color:#c95a1e">'+_fmtR(par.valorBuckets['61-90'])+'</strong>':''}</div>
     </div>
     <div class="d-bucket d-bucket-vermelho" onclick="dashFiltrarParados(91,9999)">
       <div class="d-bucket-lbl">🔴 Crítico</div>
       <div class="d-bucket-n">${par.buckets['90+']}</div>
-      <div class="d-bucket-sub">+90 dias</div>
+      <div class="d-bucket-sub">+90 dias${_vlP&&par.valorBuckets['90+']>0?'<br><strong style="color:var(--red-dark)">'+_fmtR(par.valorBuckets['90+'])+'</strong>':''}</div>
     </div>
   `;
   if(par.top.length){
-    const topDesc = par.top.map(x=>`${x.p.modelo||''} ${x.p.gb||''} (${x.dias}d)`).join(' · ');
+    const topDesc = par.top.map(x=>`${x.p.modelo||''} ${x.p.gb||''} (${x.dias}d)${_vlP&&x.valor>0?' · '+_fmtR(x.valor):''}`).join(' · ');
+    const alertaCapital = _vlP && par.capitalParadoCritico > 0 ? `<br>💸 <strong>${_fmtR(par.capitalParadoCritico)}</strong> parados há mais de 60 dias — considere desconto` : '';
     document.getElementById('dashParadosTop').innerHTML = `
       <div style="padding:12px 16px;background:rgba(200,16,46,.06);border-left:3px solid var(--red);border-radius:8px;font-size:11px;font-weight:700;color:var(--red-dark)">
-        🔴 Top ${par.top.length} mais parados: ${esc(topDesc)}
+        🔴 Top ${par.top.length} mais parados: ${esc(topDesc)}${alertaCapital}
       </div>`;
   } else document.getElementById('dashParadosTop').innerHTML = '';
 
@@ -3867,22 +4049,29 @@ function renderDash(){
   const topForns = _dashTopFornecedoresMes(mes, fam);
   const maxProds = topProds.length ? topProds[0].qtd : 1;
   const maxForns = topForns.length ? topForns[0].qtd : 1;
+  const _vlT = podeVerLucro();
+  // v11: col extra para ticket médio de venda (todos) e valor médio pago (só podeVerLucro)
   document.getElementById('dashTopProds').innerHTML = topProds.length ? topProds.map((it,i)=>{
     const medalhas = ['gold','silver','bronze'];
-    return `<div class="d-bar-row" style="grid-template-columns:30px 1fr 60px 100px">
+    const ticket = it.qtd > 0 ? it.fat / it.qtd : 0;
+    return `<div class="d-bar-row" style="grid-template-columns:30px 1fr 50px 90px 90px">
       <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span></div>
       <div class="d-bar-lbl" style="min-width:0;overflow:hidden;text-overflow:ellipsis" title="${esc(it.nome)}">${esc(it.nome)}</div>
       <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(15,Math.round(it.qtd/maxProds*100))}%">${it.qtd}</div></div>
-      <div class="d-bar-val">${_fmtR(it.fat)}</div>
+      <div class="d-bar-val" title="Faturamento total">${_fmtR(it.fat)}</div>
+      <div class="d-bar-val" title="Ticket médio por aparelho vendido" style="color:var(--azul)">${_fmtR(ticket)}</div>
     </div>`;
   }).join('') : '<div style="padding:16px;text-align:center;color:var(--txt2);font-size:12px">Nenhuma venda no período</div>';
   document.getElementById('dashTopForns').innerHTML = topForns.length ? topForns.map((it,i)=>{
     const medalhas = ['gold','silver','bronze'];
-    return `<div class="d-bar-row" style="grid-template-columns:30px 1fr 60px 100px">
+    const medio = it.qtd > 0 ? it.valor / it.qtd : 0;
+    const grid = _vlT ? '30px 1fr 50px 90px 90px' : '30px 1fr 50px';
+    return `<div class="d-bar-row" style="grid-template-columns:${grid}">
       <div class="d-bar-lbl"><span class="rank ${medalhas[i]||''}">${i+1}</span></div>
       <div class="d-bar-lbl" style="min-width:0;overflow:hidden;text-overflow:ellipsis" title="${esc(it.nome)}">${esc(it.nome)}</div>
       <div class="d-bar-track"><div class="d-bar-fill" style="width:${Math.max(15,Math.round(it.qtd/maxForns*100))}%">${it.qtd}</div></div>
-      <div class="d-bar-val">${_fmtR(it.valor)}</div>
+      ${_vlT?`<div class="d-bar-val" title="Total pago">${_fmtR(it.valor)}</div>
+      <div class="d-bar-val" title="Valor médio pago por aparelho" style="color:var(--azul)">${_fmtR(medio)}</div>`:''}
     </div>`;
   }).join('') : '<div style="padding:16px;text-align:center;color:var(--txt2);font-size:12px">Nenhum fornecedor com compras (preencha o campo Fornecedor nos produtos)</div>';
 
@@ -3907,13 +4096,13 @@ function renderDash(){
         <div style="font-size:9px;font-weight:700;color:var(--txt2);margin-top:3px">${falta > 0 ? 'Faltam '+formato(falta) : '✓ Bateu!'}</div>
       </div>`;
     };
+    const _vlEq = podeVerLucro();
     tbl.innerHTML = `
       <thead><tr>
         <th>Vendedor</th>
         <th class="r">Nº Vendas</th>
         <th class="r">Faturamento</th>
-        <th class="r">Lucro bruto</th>
-        <th class="r">Margem %</th>
+        ${_vlEq?'<th class="r">Lucro bruto</th><th class="r">Margem %</th>':''}
         <th class="r">Ticket médio</th>
         <th>🎯 Meta Qtd</th>
         <th>💰 Meta R$</th>
@@ -3924,8 +4113,8 @@ function renderDash(){
             <td class="nome"><span class="d-medalha">${medalhas[i]||''}</span>${esc(v.nome)}</td>
             <td class="r">${v.qtd}</td>
             <td class="r">${_fmtR(v.fat)}</td>
-            <td class="r ${v.lucro>0?'ok':''}">${_fmtR(v.lucro)}</td>
-            <td class="r ${v.margem>=20?'ok':v.margem>=10?'warn':''}">${v.margem.toFixed(1)}%</td>
+            ${_vlEq?`<td class="r ${v.lucro>0?'ok':''}">${_fmtR(v.lucro)}</td>
+            <td class="r ${v.margem>=20?'ok':v.margem>=10?'warn':''}">${v.margem.toFixed(1)}%</td>`:''}
             <td class="r">${_fmtR(v.ticket)}</td>
             <td>${_mkMeta(v.qtd, v.metaQtd, v.progressoQtd, n=>String(Math.round(n))+' un')}</td>
             <td>${_mkMeta(v.fat, v.metaFat, v.progressoFat, _fmtR)}</td>
@@ -3947,6 +4136,91 @@ function renderDash(){
     if(semMeta.length) ins.push(`<strong style="color:var(--txt2)">${semMeta.length} sem meta</strong> — defina em <button onclick="abrirMetas()" style="background:none;border:none;color:var(--azul);text-decoration:underline;cursor:pointer;font-family:inherit;font-size:inherit;font-weight:800;padding:0">🎯 Metas mensais</button>`);
   }
   document.getElementById('dashInsights').innerHTML = ins.length ? '💡 ' + ins.join(' · ') : '';
+
+  // ─── v11: GRÁFICOS ───
+  (function(){
+    const elLoja = document.getElementById('dashGraphLoja');
+    const elVend = document.getElementById('dashGraphVendedores');
+    if(!elLoja || !elVend) return;
+    const rangeSel = document.getElementById('dashGraphRange');
+    const range = rangeSel ? rangeSel.value : '30';
+    const dados = _dashGraphLojaDados(mes, fam, range);
+    let dadosAnt = null;
+    if(window._dashCmpMesAnt && range === '30'){
+      const dtAntMes = new Date(parseInt(ano), parseInt(m)-2, 1);
+      const mesAntStr = dtAntMes.toISOString().slice(0,7);
+      dadosAnt = _dashGraphLojaDados(mesAntStr, fam, range);
+      // Trunca ao mesmo tamanho do atual
+      if(dadosAnt.length > dados.length) dadosAnt = dadosAnt.slice(0, dados.length);
+      else while(dadosAnt.length < dados.length) dadosAnt.push({data:'', qtd:0, fat:0, lucro:0});
+    }
+    elLoja.innerHTML = _dashRenderGraphLoja(dados, dadosAnt);
+    const dadosV = _dashGraphVendedoresDados(mes, fam, range);
+    elVend.innerHTML = _dashRenderGraphVendedores(dadosV);
+    // Toggle visual do botão comparar
+    const btn = document.getElementById('dashCmpMesBtn');
+    if(btn){
+      btn.style.background = window._dashCmpMesAnt ? 'var(--azul)' : '#fff';
+      btn.style.color = window._dashCmpMesAnt ? '#fff' : 'var(--preto)';
+    }
+  })();
+
+  // ─── v11: COMISSÃO MENSAL ───
+  (function(){
+    const sec = document.getElementById('dashComissaoSec');
+    if(!sec) return;
+    document.getElementById('dashComMesLbl').textContent = nomeMes;
+    const cfg = window.comissaoConfig || {tabela:[], openBoxExtra:25, vendedoresElegiveis:[]};
+    const obHdr = document.getElementById('dashComOBHdr');
+    if(obHdr) obHdr.textContent = cfg.openBoxExtra || 0;
+    // Botão de configurar só pra admin
+    const btnCfg = document.getElementById('btn-com-config');
+    if(btnCfg) btnCfg.style.display = isAdmin() ? '' : 'none';
+    const lista = _dashComissaoMes(mes, fam);
+    const _vlC = podeVerLucro();
+    const totalPagar = lista.filter(l=>l.elegivel).reduce((s,l)=> s + l.comissaoTotal, 0);
+    const totalEl = document.getElementById('dashComTotal');
+    if(totalEl){
+      totalEl.textContent = _vlC ? _fmtR(totalPagar) + ' a pagar' : '—';
+      totalEl.style.color = _vlC && totalPagar > 0 ? 'var(--verde)' : 'var(--txt2)';
+    }
+    const container = document.getElementById('dashComLista');
+    if(!container) return;
+    if(!lista.length){
+      container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--txt2);font-size:12px">Nenhum vendedor com vendas no mês</div>';
+      document.getElementById('dashComHelp').innerHTML = '';
+      return;
+    }
+    // Grid: nome | qtd | qtd OpenBox | faixa (R$/un) | base | OpenBox extra | TOTAL (só admin/fin)
+    const headerGrid = _vlC ? '160px 55px 70px 90px 90px 90px 110px' : '160px 55px 70px';
+    const header = `<div style="display:grid;grid-template-columns:${headerGrid};gap:10px;font-size:9px;font-weight:800;color:var(--txt2);text-transform:uppercase;padding:0 0 8px;border-bottom:1px solid var(--brd);letter-spacing:.4px">
+      <div>Vendedor</div>
+      <div style="text-align:center">Qtd</div>
+      <div style="text-align:center">Op.Box</div>
+      ${_vlC?`<div style="text-align:right">R$/un</div>
+      <div style="text-align:right">Base</div>
+      <div style="text-align:right">Op.Box</div>
+      <div style="text-align:right">TOTAL</div>`:''}
+    </div>`;
+    const rows = lista.map(l=>{
+      const cor = l.elegivel ? (l.comissaoTotal>0?'var(--preto)':'var(--txt2)') : '#8e8e93';
+      const bgRow = l.elegivel ? '' : 'background:#f7f6f3';
+      return `<div style="display:grid;grid-template-columns:${headerGrid};gap:10px;padding:9px 0;border-bottom:1px solid var(--brd);align-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;color:${cor};${bgRow}">
+        <div><strong>${esc(l.nome)}</strong>${l.elegivel?'':' <span style="font-size:9px;color:#8e8e93;background:#f0f0f0;padding:1px 6px;border-radius:4px;font-weight:800">não elegível</span>'}</div>
+        <div style="text-align:center">${l.qtd}</div>
+        <div style="text-align:center">${l.qtdOpenBox||'—'}</div>
+        ${_vlC?`<div style="text-align:right">${l.valorFaixa?_fmtR(l.valorFaixa):'—'}</div>
+        <div style="text-align:right">${l.elegivel?_fmtR(l.comissaoBase):'—'}</div>
+        <div style="text-align:right">${l.elegivel&&l.comissaoOpenBox?_fmtR(l.comissaoOpenBox):'—'}</div>
+        <div style="text-align:right;color:${l.elegivel&&l.comissaoTotal>0?'var(--verde)':'var(--txt2)'};font-weight:900;font-size:13px">${l.elegivel?_fmtR(l.comissaoTotal):'—'}</div>`:''}
+      </div>`;
+    }).join('');
+    container.innerHTML = header + rows;
+    const help = _vlC
+      ? `Soma: <strong style="color:var(--verde)">${_fmtR(totalPagar)}</strong> a pagar no fechamento do mês. Faixa é determinada pela qtd TOTAL (inclui OpenBox); atacado não entra na contagem.`
+      : `Operador vê só número de aparelhos. Valores de comissão são restritos a admin/financeiro.`;
+    document.getElementById('dashComHelp').innerHTML = help;
+  })();
 }
 
 // Botão "Hoje" no fechamento — volta o input date para hoje e re-renderiza
@@ -3954,6 +4228,248 @@ function dashDiaHoje(){
   const el = document.getElementById('dashDia');
   if(el){ el.value = hoje(); renderDash(); }
 }
+// v11: Fechamento SEMANAL (seg-dom) — métricas da semana que contém a data `refDate`
+function _dashMetricasSemana(refDate, famFiltro){
+  // Encontra a segunda da semana da data de referência
+  const d = new Date(refDate);
+  const diaSem = d.getDay(); // 0=dom, 1=seg...
+  const diffSeg = diaSem === 0 ? -6 : 1 - diaSem;
+  const seg = new Date(d);
+  seg.setDate(d.getDate() + diffSeg);
+  seg.setHours(0,0,0,0);
+  const dom = new Date(seg);
+  dom.setDate(seg.getDate() + 6);
+  dom.setHours(23,59,59,999);
+  const segStr = seg.toISOString().slice(0,10);
+  const domStr = dom.toISOString().slice(0,10);
+  // Filtra vendas na semana
+  const vendas = (window.produtos||[]).filter(p=>{
+    if(!p.dataVenda) return false;
+    if(p.dataVenda < segStr || p.dataVenda > domStr) return false;
+    if(famFiltro && p.familia !== famFiltro) return false;
+    return true;
+  });
+  const fat = vendas.reduce((s,p)=> s + _num(p.valorSaida), 0);
+  const custo = vendas.reduce((s,p)=> s + _num(p.valorCompra), 0);
+  const lucro = fat - custo;
+  const ticket = vendas.length ? fat/vendas.length : 0;
+  // Por dia (array seg a dom)
+  const porDia = {}; // '2026-10-05': {qtd,fat,lucro}
+  for(let i=0;i<7;i++){
+    const dt = new Date(seg); dt.setDate(seg.getDate()+i);
+    porDia[dt.toISOString().slice(0,10)] = {qtd:0, fat:0, lucro:0};
+  }
+  vendas.forEach(p=>{
+    const k = p.dataVenda;
+    if(porDia[k]){
+      porDia[k].qtd++;
+      porDia[k].fat += _num(p.valorSaida);
+      porDia[k].lucro += _num(p.valorSaida) - _num(p.valorCompra);
+    }
+  });
+  // Top vendedor
+  const vMap = new Map();
+  vendas.forEach(p=>{
+    const v = String(p.vendedor||'—').toUpperCase().trim() || '—';
+    const cur = vMap.get(v) || {nome:v, qtd:0, fat:0};
+    cur.qtd++; cur.fat += _num(p.valorSaida);
+    vMap.set(v, cur);
+  });
+  const topVend = [...vMap.values()].sort((a,b)=> b.fat - a.fat)[0] || null;
+  return {segStr, domStr, vendas: vendas.length, fat, custo, lucro, ticket, porDia, topVend};
+}
+function _dashMetricasSemanaAnterior(refDate, famFiltro){
+  const d = new Date(refDate);
+  d.setDate(d.getDate() - 7);
+  return _dashMetricasSemana(d.toISOString().slice(0,10), famFiltro);
+}
+
+// v11: Dados de FATURAMENTO POR DIA — para gráfico da loja (range: últimos N dias ou mês atual)
+function _dashGraphLojaDados(mesStr, famFiltro, range){
+  const dias = [];
+  const hoje2 = new Date();
+  if(range === '7'){
+    for(let i=6;i>=0;i--){
+      const d = new Date(hoje2); d.setDate(hoje2.getDate()-i);
+      dias.push(d.toISOString().slice(0,10));
+    }
+  } else {
+    const [ano,m] = mesStr.split('-').map(Number);
+    const dtFim = new Date(ano, m, 0);
+    const diasNoMes = dtFim.getDate();
+    for(let i=1;i<=diasNoMes;i++){
+      dias.push(`${ano}-${String(m).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
+    }
+  }
+  const porDia = {};
+  dias.forEach(d=> porDia[d] = {qtd:0, fat:0, lucro:0});
+  (window.produtos||[]).forEach(p=>{
+    if(!p.dataVenda || !porDia[p.dataVenda]) return;
+    if(famFiltro && p.familia !== famFiltro) return;
+    porDia[p.dataVenda].qtd++;
+    porDia[p.dataVenda].fat += _num(p.valorSaida);
+    porDia[p.dataVenda].lucro += _num(p.valorSaida) - _num(p.valorCompra);
+  });
+  return dias.map(d=> ({data:d, ...porDia[d]}));
+}
+// Dados por vendedor por dia — para gráfico de vendedores
+function _dashGraphVendedoresDados(mesStr, famFiltro, range){
+  const dias = [];
+  const hoje2 = new Date();
+  if(range === '7'){
+    for(let i=6;i>=0;i--){
+      const d = new Date(hoje2); d.setDate(hoje2.getDate()-i);
+      dias.push(d.toISOString().slice(0,10));
+    }
+  } else {
+    const [ano,m] = mesStr.split('-').map(Number);
+    const dtFim = new Date(ano, m, 0);
+    const diasNoMes = dtFim.getDate();
+    for(let i=1;i<=diasNoMes;i++){
+      dias.push(`${ano}-${String(m).padStart(2,'0')}-${String(i).padStart(2,'0')}`);
+    }
+  }
+  // Agrupa por vendedor
+  const vendsMap = new Map();
+  (window.produtos||[]).forEach(p=>{
+    if(!p.dataVenda) return;
+    if(!dias.includes(p.dataVenda)) return;
+    if(famFiltro && p.familia !== famFiltro) return;
+    const v = String(p.vendedor||'—').toUpperCase().trim() || '—';
+    if(v.startsWith('ATACADO')) return; // esconde atacado do gráfico de vendedores individuais
+    if(!vendsMap.has(v)) vendsMap.set(v, {nome:v, totalQtd:0, totalFat:0, porDia:{}});
+    const r = vendsMap.get(v);
+    r.totalQtd++;
+    r.totalFat += _num(p.valorSaida);
+    if(!r.porDia[p.dataVenda]) r.porDia[p.dataVenda] = {qtd:0, fat:0};
+    r.porDia[p.dataVenda].qtd++;
+    r.porDia[p.dataVenda].fat += _num(p.valorSaida);
+  });
+  // Converte pra array ordenado por totalFat desc, pega top 6
+  const vendedores = [...vendsMap.values()].sort((a,b)=> b.totalFat - a.totalFat).slice(0,6);
+  // Preenche dias vazios
+  vendedores.forEach(v=>{
+    dias.forEach(d=>{
+      if(!v.porDia[d]) v.porDia[d] = {qtd:0, fat:0};
+    });
+  });
+  return {dias, vendedores};
+}
+// Renderiza gráfico de barras SVG (loja) + opcional sobreposição mês anterior
+function _dashRenderGraphLoja(dados, dadosAnt){
+  if(!dados.length) return '<div style="padding:40px;text-align:center;color:var(--txt2);font-size:12px">Sem dados</div>';
+  const W = 720, H = 200, PAD_L = 48, PAD_R = 12, PAD_T = 16, PAD_B = 30;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+  const maxFat = Math.max(1, ...dados.map(d=>d.fat), ...(dadosAnt||[]).map(d=>d.fat));
+  const bw = chartW / dados.length;
+  // Y ticks
+  const ticks = 4;
+  const yLabels = [];
+  for(let i=0;i<=ticks;i++){
+    const v = (maxFat/ticks)*i;
+    const y = PAD_T + chartH - (v/maxFat)*chartH;
+    yLabels.push(`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eceae5" stroke-width="1"/><text x="${PAD_L-6}" y="${y+3}" font-size="9" text-anchor="end" fill="#8e8e93" font-weight="700">${v>=1000?(v/1000).toFixed(0)+'k':Math.round(v)}</text>`);
+  }
+  // Barras
+  const _fD = (s)=>{const [a,m,d]=s.split('-'); return `${d}/${m}`;};
+  const bars = dados.map((d,i)=>{
+    const h = d.fat>0 ? (d.fat/maxFat)*chartH : 0;
+    const x = PAD_L + i*bw + 2;
+    const y = PAD_T + chartH - h;
+    const w = Math.max(1, bw - 4);
+    const hojeD = d.data === hoje();
+    const cor = hojeD ? '#c8102e' : '#1a7a3a';
+    const _lbl = i % Math.max(1,Math.round(dados.length/10)) === 0 ? _fD(d.data) : '';
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${cor}" opacity="0.85" rx="2"><title>${_fD(d.data)}: ${d.qtd} vendas · R$ ${Math.round(d.fat).toLocaleString('pt-BR')}</title></rect>
+            ${_lbl?`<text x="${x+w/2}" y="${H-10}" font-size="9" text-anchor="middle" fill="#7a7772" font-weight="700">${_lbl}</text>`:''}`;
+  }).join('');
+  // Linha mês anterior (opcional)
+  let lineAnt = '';
+  if(dadosAnt && dadosAnt.length === dados.length){
+    const pontos = dadosAnt.map((d,i)=>{
+      const x = PAD_L + i*bw + bw/2;
+      const y = PAD_T + chartH - (d.fat/maxFat)*chartH;
+      return `${x},${y}`;
+    }).join(' ');
+    lineAnt = `<polyline points="${pontos}" fill="none" stroke="#8e8e93" stroke-width="2" stroke-dasharray="4,3" opacity="0.75"/>`;
+  }
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto" preserveAspectRatio="xMidYMid meet">
+    ${yLabels.join('')}
+    ${lineAnt}
+    ${bars}
+    ${dadosAnt?`<text x="${W-PAD_R}" y="${PAD_T-4}" font-size="9" text-anchor="end" fill="#8e8e93" font-weight="700">— — mês anterior</text>`:''}
+  </svg>`;
+}
+// Renderiza gráfico de linhas SVG (vendedores) — múltiplas séries
+function _dashRenderGraphVendedores(dados){
+  const { dias, vendedores } = dados;
+  if(!vendedores.length) return '<div style="padding:40px;text-align:center;color:var(--txt2);font-size:12px">Sem vendas no período</div>';
+  const W = 720, H = 240, PAD_L = 48, PAD_R = 150, PAD_T = 16, PAD_B = 30;
+  const chartW = W - PAD_L - PAD_R;
+  const chartH = H - PAD_T - PAD_B;
+  // Max de qtd/dia (não de fat, pra escala comum)
+  let maxQtdDia = 1;
+  vendedores.forEach(v=>{
+    dias.forEach(d=>{
+      if(v.porDia[d] && v.porDia[d].qtd > maxQtdDia) maxQtdDia = v.porDia[d].qtd;
+    });
+  });
+  // Cores
+  const CORES = ['#c8102e','#007aff','#1a7a3a','#af52de','#ff9500','#5856d6'];
+  const _fD = (s)=>{const [a,m,d]=s.split('-'); return `${d}/${m}`;};
+  const bw = chartW / Math.max(1,dias.length-1);
+  // Y ticks
+  const ticks = Math.min(5, maxQtdDia);
+  const yLabels = [];
+  for(let i=0;i<=ticks;i++){
+    const v = (maxQtdDia/ticks)*i;
+    const y = PAD_T + chartH - (v/maxQtdDia)*chartH;
+    yLabels.push(`<line x1="${PAD_L}" y1="${y}" x2="${W-PAD_R}" y2="${y}" stroke="#eceae5" stroke-width="1"/><text x="${PAD_L-6}" y="${y+3}" font-size="9" text-anchor="end" fill="#8e8e93" font-weight="700">${Math.round(v)}</text>`);
+  }
+  // Labels x (datas espaçadas)
+  const stepLbl = Math.max(1,Math.round(dias.length/8));
+  const xLabels = dias.map((d,i)=>{
+    if(i % stepLbl !== 0 && i !== dias.length-1) return '';
+    const x = PAD_L + i*bw;
+    return `<text x="${x}" y="${H-10}" font-size="9" text-anchor="middle" fill="#7a7772" font-weight="700">${_fD(d)}</text>`;
+  }).join('');
+  // Linhas por vendedor
+  const linhas = vendedores.map((v,idx)=>{
+    const cor = CORES[idx%CORES.length];
+    const pontos = dias.map((d,i)=>{
+      const x = PAD_L + i*bw;
+      const qtd = v.porDia[d]?.qtd||0;
+      const y = PAD_T + chartH - (qtd/maxQtdDia)*chartH;
+      return `${x},${y}`;
+    }).join(' ');
+    const circulos = dias.map((d,i)=>{
+      const qtd = v.porDia[d]?.qtd||0;
+      if(qtd === 0) return '';
+      const x = PAD_L + i*bw;
+      const y = PAD_T + chartH - (qtd/maxQtdDia)*chartH;
+      return `<circle cx="${x}" cy="${y}" r="3" fill="${cor}"><title>${v.nome} em ${_fD(d)}: ${qtd} venda${qtd!==1?'s':''}</title></circle>`;
+    }).join('');
+    return `<polyline points="${pontos}" fill="none" stroke="${cor}" stroke-width="2" opacity="0.9"/>${circulos}`;
+  }).join('');
+  // Legenda à direita
+  const legY = PAD_T;
+  const legenda = vendedores.map((v,idx)=>{
+    const cor = CORES[idx%CORES.length];
+    const y = legY + idx*18;
+    return `<line x1="${W-PAD_R+8}" y1="${y+6}" x2="${W-PAD_R+24}" y2="${y+6}" stroke="${cor}" stroke-width="2"/>
+            <text x="${W-PAD_R+28}" y="${y+9}" font-size="10" fill="#1d1d1f" font-weight="800">${_esc(v.nome)}</text>
+            <text x="${W-PAD_R+28}" y="${y+20}" font-size="9" fill="#8e8e93" font-weight="700">${v.totalQtd} vendas</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:100%;height:auto" preserveAspectRatio="xMidYMid meet">
+    ${yLabels.join('')}
+    ${xLabels}
+    ${linhas}
+    ${legenda}
+  </svg>`;
+}
+// Helper esc dedicado (evita conflito com esc do app, que requer html entity encoding em certos lugares)
+function _esc(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
 // v10: Progresso GERAL da loja no mês (meta total × realizado)
 function _dashProgressoLoja(mesStr, famFiltro){
   const vendasMes = (window.produtos||[]).filter(p=>{
@@ -4008,6 +4524,161 @@ function _dashTopFornecedoresMes(mesStr, famFiltro){
     map.set(key, cur);
   });
   return [...map.values()].sort((a,b)=>b.qtd-a.qtd || b.valor-a.valor).slice(0,8);
+}
+
+// v11: Cálculo de COMISSÃO por vendedor no mês
+// Regra:
+// 1. Faixa cheia — todos os aparelhos valem o valor da faixa atingida pela qtd TOTAL do vendedor
+// 2. ATACADO (vendedor começa com 'ATACADO') NÃO entra na contagem nem recebe comissão
+// 3. OpenBox CONTA pra faixa + ADICIONA R$ openBoxExtra extra por aparelho
+// 4. Só calcula pros vendedores em window.comissaoConfig.vendedoresElegiveis
+function _dashComissaoMes(mesStr, famFiltro){
+  const cfg = window.comissaoConfig || {tabela:[], openBoxExtra:25, vendedoresElegiveis:[]};
+  const elegiveis = new Set((cfg.vendedoresElegiveis||[]).map(n=>String(n).toUpperCase().trim()));
+  const tabela = (cfg.tabela||[]).slice().sort((a,b)=>a.min-b.min);
+  const openBoxExtra = typeof cfg.openBoxExtra === 'number' ? cfg.openBoxExtra : 25;
+  // Agrupa vendas por vendedor (excluindo atacado)
+  const map = new Map();
+  (window.produtos||[]).forEach(p=>{
+    if(!p.dataVenda) return;
+    if(!String(p.dataVenda).startsWith(mesStr)) return;
+    if(famFiltro && p.familia !== famFiltro) return;
+    const vend = String(p.vendedor||'').toUpperCase().trim();
+    if(!vend) return;
+    if(vend.startsWith('ATACADO')) return; // atacado não gera comissão
+    const cond = String(p.condicao||'').toUpperCase().trim();
+    const isOpenBox = cond === 'OPEN BOX';
+    const cur = map.get(vend) || {nome: vend, qtd:0, qtdOpenBox:0, fat:0};
+    cur.qtd++;
+    if(isOpenBox) cur.qtdOpenBox++;
+    cur.fat += _num(p.valorSaida);
+    map.set(vend, cur);
+  });
+  // Também adiciona elegíveis que não venderam ainda nesse mês (pra aparecer com 0)
+  elegiveis.forEach(ev=>{
+    if(!map.has(ev)) map.set(ev, {nome: ev, qtd:0, qtdOpenBox:0, fat:0});
+  });
+  // Calcula valor por faixa
+  const _valorPorFaixa = (qtd)=>{
+    if(qtd <= 0) return 0;
+    for(const f of tabela){
+      if(qtd >= f.min && qtd <= f.max) return _num(f.valor);
+    }
+    // Se acima da última faixa, retorna o maior valor
+    if(tabela.length) return _num(tabela[tabela.length-1].valor);
+    return 0;
+  };
+  const resultado = [];
+  map.forEach(v=>{
+    const elegivel = elegiveis.size === 0 || elegiveis.has(v.nome);
+    const valorFaixa = _valorPorFaixa(v.qtd);
+    const comissaoBase = valorFaixa * v.qtd;
+    const comissaoOpenBox = openBoxExtra * v.qtdOpenBox;
+    const total = elegivel ? (comissaoBase + comissaoOpenBox) : 0;
+    resultado.push({
+      ...v,
+      elegivel,
+      valorFaixa,
+      comissaoBase,
+      comissaoOpenBox,
+      comissaoTotal: total,
+    });
+  });
+  // Ordena: elegíveis primeiro, maior comissão primeiro, maior qtd em caso de empate
+  return resultado.sort((a,b)=>{
+    if(a.elegivel !== b.elegivel) return a.elegivel ? -1 : 1;
+    return b.comissaoTotal - a.comissaoTotal || b.qtd - a.qtd;
+  });
+}
+// Abre o modal de configuração de comissão (só admin)
+function abrirConfigComissao(){
+  if(!isAdmin()){ toast('🔐 Só admin pode editar as regras de comissão.'); return; }
+  comissaoConfigRender();
+  const mdl = document.getElementById('mComissao');
+  if(mdl) mdl.classList.add('on');
+}
+function comissaoConfigRender(){
+  const cfg = window.comissaoConfig;
+  // Tabela de faixas
+  const tblFaixas = document.getElementById('comFaixasTbl');
+  if(tblFaixas){
+    tblFaixas.innerHTML = `
+      <thead><tr><th style="width:40px">#</th><th style="width:80px">Mín</th><th style="width:80px">Máx</th><th>R$ por aparelho</th><th style="width:60px"></th></tr></thead>
+      <tbody>
+        ${cfg.tabela.map((f,i)=>`
+          <tr>
+            <td style="font-weight:800;color:var(--txt2)">${i+1}</td>
+            <td><input type="number" min="0" value="${f.min}" data-i="${i}" data-k="min" oninput="comissaoAlterarFaixa(this)" style="width:70px;padding:5px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:inherit;font-size:12px;font-weight:700;text-align:center"></td>
+            <td><input type="number" min="0" value="${f.max===9999?'∞':f.max}" data-i="${i}" data-k="max" oninput="comissaoAlterarFaixa(this)" style="width:70px;padding:5px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:inherit;font-size:12px;font-weight:700;text-align:center"></td>
+            <td><input type="number" min="0" step="1" value="${f.valor}" data-i="${i}" data-k="valor" oninput="comissaoAlterarFaixa(this)" style="width:90px;padding:5px 8px;border:1.5px solid var(--brd);border-radius:6px;font-family:inherit;font-size:12px;font-weight:800;color:var(--verde)"></td>
+            <td><button onclick="comissaoRemoverFaixa(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:16px">🗑</button></td>
+          </tr>`).join('')}
+      </tbody>`;
+  }
+  // Open Box
+  const inpOB = document.getElementById('comOpenBox');
+  if(inpOB) inpOB.value = cfg.openBoxExtra;
+  // Vendedores elegíveis
+  const lstV = document.getElementById('comVendList');
+  if(lstV){
+    lstV.innerHTML = cfg.vendedoresElegiveis.map((v,i)=>`
+      <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg);padding:6px 10px;border-radius:20px;margin:3px;font-size:12px;font-weight:700">
+        👤 ${esc(v)} <button onclick="comissaoRemoverVend(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:14px">×</button>
+      </span>`).join('') || '<span style="color:var(--txt2);font-size:11px;font-style:italic">Nenhum — comissão não será calculada</span>';
+  }
+}
+function comissaoAlterarFaixa(inp){
+  const i = parseInt(inp.getAttribute('data-i'));
+  const k = inp.getAttribute('data-k');
+  if(!window.comissaoConfig.tabela[i]) return;
+  const v = String(inp.value).trim();
+  if(k === 'max' && (v === '' || v === '∞' || v === 'inf')){
+    window.comissaoConfig.tabela[i].max = 9999;
+  } else {
+    window.comissaoConfig.tabela[i][k] = _num(v);
+  }
+}
+function comissaoAdicionarFaixa(){
+  if(!window.comissaoConfig.tabela) window.comissaoConfig.tabela = [];
+  const ult = window.comissaoConfig.tabela[window.comissaoConfig.tabela.length-1];
+  const nextMin = ult ? (ult.max === 9999 ? 9999 : ult.max + 1) : 0;
+  window.comissaoConfig.tabela.push({min: nextMin, max: nextMin + 10, valor: ult ? ult.valor : 0});
+  comissaoConfigRender();
+}
+function comissaoRemoverFaixa(i){
+  if(!confirm('Remover esta faixa?')) return;
+  window.comissaoConfig.tabela.splice(i,1);
+  comissaoConfigRender();
+}
+function comissaoAdicionarVend(){
+  const nv = prompt('Nome do vendedor (ex: FELIPE DIAS):');
+  if(!nv || !nv.trim()) return;
+  const nome = nv.trim().toUpperCase();
+  if(!window.comissaoConfig.vendedoresElegiveis.includes(nome)){
+    window.comissaoConfig.vendedoresElegiveis.push(nome);
+  }
+  comissaoConfigRender();
+}
+function comissaoRemoverVend(i){
+  window.comissaoConfig.vendedoresElegiveis.splice(i,1);
+  comissaoConfigRender();
+}
+async function comissaoSalvarConfig(){
+  if(!isAdmin()){ toast('🔐 Só admin pode salvar.'); return; }
+  // Valida Open Box
+  const inpOB = document.getElementById('comOpenBox');
+  if(inpOB) window.comissaoConfig.openBoxExtra = _num(inpOB.value);
+  // Ordena tabela por min
+  window.comissaoConfig.tabela.sort((a,b)=>a.min-b.min);
+  try {
+    await comissaoSalvarFirebase();
+    toast('✅ Regra de comissão salva!');
+    const mdl = document.getElementById('mComissao');
+    if(mdl) mdl.classList.remove('on');
+    renderDash();
+  } catch(e){
+    alert('Erro ao salvar: '+e.message);
+  }
 }
 
 // Filtrar produtos parados por faixa (abre estoque com filtro)
@@ -4104,8 +4775,8 @@ function metasSalvar(){
 // ═════════════════════════════════════════════════════════════
 
 function gerarPdfFechamento(){
-  // v10: admin E financeiro podem gerar
-  if(!podeDashboard()){ toast('🔐 Sem permissão pra fechamento.'); return; }
+  // v11: PDF do fechamento é só pra admin/financeiro (contém lucro, margem, custo)
+  if(!podeVerLucro()){ toast('🔐 PDF do fechamento só pra admin/financeiro.'); return; }
   const fam = document.getElementById('dashFam').value || '';
   // v9: usa a data selecionada no seletor "Fechamento do dia" (não sempre hoje)
   const dashDiaEl = document.getElementById('dashDia');
@@ -5180,6 +5851,16 @@ window.dashDiaHoje=dashDiaHoje;
 window.abrirMetas=abrirMetas;
 window.isFin=isFin;
 window.podeDashboard=podeDashboard;
+window.podeVerLucro=podeVerLucro;
+window.abrirConfigComissao=abrirConfigComissao;
+window.comissaoConfigRender=comissaoConfigRender;
+window.comissaoAlterarFaixa=comissaoAlterarFaixa;
+window.comissaoAdicionarFaixa=comissaoAdicionarFaixa;
+window.comissaoRemoverFaixa=comissaoRemoverFaixa;
+window.comissaoAdicionarVend=comissaoAdicionarVend;
+window.comissaoRemoverVend=comissaoRemoverVend;
+window.comissaoSalvarConfig=comissaoSalvarConfig;
+window._dashComissaoMes=_dashComissaoMes;
 window.metasRender=metasRender;
 window.metasSalvar=metasSalvar;
 window.metasAdicionarVendedor=metasAdicionarVendedor;
@@ -5349,6 +6030,29 @@ if(db) {
     },
     error => {
       if(error.code !== 'PERMISSION_DENIED') console.warn('formas pagto load:', error);
+    }
+  );
+
+  // v11: Listener de COMISSÃO config (nó separado)
+  onValue(
+    ref(db,'comissao_config_revend'),
+    snap => {
+      const v = snap.val();
+      if(v && typeof v === 'object' && Array.isArray(v.tabela) && v.tabela.length){
+        window.comissaoConfig = {
+          tabela: v.tabela,
+          openBoxExtra: typeof v.openBoxExtra === 'number' ? v.openBoxExtra : 25,
+          vendedoresElegiveis: Array.isArray(v.vendedoresElegiveis) ? v.vendedoresElegiveis : ['FELIPE DIAS','STEPHANIE'],
+        };
+      }
+      window._fbLoadedComissao = true;
+      if(typeof renderDash === 'function' && typeof podeDashboard === 'function' && podeDashboard()){
+        try { renderDash(); } catch(e){}
+      }
+    },
+    error => {
+      if(error.code !== 'PERMISSION_DENIED') console.warn('comissao load:', error);
+      window._fbLoadedComissao = true; // mesmo com erro, permite salvar depois
     }
   );
 
