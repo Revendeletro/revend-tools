@@ -248,6 +248,11 @@
         }
         .proposta-item-nome { font-weight: 700; font-size: 13px; color: #1a1a1a; }
         .proposta-item-preco { font-size: 13px; font-weight: 700; color: #065f46; }
+        .proposta-desc { display:flex; align-items:center; gap:6px; margin-top:6px; }
+        .proposta-desc label { font-size:11px; font-weight:700; color:#b45309; white-space:nowrap; }
+        .proposta-desc input { width:110px; padding:5px 8px; border:1.5px solid #fcd34d; border-radius:8px; font-size:12px; font-weight:700; color:#92400e; background:#fffbeb; outline:none; }
+        .proposta-desc input:focus { border-color:#f59e0b; }
+        .proposta-item-orig { text-decoration: line-through; color:#aaa; font-size:11px; margin-right:4px; }
         .proposta-item-rm { background: none; border: none; color: #ccc; cursor: pointer; font-size: 16px; padding: 0 4px; line-height: 1; }
         .proposta-item-rm:hover { color: var(--red); }
         .proposta-total {
@@ -717,6 +722,30 @@ const SENHA_GESTOR = "Revend@2026";
 // ════════════════════════════════════════════
 const catalog = [
     {
+        id: "iphone18",
+        tab: "🚀 iPhone 18",
+        groups: [
+            { title: "iPhone 18 — LACRADO · Garantia 1 ano Apple", items: [
+                "iPhone 18 Pro 256GB",
+                "iPhone 18 Pro 512GB",
+                "iPhone 18 Pro 1TB",
+                "iPhone 18 Pro Max 256GB",
+                "iPhone 18 Pro Max 512GB",
+                "iPhone 18 Pro Max 1TB",
+                "iPhone 18 Pro Max 2TB",
+            ]},
+            { title: "iPhone 18 — SEM CAIXA · Garantia 6 meses", items: [
+                "iPhone 18 Pro 256GB (SC)",
+                "iPhone 18 Pro 512GB (SC)",
+                "iPhone 18 Pro 1TB (SC)",
+                "iPhone 18 Pro Max 256GB (SC)",
+                "iPhone 18 Pro Max 512GB (SC)",
+                "iPhone 18 Pro Max 1TB (SC)",
+                "iPhone 18 Pro Max 2TB (SC)",
+            ]},
+        ]
+    },
+    {
         id: "iphone17",
         tab: "🔥 iPhone 17",
         groups: [
@@ -930,6 +959,12 @@ const catalog = [
                 "iPad Pro M5 13\" 512GB WiFi",
                 "iPad Pro M5 13\" 512GB WiFi + CEL",
             ]},
+            // ⚠️ Novos grupos SEMPRE no final (o Firebase guarda o índice do grupo)
+            { title: "Apple Pencil — LACRADO · Garantia 1 ano Apple", items: [
+                "Apple Pencil Pro",
+                "Apple Pencil USB-C",
+                "Apple Pencil 2ª Geração",
+            ]},
         ]
     },
     {
@@ -983,6 +1018,9 @@ const catalog = [
                 "iMac M4 24\" 16GB 256GB",
                 "iMac M4 24\" 16GB 512GB",
                 "iMac M4 24\" 24GB 512GB",
+            ]},
+            // ⚠️ Novo grupo no final do array; "ordem" só muda a posição na tela
+            { title: "MacBook Neo — LACRADO · Garantia 1 ano Apple", ordem: 0.5, rotaNome: /\bneo\b/i, items: [
             ]},
         ]
     },
@@ -1412,7 +1450,7 @@ function catalogoEfetivo() {
     // Faz uma cópia profunda do catalog base
     const eff = catalog.map(sec => ({
         ...sec,
-        groups: sec.groups.map(g => ({ ...g, items: [...g.items] }))
+        groups: sec.groups.map((g, i) => ({ ...g, _idx: i, items: [...g.items] }))
     }));
     // Insere produtos novos vindos do Firebase, em ordem determinística por criadoEm
     const entradasOrdenadas = Object.entries(_prodNovos).sort((a, b) => {
@@ -1424,7 +1462,7 @@ function catalogoEfetivo() {
         if (!info || !info.tabId || !info.nome) return;
         const sec = eff.find(s => s.id === info.tabId);
         if (!sec) return;
-        const gi = (typeof info.grupoIdx === 'number' && sec.groups[info.grupoIdx]) ? info.grupoIdx : 0;
+        const gi = grupoDestino(sec, info);
         // evita duplicar (caso o item já exista no catálogo base)
         const jaExiste = sec.groups.some(g => g.items.some(it => itemKey(sec.id, it) === key));
         if (!jaExiste) {
@@ -1451,7 +1489,20 @@ function catalogoEfetivo() {
             g.items.sort((a, b) => _cmpProduto(a, b));
         });
     });
+    // Ordem de exibição: grupos com "ordem" (ex.: Mac Neo = 0.5) entram na posição desejada.
+    // O índice real continua em g._idx (usado ao adicionar produto no grupo).
+    eff.forEach(sec => {
+        sec.groups.sort((a, b) => (a.ordem ?? a._idx) - (b.ordem ?? b._idx));
+    });
     return eff;
+}
+
+// Decide em qual grupo um produto novo (Firebase) aparece.
+// Grupos com "rotaNome" capturam produtos pelo nome (ex.: Macbook Neo cadastrado antes no grupo Mac Mini).
+function grupoDestino(sec, info) {
+    const porNome = sec.groups.findIndex(g => g.rotaNome && g.rotaNome.test(info.nome || ''));
+    if (porNome >= 0) return porNome;
+    return (typeof info.grupoIdx === 'number' && sec.groups[info.grupoIdx]) ? info.grupoIdx : 0;
 }
 
 function itemKey(tabId, itemName) {
@@ -1557,6 +1608,7 @@ function paleta(tabId, itemName) {
     const n = itemName.toUpperCase();
     if (tabId === 'acessorios') return null; // acessórios nunca têm cores
     if (tabId === 'watch') return 'watch';
+    if (/PENCIL/.test(n))  return null;   // Apple Pencil — sem variação de cor
     if (tabId === 'ipad')  return 'ipad';
     if (tabId === 'mac')   return 'mac';
     // iPhones
@@ -1846,7 +1898,7 @@ function renderAll() {
 
             html += `</tbody></table>
                 <div class="grupo-add-row">
-                    <button class="grupo-add-btn" onclick="abrirModalNovo('${section.id}',${grupoIdx})">➕ Adicionar produto neste grupo</button>
+                    <button class="grupo-add-btn" onclick="abrirModalNovo('${section.id}',${group._idx ?? grupoIdx})">➕ Adicionar produto neste grupo</button>
                 </div>
             </div>`;
         });
@@ -2480,7 +2532,48 @@ window.exportarParcImagem = exportarParcImagem;
 // ════════════════════════════════════════════
 // PROPOSTA — SELEÇÃO DE PRODUTOS
 // ════════════════════════════════════════════
-let proposta = {}; // { key: { nome, avista, credito } }
+let proposta = {}; // { key: { nome, avista, credito, desconto } }
+
+// ── DESCONTO POR PRODUTO (R$) — definido pelo vendedor na proposta ──
+function descontoItem(item) { return Math.max(0, Number(item && item.desconto) || 0); }
+// Aplica o desconto do item sobre um valor (nunca negativo)
+function comDesconto(item, valor) { return Math.max(0, (valor || 0) - descontoItem(item)); }
+// Preço à vista do item já com desconto
+function precoItem(item) { return comDesconto(item, item.avista); }
+
+// Digitação no campo: atualiza só o preço exibido (sem re-renderizar, mantém o foco)
+function setDescontoInput(key, el) {
+    const item = proposta[key];
+    if (!item) return;
+    let v = String(el.value || '').replace(/R\$\s*/g, '').trim();
+    if (!v.includes(',') && /^\d{1,3}(\.\d{3})+$/.test(v)) v = v.replace(/\./g, ''); // "1.000" = mil
+    item.desconto = Math.min(parseBRL(v) || 0, item.avista || 0);
+    const pv = document.getElementById('pp_' + key);
+    if (pv) {
+        pv.innerHTML = descontoItem(item) > 0
+            ? `<span class="proposta-item-orig">${fmtBRL(item.avista)}</span>${fmtBRL(precoItem(item))}`
+            : fmtBRL(item.avista);
+    }
+}
+window.setDescontoInput = setDescontoInput;
+// Ao sair do campo: re-renderiza painel (total, parcelamento rápido)
+function setDescontoCommit(key, el) {
+    setDescontoInput(key, el);
+    const item = proposta[key];
+    if (item && descontoItem(item) > 0) el.value = fmtBRL(item.desconto).replace(/^R\$\s*/, '');
+    else el.value = '';
+    // Re-renderiza depois que o foco já mudou e devolve o foco ao campo clicado
+    // (ex.: vendedor sai do desconto de um item direto para o desconto de outro)
+    setTimeout(() => {
+        const alvo = document.activeElement && document.activeElement.id;
+        atualizarProposta();
+        if (alvo && alvo.startsWith('desc_')) {
+            const novo = document.getElementById(alvo);
+            if (novo) { novo.focus(); novo.select && novo.select(); }
+        }
+    }, 0);
+}
+window.setDescontoCommit = setDescontoCommit;
 
 function toggleSel(checkbox) {
     const row = checkbox.closest('tr');
@@ -2490,7 +2583,7 @@ function toggleSel(checkbox) {
     const credito = parseFloat(row.getAttribute('data-credito')) || avista;
 
     if (checkbox.checked) {
-        proposta[key] = { nome, avista, credito, key };
+        proposta[key] = { nome, avista, credito, key, desconto: 0 };
         row.classList.add('selecionado');
     } else {
         delete proposta[key];
@@ -2550,8 +2643,16 @@ function atualizarProposta() {
                 </div>
                 <div class="proposta-item-nome">${item.nome}</div>
                 <div style="font-size:11px;color:#888;margin-top:2px;">
-                    💰 <span class="proposta-item-preco">${fmtBRL(item.avista)}</span>
-                    ${item.credito && item.credito !== item.avista ? `&nbsp;·&nbsp;💳 <span style="color:#1d4ed8;font-weight:700">${fmtBRL(item.credito)}</span>` : ''}
+                    💰 <span class="proposta-item-preco" id="pp_${keys[idx]}">${descontoItem(item) > 0 ? `<span class="proposta-item-orig">${fmtBRL(item.avista)}</span>${fmtBRL(precoItem(item))}` : fmtBRL(item.avista)}</span>
+                    ${item.credito && item.credito !== item.avista && !descontoItem(item) ? `&nbsp;·&nbsp;💳 <span style="color:#1d4ed8;font-weight:700">${fmtBRL(item.credito)}</span>` : ''}
+                </div>
+                <div class="proposta-desc">
+                    <label for="desc_${keys[idx]}">🏷️ Desconto R$</label>
+                    <input id="desc_${keys[idx]}" type="text" inputmode="decimal" placeholder="0,00"
+                        value="${descontoItem(item) > 0 ? fmtBRL(item.desconto).replace(/^R\$\s*/, '') : ''}"
+                        oninput="setDescontoInput('${keys[idx]}', this)"
+                        onchange="setDescontoCommit('${keys[idx]}', this)"
+                        onkeydown="if(event.key==='Enter'){this.blur();}">
                 </div>
             </div>
             <button class="proposta-item-rm" onclick="removerItem('${keys[idx]}')" title="Remover">✕</button>
@@ -2563,7 +2664,7 @@ function atualizarProposta() {
     const totalEl = document.getElementById('propostaTotal');
     if (itens.length === 1) {
         totalEl.closest('.proposta-total').style.display = 'flex';
-        totalEl.textContent = fmtBRL(itens[0].avista);
+        totalEl.textContent = fmtBRL(precoItem(itens[0]));
         const spanLabel = totalEl.closest('.proposta-total').querySelector('span');
         if (spanLabel) spanLabel.textContent = '💰 Valor à vista:';
     } else {
@@ -2582,18 +2683,19 @@ function atualizarProposta() {
         const { tipo, geracao } = detectarTipoProduto(item.nome);
         const nomeExib = item.nome.replace(/\s+SC\s*$/i,'').replace(/\s+CPO\s*$/i,'').trim();
 
+        const avItem = precoItem(item); // já com desconto do vendedor
         if (tipo === 'sc') {
             // Sem Caixa
-            const vlSC = Math.max(0, (item.avista||0) - upgradeVal);
-            opcoes.push({ label: nomeExib + ' · Sem Caixa', valor: vlSC, original: item.avista });
+            const vlSC = Math.max(0, avItem - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Sem Caixa', valor: vlSC, original: avItem });
             // Open Box automático
             const acrescimo = geracao >= 15 ? 300 : 250;
-            const vlOB = Math.max(0, (item.avista||0) + acrescimo - upgradeVal);
-            opcoes.push({ label: nomeExib + ' · Open Box', valor: vlOB, original: item.avista + acrescimo });
+            const vlOB = Math.max(0, comDesconto(item, (item.avista||0) + acrescimo) - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Open Box', valor: vlOB, original: comDesconto(item, (item.avista||0) + acrescimo) });
         } else {
             // Lacrado / CPO
-            const vlLac = Math.max(0, (item.avista||0) - upgradeVal);
-            opcoes.push({ label: nomeExib + ' · Lacrado', valor: vlLac, original: item.avista });
+            const vlLac = Math.max(0, avItem - upgradeVal);
+            opcoes.push({ label: nomeExib + ' · Lacrado', valor: vlLac, original: avItem });
         }
     });
 
@@ -2794,6 +2896,42 @@ function gerarMensagem() {
         // Helper: preço com upgrade subtraído (nunca negativo)
         function precoFinal(valor) { return Math.max(0, (valor || 0) - valorUpgrade); }
 
+        // Linha de preço: considera desconto do vendedor (por item) + upgrade
+        // Preço cheio de cada cor ativa (cor sem preço próprio usa o preço do produto)
+        function precosCores(item, acrescimo) {
+            return coresAtivas(item.key).map(c => ({ nome: c.nome, cheio: (Number(c.avista) || item.avista || 0) + acrescimo }));
+        }
+        // Linha de preço: "A partir de" (menor preço entre as cores) quando as cores têm preços diferentes.
+        // Considera desconto do vendedor (por item) + upgrade.
+        function linhaPreco(item, acrescimo, negrito) {
+            const cores = precosCores(item, acrescimo);
+            const valores = cores.length > 1 ? cores.map(c => c.cheio) : [(item.avista || 0) + acrescimo];
+            const valorCheio = Math.min(...valores);
+            const aPartir = new Set(valores.map(v => v.toFixed(2))).size > 1 ? 'A partir de ' : '';
+            const final = precoFinal(comDesconto(item, valorCheio));
+            if (valorUpgrade || descontoItem(item) > 0) {
+                return `💰 ${aPartir}~~${fmtBRL(valorCheio)}~~ → *${fmtBRL(final)}*\n`;
+            }
+            return negrito ? `💰 ${aPartir}*${fmtBRL(valorCheio)}*\n` : `💰 ${aPartir}${fmtBRL(valorCheio)}\n`;
+        }
+        // Cores agrupadas por preço (mais barata primeiro); mesmo preço → "Azul | Branco | Roxo (R$ X)"
+        function linhaCores(item, acrescimo) {
+            const cores = precosCores(item, acrescimo);
+            if (cores.length <= 1) return '';
+            const grupos = new Map(); // preço final → { v, nomes }
+            cores.forEach(c => {
+                const v = precoFinal(comDesconto(item, c.cheio));
+                const k = v.toFixed(2);
+                if (!grupos.has(k)) grupos.set(k, { v, nomes: [] });
+                grupos.get(k).nomes.push(c.nome);
+            });
+            const coresTxt = [...grupos.values()]
+                .sort((a, b) => a.v - b.v)
+                .map(g => `${g.nomes.join(' | ')} (${fmtBRL(g.v)})`)
+                .join(' · ');
+            return `🎨 Cores: · ${coresTxt}\n`;
+        }
+
         // Bloco de upgrade — inserido antes dos preços se tiver valor (mantido vazio, já usado acima)
         function blocoUpgrade() {
             return '';
@@ -2803,48 +2941,29 @@ function gerarMensagem() {
         // 1. SEM CAIXA
         if (porTipo.sc && porTipo.sc.length) {
             msg += `\n *Sem Caixa*\n`;
-            porTipo.sc.forEach(item => {
+            porTipo.sc.forEach((item, i) => {
+                if (i > 0) msg += `\n`; // linha em branco entre um modelo e outro
                 const storage = extrairStorage(item.nome);
                 msg += `${emojiTipo('sc')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
-                if (valorUpgrade) {
-                    msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(precoFinal(item.avista))}*\n`;
-                } else {
-                    msg += `💰 *${fmtBRL(item.avista)}*\n`;
-                }
-                const cores = coresAtivas(item.key);
-                if (cores.length > 1) {
-                    const coresTxt = cores.map(c => {
-                        const base = c.avista || item.avista;
-                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista)})` : c.nome);
-                    }).join(' · ');
-                    msg += `🎨 Cores: ${coresTxt}\n`;
-                }
+                msg += linhaPreco(item, 0, true);
+                msg += linhaCores(item, 0);
             });
+            msg += `\n`; // linha em branco antes das vantagens
             bulletsTipo('sc', menorGer).forEach(b => { msg += `✅ ${b}\n`; });
         }
 
         // 2. OPEN BOX — gerado automaticamente a partir dos itens SC
         if (porTipo.sc && porTipo.sc.length) {
-            msg += `\n\n *Open Box*\n`;
-            porTipo.sc.forEach(item => {
+            msg += `\n *Open Box*\n`;
+            porTipo.sc.forEach((item, i) => {
+                if (i > 0) msg += `\n`; // linha em branco entre um modelo e outro
                 const storage = extrairStorage(item.nome);
                 msg += `${emojiTipo('openbox')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
                 const acrescimo = item.geracao >= 15 ? 300 : 250;
-                const precoOB = (item.avista || 0) + acrescimo;
-                if (valorUpgrade) {
-                    msg += `💰 ~~${fmtBRL(precoOB)}~~ → *${fmtBRL(precoFinal(precoOB))}*\n`;
-                } else {
-                    msg += `💰 ${fmtBRL(precoOB)}\n`;
-                }
-                const cores = coresAtivas(item.key);
-                if (cores.length > 1) {
-                    const coresTxt = cores.map(c => {
-                        const base = (c.avista || item.avista) + acrescimo;
-                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista + acrescimo)})` : c.nome);
-                    }).join(' · ');
-                    msg += `🎨 Cores: ${coresTxt}\n`;
-                }
+                msg += linhaPreco(item, acrescimo, false);
+                msg += linhaCores(item, acrescimo);
             });
+            msg += `\n`; // linha em branco antes das vantagens
             const gerOB = porTipo.sc[0].geracao || menorGer;
             bulletsTipo('openbox', gerOB).forEach(b => { msg += `✅ ${b}\n`; });
         }
@@ -2852,23 +2971,14 @@ function gerarMensagem() {
         // 3. LACRADO
         if (porTipo.lacrado && porTipo.lacrado.length) {
             msg += `\n\n *Lacrado (Novo)*\n`;
-            porTipo.lacrado.forEach(item => {
+            porTipo.lacrado.forEach((item, i) => {
+                if (i > 0) msg += `\n`; // linha em branco entre um modelo e outro
                 const storage = extrairStorage(item.nome);
                 msg += `${emojiTipo('lacrado')} ${nomeBase(modeloBase(item.nome))}${storage ? ' – ' + storage : ''}\n`;
-                if (valorUpgrade) {
-                    msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(precoFinal(item.avista))}*\n`;
-                } else {
-                    msg += `💰 ${fmtBRL(item.avista)}\n`;
-                }
-                const cores = coresAtivas(item.key);
-                if (cores.length > 1) {
-                    const coresTxt = cores.map(c => {
-                        const base = c.avista || item.avista;
-                        return valorUpgrade ? `${c.nome} (${fmtBRL(precoFinal(base))})` : (c.avista ? `${c.nome} (${fmtBRL(c.avista)})` : c.nome);
-                    }).join(' · ');
-                    msg += `🎨 Cores: ${coresTxt}\n`;
-                }
+                msg += linhaPreco(item, 0, false);
+                msg += linhaCores(item, 0);
             });
+            msg += `\n`; // linha em branco antes das vantagens
             bulletsTipo('lacrado', menorGer).forEach(b => { msg += `✅ ${b}\n`; });
         }
 
@@ -2879,22 +2989,31 @@ function gerarMensagem() {
         }
 
         // ── PARCELAMENTO NA PROPOSTA ──
-        // Mostra as principais opções de parcelamento do primeiro item com preço
-        const itenComPreco = itens.find(i => i.avista > 0);
+        // Simula sempre a opção MAIS BARATA da proposta (menor preço entre itens e cores, já com desconto)
+        function menorPrecoItem(item) {
+            const cores = precosCores(item, 0);
+            const cheio = cores.length > 1 ? Math.min(...cores.map(c => c.cheio)) : (item.avista || 0);
+            return comDesconto(item, cheio);
+        }
+        const itenComPreco = itens.filter(i => i.avista > 0)
+            .sort((a, b) => menorPrecoItem(a) - menorPrecoItem(b))[0];
         if (itenComPreco) {
-            const baseParc = Math.max(0, (itenComPreco.avista || 0) - valorUpgrade);
-            const nomeParc = nomeBase(modeloBase(itenComPreco.nome)) + (extrairStorage(itenComPreco.nome) ? ' ' + extrairStorage(itenComPreco.nome) : '');
+            const precoParc = menorPrecoItem(itenComPreco);
+            const baseParc = Math.max(0, precoParc - valorUpgrade);
+            const tiposNaProposta = new Set(itens.map(i => detectarTipoProduto(i.nome).tipo));
+            const condParc = tiposNaProposta.size > 1 ? ' · ' + labelTipo(detectarTipoProduto(itenComPreco.nome).tipo) : '';
+            const nomeParc = nomeBase(modeloBase(itenComPreco.nome)) + (extrairStorage(itenComPreco.nome) ? ' ' + extrairStorage(itenComPreco.nome) : '') + condParc;
             const opcParcDisplay = [1, 3, 6, 9, 12, 18];
             msg += `\n\n💳 *Simulação de Parcelamento${valorUpgrade ? ' (valor de diferença)' : ''}* — ${nomeParc}\n`;
             if (valorUpgrade) {
                 const nomeAp = modeloUpgrade || 'aparelho';
-                msg += `_${fmtBRL(itenComPreco.avista)} − ${fmtBRL(valorUpgrade)} (${nomeAp}) = ${fmtBRL(baseParc)}_\n`;
+                msg += `_${fmtBRL(precoParc)} − ${fmtBRL(valorUpgrade)} (${nomeAp}) = ${fmtBRL(baseParc)}_\n`;
             }
             msg += `\`\`\`\n`;
-            msg += `Débito  → ${fmtBRL(baseParc * (1 + TAXAS.debito))}\n`;
+            msg += `\`Débito  → ${fmtBRL(baseParc * (1 + TAXAS.debito))}\`\n`;
             opcParcDisplay.forEach(n => {
                 const total = baseParc * (1 + TAXAS[n]);
-                msg += `${String(n + 'x').padEnd(7)} → ${fmtBRL(total / n)}/mês  (total ${fmtBRL(total)})\n`;
+                msg += `\`${String(n + 'x').padEnd(7)} → ${fmtBRL(total / n)}/mês  (total ${fmtBRL(total)})\`\n`;
             });
             msg += `\`\`\``;
         }
@@ -2919,12 +3038,12 @@ function gerarMensagem() {
         }
         itens.forEach(item => {
             msg += `◼️ *${item.nome}*\n`;
-            if (valorUpgrade) {
-                msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(Math.max(0,(item.avista||0)-valorUpgrade))}*\n`;
+            if (valorUpgrade || descontoItem(item) > 0) {
+                msg += `💰 ~~${fmtBRL(item.avista)}~~ → *${fmtBRL(Math.max(0, precoItem(item) - valorUpgrade))}*\n`;
             } else {
                 msg += `💰 *${fmtBRL(item.avista)}*\n`;
             }
-            if (item.credito && item.credito !== item.avista)
+            if (item.credito && item.credito !== item.avista && !descontoItem(item))
                 msg += `💳 Crédito: ${fmtBRL(item.credito)}\n`;
             msg += `\n`;
         });
@@ -3113,7 +3232,7 @@ function abrirExtractPanel() {
 
     // Preencher dropdown de categorias
     const selectCat = document.getElementById('extractCategory');
-    if (!selectCat.querySelector('option[value="iphone17"]')) {
+    if (!selectCat.querySelector('option[value="' + catalog[0].id + '"]')) {
         catalog.forEach(sec => {
             const opt = document.createElement('option');
             opt.value = sec.id;
